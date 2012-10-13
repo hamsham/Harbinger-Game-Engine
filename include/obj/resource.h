@@ -9,78 +9,40 @@
 #define	__HGE_RESOURCE_H__
 namespace harbinger {
 
-template <typename type>
+template < typename type = c_script >
 class c_resourceManager {
-	private:
-		struct s_resource {
-			std::string	fileName;
-			std::string	filePath;
-			std::string	fileType;
-			type			data;
-		};
-		std::list<s_resource>	resourceList;
-		std::list<s_resource>	resourceCopies;
+	protected:
+		std::vector< type > resourceArray;
 		
-	public:
-		c_resourceManager() {};
-		c_resourceManager( const c_resourceManager& mgrCopy ) = 0;
-		virtual ~c_resourceManager() {};
-		virtual c_resourceManager& operator = (const c_resourceManager& mgrCopy ) = 0;
+	public://construction & destruction
+		c_resourceManager() {}
+		c_resourceManager( const c_resourceManager& mgrCopy ) {}
+		virtual ~c_resourceManager() = 0;
+		c_resourceManager& operator = (const c_resourceManager& mgrCopy ) {}
 		
-		//Loading Data
-		virtual bool		loadResource	( const char* fileName, const char* name = NULL ) = 0; // the name can be inferred by the filename
-		virtual void		unloadResource	( const char* name ) = 0;
+		//serialization
+		virtual bool save ( const char* configFile );
+		virtual bool load ( const char* configFile );
 		
-		//Resouce Acquisition
-		type*			getResource	( const char* name ) const;
-		type*			getNewInstance	( const char* name ) const;	//return a copy of a resource
-		virtual void		killInstance	( const type* instance );	//destroy a copy of a resource
-		virtual void		clearResources	();
+		//direct access
+		type operator[] ( size_t index ) const;
+		type& operator[] ( size_t index );
+		size_t getNumObjects() const;
+		
+		//meat & potatoes
+		virtual size_t addObject ( const type& objToAdd ); //manage an object
+		virtual void removeObject ( size_t objID );
 };
 
-//-----------------------------------------------------------------------------
-//			Resource Acquisition
-//-----------------------------------------------------------------------------
-template <typename type>
-type* c_resourceManager<type>::getResource(const char* name) const {
-	typename std::list<s_resource>::iterator iter = resourceList.begin();
-	while (iter != resourceList.end()) {
-		if (iter->fileName == name)
-			return iter->data;
-		++iter;
-	}
-	return NULL;
-}
-
-template <typename type>
-type* c_resourceManager<type>::getNewInstance(const char* name) const {
-	typename std::list<s_resource>::iterator iter = resourceList.begin();
-	while (iter != resourceList.end()) {
-		if (iter->fileName == name) {
-			resourceCopies.push_back( type() );
-			return resourceCopies.back();
-		}
-		++iter;
-	}
-	return NULL;
-}
-
-template <typename type>
-void c_resourceManager<type>::killInstance(const type* instance) {
-	typename std::list<s_resource>::iterator iter = resourceCopies.begin();
-	while (iter != resourceCopies.end()) {
-		if (&(iter->data) == instance) {
-			resourceCopies.erase( iter );
-			return;
-		}
-	}
-}
-
-template <typename type>
-void c_resourceManager<type>::clearResources() {
-	resourceList.clear();
-	resourceCopies.clear();
-}
+class c_FunctionManager : public c_resourceManager< c_script > {
+	private:
+		hamLibs::containers::dictionary scriptDict;
+		
+	public:
+		c_scriptManager() {}
+		c_scriptManager( const c_scriptManager& smCopy ) {}
+		virtual ~c_scriptManager() {}
+};
 
 } // end harbinger namespace
 #endif	/* __HGE_RESOURCE_H__ */

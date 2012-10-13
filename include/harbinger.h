@@ -8,30 +8,47 @@
 #ifndef	__HGE_HARBINGER_H__
 #define	__HGE_HARBINGER_H__
 
+#ifndef __cplusplus
+	#error "A C++ compiler is required to build the Harbinger Game Engine"
+#endif
+
+#include <vector>
+#include <string>
+#include <sstream>
+#include <cmath>
+#include <list>
+#include <queue>
+#include <glm/glm.hpp>
+#include <allegro5/allegro.h>
+#include <SFML/Graphics.hpp>
+#include <SFML/Window.hpp>
+#include "../../hamlibs/include/hamLibs.h"
+
 #ifndef NULL
 	#define NULL 0x0
 #endif
 
-#include <string>
-#include <cmath>
-#include <queue>
-#include <list>
-#include <allegro5/allegro.h>
-#include <glm/glm.hpp>
-#include <SFML/System/Thread.hpp>
-#include <SFML/Graphics.hpp>
-#include "../../hamlibs/include/hamLibs.h"
+//Header file with forward declarations
+#include "scripting/script.h"
 
 namespace harbinger {
+	//initialization
+	bool init();
+	
+	//forward declarations
 	class c_message;
 	class c_messenger;
 	class c_clock;
 	class c_entity;
 	class c_object;
-	template <typename type> class c_resourceManager;
-	template <int, int> class c_node;
-	template <int, int> class c_node_gui;
+	class c_serializer;
+	template < typename type> class c_resourceManager;
+	class c_scriptManager;
 } // end harbinger namespace
+
+#include "scripting/script_base.h"
+#include "scripting/script_variables.h"
+#include "scripting/script_functions.h"
 
 #include "events/message.h"
 
@@ -40,7 +57,5 @@ namespace harbinger {
 
 #include "obj/resource.h"
 #include "obj/object.h"
-
-#include "scripting/script.h"
 
 #endif	/* __HGE_HARBINGER_H__ */

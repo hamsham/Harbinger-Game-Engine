@@ -8,15 +8,19 @@
 #ifndef SCRIPT_BASE_H
 #define	SCRIPT_BASE_H
 
+#include "script.h"
+
+
 namespace harbinger {
 
 //-----------------------------------------------------------------------------
 //		Script Base Class
 //-----------------------------------------------------------------------------
 class c_script {
+	static const char* defaultName;
+	
 	protected:
 		std::string name;
-		std::string group;
 
 	public:
 		c_script();
@@ -24,12 +28,21 @@ class c_script {
 		~c_script();
 		virtual c_script& operator= ( const c_script& scriptCopy );
 		
-		const std::string& scriptName();
-		const std::string& scriptGroup();
+		virtual int getScriptType() const {
+			return SCRIPT_BASE;
+		}
+		virtual const char* getScriptTypeStr() const {
+			return "SCRIPT_BASE";
+		}
+		std::string& getName() const;
+		void setName( const std::string& inName );
+		virtual std::string toString() const;
+		virtual bool fromString( const std::string& inStr );
 };
 
 //-----------------------------------------------------------------------------
 //		Variable Base Classes
+//		All variables MUST support copy construction & assignment operators
 //-----------------------------------------------------------------------------
 template <typename type>
 class c_scriptVar : virtual public c_script {
@@ -46,9 +59,20 @@ class c_scriptVar : virtual public c_script {
 		c_scriptVar ( const type& varCopy );
 		c_scriptVar( const c_scriptVar& varCopy );
 		virtual ~c_scriptVar() = 0;
-		virtual c_scriptVar& operator = ( const c_scriptVar& varCopy );
+		virtual c_scriptVar& operator = ( const c_scriptVar<type>& varCopy );
 		virtual c_scriptVar& operator = ( const type& inVar );
-		virtual type& getData();
+		
+		virtual type& getData() const;
+		virtual void setData( const type& inData );
+		
+		virtual int getScriptType() const {
+			return SCRIPT_VAR | SCRIPT_BASE;
+		}
+		virtual const char* getScriptTypeStr() const {
+			return "SCRIPT_VAR";
+		}
+		virtual std::string toString() const;
+		virtual bool fromString( const std::string& inStr );
 };
 
 template <typename type>
@@ -71,9 +95,8 @@ template <typename type>
 c_scriptVar<type>::~c_scriptVar() {}
 
 template <typename type>
-c_scriptVar<type>& c_scriptVar<type>::operator= ( const c_scriptVar& varCopy ) {
+c_scriptVar<type>& c_scriptVar<type>::operator= ( const c_scriptVar<type>& varCopy ) {
 	name = varCopy.name;
-	group = varCopy.group;
 	data = varCopy.data;
 	return *this;
 }
@@ -85,12 +108,51 @@ c_scriptVar<type>& c_scriptVar<type>::operator= ( const type& inVar ) {
 }
 
 template <typename type>
-type& c_scriptVar<type>::getData() {
+type& c_scriptVar<type>::getData() const {
 	return data;
+}
+
+template <typename type>
+void c_scriptVar<type>::setData( const type& inData ) {
+	data = inData;
+}
+
+template <typename type>
+std::string c_scriptVar<type>::toString() const {
+	std::string retVal( c_script::toString() );
+	retVal.append( hamLibs::stringUtils::convertToString<type>( data ) );
+	return retVal;
+}
+
+template <typename type>
+bool c_scriptVar<type>::fromString(const std::string& inStr) {
+	std::string token;
+	std::istringstream parser( inStr );
+	bool ableToReadData( false );
+	
+	while ( parser.good() ) {
+		parser >> token;
+		
+		if ( token == "|" && ableToReadData = false ) {
+			ableToReadData = true;
+			continue;
+		}
+		else if ( token == getScriptTypeStr()  && ableToReadData = false ) {
+			parser >> name;
+			if ( name.size() == 0 )
+				return false;
+		}
+		else {
+			parser >> data;
+		}
+	}
+	parser.clear();
+	return true;
 }
 
 //-----------------------------------------------------------------------------
 //		Numerical Variable Base Class
+//		--Doesn't inherit anything
 //-----------------------------------------------------------------------------
 class c_scriptNum {
 	protected:
@@ -144,9 +206,19 @@ class c_scriptFunc : virtual public c_script {
 		c_scriptFunc();
 		c_scriptFunc( const c_scriptFunc& funcCopy );
 		virtual ~c_scriptFunc() = 0;
+		 
 		virtual const returnType* returnValue();
 		virtual void run() = 0;
 		virtual void tick( float timeElapsed = 0 ) = 0;
+		
+		virtual int getScriptType() const {
+			return SCRIPT_FUNC | SCRIPT_BASE;
+		}
+		virtual const char* getScriptTypeStr() const {
+			return "SCRIPT_FUNC";
+		}
+		virtual std::string toString() const = 0;
+		virtual bool fromString( const std::string& inStr ) = 0;
 };
 
 template <typename returnType>
@@ -179,6 +251,15 @@ class c_scriptEvaluation : public c_scriptFunc<bool> {
 		virtual ~c_scriptEvaluation() = 0;
 
 		const bool& evalResult() const;
+		
+		virtual int getScriptType() const {
+			return SCRIPT_FUNC_EVAL | SCRIPT_FUNC | SCRIPT_BASE;
+		}
+		virtual const char* getScriptTypeStr() const {
+			return "SCRIPT_FUNC_EVAL";
+		}
+		virtual std::string toString() const = 0;
+		virtual bool fromString( const std::string& inStr ) = 0;
 };
 
 } // end harbinger namespace

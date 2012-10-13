@@ -12,27 +12,58 @@ namespace harbinger {
 //-----------------------------------------------------------------------------
 //		Script Base Class
 //-----------------------------------------------------------------------------
-c_script::c_script() {}
+const char* c_script::defaultName = "???";
+
+c_script::c_script() :
+	name( defaultName )
+{}
 
 c_script::c_script( const c_script& scriptCopy ) :
-	name (scriptCopy.name),
-	group (scriptCopy.group)
+	name (scriptCopy.name)
 {}
 
 c_script::~c_script() {}
 
 c_script& c_script::operator= ( const c_script& scriptCopy ) {
 	name = scriptCopy.name;
-	group = scriptCopy.group;
 	return *this;
 }
 
-const std::string& c_script::scriptName() {
+std::string& c_script::getName() const {
 	return name;
 }
 
-const std::string& c_script::scriptGroup() {
-	return group;
+void c_script::setName( const std::string& inName ) {
+	name = inName;
+}
+
+std::string c_script::toString() const {
+	//the format is "TYPE NAME | data..."
+	std::string outStr ( getScriptTypeStr() );
+	outStr.push_back(' '); //always need whitespace
+	outStr.append( name );
+	outStr.append(" | "); //separator for use with derived classes
+	return outStr;
+}
+
+bool c_script::fromString(const std::string& inStr) {
+	std::string token;
+	std::istringstream parser( inStr );
+	
+	while ( parser.good() ) {
+		parser >> token;
+		
+		if ( token == "|") {
+			continue;
+		}
+		else if ( token == getScriptTypeStr() ) {
+			parser >> name;
+			if ( name.size() == 0 )
+				return false;
+		}
+	}
+	parser.clear();
+	return true;
 }
 
 //-----------------------------------------------------------------------------

@@ -43,6 +43,15 @@ class c_scriptNumEval : public c_scriptEvaluation {
 		
 		void run();
 		void tick( float timeElapsed = 0 );
+		
+		int getScriptType() const {
+			return SCRIPT_FUNC_NUM_EVAL | c_scriptEvaluation::getScriptType();
+		}
+		const char* getScriptTypeStr() const {
+			return "SCRIPT_FUNC_NUM_EVAL";
+		}
+		std::string toString() const;
+		bool fromString( const std::string& inStr );
 };
 
 //-----------------------------------------------------------------------------
@@ -77,6 +86,15 @@ class c_scriptMiscMath : public c_scriptFunc<float> {
 		
 		void run();
 		void tick( float timeElapsed = 0 );
+		
+		int getScriptType() const {
+			return SCRIPT_FUNC_NUM_MATH | c_scriptFunc::getScriptType();
+		}
+		const char* getScriptTypeStr() const {
+			return "SCRIPT_FUNC_NUM_MATH";
+		}
+		std::string toString() const;
+		bool fromString( const std::string& inStr );
 };
 
 //-----------------------------------------------------------------------------
@@ -113,6 +131,15 @@ class c_scriptArithmetic : public c_scriptFunc<c_scriptNum> {
 		
 		void run();
 		void tick( float timeElapsed = 0 );
+		
+		int getScriptType() const {
+			return SCRIPT_FUNC_NUM_ARITHMETIC | c_scriptFunc::getScriptType();
+		}
+		const char* getScriptTypeStr() const {
+			return "SCRIPT_FUNC_NUM_ARITHMETIC";
+		}
+		std::string toString() const;
+		bool fromString( const std::string& inStr );
 };
 
 //-----------------------------------------------------------------------------
@@ -152,6 +179,15 @@ class c_scriptTrigonometry : public c_scriptFunc<float> {
 		
 		void run();
 		void tick( float timeElapsed = 0 );
+		
+		int getScriptType() const {
+			return SCRIPT_FUNC_NUM_TRIG | c_scriptFunc::getScriptType();
+		}
+		const char* getScriptTypeStr() const {
+			return "SCRIPT_FUNC_NUM_TRIG";
+		}
+		std::string toString() const;
+		bool fromString( const std::string& inStr );
 };
 
 } // end harbinger namespace

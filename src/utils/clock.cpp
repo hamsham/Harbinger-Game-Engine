@@ -9,7 +9,7 @@
 #include "../../include/harbinger.h"
 
 namespace {
-	const static double SECS_PER_CLOCK(1.0/CLOCKS_PER_SEC); //hurr hurr
+	const static double SECS_PER_CLOCK(1.0/CLOCKS_PER_SEC); //hurr hurr... secs
 }
 
 namespace harbinger {

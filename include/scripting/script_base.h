@@ -17,155 +17,171 @@ namespace harbinger {
 //		Script Base Class
 //-----------------------------------------------------------------------------
 class c_script {
+	friend class c_scriptManager;
+	friend class c_serializer;
+	
+	/* A note about the stream operators:
+	 * The script type and sub-type will be printed when being sent to an ostream
+	 * but they are not read back in by an istream.
+	 * This is because the script type and sub-type must be determined before
+	 * reading in any object data. This makes it much easier to determine what
+	 * type of polymorphic object should be loaded when saving to/loading from files
+	 */
+	friend std::ostream& operator << ( std::ostream&, const c_script& );
+	friend std::istream& operator >> ( std::istream&, c_script& );
+	
 	static const char* defaultName;
+	static const char* invalidName;
 	
 	protected:
 		std::string name;
 
 	public:
-		c_script();
-		c_script( const c_script& scriptCopy );
-		~c_script();
-		virtual c_script& operator= ( const c_script& scriptCopy );
+		c_script			();
+		c_script			( const c_script& scriptCopy );
+		~c_script			();
 		
-		virtual int getScriptType() const {
-			return SCRIPT_BASE;
-		}
-		virtual const char* getScriptTypeStr() const {
-			return "SCRIPT_BASE";
-		}
-		std::string& getName() const;
-		void setName( const std::string& inName );
-		virtual std::string toString() const;
-		virtual bool fromString( const std::string& inStr );
+		virtual c_script&	operator=			( const c_script& scriptCopy );
+		virtual bool		operator==		( const c_script& scriptCopy ) const;
+		virtual bool		operator!=		( const c_script& scriptCopy ) const;
+		
+		virtual int		getScriptType		() const { return SCRIPT_BASE; }
+		virtual int		getScriptSubType	() const { return SCRIPT_INVALID; }
+		
+		const std::string&	getName			() const;
+		void				setName			( const std::string& inName );
 };
 
 //-----------------------------------------------------------------------------
-//		Variable Base Classes
+//		Variable Base Classe
+//		All variables MUST support copy construction & assignment operators
+//-----------------------------------------------------------------------------
+//ADT used for separation of variables and functions
+class c_scriptVarBase : virtual public c_script {
+	friend class c_scriptManager;
+	friend class c_scriptFuncBase;
+		
+	public:
+		c_scriptVarBase	() {}
+		c_scriptVarBase	( const c_scriptVarBase& varCopy ) :
+			c_script( varCopy )
+		{}
+		~c_scriptVarBase	() {}
+		
+		int			getScriptType		() const { return SCRIPT_VAR; }
+		virtual int	getScriptSubType	() const { return SCRIPT_INVALID; }
+		
+		virtual c_scriptVarBase& operator =	( const c_scriptVarBase& varCopy );
+		virtual bool	operator==		( const c_scriptVarBase& scriptCopy ) const;
+		virtual bool	operator!=		( const c_scriptVarBase& scriptCopy ) const;
+};
+
+//-----------------------------------------------------------------------------
+//		Variable Interface Classe
 //		All variables MUST support copy construction & assignment operators
 //-----------------------------------------------------------------------------
 template <typename type>
-class c_scriptVar : virtual public c_script {
-	friend class c_scriptNum;
+class c_scriptVar : virtual public c_scriptVarBase {
+	friend class c_scriptManager;
 	
-	template <typename returnType>
-	friend class c_scriptFunc;
-		
+	/* Serialization Spec:
+	 * name
+	 * variable
+	 */
+	template <typename T>
+	friend std::ostream& operator << ( std::ostream&, const c_scriptVar<T>& );
+	template <typename T>
+	friend std::istream& operator >> ( std::istream&, c_scriptVar<T>& );
+	
 	protected:
-		type data;
+		type variable;
 		
 	public:
 		c_scriptVar();
-		c_scriptVar ( const type& varCopy );
-		c_scriptVar( const c_scriptVar& varCopy );
+		c_scriptVar( const type& varCopy);
+		c_scriptVar( const c_scriptVar& varCopy);
 		virtual ~c_scriptVar() = 0;
-		virtual c_scriptVar& operator = ( const c_scriptVar<type>& varCopy );
-		virtual c_scriptVar& operator = ( const type& inVar );
 		
-		virtual type& getData() const;
-		virtual void setData( const type& inData );
+		virtual type& varData();
+		virtual type varData() const;
 		
-		virtual int getScriptType() const {
-			return SCRIPT_VAR | SCRIPT_BASE;
-		}
-		virtual const char* getScriptTypeStr() const {
-			return "SCRIPT_VAR";
-		}
-		virtual std::string toString() const;
-		virtual bool fromString( const std::string& inStr );
+		virtual operator type() const;
+		c_scriptVar& operator = ( const type& varCopy );
+		virtual c_scriptVar& operator = ( const c_scriptVar& varCopy );
+		virtual bool operator== ( const c_scriptVar& scriptCopy ) const;
+		virtual bool operator!= ( const c_scriptVar& scriptCopy ) const;
 };
 
 template <typename type>
-c_scriptVar<type>::c_scriptVar() :
-	data()
-{}
+c_scriptVar<type>::c_scriptVar() {}
 
 template <typename type>
-c_scriptVar<type>::c_scriptVar (const type& varCopy ) :
-	data( varCopy )
+c_scriptVar<type>::c_scriptVar( const type& varCopy ) :
+	variable( varCopy )
 {}
 
 template <typename type>
 c_scriptVar<type>::c_scriptVar( const c_scriptVar& varCopy ) :
-	c_script( varCopy ),
-	data( varCopy.data )
+	c_scriptVarBase( varCopy ),
+	variable( varCopy.variable )
 {}
 
 template <typename type>
 c_scriptVar<type>::~c_scriptVar() {}
 
 template <typename type>
-c_scriptVar<type>& c_scriptVar<type>::operator= ( const c_scriptVar<type>& varCopy ) {
-	name = varCopy.name;
-	data = varCopy.data;
-	return *this;
+type c_scriptVar<type>::varData() const {
+	return variable;
+}
+
+template <typename type>
+type& c_scriptVar<type>::varData() {
+	return variable;
+}
+
+template <typename type>
+c_scriptVar<type>::operator type() const {
+	return variable;
 }
 
 template <typename type>
 c_scriptVar<type>& c_scriptVar<type>::operator= ( const type& inVar ) {
-	data = inVar;
+	variable = inVar;
 	return *this;
 }
 
 template <typename type>
-type& c_scriptVar<type>::getData() const {
-	return data;
+c_scriptVar<type>& c_scriptVar<type>::operator= ( const c_scriptVar& varCopy ) {
+	name = varCopy.name;
+	variable = varCopy.variable;
+	return *this;
 }
 
 template <typename type>
-void c_scriptVar<type>::setData( const type& inData ) {
-	data = inData;
+bool c_scriptVar<type>::operator== ( const c_scriptVar& varCopy ) const {
+	return ( variable == varCopy.variable );
 }
 
 template <typename type>
-std::string c_scriptVar<type>::toString() const {
-	std::string retVal( c_script::toString() );
-	retVal.append( hamLibs::stringUtils::convertToString<type>( data ) );
-	return retVal;
-}
-
-template <typename type>
-bool c_scriptVar<type>::fromString(const std::string& inStr) {
-	std::string token;
-	std::istringstream parser( inStr );
-	bool ableToReadData( false );
-	
-	while ( parser.good() ) {
-		parser >> token;
-		
-		if ( token == "|" && ableToReadData = false ) {
-			ableToReadData = true;
-			continue;
-		}
-		else if ( token == getScriptTypeStr()  && ableToReadData = false ) {
-			parser >> name;
-			if ( name.size() == 0 )
-				return false;
-		}
-		else {
-			parser >> data;
-		}
-	}
-	parser.clear();
-	return true;
+bool c_scriptVar<type>::operator!= ( const c_scriptVar& varCopy ) const {
+	return ( variable != varCopy.variable );
 }
 
 //-----------------------------------------------------------------------------
 //		Numerical Variable Base Class
-//		--Doesn't inherit anything
 //-----------------------------------------------------------------------------
-class c_scriptNum {
-	protected:
+class c_scriptNum : virtual public c_scriptVarBase {
+	friend class c_scriptManager;
 	public:
 		c_scriptNum();
 		c_scriptNum( const c_scriptNum& numCopy );
 		virtual ~c_scriptNum();
 		
-		virtual c_scriptNum operator + ( const c_scriptNum& inVar );
-		virtual c_scriptNum operator - ( const c_scriptNum& inVar );
-		virtual c_scriptNum operator * ( const c_scriptNum& inVar );
-		virtual c_scriptNum operator / ( const c_scriptNum& inVar );
-		virtual c_scriptNum operator % ( const c_scriptNum& inVar );
+		virtual c_scriptNum operator + ( const c_scriptNum& inVar ) const;
+		virtual c_scriptNum operator - ( const c_scriptNum& inVar ) const;
+		virtual c_scriptNum operator * ( const c_scriptNum& inVar ) const;
+		virtual c_scriptNum operator / ( const c_scriptNum& inVar ) const;
+		virtual c_scriptNum operator % ( const c_scriptNum& inVar ) const;
 		
 		virtual c_scriptNum& operator = ( const c_scriptNum& inVar );
 		virtual c_scriptNum& operator += ( const c_scriptNum& inVar );
@@ -174,12 +190,12 @@ class c_scriptNum {
 		virtual c_scriptNum& operator /= ( const c_scriptNum& inVar );
 		virtual c_scriptNum& operator %= ( const c_scriptNum& inVar );
 		
-		virtual bool operator == ( const c_scriptNum& inVar );
-		virtual bool operator != ( const c_scriptNum& inVar );
-		virtual bool operator > ( const c_scriptNum& inVar );
-		virtual bool operator < ( const c_scriptNum& inVar );
-		virtual bool operator >= ( const c_scriptNum& inVar );
-		virtual bool operator <= ( const c_scriptNum& inVar );
+		virtual bool operator == ( const c_scriptNum& inVar ) const;
+		virtual bool operator != ( const c_scriptNum& inVar ) const;
+		virtual bool operator > ( const c_scriptNum& inVar ) const;
+		virtual bool operator < ( const c_scriptNum& inVar ) const;
+		virtual bool operator >= ( const c_scriptNum& inVar ) const;
+		virtual bool operator <= ( const c_scriptNum& inVar ) const;
 		
 		virtual c_scriptNum& operator = ( int inVar );
 		virtual c_scriptNum& operator = ( unsigned int inVar );
@@ -195,71 +211,95 @@ class c_scriptNum {
 };
 
 //-----------------------------------------------------------------------------
-//		Function Base Class
+//		Function Base Classes
 //-----------------------------------------------------------------------------
-template <typename returnType = void*>
-class c_scriptFunc : virtual public c_script {
+class c_scriptFuncBase : virtual public c_script {
+	friend class c_scriptManager;
+	public:
+		c_scriptFuncBase();
+		c_scriptFuncBase( const c_scriptFuncBase& funcCopy );
+		virtual ~c_scriptFuncBase() = 0;
+		 
+		virtual void run() = 0;
+		virtual void tick( float timeElapsed = 0 ) = 0;
+		
+		int getScriptType() const { return SCRIPT_FUNC; }
+		virtual int getScriptSubType() const { return SCRIPT_INVALID; }
+};
+
+//-----------------------------------------------------------------------------
+//		Function Class Interface (abstract due to c_scriptFuncBase)
+//-----------------------------------------------------------------------------
+template <typename returnType>
+class c_scriptFunc : virtual public c_scriptFuncBase {
+	friend class c_scriptManager;
 	protected:
 		returnType returnVal;
 		
 	public:
 		c_scriptFunc();
 		c_scriptFunc( const c_scriptFunc& funcCopy );
-		virtual ~c_scriptFunc() = 0;
-		 
-		virtual const returnType* returnValue();
-		virtual void run() = 0;
-		virtual void tick( float timeElapsed = 0 ) = 0;
+		~c_scriptFunc();
 		
-		virtual int getScriptType() const {
-			return SCRIPT_FUNC | SCRIPT_BASE;
-		}
-		virtual const char* getScriptTypeStr() const {
-			return "SCRIPT_FUNC";
-		}
-		virtual std::string toString() const = 0;
-		virtual bool fromString( const std::string& inStr ) = 0;
+		returnType getReturnVal() const;
+		returnType& getReturnVal();
 };
 
 template <typename returnType>
-c_scriptFunc<returnType>::c_scriptFunc() :
+c_scriptFunc< returnType >::c_scriptFunc() :
 	returnVal()
 {}
 
 template <typename returnType>
-c_scriptFunc<returnType>::c_scriptFunc( const c_scriptFunc& funcCopy ) :
-	c_script( funcCopy ),
-	returnVal( funcCopy.returnVal )
+c_scriptFunc< returnType >::c_scriptFunc( const c_scriptFunc& funcCopy ) :
+	c_scriptFuncBase( funcCopy ),
+	returnVal()
 {}
 
 template <typename returnType>
-c_scriptFunc<returnType>::~c_scriptFunc() {}
+c_scriptFunc< returnType >::~c_scriptFunc() {}
 
 template <typename returnType>
-const returnType* c_scriptFunc<returnType>::returnValue() {
-	return &returnVal;
+returnType c_scriptFunc< returnType >::getReturnVal() const {
+	return returnVal;
+}
+
+template <typename returnType>
+returnType& c_scriptFunc< returnType >::getReturnVal() {
+	return returnVal;
 }
 
 //-----------------------------------------------------------------------------
 //		Evaluation Function Base Class
 //-----------------------------------------------------------------------------
-class c_scriptEvaluation : public c_scriptFunc<bool> {
+class c_scriptEvaluation : virtual public c_scriptFunc< bool > {
+	friend class c_scriptManager;
+	
+	friend std::ostream& operator << ( std::ostream&, const c_scriptEvaluation& );
+	friend std::istream& operator >> ( std::istream&, c_scriptEvaluation& );
+	
+	protected:
+		int evalType;
+	
 	public:
 		c_scriptEvaluation();
 		c_scriptEvaluation( const c_scriptEvaluation& evalCopy );
-		c_scriptEvaluation( bool inValue );
-		virtual ~c_scriptEvaluation() = 0;
-
-		const bool& evalResult() const;
+		virtual ~c_scriptEvaluation();
+			
+	virtual int getScriptSubType() const {
+			return SCRIPT_FUNC_EVAL;
+		}
 		
-		virtual int getScriptType() const {
-			return SCRIPT_FUNC_EVAL | SCRIPT_FUNC | SCRIPT_BASE;
-		}
-		virtual const char* getScriptTypeStr() const {
-			return "SCRIPT_FUNC_EVAL";
-		}
-		virtual std::string toString() const = 0;
-		virtual bool fromString( const std::string& inStr ) = 0;
+		virtual void setEvalType( int eval = 0 );
+		int getEvalType() const;
+		
+		virtual const c_scriptVarBase* getVarToEvaluate() const;
+		virtual void attachVarToEvaluate( const c_scriptVarBase* inVar ) = 0;
+		virtual void detachVarToEvaluate() = 0;
+		
+		virtual const c_scriptVarBase* getVarToReference() const;
+		virtual void attachVarToReference( const c_scriptVarBase* inVar ) = 0;
+		virtual void detachVarToReference() = 0;
 };
 
 } // end harbinger namespace

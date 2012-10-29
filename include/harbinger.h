@@ -12,6 +12,8 @@
 	#error "A C++ compiler is required to build the Harbinger Game Engine"
 #endif
 
+#include <cassert>
+#include <stdexcept>
 #include <vector>
 #include <string>
 #include <sstream>
@@ -28,22 +30,11 @@
 	#define NULL 0x0
 #endif
 
-//Header file with forward declarations
-#include "scripting/script.h"
+//forward declarations
+#include "types.h"
 
 namespace harbinger {
-	//initialization
 	bool init();
-	
-	//forward declarations
-	class c_message;
-	class c_messenger;
-	class c_clock;
-	class c_entity;
-	class c_object;
-	class c_serializer;
-	template < typename type> class c_resourceManager;
-	class c_scriptManager;
 } // end harbinger namespace
 
 #include "scripting/script_base.h"

@@ -18,17 +18,19 @@ namespace harbinger {
 //-----------------------------------------------------------------------------
 class c_scriptInt :	virtual public c_scriptVar<int>,
 				virtual public c_scriptNum {
+	friend class c_scriptManager;
+	
 	public:
 		c_scriptInt();
 		c_scriptInt( int integer );
 		c_scriptInt( const c_scriptNum& inVar );
 		~c_scriptInt();
 		
-		c_scriptNum operator + ( const c_scriptNum& inVar );
-		c_scriptNum operator - ( const c_scriptNum& inVar );
-		c_scriptNum operator * ( const c_scriptNum& inVar );
-		c_scriptNum operator / ( const c_scriptNum& inVar );
-		c_scriptNum operator % ( const c_scriptNum& inVar );
+		c_scriptNum operator + ( const c_scriptNum& inVar ) const;
+		c_scriptNum operator - ( const c_scriptNum& inVar ) const;
+		c_scriptNum operator * ( const c_scriptNum& inVar ) const;
+		c_scriptNum operator / ( const c_scriptNum& inVar ) const;
+		c_scriptNum operator % ( const c_scriptNum& inVar ) const;
 		
 		c_scriptNum& operator = ( const c_scriptNum& inVar );
 		c_scriptNum& operator += ( const c_scriptNum& inVar );
@@ -37,12 +39,12 @@ class c_scriptInt :	virtual public c_scriptVar<int>,
 		c_scriptNum& operator /= ( const c_scriptNum& inVar );
 		c_scriptNum& operator %= ( const c_scriptNum& inVar );
 		
-		bool operator == ( const c_scriptNum& inVar );
-		bool operator != ( const c_scriptNum& inVar );
-		bool operator > ( const c_scriptNum& inVar );
-		bool operator < ( const c_scriptNum& inVar );
-		bool operator >= ( const c_scriptNum& inVar );
-		bool operator <= ( const c_scriptNum& inVar );
+		bool operator == ( const c_scriptNum& inVar ) const;
+		bool operator != ( const c_scriptNum& inVar ) const;
+		bool operator > ( const c_scriptNum& inVar ) const;
+		bool operator < ( const c_scriptNum& inVar ) const;
+		bool operator >= ( const c_scriptNum& inVar ) const;
+		bool operator <= ( const c_scriptNum& inVar ) const;
 		
 		c_scriptNum& operator = ( int inVar );
 		c_scriptNum& operator = ( unsigned int inVar );
@@ -55,17 +57,9 @@ class c_scriptInt :	virtual public c_scriptVar<int>,
 		operator c_scriptUint() const;
 		operator c_scriptFloat() const;
 		
-		int getScriptType() const {
-			return
-				   SCRIPT_VAR_INT |
-				   SCRIPT_VAR_NUM |
-				   c_scriptVar::getScriptType();
+		int getScriptSubType() const {
+			return SCRIPT_VAR_INT;
 		}
-		const char* getScriptTypeStr() const {
-			return "SCRIPT_VAR_INT";
-		}
-		std::string toString() const;
-		bool fromString( const std::string& inStr );
 };
 
 //-----------------------------------------------------------------------------
@@ -73,17 +67,19 @@ class c_scriptInt :	virtual public c_scriptVar<int>,
 //-----------------------------------------------------------------------------
 class c_scriptFloat :	virtual public c_scriptVar<float>,
 					virtual public c_scriptNum {
+	friend class c_scriptManager;
+	
 	public:
 		c_scriptFloat();
 		c_scriptFloat( float fpVal );
 		c_scriptFloat( const c_scriptNum& inVar );
 		~c_scriptFloat();
 		
-		c_scriptNum operator + ( const c_scriptNum& inVar );
-		c_scriptNum operator - ( const c_scriptNum& inVar );
-		c_scriptNum operator * ( const c_scriptNum& inVar );
-		c_scriptNum operator / ( const c_scriptNum& inVar );
-		c_scriptNum operator % ( const c_scriptNum& inVar );
+		c_scriptNum operator + ( const c_scriptNum& inVar ) const;
+		c_scriptNum operator - ( const c_scriptNum& inVar ) const;
+		c_scriptNum operator * ( const c_scriptNum& inVar ) const;
+		c_scriptNum operator / ( const c_scriptNum& inVar ) const;
+		c_scriptNum operator % ( const c_scriptNum& inVar ) const;
 		
 		c_scriptNum& operator = ( const c_scriptNum& inVar );
 		c_scriptNum& operator += ( const c_scriptNum& inVar );
@@ -92,12 +88,12 @@ class c_scriptFloat :	virtual public c_scriptVar<float>,
 		c_scriptNum& operator /= ( const c_scriptNum& inVar );
 		c_scriptNum& operator %= ( const c_scriptNum& inVar );
 		
-		bool operator == ( const c_scriptNum& inVar );
-		bool operator != ( const c_scriptNum& inVar );
-		bool operator > ( const c_scriptNum& inVar );
-		bool operator < ( const c_scriptNum& inVar );
-		bool operator >= ( const c_scriptNum& inVar );
-		bool operator <= ( const c_scriptNum& inVar );
+		bool operator == ( const c_scriptNum& inVar ) const;
+		bool operator != ( const c_scriptNum& inVar ) const;
+		bool operator > ( const c_scriptNum& inVar ) const;
+		bool operator < ( const c_scriptNum& inVar ) const;
+		bool operator >= ( const c_scriptNum& inVar ) const;
+		bool operator <= ( const c_scriptNum& inVar ) const;
 		
 		c_scriptNum& operator = ( int inVar );
 		c_scriptNum& operator = ( unsigned int inVar );
@@ -110,17 +106,9 @@ class c_scriptFloat :	virtual public c_scriptVar<float>,
 		operator c_scriptInt() const;
 		operator c_scriptUint() const;
 		
-		int getScriptType() const {
-			return
-				   SCRIPT_VAR_FLOAT |
-				   SCRIPT_VAR_NUM |
-				   c_scriptVar::getScriptType();
+		int getScriptSubType() const {
+			return SCRIPT_VAR_FLOAT;
 		}
-		const char* getScriptTypeStr() const {
-			return "SCRIPT_VAR_FLOAT";
-		}
-		std::string toString() const;
-		bool fromString( const std::string& inStr );
 };
 
 //-----------------------------------------------------------------------------
@@ -128,17 +116,19 @@ class c_scriptFloat :	virtual public c_scriptVar<float>,
 //-----------------------------------------------------------------------------
 class c_scriptUint :	virtual public c_scriptVar<unsigned int>,
 					virtual public c_scriptNum {
+	friend class c_scriptManager;
+	
 	public:
 		c_scriptUint();
 		c_scriptUint( unsigned int integer );
 		c_scriptUint( const c_scriptNum& inVar );
 		~c_scriptUint();
 		
-		c_scriptNum operator + ( const c_scriptNum& inVar );
-		c_scriptNum operator - ( const c_scriptNum& inVar );
-		c_scriptNum operator * ( const c_scriptNum& inVar );
-		c_scriptNum operator / ( const c_scriptNum& inVar );
-		c_scriptNum operator % ( const c_scriptNum& inVar );
+		c_scriptNum operator + ( const c_scriptNum& inVar ) const;
+		c_scriptNum operator - ( const c_scriptNum& inVar ) const;
+		c_scriptNum operator * ( const c_scriptNum& inVar ) const;
+		c_scriptNum operator / ( const c_scriptNum& inVar ) const;
+		c_scriptNum operator % ( const c_scriptNum& inVar ) const;
 		
 		c_scriptNum& operator = ( const c_scriptNum& inVar );
 		c_scriptNum& operator += ( const c_scriptNum& inVar );
@@ -147,12 +137,12 @@ class c_scriptUint :	virtual public c_scriptVar<unsigned int>,
 		c_scriptNum& operator /= ( const c_scriptNum& inVar );
 		c_scriptNum& operator %= ( const c_scriptNum& inVar );
 		
-		bool operator == ( const c_scriptNum& inVar );
-		bool operator != ( const c_scriptNum& inVar );
-		bool operator > ( const c_scriptNum& inVar );
-		bool operator < ( const c_scriptNum& inVar );
-		bool operator >= ( const c_scriptNum& inVar );
-		bool operator <= ( const c_scriptNum& inVar );
+		bool operator == ( const c_scriptNum& inVar ) const;
+		bool operator != ( const c_scriptNum& inVar ) const;
+		bool operator > ( const c_scriptNum& inVar ) const;
+		bool operator < ( const c_scriptNum& inVar ) const;
+		bool operator >= ( const c_scriptNum& inVar ) const;
+		bool operator <= ( const c_scriptNum& inVar ) const;
 		
 		c_scriptNum& operator = ( int inVar );
 		c_scriptNum& operator = ( unsigned int inVar );
@@ -165,17 +155,49 @@ class c_scriptUint :	virtual public c_scriptVar<unsigned int>,
 		operator c_scriptInt() const;
 		operator c_scriptFloat() const;
 		
-		int getScriptType() const {
-			return
-				   SCRIPT_VAR_UINT |
-				   SCRIPT_VAR_NUM |
-				   c_scriptVar::getScriptType();
+		int getScriptSubType() const {
+			return SCRIPT_VAR_UINT;
 		}
-		const char* getScriptTypeStr() const {
-			return "SCRIPT_VAR_UINT";
+};
+
+//-----------------------------------------------------------------------------
+//		Character String Variable
+//-----------------------------------------------------------------------------
+class c_scriptString : virtual public c_scriptVar< std::string > {
+	friend class c_scriptManager;
+	friend std::ostream& operator << ( std::ostream&, const c_scriptString& );
+	friend std::istream& operator >> ( std::istream&, c_scriptString& );
+	
+	public:
+		c_scriptString();
+		c_scriptString( const char* strCopy );
+		c_scriptString( const std::string& strCopy );
+		c_scriptString( const c_scriptString& strCopy );
+		~c_scriptString();
+		
+		char operator[] ( size_t index ) const;
+		char& operator[] ( size_t index );
+		
+		int getScriptSubType() const {
+			return SCRIPT_VAR_STRING;
 		}
-		std::string toString() const;
-		bool fromString( const std::string& inStr );
+};
+
+//-----------------------------------------------------------------------------
+//		Boolean Variable
+//-----------------------------------------------------------------------------
+class c_scriptBool : virtual public c_scriptVar< bool > {
+	friend class c_scriptManager;
+	
+	public:
+		c_scriptBool();
+		c_scriptBool( bool inBool );
+		c_scriptBool( const c_scriptBool& inBool );
+		~c_scriptBool();
+		
+		int getScriptSubType() {
+			return SCRIPT_VAR_BOOL;
+		}
 };
 
 } // end harbinger namespace

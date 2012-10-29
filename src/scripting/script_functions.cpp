@@ -12,81 +12,75 @@ namespace harbinger {
 //-----------------------------------------------------------------------------
 //		Numerical Evaluations
 //-----------------------------------------------------------------------------
-c_scriptNumEval::c_scriptNumEval() :
-	evalType( c_scriptNumEval::IS_EQUAL ),
-	evalNum( NULL ),
-	refNum( NULL )
-{}
+c_scriptNumEval::c_scriptNumEval() {}
 
 c_scriptNumEval::c_scriptNumEval( const c_scriptNumEval& evalCopy ) :
-	c_scriptEvaluation( evalCopy ),
-	evalType( evalCopy.evalType ),
-	evalNum( evalCopy.evalNum ),
-	refNum( evalCopy.refNum )
+	c_scriptEvaluation( evalCopy )
 {}
 
 c_scriptNumEval::~c_scriptNumEval(){}
 
-const c_scriptNum* c_scriptNumEval::getNumToEvaluate() {
-	return evalNum;
-}
-
-const c_scriptNum* c_scriptNumEval::getNumToReference() {
-	return refNum;
-}
-
-void c_scriptNumEval::setNumToEvaluate( c_scriptNum* arg ) {
-	evalNum = arg;
-}
-
-void c_scriptNumEval::setNumToReference( c_scriptNum* arg ) {
-	refNum = arg;
-}
-
-void c_scriptNumEval::setEvalType( e_evalType eval ) {
-	evalType = eval;
-}
-
 void c_scriptNumEval::setEvalType( int eval ) {
+	assert( (evalType >= IS_EQUAL && evalType < FUNC_NUM_INVALID) );
 	evalType = eval;
 }
+		
+const c_scriptNum* c_scriptNumEval::getVarToEvaluate() const {
+	return varToEval;
+}
 
-int c_scriptNumEval::getEvalType() const {
-	return evalType;
+void c_scriptNumEval::attachVarToEvaluate( const c_scriptNum* inVar ) {
+	varToEval = inVar;
+}
+
+void c_scriptNumEval::detachVarToEvaluate() {
+	varToEval = NULL;
+}
+
+const c_scriptNum* c_scriptNumEval::getVarToReference() const {
+	return varToRef;
+}
+
+void c_scriptNumEval::attachVarToReference( const c_scriptNum* inVar ) {
+	varToRef = inVar;
+}
+
+void c_scriptNumEval::detachVarToReference() {
+	varToRef = NULL;
 }
 
 void c_scriptNumEval::run() {
 	//ensure that there are numbers to evaluate
-	if (evalNum == NULL || refNum == NULL) {
+	if (varToEval == NULL || varToRef == NULL) {
 		returnVal = false;
 		return;
 	}
 	
 	switch ( evalType ) {
 		case IS_EQUAL:
-			returnVal = (*evalNum == *refNum);
+			returnVal = ( *varToEval == *varToRef );
 			break;
 		case IS_NOT_EQUAL:
-			returnVal = (*evalNum != *refNum);
+			returnVal = ( *varToEval != *varToRef );
 			break;
 		case IS_GREATER:
-			returnVal = (*evalNum > *refNum);
+			returnVal = ( *varToEval > *varToRef );
 			break;
 		case IS_LESS:
-			returnVal = (*evalNum < *refNum);
+			returnVal = ( *varToEval < *varToRef );
 			break;
 		case IS_GREATER_OR_EQUAL:
-			returnVal = (*evalNum >= *refNum);
+			returnVal = ( *varToEval >= *varToRef );
 			break;
 		case IS_LESS_OR_EQUAL:
-			returnVal = (*evalNum <= *refNum);
+			returnVal = ( *varToEval <= *varToRef );
 			break;
 		default:
 			returnVal = false;
 	}
 }
 
-void c_scriptNumEval::tick(float timeElapsed) {
+void c_scriptNumEval::tick( float timeElapsed ) {
 	run();
 }
 
@@ -114,16 +108,9 @@ void c_scriptMiscMath::setNumToEvaluate( c_scriptNum* arg ) {
 	evalNum = arg;
 }
 
-void c_scriptMiscMath::setEvalType( c_scriptMiscMath::e_math eval ) {
-	evalType = eval;
-}
-
 void c_scriptMiscMath::setEvalType( int eval ) {
+	assert( (evalType >= SQRT && evalType < FUNC_MATH_INVALID) );
 	evalType = eval;
-}
-
-int c_scriptMiscMath::getEvalType() const {
-	return evalType;
 }
 
 void c_scriptMiscMath::run() {
@@ -196,16 +183,9 @@ void c_scriptArithmetic::setNumToReference( c_scriptNum* arg ) {
 	refNum = arg;
 }
 
-void c_scriptArithmetic::setEvalType( e_arithmetic eval ) {
-	evalType = eval;
-}
-
 void c_scriptArithmetic::setEvalType( int eval ) {
+	assert( (evalType >= ADD && evalType < FUNC_ARITH_INVALID) );
 	evalType = eval;
-}
-
-int c_scriptArithmetic::getEvalType() const {
-	return evalType;
 }
 
 void c_scriptArithmetic::run() {
@@ -272,16 +252,9 @@ void c_scriptTrigonometry::setNumToEvaluate( c_scriptNum* arg ) {
 	evalNum = arg;
 }
 
-void c_scriptTrigonometry::setEvalType( e_trigonometry eval ) {
-	evalType = eval;
-}
-
 void c_scriptTrigonometry::setEvalType( int eval ) {
+	assert( (evalType >= SIN && evalType < FUNC_TRIG_INVALID) );
 	evalType = eval;
-}
-
-int c_scriptTrigonometry::getEvalType() const {
-	return evalType;
 }
 
 void c_scriptTrigonometry::run() {

@@ -8,57 +8,68 @@ namespace harbinger {
 //-----------------------------------------------------------------------------
 //		Script Types
 //-----------------------------------------------------------------------------
-//DO NOT USE AS BIT-FLAGS! These are used for versioning,
 enum e_scriptType { 
 	//base classes
-	SCRIPT_BASE				= 0x00001,
-	SCRIPT_VAR				= 0x00002,
-	SCRIPT_FUNC				= 0x00004,
-	
-	//functions
-	SCRIPT_FUNC_EVAL			= 0x00010,
-	SCRIPT_FUNC_NUM_EVAL		= 0x00020,
-	SCRIPT_FUNC_NUM_ARITHMETIC	= 0x00040,
-	SCRIPT_FUNC_NUM_MATH		= 0x00080,
-	SCRIPT_FUNC_NUM_TRIG		= 0x00100,
-	
-	//variables
-	SCRIPT_VAR_NUM				= 0x00200,
-	SCRIPT_VAR_INT				= 0x00400,
-	SCRIPT_VAR_UINT			= 0x00800,
-	SCRIPT_VAR_FLOAT			= 0x01000,
-	SCRIPT_VAR_FIXED			= 0x02000,
-	SCRIPT_VAR_VEC_2D			= 0x04000,
-	SCRIPT_VAR_VEC_3D			= 0x08000,
-	SCRIPT_VAR_STRING			= 0x10000,
-	SCRIPT_VAR_BOOL			= 0x20000,
+	SCRIPT_BASE = 0,
+	SCRIPT_VAR,
+	SCRIPT_FUNC,
+	SCRIPT_INVALID
+};
 
-	SCRIPT_INVALID				= 0
+enum e_scriptVarType {
+	SCRIPT_VAR_INVALID = 0,
+	SCRIPT_VAR_NUM,
+	SCRIPT_VAR_INT,
+	SCRIPT_VAR_UINT,
+	SCRIPT_VAR_FLOAT,
+	SCRIPT_VAR_BOOL,
+	SCRIPT_VAR_STRING,
+	SCRIPT_VAR_VEC3 //NOT YET IMPLEMENTED
+};
+/* None of these are anywhere close to being implemented
+enum e_scriptResourceType {
+	SCRIPT_RES_BITMAP,
+	SCRIPT_RES_SPRITE,
+	SCRIPT_RES_SOUND,
+	SCRIPT_RES_POLYGON,
+	SCRIPT_RES_MESH,
+	SCRIPT_RES_SKELETON,
+	SCRIPT_RES_ANIMATION,
+};
+*/
+enum e_scriptFuncType {
+	SCRIPT_FUNC_INVALID = 0,
+	SCRIPT_FUNC_EVAL,
+	SCRIPT_FUNC_NUM_EVAL,
+	SCRIPT_FUNC_NUM_ARITH,
+	SCRIPT_FUNC_NUM_TRIG,
+	SCRIPT_FUNC_NUM_MISC,
+	SCRIPT_FUNC_STRING_EVAL //NOT YET IMPLEMENTED
 };
 
 //-----------------------------------------------------------------------------
 //		Forward Declarations
 //-----------------------------------------------------------------------------
-//base class
+//base classes, all abstract
 class c_script;
-
-//function base class
-template <typename returnType>
-class c_scriptFunc; //abstract,  inherits c_script
+class c_scriptVarBase;
+class c_scriptFuncBase;
 
 //variables
 template <typename type>
-class c_scriptVar; //inherits c_script
+class c_scriptVar; //inherits c_scriptVarBase
 class c_scriptNum; //empty base class, inherits nothing
-
-//numeric variables, all inherit c_scriptVar & c_scriptNum
 class c_scriptInt;
 class c_scriptUint;
 class c_scriptFloat;
+class c_scriptString; //NOT IMPLEMENTED YET
+class c_scriptBool; //NOT IMPLEMENTED YET
+class c_scriptBitmap; //NOT IMPLEMENTED YET
 
-//math functions, all inherit c_scriptFunc in some way
+//functions
+template <typename returnType>
+class c_scriptFunc; //abstract base,  inherits c_scriptFuncBase
 class c_scriptEvaluation; //abstract, inherits c_scriptFunction, has a boolean result
-
 class c_scriptNumEval; //inherits c_scriptEval, has a boolean result
 class c_scriptMiscMath; //inherits c_scriptFunc. has a float result
 class c_scriptArithmetic; //inherits c_scriptFunc. has a c_scriptNum result. takes two arguments (except for the EQL function, which has one)

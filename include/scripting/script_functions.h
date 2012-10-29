@@ -14,10 +14,14 @@ namespace harbinger {
 //		Numerical Evaluations
 //-----------------------------------------------------------------------------
 class c_scriptNumEval : public c_scriptEvaluation {
-	private:
-		int evalType;
-		c_scriptNum *evalNum, *refNum;
-		//NOTE: a boolean "outputVal" was inherited from c_scriptFunction
+	friend class c_scriptManager;
+	friend std::ostream& operator << ( std::ostream&, const c_scriptNumEval& );
+	friend std::istream& operator >> ( std::istream&, c_scriptNumEval& );
+	
+	protected:
+		const c_scriptNum *varToEval, *varToRef;
+		//NOTE: a boolean "returnVal" was inherited from c_scriptFunction
+		
 	public:
 		enum e_evalType {
 			IS_EQUAL,
@@ -25,39 +29,40 @@ class c_scriptNumEval : public c_scriptEvaluation {
 			IS_GREATER,
 			IS_LESS,
 			IS_GREATER_OR_EQUAL,
-			IS_LESS_OR_EQUAL
+			IS_LESS_OR_EQUAL,
+			FUNC_NUM_INVALID
 		};
 		
 		c_scriptNumEval();
 		c_scriptNumEval( const c_scriptNumEval& evalCopy );
 		~c_scriptNumEval();
-
-		const c_scriptNum* getNumToEvaluate();
-		const c_scriptNum* getNumToReference();
-		void setNumToEvaluate( c_scriptNum* arg );
-		void setNumToReference( c_scriptNum* arg );
 		
-		void setEvalType( e_evalType eval );
+		int getScriptSubType() const {
+			return SCRIPT_FUNC_NUM_EVAL;
+		}
+		
+		const c_scriptNum* getVarToEvaluate() const;
+		void attachVarToEvaluate( const c_scriptNum* inVar );
+		void detachVarToEvaluate();
+		
+		const c_scriptNum* getVarToReference() const;
+		void attachVarToReference( const c_scriptNum* inVar );
+		void detachVarToReference();
+		
 		void setEvalType( int eval );
-		int getEvalType() const;
 		
 		void run();
 		void tick( float timeElapsed = 0 );
-		
-		int getScriptType() const {
-			return SCRIPT_FUNC_NUM_EVAL | c_scriptEvaluation::getScriptType();
-		}
-		const char* getScriptTypeStr() const {
-			return "SCRIPT_FUNC_NUM_EVAL";
-		}
-		std::string toString() const;
-		bool fromString( const std::string& inStr );
 };
 
 //-----------------------------------------------------------------------------
 //		Misc. Mathematical Functions
 //-----------------------------------------------------------------------------
 class c_scriptMiscMath : public c_scriptFunc<float> {
+	friend class c_scriptManager;
+	friend std::ostream& operator << ( std::ostream&, const c_scriptMiscMath& );
+	friend std::istream& operator >> ( std::istream&, c_scriptMiscMath& );
+	
 	private:
 		int evalType;
 		c_scriptNum *evalNum;
@@ -68,9 +73,10 @@ class c_scriptMiscMath : public c_scriptFunc<float> {
 			SQRT,
 			LOG,	//log base 10
 			ABS,
-			RND,
+			RND, //basically, floor() + 0.5f
 			CEIL,
-			FLOOR
+			FLOOR,
+			FUNC_MATH_INVALID
 		};
 		
 		c_scriptMiscMath();
@@ -80,27 +86,24 @@ class c_scriptMiscMath : public c_scriptFunc<float> {
 		const c_scriptNum* getNumToEvaluate();
 		void setNumToEvaluate( c_scriptNum* arg );
 		
-		void setEvalType( e_math eval );
 		void setEvalType( int eval );
-		int getEvalType() const;
 		
 		void run();
 		void tick( float timeElapsed = 0 );
 		
-		int getScriptType() const {
-			return SCRIPT_FUNC_NUM_MATH | c_scriptFunc::getScriptType();
+		int getScriptSubType() const {
+			return SCRIPT_FUNC_NUM_MISC;
 		}
-		const char* getScriptTypeStr() const {
-			return "SCRIPT_FUNC_NUM_MATH";
-		}
-		std::string toString() const;
-		bool fromString( const std::string& inStr );
 };
 
 //-----------------------------------------------------------------------------
 //		Numerical Arithmetic
 //-----------------------------------------------------------------------------
 class c_scriptArithmetic : public c_scriptFunc<c_scriptNum> {
+	friend class c_scriptManager;
+	friend std::ostream& operator << ( std::ostream&, const c_scriptArithmetic& );
+	friend std::istream& operator >> ( std::istream&, c_scriptArithmetic& );
+	
 	private:
 		int evalType;
 		c_scriptNum *evalNum, *refNum;
@@ -113,7 +116,8 @@ class c_scriptArithmetic : public c_scriptFunc<c_scriptNum> {
 			DIV,
 			MOD,
 			POW,
-			EQL
+			EQL,
+			FUNC_ARITH_INVALID
 		};
 		
 		c_scriptArithmetic();
@@ -125,27 +129,24 @@ class c_scriptArithmetic : public c_scriptFunc<c_scriptNum> {
 		void setNumToEvaluate( c_scriptNum* arg );
 		void setNumToReference( c_scriptNum* arg );
 		
-		void setEvalType( e_arithmetic eval );
 		void setEvalType( int eval );
-		int getEvalType() const;
 		
 		void run();
 		void tick( float timeElapsed = 0 );
 		
-		int getScriptType() const {
-			return SCRIPT_FUNC_NUM_ARITHMETIC | c_scriptFunc::getScriptType();
+		int getScriptSubType() const {
+			return SCRIPT_FUNC_NUM_ARITH;
 		}
-		const char* getScriptTypeStr() const {
-			return "SCRIPT_FUNC_NUM_ARITHMETIC";
-		}
-		std::string toString() const;
-		bool fromString( const std::string& inStr );
 };
 
 //-----------------------------------------------------------------------------
 //		Numerical Trigonometry
 //-----------------------------------------------------------------------------
 class c_scriptTrigonometry : public c_scriptFunc<float> {
+	friend class c_scriptManager;
+	friend std::ostream& operator << ( std::ostream&, const c_scriptTrigonometry& );
+	friend std::istream& operator >> ( std::istream&, c_scriptTrigonometry& );
+	
 	private:
 		int evalType;
 		c_scriptNum *evalNum;
@@ -163,7 +164,8 @@ class c_scriptTrigonometry : public c_scriptFunc<float> {
 			ARC_TAN,
 			HYP_SIN,
 			HYP_COS,
-			HYP_TAN
+			HYP_TAN,
+			FUNC_TRIG_INVALID
 		};
 		
 		c_scriptTrigonometry();
@@ -173,21 +175,14 @@ class c_scriptTrigonometry : public c_scriptFunc<float> {
 		const c_scriptNum* getNumToEvaluate();
 		void setNumToEvaluate( c_scriptNum* arg );
 		
-		void setEvalType( e_trigonometry eval );
 		void setEvalType( int eval );
-		int getEvalType() const;
 		
 		void run();
 		void tick( float timeElapsed = 0 );
 		
-		int getScriptType() const {
-			return SCRIPT_FUNC_NUM_TRIG | c_scriptFunc::getScriptType();
+		int getScriptSubType() const {
+			return SCRIPT_FUNC_NUM_TRIG;
 		}
-		const char* getScriptTypeStr() const {
-			return "SCRIPT_FUNC_NUM_TRIG";
-		}
-		std::string toString() const;
-		bool fromString( const std::string& inStr );
 };
 
 } // end harbinger namespace

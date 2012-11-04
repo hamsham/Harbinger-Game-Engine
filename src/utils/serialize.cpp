@@ -116,10 +116,11 @@ e_fileStatus saveScripts( const char* fileName, e_hgeFileType fileType, scriptLi
 		
 		if ( pScript->getScriptType() == SCRIPT_VAR ) {
 			//variable addresses will be read back upon deserialization
-			fout << (ulong)pScript << " ";
+			fout << (ulong)pScript << " " << *pScript;
 			++numVars;
 		}
 		else if ( pScript->getScriptType() == SCRIPT_FUNC ) {
+			fout << *pScript;
 			++numFuncs;
 		}
 		else {

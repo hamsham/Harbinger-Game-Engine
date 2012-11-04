@@ -10,6 +10,13 @@
 
 //This header file includes forward declarations of all data types used by the engine
 
+#ifdef NULL
+	#undef NULL
+#endif
+#ifndef NULL
+	#define NULL nullptr
+#endif
+
 #include "scripting/script.h"
 
 namespace harbinger {
@@ -33,8 +40,12 @@ namespace harbinger {
 	//------------------------------------------------------------------------
 	//	TYPEDEF's
 	//------------------------------------------------------------------------
+	typedef unsigned int uint;
+	typedef unsigned long int ulong;
 	typedef std::list< c_script* > scriptList;
 	typedef std::vector< c_script* > scriptArray;
+	typedef std::map< ulong, c_scriptVarBase* > scriptVarMap;
+	typedef scriptList::size_type scriptListSize_t;
 	
 } // end harbinger namespace
 

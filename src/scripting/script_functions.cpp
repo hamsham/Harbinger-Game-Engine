@@ -10,6 +10,92 @@
 namespace harbinger {
 
 //-----------------------------------------------------------------------------
+//		Evaluation Function Base Class
+//-----------------------------------------------------------------------------
+c_scriptEvaluation::c_scriptEvaluation() :
+	c_scriptFunc( false ),
+	evalType( 0 ),
+	evalVar( NULL ),
+	compVar( NULL )
+{}
+
+c_scriptEvaluation::c_scriptEvaluation( const c_scriptEvaluation& evalCopy ) :
+	c_scriptFunc( evalCopy ),
+	evalType( evalCopy.evalType ),
+	evalVar( evalCopy.evalVar ),
+	compVar( evalCopy.compVar )
+{}
+
+c_scriptEvaluation::~c_scriptEvaluation() {}
+
+int c_scriptEvaluation::getEvalType() const {
+	return evalType;
+}
+
+void c_scriptEvaluation::setEvalType( int eval ) {
+	evalType = eval;
+}
+
+const c_scriptVarBase* c_scriptEvaluation::getVarToEvaluate() const {
+	return evalVar;
+}
+
+void c_scriptEvaluation::setVarToEvaluate( const c_scriptVarBase* inVar ) {
+	evalVar = inVar;
+}
+
+const c_scriptVarBase* c_scriptEvaluation::getVarToCompare() const {
+	return compVar;
+}
+
+void c_scriptEvaluation::setVarToCompare( const c_scriptVarBase* inVar ) {
+	compVar = inVar;
+}
+
+//-----------------------------------------------------------------------------
+//		Math Function Base Class
+//-----------------------------------------------------------------------------
+c_scriptNumeric::c_scriptNumeric() :
+	c_scriptFunc( 0.f ),
+	evalType( 0 ),
+	evalVar( NULL ),
+	compVar( NULL )
+{}
+
+c_scriptNumeric::c_scriptNumeric( const c_scriptNumeric& numFunc ) :
+	c_scriptFunc( numFunc ),
+	evalType( numFunc.evalType ),
+	evalVar( numFunc.evalVar ),
+	compVar( numFunc.compVar )
+{}
+
+c_scriptNumeric::~c_scriptNumeric() {}
+
+int c_scriptNumeric::getEvalType() const {
+	return evalType;
+}
+
+void c_scriptNumeric::setEvalType( int eval ) {
+	evalType = eval;
+}
+
+const c_scriptNum* c_scriptNumeric::getVarToEvaluate() const {
+	return evalVar;
+}
+
+void c_scriptNumeric::setVarToEvaluate( const c_scriptNum* inVar ) {
+	evalVar = inVar;
+}
+
+const c_scriptNum* c_scriptNumeric::getVarToCompare() const {
+	return compVar;
+}
+
+void c_scriptNumeric::setVarToCompare( const c_scriptNum* inVar ) {
+	compVar = inVar;
+}
+
+//-----------------------------------------------------------------------------
 //		Numerical Evaluations
 //-----------------------------------------------------------------------------
 c_scriptNumEval::c_scriptNumEval() {}
@@ -20,93 +106,71 @@ c_scriptNumEval::c_scriptNumEval( const c_scriptNumEval& evalCopy ) :
 
 c_scriptNumEval::~c_scriptNumEval(){}
 
+const c_scriptNum* c_scriptNumEval::getVarToEvaluate() const {
+	return reinterpret_cast< const c_scriptNum* >( evalVar );
+}
+
+void c_scriptNumEval::setVarToEvaluate( const c_scriptNum* inVar ) {
+	evalVar = inVar;
+}
+
+const c_scriptNum* c_scriptNumEval::getVarToCompare() const {
+	return reinterpret_cast< const c_scriptNum* >( compVar );
+}
+
+void c_scriptNumEval::setVarToCompare( const c_scriptNum* inVar ) {
+	compVar = inVar;
+}
+
 void c_scriptNumEval::setEvalType( int eval ) {
 	assert( (evalType >= IS_EQUAL && evalType < FUNC_NUM_INVALID) );
 	evalType = eval;
 }
-		
-const c_scriptNum* c_scriptNumEval::getVarToEvaluate() const {
-	return varToEval;
-}
-
-void c_scriptNumEval::attachVarToEvaluate( const c_scriptNum* inVar ) {
-	varToEval = inVar;
-}
-
-void c_scriptNumEval::detachVarToEvaluate() {
-	varToEval = NULL;
-}
-
-const c_scriptNum* c_scriptNumEval::getVarToReference() const {
-	return varToRef;
-}
-
-void c_scriptNumEval::attachVarToReference( const c_scriptNum* inVar ) {
-	varToRef = inVar;
-}
-
-void c_scriptNumEval::detachVarToReference() {
-	varToRef = NULL;
-}
 
 void c_scriptNumEval::run() {
 	//ensure that there are numbers to evaluate
-	if (varToEval == NULL || varToRef == NULL) {
-		returnVal = false;
+	if (evalVar == NULL || compVar == NULL) {
+		returnVal.setFalse();
 		return;
 	}
 	
+	const c_scriptNum* pEval = reinterpret_cast< const c_scriptNum* >( evalVar );
+	const c_scriptNum* pComp = reinterpret_cast< const c_scriptNum* >( compVar );
+	
 	switch ( evalType ) {
 		case IS_EQUAL:
-			returnVal = ( *varToEval == *varToRef );
+			returnVal = ( *pEval == *pComp );
 			break;
 		case IS_NOT_EQUAL:
-			returnVal = ( *varToEval != *varToRef );
+			returnVal = ( *pEval != *pComp );
 			break;
 		case IS_GREATER:
-			returnVal = ( *varToEval > *varToRef );
+			returnVal = ( *pEval > *pComp );
 			break;
 		case IS_LESS:
-			returnVal = ( *varToEval < *varToRef );
+			returnVal = ( *pEval < *pComp );
 			break;
 		case IS_GREATER_OR_EQUAL:
-			returnVal = ( *varToEval >= *varToRef );
+			returnVal = ( *pEval >= *pComp );
 			break;
 		case IS_LESS_OR_EQUAL:
-			returnVal = ( *varToEval <= *varToRef );
+			returnVal = ( *pEval <= *pComp );
 			break;
 		default:
-			returnVal = false;
+			returnVal.setFalse();
 	}
-}
-
-void c_scriptNumEval::tick( float timeElapsed ) {
-	run();
 }
 
 //-----------------------------------------------------------------------------
 //		Misc. Mathematical Functions
 //-----------------------------------------------------------------------------
-c_scriptMiscMath::c_scriptMiscMath() :
-	evalType( c_scriptMiscMath::SQRT ),
-	evalNum( NULL )
-{}
+c_scriptMiscMath::c_scriptMiscMath() {}
 
 c_scriptMiscMath::c_scriptMiscMath( const c_scriptMiscMath& evalCopy ) :
-	c_scriptFunc( evalCopy ),
-	evalType( evalCopy.evalType ),
-	evalNum( evalCopy.evalNum )
+	c_scriptNumeric( evalCopy )
 {}
 
 c_scriptMiscMath::~c_scriptMiscMath() {}
-
-const c_scriptNum* c_scriptMiscMath::getNumToEvaluate() {
-	return evalNum;
-}
-
-void c_scriptMiscMath::setNumToEvaluate( c_scriptNum* arg ) {
-	evalNum = arg;
-}
 
 void c_scriptMiscMath::setEvalType( int eval ) {
 	assert( (evalType >= SQRT && evalType < FUNC_MATH_INVALID) );
@@ -115,73 +179,42 @@ void c_scriptMiscMath::setEvalType( int eval ) {
 
 void c_scriptMiscMath::run() {
 	//ensure that there are numbers to evaluate
-	if (evalNum == NULL) {
+	if (evalVar == NULL) {
 		returnVal = 0.0f;
 		return;
 	}
 	
-	switch ( evalType ) {
-		case SQRT:
-			returnVal = std::sqrt( (float)(*evalNum) );
-			break;
-		case LOG:
-			returnVal = std::log( (float)(*evalNum) );
-			break;
-		case ABS:
-			returnVal = std::fabs( (float)(*evalNum) );
-			break;
-		case RND:
-			returnVal = std::floor( (float)(*evalNum) + 0.5f );
-			break;
-		case CEIL:
-			returnVal = std::ceil( (float)(*evalNum) );
-			break;
-		case FLOOR:
-			returnVal = std::floor( (float)(*evalNum) );
-			break;
-		default:
-			returnVal = 0.0f;
+	//opting for an array of function pointers instead of switch statements
+	float ( *mathFunc[] )( float ) = {
+		std::sqrt,
+		std::log,
+		std::fabs,
+		std::floor,
+		std::ceil
+	};
+	if ( (evalType >= SQRT) && (evalType < FUNC_MATH_INVALID) ) {
+		if ( evalType == RND ) {
+			returnVal = mathFunc[ evalType ]( floor(*evalVar) + 0.5f );
+		}
+		else {
+			returnVal = mathFunc[ evalType ]( (float)(*evalVar) );
+		}
 	}
-}
-void c_scriptMiscMath::tick( float timeElapsed ) {
-	run();
+	else {
+		returnVal = 0.f;
+	}
 }
 
 //-----------------------------------------------------------------------------
 //		Numerical Math/Arithmetic
 //-----------------------------------------------------------------------------
-c_scriptArithmetic::c_scriptArithmetic() :
-	evalType( c_scriptArithmetic::ADD ),
-	evalNum( NULL ),
-	refNum( NULL )
-{
-	returnVal = 0.0f;
-}
+c_scriptArithmetic::c_scriptArithmetic() {}
 
 c_scriptArithmetic::c_scriptArithmetic( const c_scriptArithmetic& evalCopy ) :
-	c_scriptFunc( evalCopy ),
-	evalType( evalCopy.evalType ),
-	evalNum( evalCopy.evalNum ),
-	refNum( evalCopy.refNum )
+	c_scriptFunc( evalCopy )
 {}
 
-c_scriptArithmetic::~c_scriptArithmetic(){}
-
-const c_scriptNum* c_scriptArithmetic::getNumToEvaluate() {
-	return evalNum;
-}
-
-const c_scriptNum* c_scriptArithmetic::getNumToReference() {
-	return refNum;
-}
-
-void c_scriptArithmetic::setNumToEvaluate( c_scriptNum* arg ) {
-	evalNum = arg;
-}
-
-void c_scriptArithmetic::setNumToReference( c_scriptNum* arg ) {
-	refNum = arg;
-}
+c_scriptArithmetic::~c_scriptArithmetic() {}
 
 void c_scriptArithmetic::setEvalType( int eval ) {
 	assert( (evalType >= ADD && evalType < FUNC_ARITH_INVALID) );
@@ -190,67 +223,48 @@ void c_scriptArithmetic::setEvalType( int eval ) {
 
 void c_scriptArithmetic::run() {
 	//ensure that there are numbers to evaluate
-	if (evalNum == NULL || refNum == NULL) {
+	if (evalVar == NULL || compVar == NULL) {
 		returnVal = 0;
 		return;
 	}
 	
 	switch ( evalType ) {
 		case ADD:
-			returnVal = (*evalNum + *refNum);
+			returnVal = (*evalVar + *compVar);
 			break;
 		case SUB:
-			returnVal = (*evalNum - *refNum);
+			returnVal = (*evalVar - *compVar);
 			break;
 		case MUL:
-			returnVal = (*evalNum * *refNum);
+			returnVal = (*evalVar * *compVar);
 			break;
 		case DIV:
-			returnVal = (*evalNum / *refNum);
+			returnVal = (*evalVar / *compVar);
 			break;
 		case MOD:
-			returnVal = (*evalNum % *refNum);
+			returnVal = (*evalVar % *compVar);
 			break;
 		case POW:
-			returnVal = std::pow( (float)(*evalNum), (float)(*refNum) );
+			returnVal = std::pow( (float)(*evalVar), (float)(*compVar) );
 			break;
 		case EQL:
-			returnVal = *refNum;
+			returnVal = *evalVar;
 			break;
 		default:
-			returnVal = 0;
+			returnVal = 0.f;
 	}
-}
-
-void c_scriptArithmetic::tick(float timeElapsed) {
-	run();
 }
 
 //-----------------------------------------------------------------------------
 //		Trigonometric Functinos
 //-----------------------------------------------------------------------------
-c_scriptTrigonometry::c_scriptTrigonometry() :
-	evalType( c_scriptTrigonometry::SIN ),
-	evalNum( NULL )
-{
-	returnVal = 0.0f;
-}
+c_scriptTrigonometry::c_scriptTrigonometry() {}
 
 c_scriptTrigonometry::c_scriptTrigonometry( const c_scriptTrigonometry& trigCopy ) :
-	c_scriptFunc( trigCopy ),
-	evalType( trigCopy.evalType ),
-	evalNum( trigCopy.evalNum )
+	c_scriptNumeric( trigCopy )
 {}
 
-c_scriptTrigonometry::~c_scriptTrigonometry(){}
-
-const c_scriptNum* c_scriptTrigonometry::getNumToEvaluate() {
-	return evalNum;
-}
-
-void c_scriptTrigonometry::setNumToEvaluate( c_scriptNum* arg ) {
-	evalNum = arg;
-}
+c_scriptTrigonometry::~c_scriptTrigonometry() {}
 
 void c_scriptTrigonometry::setEvalType( int eval ) {
 	assert( (evalType >= SIN && evalType < FUNC_TRIG_INVALID) );
@@ -258,59 +272,82 @@ void c_scriptTrigonometry::setEvalType( int eval ) {
 }
 
 void c_scriptTrigonometry::run() {
-	if (evalNum == NULL) {
-		returnVal = 0;
+	if (evalVar == NULL) {
+		returnVal = 0.f;
 		return;
 	}
-	float divZeroCheck( 0 );
 	
+	//opting for an array of function pointers instead of switch statements
+	float ( *mathFunc[] )( float ) = {
+		std::sin,
+		std::cos,
+		std::tan,
+		std::asin,
+		std::acos,
+		std::atan,
+		std::sinh,
+		std::cosh,
+		std::tanh,
+	};
+	
+	if ( (evalType >= SIN) && (evalType < FUNC_TRIG_INVALID) ) {
+		//check if secant, cosecant, or cotangent functions were requested
+		if ( (evalType >= CSC) && (evalType <= COT) ) {
+			float divByZeroCheck( mathFunc[ evalType-3 ]( *evalVar ) );
+			returnVal = divByZeroCheck ? 1.0f/divByZeroCheck : 0.0f;
+		}
+		else {
+			returnVal = mathFunc[ evalType ]( (float)(*evalVar) );
+		}
+	}
+	else {
+		returnVal = 0.f;
+	}
+	/*
 	switch ( evalType ) {
 		case SIN:
-			returnVal = std::sin( (float)(*evalNum) );
+			returnVal = std::sin( (float)(*evalVar) );
 			break;
 		case COS:
-			returnVal = std::cos( (float)(*evalNum) );
+			returnVal = std::cos( (float)(*evalVar) );
 			break;
 		case TAN:
-			returnVal = std::tan( (float)(*evalNum) );
+			returnVal = std::tan( (float)(*evalVar) );
 			break;
 		case CSC:
-			divZeroCheck = std::sin( (float)(*evalNum) );	//runtime error checking
+			divZeroCheck = std::sin( (float)(*evalVar) );	//runtime error checking
 			returnVal = (divZeroCheck != 0) ? 1.0f/divZeroCheck : 0.0f; //never divide by 0!
 			break;
 		case SEC:
-			divZeroCheck = std::cos( (float)(*evalNum) );
+			divZeroCheck = std::cos( (float)(*evalVar) );
 			returnVal = (divZeroCheck != 0) ? 1.0f/divZeroCheck : 0.0f;
 			break;
 		case COT:
-			divZeroCheck = std::cos( (float)(*evalNum) );
+			divZeroCheck = std::tan( (float)(*evalVar) );
 			returnVal = (divZeroCheck != 0) ? 1.0f/divZeroCheck : 0.0f;
 			break;
 		case ARC_SIN:
-			returnVal = std::asin( (float)(*evalNum) );
+			returnVal = std::asin( (float)(*evalVar) );
 			break;
 		case ARC_COS:
-			returnVal = std::acos( (float)(*evalNum) );
+			returnVal = std::acos( (float)(*evalVar) );
 			break;
 		case ARC_TAN:
-			returnVal = std::atan( (float)(*evalNum) );
+			returnVal = std::atan( (float)(*evalVar) );
 			break;
 		case HYP_SIN:
-			returnVal = std::sinh( (float)(*evalNum) );
+			returnVal = std::sinh( (float)(*evalVar) );
 			break;
 		case HYP_COS:
-			returnVal = std::cosh( (float)(*evalNum) );
+			returnVal = std::cosh( (float)(*evalVar) );
 			break;
 		case HYP_TAN:
-			returnVal = std::tanh( (float)(*evalNum) );
+			returnVal = std::tanh( (float)(*evalVar) );
 			break;
 		default:
-			returnVal = 0;
+			returnVal = 0.f;
 	}
-}
-
-void c_scriptTrigonometry::tick(float timeElapsed) {
-	run();
+	*/
 }
 
 } // end harbinger namespace

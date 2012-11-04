@@ -24,7 +24,7 @@ class c_resourceManager {
 			type* resource;
 			std::string resourceId;
 			
-			s_resource() : resource( NULL ) { setIdStr(); }
+			s_resource() : resource( nullptr ) { setIdStr(); }
 			
 			inline void setIdStr() {
 				std::ostringstream stout;
@@ -100,7 +100,7 @@ template <typename type>
 type* c_resourceManager<type>::getResource ( const char* resourceName ) {
 	//CAUTION: returns NULL if "resourceName" doesn't exist within the dictionary
 	type** resRef = referenceDict.getDefinition( resourceName );
-	return ( resRef != NULL ) ? *resRef : NULL;
+	return ( resRef != nullptr ) ? *resRef : nullptr;
 }
 
 template <typename type>
@@ -123,13 +123,13 @@ const char* c_resourceManager<type>::addResource( const type& objToAdd ) {
 		std::cerr
 			<< "ERROR: Maximum resource limit reached for " << vecMemErr.what()
 			<< " in Resource Manager Object " << this << std::endl;
-		return NULL;
+		return nullptr;
 	}
 	catch ( std::bad_alloc& vecMemErr ) {
 		std::cerr
 			<< "ERROR: Unable to reallocate memory for " << vecMemErr.what()
 			<< " in Resource Manager Object " << this << std::endl;
-		return NULL;
+		return nullptr;
 	}
 	
 	s_resource& resRef = resourceArray.back();
@@ -142,7 +142,7 @@ const char* c_resourceManager<type>::addResource( const type& objToAdd ) {
 template <typename type>
 void c_resourceManager<type>::removeObject( const char* objID ) {
 	type** objToRemove = referenceDict.getDefinition( objID );
-	if ( objToRemove == NULL || *objToRemove == NULL )
+	if ( objToRemove == nullptr || *objToRemove == nullptr )
 		return;
 	
 	typename std::vector< s_resource >::iterator iter;
@@ -150,7 +150,7 @@ void c_resourceManager<type>::removeObject( const char* objID ) {
 	while ( iter != resourceArray.end() ) {
 		if ( iter->resource == *objToRemove ) {
 			delete *objToRemove;
-			*objToRemove = NULL;
+			*objToRemove = nullptr;
 			resourceArray.erase( iter );
 		}
 		++iter;

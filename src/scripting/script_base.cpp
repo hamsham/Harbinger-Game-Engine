@@ -52,6 +52,14 @@ void c_script::setName( const std::string& inName ) {
 //-----------------------------------------------------------------------------
 //		Variable Base Class
 //-----------------------------------------------------------------------------
+c_scriptVarBase::c_scriptVarBase() {}
+
+c_scriptVarBase::c_scriptVarBase(const c_scriptVarBase& varCopy) :
+	c_script( varCopy )
+{}
+
+c_scriptVarBase::~c_scriptVarBase() {}
+
 c_scriptVarBase& c_scriptVarBase::operator = (const c_scriptVarBase& varCopy) {
 	name = varCopy.name;
 	return *this;
@@ -171,47 +179,13 @@ c_scriptFuncBase::~c_scriptFuncBase() {}
 //-----------------------------------------------------------------------------
 template <>
 c_scriptFunc< void* >::c_scriptFunc() :
-	returnVal( NULL )
+	returnVal( nullptr )
 {}
 
 template <>
 c_scriptFunc< void* >::c_scriptFunc( const c_scriptFunc& funcCopy ) :
 	c_scriptFuncBase( funcCopy ),
-	returnVal( NULL )
+	returnVal( nullptr )
 {}
-
-//-----------------------------------------------------------------------------
-//		Evaluation Function Base Class
-//-----------------------------------------------------------------------------
-c_scriptEvaluation::c_scriptEvaluation() :
-	evalType( 0 )
-{
-	returnVal = false;
-}
-
-c_scriptEvaluation::c_scriptEvaluation( const c_scriptEvaluation& evalCopy ) :
-	c_scriptFunc( evalCopy ),
-	evalType( evalCopy.evalType )
-{
-	returnVal = false;
-}
-
-c_scriptEvaluation::~c_scriptEvaluation() {}
-
-int c_scriptEvaluation::getEvalType() const {
-	return evalType;
-}
-
-void c_scriptEvaluation::setEvalType( int eval ) {
-	evalType = eval;
-}
-
-const c_scriptVarBase* c_scriptEvaluation::getVarToEvaluate() const {
-	return NULL;
-}
-
-const c_scriptVarBase* c_scriptEvaluation::getVarToReference() const {
-	return NULL;
-}
 
 } // end harbinger namespace

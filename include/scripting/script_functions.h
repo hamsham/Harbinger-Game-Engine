@@ -11,16 +11,78 @@
 namespace harbinger {
 
 //-----------------------------------------------------------------------------
+//		Evaluation Function Base Class
+//		Abstract
+//-----------------------------------------------------------------------------
+class c_scriptEvaluation : virtual public c_scriptFunc< c_scriptBool > {
+	friend class c_scriptManager;
+	
+	friend std::ostream& operator << ( std::ostream&, const c_scriptEvaluation& );
+	friend std::istream& operator >> ( std::istream&, c_scriptEvaluation& );
+	
+	protected:
+		int evalType;
+		const c_scriptVarBase *evalVar, *compVar;
+		//The object to evaluate, the object to compare it to
+	
+	public:
+		c_scriptEvaluation();
+		c_scriptEvaluation( const c_scriptEvaluation& evalCopy );
+		virtual ~c_scriptEvaluation() = 0;
+			
+	virtual int getScriptSubType() const {
+			return SCRIPT_FUNC_EVAL;
+		}
+		
+		int getEvalType() const;
+		virtual void setEvalType( int eval = 0 );
+		
+		virtual const c_scriptVarBase* getVarToEvaluate() const;
+		virtual void setVarToEvaluate( const c_scriptVarBase* inVar );
+		
+		virtual const c_scriptVarBase* getVarToCompare() const;
+		virtual void setVarToCompare( const c_scriptVarBase* inVar );
+};
+
+//-----------------------------------------------------------------------------
+//		Math Function Base Class
+//		Abstract
+//-----------------------------------------------------------------------------
+class c_scriptNumeric : virtual public c_scriptFunc< c_scriptFloat > {
+	friend class c_scriptManager;
+	
+	friend std::ostream& operator << ( std::ostream&, const c_scriptNumeric& );
+	friend std::istream& operator >> ( std::istream&, c_scriptNumeric& );
+	
+	protected:
+		int evalType;
+		const c_scriptNum *evalVar, *compVar;
+		//The object to evaluate, the object to compare to
+	
+	public:
+		c_scriptNumeric();
+		c_scriptNumeric( const c_scriptNumeric& numFunc );
+		virtual ~c_scriptNumeric() = 0;
+			
+	virtual int getScriptSubType() const {
+			return SCRIPT_FUNC_NUMERICAL;
+		}
+		
+		int getEvalType() const;
+		virtual void setEvalType( int eval = 0 );
+		
+		virtual const c_scriptNum* getVarToEvaluate() const;
+		virtual void setVarToEvaluate( const c_scriptNum* inVar );
+		
+		virtual const c_scriptNum* getVarToCompare() const;
+		virtual void setVarToCompare( const c_scriptNum* inVar );
+};
+
+//-----------------------------------------------------------------------------
 //		Numerical Evaluations
 //-----------------------------------------------------------------------------
 class c_scriptNumEval : public c_scriptEvaluation {
 	friend class c_scriptManager;
-	friend std::ostream& operator << ( std::ostream&, const c_scriptNumEval& );
-	friend std::istream& operator >> ( std::istream&, c_scriptNumEval& );
-	
-	protected:
-		const c_scriptNum *varToEval, *varToRef;
-		//NOTE: a boolean "returnVal" was inherited from c_scriptFunction
 		
 	public:
 		enum e_evalType {
@@ -37,36 +99,27 @@ class c_scriptNumEval : public c_scriptEvaluation {
 		c_scriptNumEval( const c_scriptNumEval& evalCopy );
 		~c_scriptNumEval();
 		
+		void setEvalType( int eval );
+		
+		const c_scriptNum* getVarToEvaluate() const;
+		void setVarToEvaluate( const c_scriptNum* inVar );
+		
+		const c_scriptNum* getVarToCompare() const;
+		void setVarToCompare( const c_scriptNum* inVar );
+		
+		void run();
+		void tick( float timeElapsed = 0 ) { run(); }
+		
 		int getScriptSubType() const {
 			return SCRIPT_FUNC_NUM_EVAL;
 		}
-		
-		const c_scriptNum* getVarToEvaluate() const;
-		void attachVarToEvaluate( const c_scriptNum* inVar );
-		void detachVarToEvaluate();
-		
-		const c_scriptNum* getVarToReference() const;
-		void attachVarToReference( const c_scriptNum* inVar );
-		void detachVarToReference();
-		
-		void setEvalType( int eval );
-		
-		void run();
-		void tick( float timeElapsed = 0 );
 };
 
 //-----------------------------------------------------------------------------
 //		Misc. Mathematical Functions
 //-----------------------------------------------------------------------------
-class c_scriptMiscMath : public c_scriptFunc<float> {
+class c_scriptMiscMath : public c_scriptNumeric {
 	friend class c_scriptManager;
-	friend std::ostream& operator << ( std::ostream&, const c_scriptMiscMath& );
-	friend std::istream& operator >> ( std::istream&, c_scriptMiscMath& );
-	
-	private:
-		int evalType;
-		c_scriptNum *evalNum;
-		// inherited member "returnVal"
 		
 	public:
 		enum e_math {
@@ -82,14 +135,11 @@ class c_scriptMiscMath : public c_scriptFunc<float> {
 		c_scriptMiscMath();
 		c_scriptMiscMath( const c_scriptMiscMath& evalCopy );
 		~c_scriptMiscMath();
-
-		const c_scriptNum* getNumToEvaluate();
-		void setNumToEvaluate( c_scriptNum* arg );
 		
 		void setEvalType( int eval );
 		
 		void run();
-		void tick( float timeElapsed = 0 );
+		void tick( float timeElapsed = 0 ) { run(); }
 		
 		int getScriptSubType() const {
 			return SCRIPT_FUNC_NUM_MISC;
@@ -99,14 +149,8 @@ class c_scriptMiscMath : public c_scriptFunc<float> {
 //-----------------------------------------------------------------------------
 //		Numerical Arithmetic
 //-----------------------------------------------------------------------------
-class c_scriptArithmetic : public c_scriptFunc<c_scriptNum> {
+class c_scriptArithmetic : public c_scriptNumeric {
 	friend class c_scriptManager;
-	friend std::ostream& operator << ( std::ostream&, const c_scriptArithmetic& );
-	friend std::istream& operator >> ( std::istream&, c_scriptArithmetic& );
-	
-	private:
-		int evalType;
-		c_scriptNum *evalNum, *refNum;
 		
 	public:
 		enum e_arithmetic {
@@ -123,16 +167,11 @@ class c_scriptArithmetic : public c_scriptFunc<c_scriptNum> {
 		c_scriptArithmetic();
 		c_scriptArithmetic( const c_scriptArithmetic& evalCopy );
 		~c_scriptArithmetic();
-
-		const c_scriptNum* getNumToEvaluate();
-		const c_scriptNum* getNumToReference();
-		void setNumToEvaluate( c_scriptNum* arg );
-		void setNumToReference( c_scriptNum* arg );
 		
 		void setEvalType( int eval );
 		
 		void run();
-		void tick( float timeElapsed = 0 );
+		void tick( float timeElapsed = 0 ) { run(); }
 		
 		int getScriptSubType() const {
 			return SCRIPT_FUNC_NUM_ARITH;
@@ -142,15 +181,9 @@ class c_scriptArithmetic : public c_scriptFunc<c_scriptNum> {
 //-----------------------------------------------------------------------------
 //		Numerical Trigonometry
 //-----------------------------------------------------------------------------
-class c_scriptTrigonometry : public c_scriptFunc<float> {
+class c_scriptTrigonometry : public c_scriptNumeric {
 	friend class c_scriptManager;
-	friend std::ostream& operator << ( std::ostream&, const c_scriptTrigonometry& );
-	friend std::istream& operator >> ( std::istream&, c_scriptTrigonometry& );
 	
-	private:
-		int evalType;
-		c_scriptNum *evalNum;
-		// The inherited member "returnVal" will always be in radians
 	public:
 		enum e_trigonometry {
 			SIN,
@@ -171,14 +204,11 @@ class c_scriptTrigonometry : public c_scriptFunc<float> {
 		c_scriptTrigonometry();
 		c_scriptTrigonometry( const c_scriptTrigonometry& evalCopy );
 		~c_scriptTrigonometry();
-
-		const c_scriptNum* getNumToEvaluate();
-		void setNumToEvaluate( c_scriptNum* arg );
 		
 		void setEvalType( int eval );
 		
 		void run();
-		void tick( float timeElapsed = 0 );
+		void tick( float timeElapsed = 0 ) { run(); }
 		
 		int getScriptSubType() const {
 			return SCRIPT_FUNC_NUM_TRIG;

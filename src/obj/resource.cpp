@@ -31,7 +31,7 @@ c_scriptManager& c_scriptManager::operator = ( const c_scriptManager& smCopy ) {
 
 //object addition & removal
 const char* c_scriptManager::addResource( const c_script& objToAdd ) {
-	if (resourceArray.size() == resourceArray.max_size()) return NULL;
+	if (resourceArray.size() == resourceArray.max_size()) return nullptr;
 	s_resource newResource;
 	
 	//massive switch statement to determine what type of class to add
@@ -57,7 +57,7 @@ const char* c_scriptManager::addResource( const c_script& objToAdd ) {
 				newResource.resource = new c_scriptBool( *(reinterpret_cast< c_scriptBool* >( &objToAdd)) );
 				break;
 			default:
-				return NULL;
+				return nullptr;
 		}
 	}
 	//script functions
@@ -76,7 +76,7 @@ const char* c_scriptManager::addResource( const c_script& objToAdd ) {
 				newResource.resource = new c_scriptTrigonometry( *(reinterpret_cast< c_scriptTrigonometry* >( &objToAdd)) );
 				break;
 			default:
-				return NULL;
+				return nullptr;
 		}
 	}
 	
@@ -99,7 +99,7 @@ const char* c_scriptManager::addResource( const c_script& objToAdd ) {
 hamLibs::config::configSaveStatus c_scriptManager::save() const {
 	std::ostringstream stout;
 	hamLibs::config cfg;
-	c_script* pScript( NULL );
+	c_script* pScript( nullptr );
 	
 	cfg.addSection( scriptVarCfgSection );
 	cfg.addSection( scriptFuncCfgSection );

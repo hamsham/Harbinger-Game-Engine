@@ -16,18 +16,20 @@ namespace harbinger {
 namespace serialization {
 	//file statuses
 	enum e_fileStatus {
-		FILE_LOAD_ERROR		= 0x1000,
-		FILE_LOAD_INVALID_NAME	= 0x3000,
-		FILE_LOAD_INVALID_PATH	= 0x5000,
-		FILE_LOAD_IO_ERROR		= 0x9000,
-		FILE_LOAD_SUCCESS		= 0x0100,
+		FILE_LOAD_ERROR,
+		FILE_LOAD_INVALID_NAME,
+		FILE_LOAD_INVALID_PATH,
+		FILE_LOAD_IO_ERROR,
+		FILE_LOAD_INVALID_DATA,
+		FILE_LOAD_SUCCESS,
 
-		FILE_SAVE_ERROR		= 0x0010,
-		FILE_SAVE_INVALID_NAME	= 0x0030,
-		FILE_SAVE_INVALID_PATH	= 0x0050,
-		FILE_SAVE_IO_ERROR		= 0x0090,
-		FILE_SAVE_OVERWRITE		= 0x0011,
-		FILE_SAVE_SUCCESS		= 0x0002
+		FILE_SAVE_ERROR,
+		FILE_SAVE_INVALID_NAME,
+		FILE_SAVE_INVALID_PATH,
+		FILE_SAVE_IO_ERROR,
+		FILE_SAVE_OVERWRITE,
+		FILE_SAVE_INVALID_DATA,
+		FILE_SAVE_SUCCESS
 	};
 	
 	//officially supported file types
@@ -87,20 +89,8 @@ std::ostream& operator << ( std::ostream&, const c_scriptEvaluation& );
 std::istream& operator >> ( std::istream&, c_scriptEvaluation& );
 
 // numerical evaluations
-std::ostream& operator << ( std::ostream&, const c_scriptNumEval& );
-std::istream& operator >> ( std::istream&, c_scriptNumEval& );
-
-// Mathematical functions
-std::ostream& operator << ( std::ostream&, const c_scriptMiscMath& );
-std::istream& operator >> ( std::istream&, c_scriptMiscMath& );
-
-// Arithmetical functions
-std::ostream& operator << ( std::ostream&, const c_scriptArithmetic& );
-std::istream& operator >> ( std::istream&, c_scriptArithmetic& );
-
-// Trigonometric Functions
-std::ostream& operator << ( std::ostream&, const c_scriptTrigonometry& );
-std::istream& operator >> ( std::istream&, c_scriptTrigonometry& );
+std::ostream& operator << ( std::ostream&, const c_scriptNumeric& );
+std::istream& operator >> ( std::istream&, c_scriptNumeric& );
 
 //------------------------------------------------------------------------
 // iostream operators - templated definitions
@@ -112,7 +102,7 @@ std::ostream& operator << ( std::ostream& sout, const c_scriptVar<type>& scr ) {
 		<< scr.getScriptType() << " "
 		<< scr.getScriptSubType() << " "
 		<< scr.getName() << " "
-		<< scr.varData();
+		<< scr.variable;
 	return sout;
 }
 
@@ -121,7 +111,7 @@ std::istream& operator >> ( std::istream& sin, c_scriptVar<type>& scr ) {
 	std::string varName;
 	sin
 		>> varName
-		>> scr.varData();
+		>> scr.variable;
 		scr.setName( varName );
 	return sin;
 }

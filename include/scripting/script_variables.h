@@ -161,10 +161,31 @@ class c_scriptUint :	virtual public c_scriptVar<unsigned int>,
 };
 
 //-----------------------------------------------------------------------------
+//		Boolean Variable
+//-----------------------------------------------------------------------------
+class c_scriptBool : virtual public c_scriptVar< bool > {
+	friend class c_scriptManager;
+	
+	public:
+		c_scriptBool();
+		c_scriptBool( bool inBool );
+		c_scriptBool( const c_scriptBool& inBool );
+		~c_scriptBool();
+		
+		int getScriptSubType() {
+			return SCRIPT_VAR_BOOL;
+		}
+		void setTrue();
+		void setFalse();
+};
+
+//-----------------------------------------------------------------------------
 //		Character String Variable
 //-----------------------------------------------------------------------------
 class c_scriptString : virtual public c_scriptVar< std::string > {
 	friend class c_scriptManager;
+	
+	//these are specially defined
 	friend std::ostream& operator << ( std::ostream&, const c_scriptString& );
 	friend std::istream& operator >> ( std::istream&, c_scriptString& );
 	
@@ -184,19 +205,22 @@ class c_scriptString : virtual public c_scriptVar< std::string > {
 };
 
 //-----------------------------------------------------------------------------
-//		Boolean Variable
+//		3D Vector Variable
 //-----------------------------------------------------------------------------
-class c_scriptBool : virtual public c_scriptVar< bool > {
+class c_scriptVec3d : virtual public c_scriptVar< hamLibs::math::vec3f > {
 	friend class c_scriptManager;
 	
 	public:
-		c_scriptBool();
-		c_scriptBool( bool inBool );
-		c_scriptBool( const c_scriptBool& inBool );
-		~c_scriptBool();
+		c_scriptVec3d();
+		c_scriptVec3d( const c_scriptVec3d& vecCopy );
+		c_scriptVec3d( const hamLibs::math::vec3f& vecCopy );
+		~c_scriptVec3d();
 		
-		int getScriptSubType() {
-			return SCRIPT_VAR_BOOL;
+		float operator[] ( int ) const;
+		float& operator[] ( int );
+		
+		int getScriptSubType() const {
+			return SCRIPT_VAR_VEC3;
 		}
 };
 

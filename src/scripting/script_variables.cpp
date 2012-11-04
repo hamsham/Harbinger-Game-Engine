@@ -411,8 +411,49 @@ c_scriptUint::operator c_scriptFloat() const {
 }
 
 //-----------------------------------------------------------------------------
+//		Boolean Variable
+//-----------------------------------------------------------------------------
+c_scriptBool::c_scriptBool() :
+	c_scriptVar( false )
+{}
+
+c_scriptBool::c_scriptBool( bool inBool ) :
+	c_scriptVar( inBool )
+{}
+
+c_scriptBool::c_scriptBool( const c_scriptBool& inBool ) :
+	c_scriptVar( inBool.variable )
+{}
+
+c_scriptBool::~c_scriptBool() {}
+
+void c_scriptBool::setTrue() {
+	variable = true;
+}
+
+void c_scriptBool::setFalse() {
+	variable = false;
+}
+
+//-----------------------------------------------------------------------------
 //		Character String Variable
 //-----------------------------------------------------------------------------
+c_scriptString::c_scriptString() {}
+
+c_scriptString::c_scriptString( const char* strCopy ) {
+	variable = strCopy;
+}
+
+c_scriptString::c_scriptString( const std::string& strCopy ) :
+	c_scriptVar( strCopy )
+{}
+
+c_scriptString::c_scriptString( const c_scriptString& strCopy ) :
+	c_scriptVar( strCopy )
+{}
+
+c_scriptString::~c_scriptString() {}
+
 char c_scriptString::operator []( size_t index ) const {
 	assert( index < variable.size() );
 	return variable[ index ];
@@ -421,6 +462,30 @@ char c_scriptString::operator []( size_t index ) const {
 char& c_scriptString::operator []( size_t index ) {
 	assert( index < variable.size() );
 	return variable[ index ];
+}
+
+//-----------------------------------------------------------------------------
+//		3D Vector Variable
+//-----------------------------------------------------------------------------
+
+c_scriptVec3d::c_scriptVec3d() {}
+
+c_scriptVec3d::c_scriptVec3d( const c_scriptVec3d& vecCopy ) :
+	c_scriptVar( vecCopy.variable )
+{}
+
+c_scriptVec3d::c_scriptVec3d( const hamLibs::math::vec3f& vecCopy ) :
+	c_scriptVar( vecCopy )
+{}
+
+c_scriptVec3d::~c_scriptVec3d() {}
+
+float c_scriptVec3d::operator[] ( int i ) const {
+	return variable[ i ];
+}
+
+float& c_scriptVec3d::operator[] ( int i ) {
+	return variable[ i ];
 }
 
 } // end harbinger namespace

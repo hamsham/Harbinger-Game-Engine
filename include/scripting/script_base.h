@@ -8,9 +8,6 @@
 #ifndef SCRIPT_BASE_H
 #define	SCRIPT_BASE_H
 
-#include "script.h"
-
-
 namespace harbinger {
 
 //-----------------------------------------------------------------------------
@@ -18,7 +15,16 @@ namespace harbinger {
 //-----------------------------------------------------------------------------
 class c_script {
 	friend class c_scriptManager;
-	friend class c_serializer;
+	
+	friend serialization::e_fileStatus serialization::saveScripts(
+		const char*, serialization::e_hgeFileType, scriptList&, bool
+	);
+	
+	friend serialization::e_fileStatus serialization::loadScripts(
+		const char*,
+		serialization::e_hgeFileType,
+		scriptList&
+	);
 	
 	/* A note about the stream operators:
 	 * The script type and sub-type will be printed when being sent to an ostream
@@ -53,7 +59,7 @@ class c_script {
 };
 
 //-----------------------------------------------------------------------------
-//		Variable Base Classe
+//		Variable Base Class
 //		All variables MUST support copy construction & assignment operators
 //-----------------------------------------------------------------------------
 //ADT used for separation of variables and functions
@@ -62,11 +68,9 @@ class c_scriptVarBase : virtual public c_script {
 	friend class c_scriptFuncBase;
 		
 	public:
-		c_scriptVarBase	() {}
-		c_scriptVarBase	( const c_scriptVarBase& varCopy ) :
-			c_script( varCopy )
-		{}
-		~c_scriptVarBase	() {}
+		c_scriptVarBase();
+		c_scriptVarBase( const c_scriptVarBase& varCopy );
+		virtual ~c_scriptVarBase	() = 0;
 		
 		int			getScriptType		() const { return SCRIPT_VAR; }
 		virtual int	getScriptSubType	() const { return SCRIPT_INVALID; }
@@ -78,6 +82,7 @@ class c_scriptVarBase : virtual public c_script {
 
 //-----------------------------------------------------------------------------
 //		Variable Interface Classe
+//		Abstract
 //		All variables MUST support copy construction & assignment operators
 //-----------------------------------------------------------------------------
 template <typename type>
@@ -212,6 +217,7 @@ class c_scriptNum : virtual public c_scriptVarBase {
 
 //-----------------------------------------------------------------------------
 //		Function Base Classes
+//		Abstract
 //-----------------------------------------------------------------------------
 class c_scriptFuncBase : virtual public c_script {
 	friend class c_scriptManager;
@@ -228,7 +234,8 @@ class c_scriptFuncBase : virtual public c_script {
 };
 
 //-----------------------------------------------------------------------------
-//		Function Class Interface (abstract due to c_scriptFuncBase)
+//		Function Class Interface
+//		Abstract
 //-----------------------------------------------------------------------------
 template <typename returnType>
 class c_scriptFunc : virtual public c_scriptFuncBase {
@@ -239,68 +246,50 @@ class c_scriptFunc : virtual public c_scriptFuncBase {
 	public:
 		c_scriptFunc();
 		c_scriptFunc( const c_scriptFunc& funcCopy );
-		~c_scriptFunc();
+		c_scriptFunc( const returnType& retVal );
+		virtual ~c_scriptFunc() = 0;
 		
-		returnType getReturnVal() const;
-		returnType& getReturnVal();
+		const returnType& getReturnVal() const;
+		void setReturnVal( const returnType& retVal );
 };
 
 template <typename returnType>
-c_scriptFunc< returnType >::c_scriptFunc() :
-	returnVal()
-{}
-
-template <typename returnType>
-c_scriptFunc< returnType >::c_scriptFunc( const c_scriptFunc& funcCopy ) :
-	c_scriptFuncBase( funcCopy ),
-	returnVal()
-{}
+c_scriptFunc< returnType >::c_scriptFunc() {}
 
 template <typename returnType>
 c_scriptFunc< returnType >::~c_scriptFunc() {}
 
 template <typename returnType>
-returnType c_scriptFunc< returnType >::getReturnVal() const {
+c_scriptFunc< returnType >::c_scriptFunc( const c_scriptFunc& funcCopy ) :
+	c_scriptFuncBase( funcCopy ),
+	returnVal( funcCopy.returnVal )
+{}
+
+template <typename returnType>
+c_scriptFunc< returnType >::c_scriptFunc( const returnType& retVal ) :
+	returnVal( retVal )
+{}
+
+template <typename returnType>
+const returnType& c_scriptFunc< returnType >::getReturnVal() const {
 	return returnVal;
 }
 
 template <typename returnType>
-returnType& c_scriptFunc< returnType >::getReturnVal() {
-	return returnVal;
+void c_scriptFunc< returnType >::setReturnVal( const returnType& retVal ) {
+	returnVal = retVal;
 }
 
-//-----------------------------------------------------------------------------
-//		Evaluation Function Base Class
-//-----------------------------------------------------------------------------
-class c_scriptEvaluation : virtual public c_scriptFunc< bool > {
-	friend class c_scriptManager;
-	
-	friend std::ostream& operator << ( std::ostream&, const c_scriptEvaluation& );
-	friend std::istream& operator >> ( std::istream&, c_scriptEvaluation& );
-	
-	protected:
-		int evalType;
-	
-	public:
-		c_scriptEvaluation();
-		c_scriptEvaluation( const c_scriptEvaluation& evalCopy );
-		virtual ~c_scriptEvaluation();
-			
-	virtual int getScriptSubType() const {
-			return SCRIPT_FUNC_EVAL;
-		}
-		
-		virtual void setEvalType( int eval = 0 );
-		int getEvalType() const;
-		
-		virtual const c_scriptVarBase* getVarToEvaluate() const;
-		virtual void attachVarToEvaluate( const c_scriptVarBase* inVar ) = 0;
-		virtual void detachVarToEvaluate() = 0;
-		
-		virtual const c_scriptVarBase* getVarToReference() const;
-		virtual void attachVarToReference( const c_scriptVarBase* inVar ) = 0;
-		virtual void detachVarToReference() = 0;
-};
+/* NOTE:
+ * The s_scriptEval and c_scriptNumeric functions have been moved to the
+ * "script_functions.h" header due to compiler errors, even though they are
+ * abstract base classes.
+ * The error generated was due to a combination of template definitions and
+ * virtual inheritance.
+ * 
+ * G++ generated the error:
+ *	"harbinger::c_scriptFunc<returnType>::returnVal' has incomplete type"
+ */
 
 } // end harbinger namespace
 #endif	/* SCRIPT_BASE_H */

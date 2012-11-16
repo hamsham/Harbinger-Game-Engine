@@ -7,7 +7,6 @@
 
 #ifndef SCRIPT_FUNCTIONS_H
 #define	SCRIPT_FUNCTIONS_H
-
 namespace harbinger {
 
 //-----------------------------------------------------------------------------
@@ -16,9 +15,7 @@ namespace harbinger {
 //-----------------------------------------------------------------------------
 class c_scriptEvaluation : virtual public c_scriptFunc< c_scriptBool > {
 	friend class c_scriptManager;
-	
-	friend std::ostream& operator << ( std::ostream&, const c_scriptEvaluation& );
-	friend std::istream& operator >> ( std::istream&, c_scriptEvaluation& );
+	friend class c_serialize;
 	
 	protected:
 		int evalType;
@@ -30,8 +27,8 @@ class c_scriptEvaluation : virtual public c_scriptFunc< c_scriptBool > {
 		c_scriptEvaluation( const c_scriptEvaluation& evalCopy );
 		virtual ~c_scriptEvaluation() = 0;
 			
-	virtual int getScriptSubType() const {
-			return SCRIPT_FUNC_EVAL;
+		virtual int getScriptSubType() const {
+			return SCRIPT_FUNC_EVAL; // invalid
 		}
 		
 		int getEvalType() const;
@@ -50,9 +47,7 @@ class c_scriptEvaluation : virtual public c_scriptFunc< c_scriptBool > {
 //-----------------------------------------------------------------------------
 class c_scriptNumeric : virtual public c_scriptFunc< c_scriptFloat > {
 	friend class c_scriptManager;
-	
-	friend std::ostream& operator << ( std::ostream&, const c_scriptNumeric& );
-	friend std::istream& operator >> ( std::istream&, c_scriptNumeric& );
+	friend class c_serialize;
 	
 	protected:
 		int evalType;
@@ -64,8 +59,8 @@ class c_scriptNumeric : virtual public c_scriptFunc< c_scriptFloat > {
 		c_scriptNumeric( const c_scriptNumeric& numFunc );
 		virtual ~c_scriptNumeric() = 0;
 			
-	virtual int getScriptSubType() const {
-			return SCRIPT_FUNC_NUMERICAL;
+		virtual int getScriptSubType() const {
+			return SCRIPT_FUNC_NUMERICAL; // invalid
 		}
 		
 		int getEvalType() const;
@@ -83,6 +78,7 @@ class c_scriptNumeric : virtual public c_scriptFunc< c_scriptFloat > {
 //-----------------------------------------------------------------------------
 class c_scriptNumEval : public c_scriptEvaluation {
 	friend class c_scriptManager;
+	friend class c_serialize;
 		
 	public:
 		enum e_evalType {
@@ -108,7 +104,6 @@ class c_scriptNumEval : public c_scriptEvaluation {
 		void setVarToCompare( const c_scriptNum* inVar );
 		
 		void run();
-		void tick( float timeElapsed = 0 ) { run(); }
 		
 		int getScriptSubType() const {
 			return SCRIPT_FUNC_NUM_EVAL;
@@ -120,6 +115,7 @@ class c_scriptNumEval : public c_scriptEvaluation {
 //-----------------------------------------------------------------------------
 class c_scriptMiscMath : public c_scriptNumeric {
 	friend class c_scriptManager;
+	friend class c_serialize;
 		
 	public:
 		enum e_math {
@@ -139,7 +135,6 @@ class c_scriptMiscMath : public c_scriptNumeric {
 		void setEvalType( int eval );
 		
 		void run();
-		void tick( float timeElapsed = 0 ) { run(); }
 		
 		int getScriptSubType() const {
 			return SCRIPT_FUNC_NUM_MISC;
@@ -151,6 +146,7 @@ class c_scriptMiscMath : public c_scriptNumeric {
 //-----------------------------------------------------------------------------
 class c_scriptArithmetic : public c_scriptNumeric {
 	friend class c_scriptManager;
+	friend class c_serialize;
 		
 	public:
 		enum e_arithmetic {
@@ -171,7 +167,6 @@ class c_scriptArithmetic : public c_scriptNumeric {
 		void setEvalType( int eval );
 		
 		void run();
-		void tick( float timeElapsed = 0 ) { run(); }
 		
 		int getScriptSubType() const {
 			return SCRIPT_FUNC_NUM_ARITH;
@@ -183,6 +178,7 @@ class c_scriptArithmetic : public c_scriptNumeric {
 //-----------------------------------------------------------------------------
 class c_scriptTrigonometry : public c_scriptNumeric {
 	friend class c_scriptManager;
+	friend class c_serialize;
 	
 	public:
 		enum e_trigonometry {
@@ -208,7 +204,6 @@ class c_scriptTrigonometry : public c_scriptNumeric {
 		void setEvalType( int eval );
 		
 		void run();
-		void tick( float timeElapsed = 0 ) { run(); }
 		
 		int getScriptSubType() const {
 			return SCRIPT_FUNC_NUM_TRIG;

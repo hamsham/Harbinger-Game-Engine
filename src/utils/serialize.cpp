@@ -8,24 +8,23 @@
 #include "../../include/harbinger.h"
 
 namespace harbinger {
-namespace serialization {
 
-//function pointers to aid in deserializing scripts.
-//CAUTION: All return a script type created using the 'NEW' operator
-// CAUTION: All factory arrays follow the order displayed by their corresponding
-// enumerations listed in the file "script.h"
 //-----------------------------------------------------------------------------
-// Script Variable Factory
+// Script Factories
 //-----------------------------------------------------------------------------
-#define SCRIPTVARFACTORY( scriptvartype )\
-c_scriptVarBase* get_##scriptvartype ( std::ifstream& fin ) {\
+#define SCRIPTFACTORY( scriptBaseType, scriptvartype )\
+c_##scriptBaseType* get_##scriptvartype () {\
 	c_##scriptvartype *var( new( std::nothrow ) c_##scriptvartype );\
-	if ( var ) {\
-		fin >> *var;\
-	}\
 	return var;\
 }
 
+//CAUTION: All factories return a script type created using the 'NEW' operator
+// CAUTION: All factory arrays follow the order displayed by their corresponding
+// enumerations listed in the file "script.h"
+#define SCRIPTVARFACTORY( x ) SCRIPTFACTORY( scriptVarBase, x )
+#define SCRIPTFUNCFACTORY( x ) SCRIPTFACTORY( scriptFuncBase, x )
+
+// Variable Factories
 SCRIPTVARFACTORY( scriptInt )
 SCRIPTVARFACTORY( scriptUint )
 SCRIPTVARFACTORY( scriptFloat )
@@ -33,7 +32,15 @@ SCRIPTVARFACTORY( scriptBool )
 SCRIPTVARFACTORY( scriptString )
 SCRIPTVARFACTORY( scriptVec3d )
 
-typedef c_scriptVarBase* ( *scriptVarFactory )( std::ifstream& fin );
+// Function Factories
+SCRIPTFUNCFACTORY( scriptNumEval )
+SCRIPTFUNCFACTORY( scriptMiscMath )
+SCRIPTFUNCFACTORY( scriptArithmetic )
+SCRIPTFUNCFACTORY( scriptTrigonometry )
+
+//Function pointers to aid in creating script objects.
+// Variable Factories
+typedef c_scriptVarBase* ( *scriptVarFactory )();
 static scriptVarFactory varFactory[] = {
 	get_scriptInt,
 	get_scriptUint,
@@ -43,24 +50,8 @@ static scriptVarFactory varFactory[] = {
 	get_scriptVec3d,
 };
 
-//-----------------------------------------------------------------------------
-// Script Function Factory
-//-----------------------------------------------------------------------------
-#define SCRIPTFUNCFACTORY( scriptfunctype )\
-c_scriptFuncBase* get_##scriptfunctype ( std::ifstream& fin ) {\
-	c_##scriptfunctype *var( new( std::nothrow ) c_##scriptfunctype );\
-	if ( var ) {\
-		fin >> *var;\
-	}\
-	return var;\
-}
-
-SCRIPTFUNCFACTORY( scriptNumEval )
-SCRIPTFUNCFACTORY( scriptMiscMath )
-SCRIPTFUNCFACTORY( scriptArithmetic )
-SCRIPTFUNCFACTORY( scriptTrigonometry )
-
-typedef c_scriptFuncBase* ( *scriptFuncFactory )( std::ifstream& );
+// Function Factories
+typedef c_scriptFuncBase* ( *scriptFuncFactory )();
 static scriptFuncFactory funcFactory[] = {
 	get_scriptNumEval,
 	get_scriptMiscMath,
@@ -68,140 +59,165 @@ static scriptFuncFactory funcFactory[] = {
 	get_scriptTrigonometry
 };
 
+//-----------------------------------------------------------------------------
+// Utility functions
+//-----------------------------------------------------------------------------
+e_hgeFileType c_serialize::getFileType( const char* fileName ) const {
+	std::string fileExt( fileName );
+	std::size_t pos( fileExt.find_last_of('.', fileExt.size()-4) );
+	
+	if ( pos == std::string::npos ) {
+		return HGE_SCRIPT_FILE_INVALID;
+	}
+	
+	if ( (fileExt[ ++pos ] == 'h' || fileExt[ pos ] == 'H')
+	&& (fileExt[ ++pos ] == 's' || fileExt[ pos ] == 'S')
+	&& (fileExt[ ++pos ] == 'd' || fileExt[ pos ] == 'D') ) {
+		return HGE_SCRIPT_FILE_DATA;
+	}
+	
+	return HGE_SCRIPT_FILE_INVALID;
+}
 
-//-----------------------------------------------------------------------------
-// serialization extension functions
-//-----------------------------------------------------------------------------
-bool readHeader( std::ifstream& fin, e_hgeFileType fileType, scriptList& scrList );
-bool readFooter( std::ifstream& fin, scriptListSize_t numVars, scriptListSize_t numFuncs );
-c_script* loadVar( std::ifstream& fin, scriptVarMap& varMap, int scriptSubType );
-c_script* loadFunc( std::ifstream& fin, scriptVarMap& varMap, int scriptSubType );
-void unloadData( scriptList& scrList ); //in case of a file read error, clear memory
+void c_serialize::closeStream() {
+	fileIO.close();
+	fileIO.clear();
+}
 
 //-----------------------------------------------------------------------------
 // SERIALIZATION - SAVING
 // Small enough to not require extra functions
 //-----------------------------------------------------------------------------
-e_fileStatus saveScripts( const char* fileName, e_hgeFileType fileType, scriptList& inScripts, bool overwriteData ) {
-	if ( al_filename_exists( fileName ) && overwriteData == false )
-		return FILE_SAVE_OVERWRITE;
+c_serialize::e_fileStatus c_serialize::saveScripts( const char* fileName, const scriptList& inScripts, bool overwriteData ) {
+	//read in the file extension
+	if ( getFileType( fileName ) == HGE_SCRIPT_FILE_INVALID )
+		return FILE_SAVE_INVALID_NAME;
 	
-	std::ofstream fout;
-	fout.open( fileName, std::ios_base::binary | std::ios_base::trunc );
-	if ( fout.bad() ) {
+	fileIO.open( fileName, std::ios_base::app );
+	if ( fileIO.bad() ) {
 		return FILE_SAVE_IO_ERROR;
 	}
+	if ( fileIO.good() && overwriteData == false )
+		return FILE_SAVE_OVERWRITE;
+	
+	closeStream();
+	fileIO.flags( std::ios_base::fixed );
+	fileIO.open( fileName, std::ios_base::out | std::ios_base::binary | std::ios_base::trunc );
 	
 	//print a header
-	fout
-		<< "hge "
-		<< HARBINGER_FILE_TYPES[ fileType ]
-		<< " "
-		<< inScripts.size()
-		<< '\n';
+	fileIO
+		<< HARBINGER_FILE_TYPE << " "
+		<< HGE_SCRIPT_FILE_DATA << " "
+		<< inScripts.size() << '\n';
 	
 	//prep a footer
-	size_t numVars( 0 );
-	size_t numFuncs( 0 );
+	size_t numVars( 0 ); // numVars & numFuncs count the amount of scripts that have been processed
+	size_t numFuncs( 0 );// not the amount of scripts that are in "varMap" or "funcMap"
 	
+	c_scriptVarBase* pVar( NULL );
+	c_scriptFuncBase* pFunc( NULL );
 	scriptList::iterator iter;
-	c_script* pScript( NULL );
-	iter = inScripts.begin();
+	iter = const_cast< scriptList* >( &inScripts)->begin();
 	
 	while ( iter != inScripts.end() ) {
-		pScript = *iter;
-		fout
-			<< pScript->getScriptType() << " "
-			<< pScript->getScriptSubType() << " ";
+		fileIO
+			<< (*iter)->getScriptType() << " "
+			<< (*iter)->getScriptSubType() << " ";
+			//<< (*iter) << " "; //use the heap pointer as a UUID
+		//"-sizeof(void*)" is used due to a strange incrementation of the UUID/pointer when saved to the file
 		
-		if ( pScript->getScriptType() == SCRIPT_VAR ) {
-			//variable addresses will be read back upon deserialization
-			fout << (ulong)pScript << " " << *pScript;
+		if ( (*iter)->getScriptType() == SCRIPT_VAR ) {
+			pVar = reinterpret_cast< c_scriptVarBase* >( *iter );
+			fileIO << pVar << " ";
+			writeVar( pVar, pVar->getScriptSubType() );
 			++numVars;
 		}
-		else if ( pScript->getScriptType() == SCRIPT_FUNC ) {
-			fout << *pScript;
+		else if ( (*iter)->getScriptType() == SCRIPT_FUNC ) {
+			pFunc = reinterpret_cast< c_scriptFuncBase* >( *iter );
+			fileIO << pFunc << " ";
+			writeFunc( pFunc, pFunc->getScriptSubType() );
 			++numFuncs;
 		}
 		else {
-			fout.close();
-			if ( overwriteData == true )
-				al_remove_filename( fileName );
+			//an invalid file type was found while saving. write the footer and quit
+			fileIO << numVars << " " << numFuncs;
+			closeStream();
 			return FILE_SAVE_INVALID_DATA;
 		}
-		fout << *pScript << '\n';
-		fout.flush();
+		
+		fileIO << '\n';
+		fileIO.flush(); //not trying to overflow the buffer
 		++iter;
 	}
 	
 	//print the footer
-	fout << numVars << " " << numFuncs;
-	fout.flush();
-	
-	fout.close();
+	fileIO << numVars << " " << numFuncs;
+	closeStream();
 	return FILE_SAVE_SUCCESS;
-}
-
-void unloadData( scriptList& scrList ) {
-	scriptList::iterator iter;
-	for ( iter != scrList.begin(); iter != scrList.end(); ++iter )
-		delete *iter;
 }
 
 //-----------------------------------------------------------------------------
 // SERIALIZATION - LOADING
 // Uses functions to read in the header, footer, variables, and functions
 //-----------------------------------------------------------------------------
-e_fileStatus loadScripts( const char* fileName, e_hgeFileType fileType, scriptList& outScripts ) {
+c_serialize::e_fileStatus c_serialize::loadScripts( const char* fileName, scriptList& outScripts ) {
+	if ( outScripts.size() != 0 )
+		return FILE_LOAD_OVERWRITE;
 	
-	if ( al_filename_exists( fileName ) == false )
-		return FILE_LOAD_INVALID_NAME;
+	fileIO.open( fileName, std::ios_base::in | std::ios_base::binary );
+	fileIO.flags( std::ios::skipws | std::ios::fixed );
 	
-	std::ifstream fin( fileName, std::ios_base::binary );
-	if ( fin.bad() == true )
-		return FILE_LOAD_IO_ERROR;
-	
-	//read the header
-	if ( !readHeader( fin, fileType, outScripts ) ) {
-		fin.close();
+	if ( fileIO.good() == false || readHeader( outScripts ) == false ) {
+		closeStream();
 		return FILE_LOAD_ERROR;
 	}
 	
 	//type verifications
+	c_scriptVarBase* pVar( NULL );
+	c_scriptFuncBase* pFunc( NULL );
 	int scrType( 0 );
 	int scrSubType( 0 );
-	size_t numVars( 0 );
-	size_t numFuncs( 0 );
+	size_t numVars( 0 ); // numVars & numFuncs count the amount of scripts that have been processed
+	size_t numFuncs( 0 );// not the amount of scripts that are in "varMap" or "funcMap"
+	ulong scriptUUID( 0 );
 	
-	//create a map/table for all pointers to variables
-	scriptVarMap varMap;
-	varMap[ 0 ] = NULL; //create a default, invalid, value
 	scriptList::iterator iter;
 	iter = outScripts.begin(); // memory was preallocated by the "readHeader" function
 	
-	while ( fin.good() ) {
+	while ( fileIO.good() ) {
+		
+		if ( iter == outScripts.end() )
+			break;
 		
 		//read in the data types
-		fin >> scrType;
-		fin >> scrSubType;
+		fileIO >> scrType;
+		fileIO >> scrSubType;
+		fileIO >> scriptUUID;
 		
 		//variable type
 		if ( scrType == SCRIPT_VAR ) {
+			HGE_ASSERT ( (scrSubType > SCRIPT_INVALID && scrSubType < SCRIPT_VAR_MAX) );
 			++numVars;
-			*iter = loadVar( fin, varMap, scrSubType );
+			pVar = varFactory[ scrSubType ](); //function pointer call
+			readVar( pVar, scrSubType );
+			varMap[ scriptUUID ] = pVar;
+			*iter = pVar;
 		}
 		//function type
 		else if ( scrType == SCRIPT_FUNC ) {
+			HGE_ASSERT ( (scrSubType > SCRIPT_INVALID && scrSubType < SCRIPT_FUNC_MAX) );
 			++numFuncs;
-			*iter = loadFunc( fin, varMap, scrSubType );
+			pFunc = funcFactory[ scrSubType ](); //function pointer call
+			readFunc( pFunc, scrSubType );
+			funcMap[ scriptUUID ] = pFunc;
+			*iter = pFunc;
 		}
-		else {
-			goto invalidFileData;
+		else { // invalid file data
+			goto scriptLoadError;
 		}
-		
-		if ( *iter == NULL ) {
-			invalidFileData: //goto used from the "else" statement above
-			fin.close();
+		if ( *iter == NULL ){
+			scriptLoadError:
+			closeStream();
 			unloadData( outScripts );
 			return FILE_LOAD_INVALID_DATA;
 		}
@@ -209,227 +225,197 @@ e_fileStatus loadScripts( const char* fileName, e_hgeFileType fileType, scriptLi
 	}
 	
 	//read in the footer
-	if ( !fin.good()
-	|| (varMap.size() != outScripts.size())
-	|| !readFooter( fin, numVars, numFuncs ) ) {
-		fin.close();
-		unloadData( outScripts );
+	if ( !fileIO.good()
+	|| !readFooter( outScripts, numVars, numFuncs) ) {
+		closeStream();
+		unloadData(outScripts );
 		return FILE_LOAD_ERROR;
 	}
 	
-	fin.close();
+	varMap.clear();
+	funcMap.clear();
+	closeStream();
 	return FILE_LOAD_SUCCESS;
+}
+
+//-----------------------------------------------------------------------------
+// Clear memory in case of error
+//-----------------------------------------------------------------------------
+void c_serialize::unloadData( scriptList& inScripts ) {
+	varMap.clear();
+	funcMap.clear();
+	scriptList::iterator iter;
+	
+	for ( iter = inScripts.begin(); iter != inScripts.end(); ++iter ) {
+		delete *iter;
+	}
+	inScripts.clear();
 }
 
 //-----------------------------------------------------------------------------
 // SERIALIZATION EXTENSION FUNCTIONS
 //-----------------------------------------------------------------------------
-bool readHeader( std::ifstream& fin, e_hgeFileType fileType, scriptList& scrList ) {
+bool c_serialize::readHeader( scriptList& scrList ) {
+	int fileType;
 	std::string inData;
 	scriptList::size_type numItems( 0 );
 	
-	fin >> inData;
-	if ( inData != "hge" )
+	fileIO >> inData;
+	if ( inData != HARBINGER_FILE_TYPE ) {
 		return false;
+	}
 		
-	fin >> inData;
-	if ( inData != HARBINGER_FILE_TYPES[ fileType ] )
+	fileIO >> fileType;
+	if ( fileType != HGE_SCRIPT_FILE_DATA ) {
 		return false;
+	}
 	
-	fin >> numItems;
-	if ( numItems < scrList.max_size() )
-		scrList.resize( numItems, NULL );
-	else
+	fileIO >> numItems;
+	if ( numItems >= scrList.max_size() ) {
+		return false;
+	}
+	scrList.resize( numItems, NULL );
+	return true;
+}
+
+bool c_serialize::readFooter( scriptList& scrList, size_t numVars, size_t numFuncs ) {
+	size_t varVerification( 0 );
+	size_t funcVerification( 0 );
+	fileIO >> varVerification >> funcVerification;
+
+	if ( (numVars != varVerification) || (numFuncs != funcVerification) )
+		return false;
+	if ( (numVars + numFuncs) != scrList.size() )
 		return false;
 	
 	return true;
 }
 
-bool readFooter( std::ifstream& fin, size_t numVars, size_t numFuncs ) {
-	size_t varVerification( 0 );
-	size_t funcVerification( 0 );
-	fin >> varVerification >> funcVerification;
-
-	if ( (numVars != varVerification) || (numFuncs != funcVerification) ) {
-		return false;
+//-----------------------------------------------------------------------------
+//	Input Functions
+//-----------------------------------------------------------------------------
+void c_serialize::readVar( c_scriptVarBase* var, int varSubType ) {
+	if ( varSubType == SCRIPT_VAR_INT ) {
+		fileIO >> dynamic_cast< c_scriptInt* >( var )->variable;
+		return;
+	}
+	else if ( varSubType == SCRIPT_VAR_UINT ) {
+		fileIO >> dynamic_cast< c_scriptUint* >( var )->variable;
+		return;
+	}
+	else if ( varSubType == SCRIPT_VAR_FLOAT ) {
+		fileIO >> dynamic_cast< c_scriptFloat* >( var )->variable;
+		return;
+	}
+	else if ( varSubType == SCRIPT_VAR_BOOL ) {
+		fileIO >> dynamic_cast< c_scriptBool* >( var )->variable;
+		return;
+	}
+	else if ( varSubType == SCRIPT_VAR_STRING ) {
+		std::string::size_type strSize( 0 );
+		std::string::size_type iter( 0 );
+		std::string& str = dynamic_cast< c_scriptString* >( var )->variable;
+		fileIO >> strSize;
+		if ( strSize == 0 ) return;
+		fileIO.get(); // discard the next whitespace before reading in the string
+		str.resize( strSize );
+		while ( iter <= strSize ) {
+			str[ iter ] = fileIO.get();
+			++iter;
+		}
+		return;
+	}
+	else if ( varSubType == SCRIPT_VAR_VEC3 ) {
+		fileIO >> dynamic_cast< c_scriptBool* >( var )->variable;
+		return;
 	}
 }
-	
-c_script* loadVar( std::ifstream& fin, scriptVarMap& varMap, int varType ) {
-	if ( varType < 0 || varType >= SCRIPT_VAR_MAX )
-		return NULL;
-	
-	ulong varRefNum( 0 ); //reference variable for script Vars
-	fin >> varRefNum;
-	
-	c_scriptVarBase* pVar( NULL );
-	pVar = varFactory[ varType ]( fin ); //function pointer call
-	
-	varMap[ varRefNum ] = pVar;
-	return pVar;
-}
 
-c_script* loadFunc( std::ifstream& fin, scriptVarMap& varMap, int scrSubType ) {
-	if ( scrSubType < 0 || scrSubType >= SCRIPT_FUNC_MAX )
-		return NULL;
+void c_serialize::readFunc( c_scriptFuncBase* func, int funcSubType ) {
+	ulong uuid( 0 );
 	
-	ulong varRefNum( 0 ); //reference variable for script Vars
-	c_scriptFuncBase* pFunc(
-		funcFactory[ scrSubType ]( fin ) //more function pointers
-	);
-	if ( pFunc == NULL ) return NULL;
-
-	//restore the function's variables (the static casts are safe due to the function factory)
-	if ( scrSubType == SCRIPT_FUNC_NUM_EVAL ) {
-		c_scriptNumEval* numEval = dynamic_cast< c_scriptNumEval* >( pFunc );
-		fin >> varRefNum;
-		numEval->setVarToEvaluate(
-			reinterpret_cast<c_scriptNum*>( varMap[ varRefNum ] )
-		);
-		fin >> varRefNum;
-		numEval->setVarToCompare(
-			reinterpret_cast<c_scriptNum*>( varMap[ varRefNum ] )
-		);
-	}
-	
-	else if ( scrSubType == SCRIPT_FUNC_NUM_MISC
-	|| SCRIPT_FUNC_NUM_ARITH
-	|| SCRIPT_FUNC_NUM_TRIG ) {
-		c_scriptNumeric* numEval = dynamic_cast< c_scriptNumeric* >( pFunc );
-		fin >> varRefNum;
-		numEval->setVarToEvaluate(
-			reinterpret_cast<c_scriptNum*>( varMap[ varRefNum ] )
-		);
-		fin >> varRefNum;
-		numEval->setVarToCompare(
-			reinterpret_cast<c_scriptNum*>( varMap[ varRefNum ] )
-		);
-	}
-	
-	else {
-		//kill the loading functions if an invalid type is found
-		return NULL;
-	}
-	
-	return pFunc;
-}
-
-} // end serialization namespace
-
-//-----------------------------------------------------------------------------
-// iostream operators - Definitions
-//-----------------------------------------------------------------------------
-/* A note about the stream operators:
-* The script type and sub-type will be printed when being sent to an ostream
-* but they are not read back in by an istream.
-* This is because the script type and sub-type must be determined before
-* reading in any object data. This makes it much easier to determine what
-* type of polymorphic object should be loaded when saving to/loading from files
-*/
-std::ostream& operator << ( std::ostream& sout, const c_script& scr ) {
-	sout
-		<< scr.getScriptType() << " "
-		<< scr.getScriptSubType() << " "
-		<< scr.name;
-	return sout;
-}
-
-std::istream& operator >> ( std::istream& stin, c_script& scr ) {
-	stin
-		>> scr.name;
-	return stin;
-}
-
-//-----------------------------------------------------------------------------
-// Evaluation Functions
-//-----------------------------------------------------------------------------
-std::ostream& operator << ( std::ostream& sout, const c_scriptEvaluation& scr ) {
-	sout
-		<< scr.getScriptType() << " "
-		<< scr.getScriptSubType() << " "
-		<< scr.name << " "
-		<< scr.evalType << " "
-		<< scr.returnVal << " "
-		<< (ulong)scr.evalVar << " "
-		<< (ulong)scr.compVar;
+	if ( funcSubType == SCRIPT_FUNC_NUM_EVAL ) {
+		c_scriptEvaluation* eval = dynamic_cast< c_scriptEvaluation* >( func );
 		
-	return sout;
-}
-
-std::istream& operator >> ( std::istream& stin, c_scriptEvaluation& scr ) {
-	stin
-		>> scr.name
-		>> scr.evalType
-		>> scr.returnVal;
-		//varToEvaluate and varToReference are neither read in or saved
-		//this is so that there can be a "master" serialization function
-		//to manage the saving and loading of pointers
-		
-	return stin;
-}
-
-//-----------------------------------------------------------------------------
-// Numerical Functions (same as Evaluations)
-//-----------------------------------------------------------------------------
-std::ostream& operator << ( std::ostream& sout, const c_scriptNumeric& scr ) {
-	sout
-		<< scr.getScriptType() << " "
-		<< scr.getScriptSubType() << " "
-		<< scr.name << " "
-		<< scr.evalType << " "
-		<< scr.returnVal << " "
-		<< (ulong)scr.evalVar << " "
-		<< (ulong)scr.compVar;
-		
-	return sout;
-}
-
-std::istream& operator >> ( std::istream& stin, c_scriptNumeric& scr ) {
-	stin
-		>> scr.name
-		>> scr.evalType
-		>> scr.returnVal;
-		//varToEvaluate and varToReference are neither read in or saved
-		//this is so that there can be a "master" serialization function
-		//to manage the saving and loading of pointers
-		
-	return stin;
-}
-
-//-----------------------------------------------------------------------------
-// String Variables
-//-----------------------------------------------------------------------------
-std::ostream& operator << ( std::ostream& sout, const c_scriptString& scr ) {
-	sout
-		<< scr.getScriptType() << " "
-		<< scr.getScriptSubType() << " "
-		<< scr.name
-		<< scr.variable << '\0';
-		//very important NULL-termination. Necessary for reading data back from files
-	return sout;
-}
-
-std::istream& operator >> ( std::istream& stin, c_scriptString& scr ) {
-	stin
-		>> scr.name;
-	
-	std::streampos string_begin;
-	std::string::size_type num_chars( 0 );
-	string_begin = stin.tellg();
-	char null_term( 1 );
-	
-	while ( null_term != 0 ) {
-		null_term = stin.get();
+		fileIO >> eval->evalType >> eval->returnVal.variable;
+		fileIO >> uuid; eval->evalVar = varMap[ uuid ];
+		fileIO >> uuid; eval->compVar = varMap[ uuid ];
+		fileIO >> uuid; eval->nextFunc = funcMap[ uuid ];
+		return;
 	}
-	
-	//I have tested this extensively using G++ & MSVC++.
-	//It NULL-terminates and gives the correct string size.
-	num_chars = (stin.tellg() - string_begin) - 1;
-	scr.variable.resize( num_chars );
-	stin.read( (char*)scr.variable.data(), num_chars );
-	scr.variable[ num_chars ] = '\0';
-	
-	return stin;
+	else if ( funcSubType == SCRIPT_FUNC_NUM_MISC
+	||  funcSubType == SCRIPT_FUNC_NUM_TRIG
+	||  funcSubType == SCRIPT_FUNC_NUM_ARITH) {
+		c_scriptNumeric* numeric = dynamic_cast< c_scriptNumeric* >( func );
+		
+		fileIO >> numeric->evalType >> numeric->returnVal.variable;
+		fileIO >> uuid;
+		numeric->evalVar = dynamic_cast< const c_scriptNum* >(varMap[ uuid ]);
+		fileIO >> uuid;
+		numeric->compVar = dynamic_cast< const c_scriptNum* >(varMap[ uuid ]);
+		fileIO >> uuid; numeric->nextFunc = funcMap[ uuid ];
+		return;
+	}
+}
+
+//-----------------------------------------------------------------------------
+//	Output Functions
+//-----------------------------------------------------------------------------
+void c_serialize::writeVar( c_scriptVarBase* var, int varSubType ) {
+	if ( varSubType == SCRIPT_VAR_INT ) {
+		fileIO << dynamic_cast< c_scriptInt* >( var )->variable;
+		return;
+	}
+	else if ( varSubType == SCRIPT_VAR_UINT ) {
+		fileIO << dynamic_cast< c_scriptUint* >( var )->variable;
+		return;
+	}
+	else if ( varSubType == SCRIPT_VAR_FLOAT ) {
+		fileIO << dynamic_cast< c_scriptFloat* >( var )->variable;
+		return;
+	}
+	else if ( varSubType == SCRIPT_VAR_BOOL ) {
+		fileIO << dynamic_cast< c_scriptBool* >( var )->variable;
+		return;
+	}
+	else if ( varSubType == SCRIPT_VAR_STRING ) {
+		std::string& str = dynamic_cast< c_scriptString* >( var )->variable;
+		fileIO << str.size() << " " << str.c_str();
+		return;
+	}
+	else if ( varSubType == SCRIPT_VAR_VEC3 ) {
+		fileIO << dynamic_cast< c_scriptVec3d* >( var )->variable;
+		return;
+	}
+}
+
+void c_serialize::writeFunc( c_scriptFuncBase* func, int funcSubType ) {
+	if ( funcSubType == SCRIPT_FUNC_NUM_EVAL ) {
+		c_scriptEvaluation* eval;
+		eval = dynamic_cast< c_scriptEvaluation* >( func );
+		
+		fileIO
+			<< eval->evalType << " "
+			<< eval->returnVal.variable << " "
+			<< eval->evalVar << " "
+			<< eval->compVar << " "
+			<< eval->nextFunc;
+		return;
+	}
+	else if ( funcSubType == SCRIPT_FUNC_NUM_MISC
+	||  funcSubType == SCRIPT_FUNC_NUM_TRIG
+	||  funcSubType == SCRIPT_FUNC_NUM_ARITH) {
+		c_scriptNumeric* numeric;
+		numeric = dynamic_cast< c_scriptNumeric* >( func );
+		
+		fileIO
+			<< numeric->evalType << " "
+			<< numeric->returnVal.variable << " "
+			<< numeric->evalVar << " "
+			<< numeric->compVar << " "
+			<< numeric->nextFunc;
+		return;
+	}
 }
 
 } // end harbinger namespace

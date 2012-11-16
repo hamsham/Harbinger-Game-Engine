@@ -7,7 +7,6 @@
 
 #ifndef SCRIPT_BASE_H
 #define	SCRIPT_BASE_H
-
 namespace harbinger {
 
 //-----------------------------------------------------------------------------
@@ -15,37 +14,10 @@ namespace harbinger {
 //-----------------------------------------------------------------------------
 class c_script {
 	friend class c_scriptManager;
-	
-	friend serialization::e_fileStatus serialization::saveScripts(
-		const char*, serialization::e_hgeFileType, scriptList&, bool
-	);
-	
-	friend serialization::e_fileStatus serialization::loadScripts(
-		const char*,
-		serialization::e_hgeFileType,
-		scriptList&
-	);
-	
-	/* A note about the stream operators:
-	 * The script type and sub-type will be printed when being sent to an ostream
-	 * but they are not read back in by an istream.
-	 * This is because the script type and sub-type must be determined before
-	 * reading in any object data. This makes it much easier to determine what
-	 * type of polymorphic object should be loaded when saving to/loading from files
-	 */
-	friend std::ostream& operator << ( std::ostream&, const c_script& );
-	friend std::istream& operator >> ( std::istream&, c_script& );
-	
-	static const char* defaultName;
-	static const char* invalidName;
-	
-	protected:
-		std::string name;
+	friend class c_serialize;
 
 	public:
-		c_script			();
-		c_script			( const c_script& scriptCopy );
-		~c_script			();
+		virtual ~c_script	() = 0;
 		
 		virtual c_script&	operator=			( const c_script& scriptCopy );
 		virtual bool		operator==		( const c_script& scriptCopy ) const;
@@ -53,9 +25,6 @@ class c_script {
 		
 		virtual int		getScriptType		() const { return SCRIPT_BASE; }
 		virtual int		getScriptSubType	() const { return SCRIPT_INVALID; }
-		
-		const std::string&	getName			() const;
-		void				setName			( const std::string& inName );
 };
 
 //-----------------------------------------------------------------------------
@@ -65,11 +34,10 @@ class c_script {
 //ADT used for separation of variables and functions
 class c_scriptVarBase : virtual public c_script {
 	friend class c_scriptManager;
+	friend class c_serialize;
 	friend class c_scriptFuncBase;
 		
 	public:
-		c_scriptVarBase();
-		c_scriptVarBase( const c_scriptVarBase& varCopy );
 		virtual ~c_scriptVarBase	() = 0;
 		
 		int			getScriptType		() const { return SCRIPT_VAR; }
@@ -88,15 +56,7 @@ class c_scriptVarBase : virtual public c_script {
 template <typename type>
 class c_scriptVar : virtual public c_scriptVarBase {
 	friend class c_scriptManager;
-	
-	/* Serialization Spec:
-	 * name
-	 * variable
-	 */
-	template <typename T>
-	friend std::ostream& operator << ( std::ostream&, const c_scriptVar<T>& );
-	template <typename T>
-	friend std::istream& operator >> ( std::istream&, c_scriptVar<T>& );
+	friend class c_serialize;
 	
 	protected:
 		type variable;
@@ -127,7 +87,6 @@ c_scriptVar<type>::c_scriptVar( const type& varCopy ) :
 
 template <typename type>
 c_scriptVar<type>::c_scriptVar( const c_scriptVar& varCopy ) :
-	c_scriptVarBase( varCopy ),
 	variable( varCopy.variable )
 {}
 
@@ -157,7 +116,6 @@ c_scriptVar<type>& c_scriptVar<type>::operator= ( const type& inVar ) {
 
 template <typename type>
 c_scriptVar<type>& c_scriptVar<type>::operator= ( const c_scriptVar& varCopy ) {
-	name = varCopy.name;
 	variable = varCopy.variable;
 	return *this;
 }
@@ -177,10 +135,10 @@ bool c_scriptVar<type>::operator!= ( const c_scriptVar& varCopy ) const {
 //-----------------------------------------------------------------------------
 class c_scriptNum : virtual public c_scriptVarBase {
 	friend class c_scriptManager;
+	friend class c_serialize;
+	
 	public:
-		c_scriptNum();
-		c_scriptNum( const c_scriptNum& numCopy );
-		virtual ~c_scriptNum();
+		~c_scriptNum() {}
 		
 		virtual c_scriptNum operator + ( const c_scriptNum& inVar ) const;
 		virtual c_scriptNum operator - ( const c_scriptNum& inVar ) const;
@@ -213,6 +171,10 @@ class c_scriptNum : virtual public c_scriptVarBase {
 		virtual operator int() const;
 		virtual operator unsigned int() const;
 		virtual operator float() const;
+		
+		virtual e_scriptVarType getScriptSubType() {
+			return SCRIPT_VAR_NUM;
+		}
 };
 
 //-----------------------------------------------------------------------------
@@ -221,16 +183,27 @@ class c_scriptNum : virtual public c_scriptVarBase {
 //-----------------------------------------------------------------------------
 class c_scriptFuncBase : virtual public c_script {
 	friend class c_scriptManager;
+	friend class c_serialize;
+	
+	protected:
+		const c_scriptFuncBase* nextFunc;
+	
 	public:
 		c_scriptFuncBase();
 		c_scriptFuncBase( const c_scriptFuncBase& funcCopy );
 		virtual ~c_scriptFuncBase() = 0;
 		 
 		virtual void run() = 0;
-		virtual void tick( float timeElapsed = 0 ) = 0;
+		virtual void tick( float timeElapsed = 0 ) {
+			assert( timeElapsed == 0);
+			run();
+		}
 		
 		int getScriptType() const { return SCRIPT_FUNC; }
 		virtual int getScriptSubType() const { return SCRIPT_INVALID; }
+		
+		const c_scriptFuncBase* getNextFunction() const;
+		void setNextFunction( const c_scriptFuncBase& next );
 };
 
 //-----------------------------------------------------------------------------
@@ -240,6 +213,8 @@ class c_scriptFuncBase : virtual public c_script {
 template <typename returnType>
 class c_scriptFunc : virtual public c_scriptFuncBase {
 	friend class c_scriptManager;
+	friend class c_serialize;
+	
 	protected:
 		returnType returnVal;
 		
@@ -254,16 +229,18 @@ class c_scriptFunc : virtual public c_scriptFuncBase {
 };
 
 template <typename returnType>
-c_scriptFunc< returnType >::c_scriptFunc() {}
-
-template <typename returnType>
-c_scriptFunc< returnType >::~c_scriptFunc() {}
+c_scriptFunc< returnType >::c_scriptFunc() :
+	returnVal()
+{}
 
 template <typename returnType>
 c_scriptFunc< returnType >::c_scriptFunc( const c_scriptFunc& funcCopy ) :
 	c_scriptFuncBase( funcCopy ),
-	returnVal( funcCopy.returnVal )
+	returnVal( funcCopy.returnVal)
 {}
+
+template <typename returnType>
+c_scriptFunc< returnType >::~c_scriptFunc() {}
 
 template <typename returnType>
 c_scriptFunc< returnType >::c_scriptFunc( const returnType& retVal ) :

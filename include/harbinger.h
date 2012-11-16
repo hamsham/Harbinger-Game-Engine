@@ -13,7 +13,6 @@
 #endif
 
 #include <cassert>
-#include <stdexcept>
 #include <vector>
 #include <string>
 #include <sstream>
@@ -25,6 +24,12 @@
 #include <SFML/Graphics.hpp>
 #include <SFML/Window.hpp>
 #include "../../hamlibs/include/hamLibs.h"
+
+#ifdef DEBUG
+	#define HGE_ASSERT( x ) assert( x )
+#else
+	#define HGE_ASSERT( x )
+#endif
 
 //forward declarations
 #include "types.h"
@@ -40,10 +45,11 @@ namespace harbinger {
 #include "scripting/script_base.h"
 #include "scripting/script_variables.h"
 #include "scripting/script_functions.h"
+#include "scripting/script_sequence.h"
 
 #include "events/message.h"
 
 #include "obj/resource.h"
-#include "obj/object.h"
+#include "obj/geometric.h"
 
 #endif	/* __HGE_HARBINGER_H__ */

@@ -16,9 +16,9 @@ namespace harbinger {
 enum e_scriptType : signed int { 
 	//base classes
 	SCRIPT_INVALID = -1,
-	SCRIPT_BASE = 0,
-	SCRIPT_VAR,
-	SCRIPT_FUNC,
+	SCRIPT_BASE = SCRIPT_INVALID,
+	SCRIPT_VAR = 0,
+	SCRIPT_FUNC = 1,
 	SCRIPT_MAX
 };
 
@@ -74,7 +74,7 @@ class c_scriptUint;
 class c_scriptFloat;
 class c_scriptBool;
 class c_scriptString;
-class c_scriptVec3;
+class c_scriptVec3d;
 
 //functions
 template <typename returnType> class c_scriptFunc; //abstract base,  inherits c_scriptFuncBase

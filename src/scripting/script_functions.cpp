@@ -20,6 +20,7 @@ c_scriptEvaluation::c_scriptEvaluation() :
 {}
 
 c_scriptEvaluation::c_scriptEvaluation( const c_scriptEvaluation& evalCopy ) :
+	c_scriptFuncBase( evalCopy ),
 	c_scriptFunc( evalCopy ),
 	evalType( evalCopy.evalType ),
 	evalVar( evalCopy.evalVar ),
@@ -53,7 +54,7 @@ void c_scriptEvaluation::setVarToCompare( const c_scriptVarBase* inVar ) {
 }
 
 //-----------------------------------------------------------------------------
-//		Math Function Base Class
+//		Numerical Function Base Class
 //-----------------------------------------------------------------------------
 c_scriptNumeric::c_scriptNumeric() :
 	c_scriptFunc( 0.f ),
@@ -63,6 +64,7 @@ c_scriptNumeric::c_scriptNumeric() :
 {}
 
 c_scriptNumeric::c_scriptNumeric( const c_scriptNumeric& numFunc ) :
+	c_scriptFuncBase( numFunc ),
 	c_scriptFunc( numFunc ),
 	evalType( numFunc.evalType ),
 	evalVar( numFunc.evalVar ),
@@ -101,6 +103,8 @@ void c_scriptNumeric::setVarToCompare( const c_scriptNum* inVar ) {
 c_scriptNumEval::c_scriptNumEval() {}
 
 c_scriptNumEval::c_scriptNumEval( const c_scriptNumEval& evalCopy ) :
+	c_scriptFuncBase( evalCopy ),
+	c_scriptFunc( evalCopy ),
 	c_scriptEvaluation( evalCopy )
 {}
 
@@ -167,6 +171,8 @@ void c_scriptNumEval::run() {
 c_scriptMiscMath::c_scriptMiscMath() {}
 
 c_scriptMiscMath::c_scriptMiscMath( const c_scriptMiscMath& evalCopy ) :
+	c_scriptFuncBase( evalCopy ),
+	c_scriptFunc( evalCopy ),
 	c_scriptNumeric( evalCopy )
 {}
 
@@ -211,7 +217,9 @@ void c_scriptMiscMath::run() {
 c_scriptArithmetic::c_scriptArithmetic() {}
 
 c_scriptArithmetic::c_scriptArithmetic( const c_scriptArithmetic& evalCopy ) :
-	c_scriptFunc( evalCopy )
+	c_scriptFuncBase( evalCopy ),
+	c_scriptFunc( evalCopy ),
+	c_scriptNumeric( evalCopy )
 {}
 
 c_scriptArithmetic::~c_scriptArithmetic() {}
@@ -260,8 +268,10 @@ void c_scriptArithmetic::run() {
 //-----------------------------------------------------------------------------
 c_scriptTrigonometry::c_scriptTrigonometry() {}
 
-c_scriptTrigonometry::c_scriptTrigonometry( const c_scriptTrigonometry& trigCopy ) :
-	c_scriptNumeric( trigCopy )
+c_scriptTrigonometry::c_scriptTrigonometry( const c_scriptTrigonometry& evalCopy ) :
+	c_scriptFuncBase( evalCopy ),
+	c_scriptFunc( evalCopy ),
+	c_scriptNumeric( evalCopy )
 {}
 
 c_scriptTrigonometry::~c_scriptTrigonometry() {}

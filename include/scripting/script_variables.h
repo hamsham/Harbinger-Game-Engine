@@ -7,10 +7,6 @@
 
 #ifndef SCRIPT_VARIABLES_H
 #define	SCRIPT_VARIABLES_H
-
-#include "script_base.h"
-
-
 namespace harbinger {
 
 //-----------------------------------------------------------------------------
@@ -19,6 +15,7 @@ namespace harbinger {
 class c_scriptInt :	virtual public c_scriptVar<int>,
 				virtual public c_scriptNum {
 	friend class c_scriptManager;
+	friend class c_serialize;
 	
 	public:
 		c_scriptInt();
@@ -68,6 +65,7 @@ class c_scriptInt :	virtual public c_scriptVar<int>,
 class c_scriptFloat :	virtual public c_scriptVar<float>,
 					virtual public c_scriptNum {
 	friend class c_scriptManager;
+	friend class c_serialize;
 	
 	public:
 		c_scriptFloat();
@@ -117,6 +115,7 @@ class c_scriptFloat :	virtual public c_scriptVar<float>,
 class c_scriptUint :	virtual public c_scriptVar<unsigned int>,
 					virtual public c_scriptNum {
 	friend class c_scriptManager;
+	friend class c_serialize;
 	
 	public:
 		c_scriptUint();
@@ -165,6 +164,7 @@ class c_scriptUint :	virtual public c_scriptVar<unsigned int>,
 //-----------------------------------------------------------------------------
 class c_scriptBool : virtual public c_scriptVar< bool > {
 	friend class c_scriptManager;
+	friend class c_serialize;
 	
 	public:
 		c_scriptBool();
@@ -184,10 +184,7 @@ class c_scriptBool : virtual public c_scriptVar< bool > {
 //-----------------------------------------------------------------------------
 class c_scriptString : virtual public c_scriptVar< std::string > {
 	friend class c_scriptManager;
-	
-	//these are specially defined
-	friend std::ostream& operator << ( std::ostream&, const c_scriptString& );
-	friend std::istream& operator >> ( std::istream&, c_scriptString& );
+	friend class c_serialize;
 	
 	public:
 		c_scriptString();
@@ -209,6 +206,7 @@ class c_scriptString : virtual public c_scriptVar< std::string > {
 //-----------------------------------------------------------------------------
 class c_scriptVec3d : virtual public c_scriptVar< hamLibs::math::vec3f > {
 	friend class c_scriptManager;
+	friend class c_serialize;
 	
 	public:
 		c_scriptVec3d();

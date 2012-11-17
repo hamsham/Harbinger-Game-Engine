@@ -3,8 +3,6 @@
 #################
 *.o
 *.o.d
-*.mm
-*.mk
 
 #################
 ## Eclipse
@@ -169,13 +167,8 @@ pip-log.txt
 
 # Mac crap
 .DS_Store
-!/include/obj/object.h
-!/include/obj/resource.h
-!/src/obj/object.cpp
-!/src/obj/resource.cpp
-!/dist/MinGW_TDM_x86-Windows/libharbinger.dll
-!/dist/MinGW_TDM_x86-Windows/libharbinger_debug.dll
-!/dist/
-!/include/obj/
-!/src/obj/
 /nbproject/
+/misc/
+/build/
+*.mm
+*.mk

@@ -44,6 +44,9 @@ namespace harbinger {
 	struct s_vertex3d;
 	struct s_vertex4d;
 	
+	//misc types
+	template < typename T1, typename T2 > struct s_pair;
+	
 	//------------------------------------------------------------------------
 	//	TYPEDEF's
 	//------------------------------------------------------------------------
@@ -57,13 +60,14 @@ namespace harbinger {
 	typedef s_polygon< 4 > s_quad;
 	
 	//Scripting Containers & Structures
-	typedef std::list< c_script* >			scriptList;
-	typedef std::map< ulong, c_scriptVarBase* >	scriptVarMap;
-	typedef std::map< ulong, c_scriptFuncBase* >	scriptFuncMap;
-	typedef scriptList::size_type				scriptListSize_t;
+	typedef std::map< ulong, c_script* >		scriptMap_t;
+	typedef std::map< ulong, c_scriptVarBase* >	scriptVarMap_t;
+	typedef std::map< ulong, c_scriptFuncBase* >	scriptFuncMap_t;
+	typedef std::list< c_script* >			scriptList_t;
+	typedef scriptList_t::size_type			scriptListSize_t;
 	
-	typedef s_message< c_scriptFuncBase& >		s_scriptFuncMessage;
-	typedef c_messenger< c_scriptFuncBase& >	c_scriptFuncMessenger;
+	typedef s_message< c_scriptFuncBase& >		s_scriptFuncMessage_t;
+	typedef c_messenger< c_scriptFuncBase& >	c_scriptFuncMessenger_t;
 	
 } // end harbinger namespace
 

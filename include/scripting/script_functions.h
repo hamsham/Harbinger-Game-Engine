@@ -15,7 +15,6 @@ namespace harbinger {
 //-----------------------------------------------------------------------------
 class c_scriptEvaluation : virtual public c_scriptFunc< c_scriptBool > {
 	friend class c_scriptManager;
-	friend class c_serialize;
 	
 	protected:
 		int evalType;
@@ -30,6 +29,9 @@ class c_scriptEvaluation : virtual public c_scriptFunc< c_scriptBool > {
 		virtual int getScriptSubType() const {
 			return SCRIPT_FUNC_EVAL; // invalid
 		}
+		
+		void read ( std::ifstream&, scriptMap_t& );
+		void write ( std::ofstream& ) const;
 		
 		int getEvalType() const;
 		virtual void setEvalType( int eval = 0 );
@@ -47,7 +49,6 @@ class c_scriptEvaluation : virtual public c_scriptFunc< c_scriptBool > {
 //-----------------------------------------------------------------------------
 class c_scriptNumeric : virtual public c_scriptFunc< c_scriptFloat > {
 	friend class c_scriptManager;
-	friend class c_serialize;
 	
 	protected:
 		int evalType;
@@ -62,6 +63,9 @@ class c_scriptNumeric : virtual public c_scriptFunc< c_scriptFloat > {
 		virtual int getScriptSubType() const {
 			return SCRIPT_FUNC_NUMERICAL; // invalid
 		}
+		
+		void read ( std::ifstream&, scriptMap_t& );
+		void write ( std::ofstream& ) const;
 		
 		int getEvalType() const;
 		virtual void setEvalType( int eval = 0 );
@@ -78,7 +82,6 @@ class c_scriptNumeric : virtual public c_scriptFunc< c_scriptFloat > {
 //-----------------------------------------------------------------------------
 class c_scriptNumEval : public c_scriptEvaluation {
 	friend class c_scriptManager;
-	friend class c_serialize;
 		
 	public:
 		enum e_evalType {
@@ -115,7 +118,6 @@ class c_scriptNumEval : public c_scriptEvaluation {
 //-----------------------------------------------------------------------------
 class c_scriptMiscMath : public c_scriptNumeric {
 	friend class c_scriptManager;
-	friend class c_serialize;
 		
 	public:
 		enum e_math {
@@ -146,7 +148,6 @@ class c_scriptMiscMath : public c_scriptNumeric {
 //-----------------------------------------------------------------------------
 class c_scriptArithmetic : public c_scriptNumeric {
 	friend class c_scriptManager;
-	friend class c_serialize;
 		
 	public:
 		enum e_arithmetic {
@@ -178,7 +179,6 @@ class c_scriptArithmetic : public c_scriptNumeric {
 //-----------------------------------------------------------------------------
 class c_scriptTrigonometry : public c_scriptNumeric {
 	friend class c_scriptManager;
-	friend class c_serialize;
 	
 	public:
 		enum e_trigonometry {

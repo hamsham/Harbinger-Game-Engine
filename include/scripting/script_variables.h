@@ -175,6 +175,7 @@ class c_scriptBool : virtual public c_scriptVar< bool > {
 		int getScriptSubType() {
 			return SCRIPT_VAR_BOOL;
 		}
+		
 		void setTrue();
 		void setFalse();
 };
@@ -199,20 +200,23 @@ class c_scriptString : virtual public c_scriptVar< std::string > {
 		int getScriptSubType() const {
 			return SCRIPT_VAR_STRING;
 		}
+		
+		void read ( std::ifstream&, scriptMap_t& );
+		void write ( std::ofstream& ) const;
 };
 
 //-----------------------------------------------------------------------------
 //		3D Vector Variable
 //-----------------------------------------------------------------------------
-class c_scriptVec3d : virtual public c_scriptVar< hamLibs::math::vec3f > {
+class c_scriptVec3 : virtual public c_scriptVar< hamLibs::math::vec3f > {
 	friend class c_scriptManager;
 	friend class c_serialize;
 	
 	public:
-		c_scriptVec3d();
-		c_scriptVec3d( const c_scriptVec3d& vecCopy );
-		c_scriptVec3d( const hamLibs::math::vec3f& vecCopy );
-		~c_scriptVec3d();
+		c_scriptVec3();
+		c_scriptVec3( const c_scriptVec3& vecCopy );
+		c_scriptVec3( const hamLibs::math::vec3f& vecCopy );
+		~c_scriptVec3();
 		
 		float operator[] ( int ) const;
 		float& operator[] ( int );

@@ -29,6 +29,23 @@ c_scriptEvaluation::c_scriptEvaluation( const c_scriptEvaluation& evalCopy ) :
 
 c_scriptEvaluation::~c_scriptEvaluation() {}
 
+//file input
+void c_scriptEvaluation::read( std::ifstream& fin, scriptMap_t& scrMap ) {
+	ulong evalPtr( 0 ), compPtr( 0 );
+	bool retVal( false );
+	c_scriptFuncBase::read( fin, scrMap );
+	fin >> retVal >> evalPtr >> compPtr;
+	returnVal = retVal;
+	evalVar = dynamic_cast< const c_scriptVarBase* >( scrMap[ evalPtr ] );
+	compVar = dynamic_cast< const c_scriptVarBase* >( scrMap[ compPtr ] );
+}
+
+//file output
+void c_scriptEvaluation::write( std::ofstream& fout ) const {
+	c_scriptFuncBase::write( fout );
+	fout << " " << (bool)returnVal << " " << evalVar << " " << compVar;
+}
+
 int c_scriptEvaluation::getEvalType() const {
 	return evalType;
 }
@@ -72,6 +89,23 @@ c_scriptNumeric::c_scriptNumeric( const c_scriptNumeric& numFunc ) :
 {}
 
 c_scriptNumeric::~c_scriptNumeric() {}
+
+//file input
+void c_scriptNumeric::read( std::ifstream& fin, scriptMap_t& scrMap ) {
+	ulong evalPtr( 0 ), compPtr( 0 );
+	float retVal( 0.f );
+	c_scriptFuncBase::read( fin, scrMap );
+	fin >> retVal >> evalPtr >> compPtr;
+	returnVal = retVal;
+	evalVar = dynamic_cast< const c_scriptNum* >( scrMap[ evalPtr ] );
+	compVar = dynamic_cast< const c_scriptNum* >( scrMap[ compPtr ] );
+}
+
+//file output
+void c_scriptNumeric::write( std::ofstream& fout ) const {
+	c_scriptFuncBase::write( fout );
+	fout << " " << (float)returnVal << " " << evalVar << " " << compVar;
+}
 
 int c_scriptNumeric::getEvalType() const {
 	return evalType;

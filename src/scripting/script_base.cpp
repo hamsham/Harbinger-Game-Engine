@@ -27,6 +27,16 @@ bool c_script::operator!= ( const c_script& scriptCopy ) const {
 	return (this != &scriptCopy);
 }
 
+void c_script::read( std::ifstream& fin, scriptMap_t& scrMap ) {
+	ulong varPtr( 0 );
+	fin >> varPtr;
+	scrMap[ varPtr ] = this;
+}
+
+void c_script::write( std::ofstream& fout ) const {
+	fout << this;
+}
+
 //-----------------------------------------------------------------------------
 //		Variable Base Class
 //-----------------------------------------------------------------------------
@@ -152,6 +162,20 @@ c_scriptFuncBase::c_scriptFuncBase( const c_scriptFuncBase& funcCopy ) :
 {}
 
 c_scriptFuncBase::~c_scriptFuncBase() {}
+
+//file input
+void c_scriptFuncBase::read( std::ifstream& fin, scriptMap_t& scrMap ) {
+	ulong funcPtr( 0 );
+	c_script::read( fin, scrMap );
+	fin >> funcPtr;
+	nextFunc = dynamic_cast< const c_scriptFuncBase* >( scrMap[ funcPtr ] );
+}
+
+//file output
+void c_scriptFuncBase::write( std::ofstream& fout ) const {
+	c_script::write( fout );
+	fout << " " << nextFunc;
+}
 
 const c_scriptFuncBase* c_scriptFuncBase::getNextFunction() const {
 	return nextFunc;

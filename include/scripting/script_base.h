@@ -25,6 +25,9 @@ class c_script {
 		
 		virtual int		getScriptType		() const { return SCRIPT_BASE; }
 		virtual int		getScriptSubType	() const { return SCRIPT_INVALID; }
+		
+		virtual void		read				( std::ifstream&, scriptMap_t& );
+		virtual void		write			( std::ofstream& ) const;
 };
 
 //-----------------------------------------------------------------------------
@@ -75,6 +78,9 @@ class c_scriptVar : virtual public c_scriptVarBase {
 		virtual c_scriptVar& operator = ( const c_scriptVar& varCopy );
 		virtual bool operator== ( const c_scriptVar& scriptCopy ) const;
 		virtual bool operator!= ( const c_scriptVar& scriptCopy ) const;
+		
+		virtual void read ( std::ifstream&, scriptMap_t& );
+		virtual void write ( std::ofstream& ) const;
 };
 
 template <typename type>
@@ -128,6 +134,18 @@ bool c_scriptVar<type>::operator== ( const c_scriptVar& varCopy ) const {
 template <typename type>
 bool c_scriptVar<type>::operator!= ( const c_scriptVar& varCopy ) const {
 	return ( variable != varCopy.variable );
+}
+
+template <typename type>
+void c_scriptVar<type>::read( std::ifstream& fin, scriptMap_t& scrMap ) {
+	c_script::read( fin, scrMap );
+	fin >> variable;
+}
+
+template <typename type>
+void c_scriptVar<type>::write( std::ofstream& fout ) const {
+	c_script::write( fout );
+	fout << " " << variable;
 }
 
 //-----------------------------------------------------------------------------
@@ -202,6 +220,9 @@ class c_scriptFuncBase : virtual public c_script {
 		int getScriptType() const { return SCRIPT_FUNC; }
 		virtual int getScriptSubType() const { return SCRIPT_INVALID; }
 		
+		virtual void read ( std::ifstream&, scriptMap_t& );
+		virtual void write ( std::ofstream& ) const;
+		
 		const c_scriptFuncBase* getNextFunction() const;
 		void setNextFunction( const c_scriptFuncBase& next );
 };
@@ -223,6 +244,9 @@ class c_scriptFunc : virtual public c_scriptFuncBase {
 		c_scriptFunc( const c_scriptFunc& funcCopy );
 		c_scriptFunc( const returnType& retVal );
 		virtual ~c_scriptFunc() = 0;
+		
+		virtual void read ( std::ifstream&, scriptMap_t& ) = 0;
+		virtual void write ( std::ofstream& ) const = 0;
 		
 		const returnType& getReturnVal() const;
 		void setReturnVal( const returnType& retVal );
@@ -255,6 +279,18 @@ const returnType& c_scriptFunc< returnType >::getReturnVal() const {
 template <typename returnType>
 void c_scriptFunc< returnType >::setReturnVal( const returnType& retVal ) {
 	returnVal = retVal;
+}
+
+template <typename returnType>
+void c_scriptFunc< returnType >::read( std::ifstream& fin, scriptMap_t& scrMap ) {
+	c_scriptFuncBase::read( fin, scrMap );
+	fin >> returnVal;
+}
+
+template <typename returnType>
+void c_scriptFunc< returnType >::write( std::ofstream& fout ) const {
+	c_scriptFuncBase::write( fout );
+	fout << " " << returnVal;
 }
 
 /* NOTE:

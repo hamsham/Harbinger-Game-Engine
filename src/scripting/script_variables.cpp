@@ -464,27 +464,53 @@ char& c_scriptString::operator []( size_t index ) {
 	return variable[ index ];
 }
 
+//file input
+void c_scriptString::read( std::ifstream& fin, scriptMap_t& scrMap ) {
+	c_script::read( fin, scrMap );
+	
+	std::string::size_type strSize( 0 );
+	std::string::size_type iter( 0 );
+	fin >> strSize;
+	if ( strSize == 0 )
+		return;
+	fin.get(); // discard the next whitespace before reading in the string
+	variable.resize( strSize );
+	while ( iter < strSize ) {
+		variable[ iter ] = fin.get();
+		++iter;
+	}
+}
+
+//file output
+void c_scriptString::write( std::ofstream& fout ) const {
+	c_script::write( fout );
+	
+	fout << " " << variable.size();
+	if ( variable.size() != 0 )
+		fout << " " << variable.data();
+}
+
 //-----------------------------------------------------------------------------
 //		3D Vector Variable
 //-----------------------------------------------------------------------------
 
-c_scriptVec3d::c_scriptVec3d() {}
+c_scriptVec3::c_scriptVec3() {}
 
-c_scriptVec3d::c_scriptVec3d( const c_scriptVec3d& vecCopy ) :
+c_scriptVec3::c_scriptVec3( const c_scriptVec3& vecCopy ) :
 	c_scriptVar( vecCopy.variable )
 {}
 
-c_scriptVec3d::c_scriptVec3d( const hamLibs::math::vec3f& vecCopy ) :
+c_scriptVec3::c_scriptVec3( const hamLibs::math::vec3f& vecCopy ) :
 	c_scriptVar( vecCopy )
 {}
 
-c_scriptVec3d::~c_scriptVec3d() {}
+c_scriptVec3::~c_scriptVec3() {}
 
-float c_scriptVec3d::operator[] ( int i ) const {
+float c_scriptVec3::operator[] ( int i ) const {
 	return variable[ i ];
 }
 
-float& c_scriptVec3d::operator[] ( int i ) {
+float& c_scriptVec3::operator[] ( int i ) {
 	return variable[ i ];
 }
 

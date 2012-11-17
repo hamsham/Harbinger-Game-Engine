@@ -21,21 +21,13 @@ static const char* const HARBINGER_FILE_TYPE = "hsd"; // harbinger script data
 //------------------------------------------------------------------------
 class c_serialize {
 	private:
-		scriptVarMap varMap;
-		scriptFuncMap funcMap;
-		std::fstream fileIO;
 		
 		e_hgeFileType getFileType( const char* fileName ) const;
-		bool readHeader( scriptList& );
-		bool readFooter( scriptList& inScripts, size_t numVars, size_t numFuncs );
-		void readVar( c_scriptVarBase* var, int varSubType );
-		void readFunc( c_scriptFuncBase* func, int funcSubType );
+		bool readHeader( std::ifstream&, scriptList_t& );
+		bool readFooter( std::ifstream&, scriptList_t& inScripts, size_t numVars, size_t numFuncs );
 		
-		void writeVar( c_scriptVarBase* var, int varSubType );
-		void writeFunc( c_scriptFuncBase* func, int funcSubType );
-		
-		void unloadData( scriptList& ); //in case of a file read error, clear memory
-		void closeStream();
+		void unloadData( scriptList_t& ); //in case of a file read error, clear memory
+		//void closeStream();
 		
 	public:
 		//file statuses
@@ -57,8 +49,8 @@ class c_serialize {
 			FILE_SAVE_SUCCESS
 		};
 		
-		e_fileStatus saveScripts( const char* fileName, const scriptList& inScripts, bool overwriteData = true );
-		e_fileStatus loadScripts( const char* fileName, scriptList& outScripts );
+		e_fileStatus saveScripts( const char* fileName, const scriptList_t& inScripts, bool overwriteData = true );
+		e_fileStatus loadScripts( const char* fileName, scriptList_t& outScripts );
 }; // end serialization class
 
 } // end harbinger namespace

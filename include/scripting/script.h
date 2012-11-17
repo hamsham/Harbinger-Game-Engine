@@ -74,7 +74,7 @@ class c_scriptUint;
 class c_scriptFloat;
 class c_scriptBool;
 class c_scriptString;
-class c_scriptVec3d;
+class c_scriptVec3;
 
 //functions
 template <typename returnType> class c_scriptFunc; //abstract base,  inherits c_scriptFuncBase

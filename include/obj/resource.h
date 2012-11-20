@@ -5,50 +5,91 @@
  * Created on November 4, 2012, 9:21 PM
  */
 
-#ifndef RESOURCE_H
-#define	RESOURCE_H
+#ifndef __HGE_RESOURCE_H__
+#define	__HGE_RESOURCE_H__
+namespace harbinger {
 
-typedef void* resourcePtr;
-
-struct s_resource {
-	resourcePtr resource;
-	std::string resourceId;
-	
-	s_resource() :
-		resource( NULL )
-	{
-		std::ostringstream stout;
-		stout << (unsigned long)this;
-		resourceId = stout.str();
-		//convert ascii number into letters for use with the dictionary container
-		for (int i = resourceId.size(); i >= 0; --i )
-			resourceId[ i ] += ( 'a' - '0' );
-		stout.flush();
-	}
-};
-
-class c_resourceMgr {
-	private:
-		bool isLoaded;
-		std::string resourceFile;
-		hamLibs::containers::dictionary< s_resource* >resDict;
+//-----------------------------------------------------------------------------
+//		Script Resource Variable Base Class
+//-----------------------------------------------------------------------------
+class c_resource : virtual public c_scriptVarBase {
+	protected:
+		std::string resFile;
 		
 	public:
-		c_resourceMgr();
-		c_resourceMgr(const c_resourceMgr& orig);
-		virtual ~c_resourceMgr() = 0;
+		enum e_resourceType : signed int {
+			RES_INVALID = SCRIPT_INVALID,
+			RES_GENERAL = 0,
+			RES_BITMAP,
+			RES_SPRITE,
+			RES_AUDIO,
+			RES_AUDIO_CLIP,
+			RES_VIDEO,
+			RES_VIDEO_CLIP,
+			RES_MESH,
+			RES_SKELETON,
+			RES_ANIMATION,
+			RES_SHADER,
+
+			RES_MAX
+		};
+	
+		c_resource() {}
+		c_resource( const std::string& );
+		c_resource( const c_resource& );
+		~c_resource() {}
+		virtual c_resource& operator = ( const c_resource& ) = 0;
 		
-		void setResourceFileName( const char* fileName );
-		const char* getResourceFileName() const;
+		virtual e_resourceType getResourceType() const {
+			return RES_INVALID;
+		}
+		void read		( std::ifstream&, scriptMap_t& );
+		void write	( std::ofstream& ) const;
 		
-		virtual void copyResource	( const resourcePtr resourceToAdd ) = 0;
-		virtual void removeResource	( const resourcePtr resourceToRemove ) = 0;
-		virtual void manageResource	( resourcePtr resourceToManage ) = 0;
-		virtual void unManageResource	( resourcePtr resourceToUnmanage ) = 0;
+		// Regarding "setFile(...)", the resource will be reloaded if:
+		// A: The new filename is different  than the current one
+		// B: The current resource is loaded as per the "isLoaded" function
+		// Reloading 
+		bool				setFile ( const std::string& );
+		const std::string&	getFile () const;
 		
-		virtual bool saveResourceList	( bool overwrite = true ) = 0;
-		virtual bool loadResourceList	() = 0;
+		virtual bool	load		() = 0;
+		virtual void	unload	() = 0;
+		bool			reload	() { unload(); return load(); }
+		virtual bool	isLoaded	() const;
 };
 
-#endif	/* RESOURCE_H */
+//-----------------------------------------------------------------------------
+//		Script Management
+//-----------------------------------------------------------------------------
+class c_scriptManager : virtual public c_messenger< c_script* > {
+	enum e_managementTasks {
+		MGR_MANAGE,
+		MGR_UNMANAGE,
+		MGR_RESOURCE_LOAD,
+		MGR_RESOURCE_UNLOAD
+	};
+	
+	private:
+		bool isLoaded = false;
+		std::string scriptFileName;
+		scriptList_t resourceList;
+		
+	public:
+		c_scriptManager() {}
+		c_scriptManager( const c_scriptManager& ) = delete;
+		~c_scriptManager();
+		
+		void setFilename( const std::string& fileName );
+		const std::string& getFileName() const;
+		
+		bool loadScripts();
+		void unloadScripts();
+		bool saveScripts();
+		
+		bool loadResources( c_resource::e_resourceType = c_resource::RES_MAX );
+		void unloadResources( c_resource::e_resourceType = c_resource::RES_MAX );
+};
 
+} // end harbinger namespace
+#endif	/* __HGE_RESOURCE_H__ */

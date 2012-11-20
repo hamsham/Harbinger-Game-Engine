@@ -6,14 +6,13 @@
  */
 
 #include "../../include/harbinger.h"
-
 namespace harbinger {
 
 //-----------------------------------------------------------------------------
 // Script Factories
 //-----------------------------------------------------------------------------
 #define SCRIPTFACTORY( scriptBaseType, scriptvartype )\
-HGE_INLINE c_##scriptBaseType* get_##scriptvartype () {\
+HL_INLINE c_##scriptBaseType* get_##scriptvartype () {\
 		return new( std::nothrow ) c_##scriptvartype();\
 }
 
@@ -68,10 +67,12 @@ e_hgeFileType c_serialize::getFileType( const char* fileName ) const {
 		return HGE_SCRIPT_FILE_INVALID;
 	}
 	
-	if ( (fileExt[ ++pos ] == 'h' || fileExt[ pos ] == 'H')
-	&& (fileExt[ ++pos ] == 's' || fileExt[ pos ] == 'S')
-	&& (fileExt[ ++pos ] == 'd' || fileExt[ pos ] == 'D') ) {
-		return HGE_SCRIPT_FILE_DATA;
+	if ( fileExt == HARBINGER_FILE_TYPE[ 0 ] ) {
+		return HGE_SCRIPT_RAW_DATA;
+	}
+	
+	if ( fileExt == HARBINGER_FILE_TYPE[ 1 ] ) {
+		return HGE_SCRIPT_EDITOR_DATA;
 	}
 	
 	return HGE_SCRIPT_FILE_INVALID;
@@ -83,7 +84,9 @@ e_hgeFileType c_serialize::getFileType( const char* fileName ) const {
 //-----------------------------------------------------------------------------
 c_serialize::e_fileStatus c_serialize::saveScripts( const char* fileName, const scriptList_t& inScripts, bool overwriteData ) {
 	//read in the file extension
-	if ( getFileType( fileName ) == HGE_SCRIPT_FILE_INVALID )
+	e_hgeFileType fileType = getFileType( fileName );
+	
+	if ( fileType == HGE_SCRIPT_FILE_INVALID )
 		return FILE_SAVE_INVALID_NAME;
 	if ( al_filename_exists( fileName ) && overwriteData == false )
 		return FILE_SAVE_OVERWRITE;
@@ -97,8 +100,8 @@ c_serialize::e_fileStatus c_serialize::saveScripts( const char* fileName, const 
 	
 	//print a header
 	fileIO
-		<< HARBINGER_FILE_TYPE << " "
-		<< HGE_SCRIPT_FILE_DATA << " "
+		<< HARBINGER_FILE_TYPE[ fileType ] << " "
+		<< fileType << " "
 		<< inScripts.size() << '\n';
 	
 	//prep a footer
@@ -234,18 +237,24 @@ void c_serialize::unloadData( scriptList_t& inScripts ) {
 //-----------------------------------------------------------------------------
 bool c_serialize::readHeader( std::ifstream& fileIO, scriptList_t& scrList ) {
 	int fileType;
-	std::string inData;
+	std::string inDataType;
 	scriptList_t::size_type numItems( 0 );
 	
-	fileIO >> inData;
-	if ( inData != HARBINGER_FILE_TYPE ) {
+	//check if the file is supported
+	fileIO >> inDataType;
+	if ( inDataType != HARBINGER_FILE_TYPE[ 0 ]
+	&& inDataType != HARBINGER_FILE_TYPE[ 1 ] ) {
 		return false;
 	}
 		
 	fileIO >> fileType;
-	if ( fileType != HGE_SCRIPT_FILE_DATA ) {
+	if ( fileType != HGE_SCRIPT_FILE_INVALID ) {
 		return false;
 	}
+	
+	/* TODO:
+	 * Confirm with the previous entry that the file types match
+	 */
 	
 	fileIO >> numItems;
 	if ( numItems >= scrList.max_size() ) {

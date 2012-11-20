@@ -5,8 +5,8 @@
  * Created on October 25, 2012, 4:51 PM
  */
 
-#ifndef __HGE_TYPES__
-#define	__HGE_TYPES__
+#ifndef __HGE_TYPES_H__
+#define	__HGE_TYPES_H__
 
 //This header file includes forward declarations of all data types used by the engine
 
@@ -17,44 +17,54 @@
 	#define NULL nullptr
 #endif /* NULL Redefinition */
 
-#define HGE_INLINE HL_INLINE //redefinition of the HamLibs macro
-
 #include "scripting/script.h"
 
 namespace harbinger {
 	
 	//------------------------------------------------------------------------
-	//	NAMESPACES
-	//------------------------------------------------------------------------
-	namespace serialization {}
-	
-	//------------------------------------------------------------------------
 	//	DATA TYPES
 	//------------------------------------------------------------------------
-	template <typename type> class s_message;
-	template <typename type> class c_messenger;
-	template <typename type> class c_resourceManager;
-	class c_clock;
-	class c_entity;
-	class c_object;
+	
+	// Messaging Header
+	template <typename message_type> class s_message;
+	template <typename message_type> class c_messenger;
+	struct s_logMessage; // message type
+	struct s_scriptMessage; // message type
+	class c_logHandler;
+	class c_resourceHandler;
+	
+	// Resource Header
+	class c_resource;
 	class c_scriptManager;
 	
+	// Utils Header
+	class c_clock;
+	
+	// Geometric Header
 	template <unsigned int numVerts> struct s_polygon;
 	struct s_vertex2d;
 	struct s_vertex3d;
 	struct s_vertex4d;
 	
-	//misc types
-	template < typename T1, typename T2 > struct s_pair;
+	// Misc Header
+	template <typename T1, typename T2> struct s_pair;
 	
 	//------------------------------------------------------------------------
 	//	TYPEDEF's
 	//------------------------------------------------------------------------
 	//P.O.D.
+	typedef unsigned char		uchar;
 	typedef unsigned int		uint;
+	typedef unsigned short		ushort;
 	typedef unsigned long int	ulong;
 	
-	//Geometry
+	typedef hamLibs::size_t		size_t;
+	
+	//function pointers
+	typedef void (*voidFunc_t)();
+	typedef void (*voidFuncArray_t [])();
+	
+	//3D Geometry
 	typedef s_polygon< 2 > s_line;
 	typedef s_polygon< 3 > s_tri;
 	typedef s_polygon< 4 > s_quad;
@@ -71,5 +81,4 @@ namespace harbinger {
 	
 } // end harbinger namespace
 
-#endif	/* __HGE_TYPES__ */
-
+#endif	/* __HGE_TYPES_H__ */

@@ -12,9 +12,13 @@ namespace harbinger {
 //officially supported file types
 enum e_hgeFileType : int {
 	HGE_SCRIPT_FILE_INVALID = -1,
-	HGE_SCRIPT_FILE_DATA = 0,		// contains a list of scripts to load
+	HGE_SCRIPT_RAW_DATA = 0,		// contains a list of scripts to load
+	HGE_SCRIPT_EDITOR_DATA = 1,	// contains the above, plus GUI data & names
 };
-static const char* const HARBINGER_FILE_TYPE = "hsd"; // harbinger script data
+static const char* const HARBINGER_FILE_TYPE[] = {
+	"hsd", // harbinger script data
+	"hed", // harbinger editor data
+};
 		
 //------------------------------------------------------------------------
 //	SERIALIZATION CLASS

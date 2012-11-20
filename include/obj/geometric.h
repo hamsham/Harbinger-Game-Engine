@@ -1,12 +1,12 @@
 /* 
- * File:   objects.h
+ * File:   geometric.h
  * Author: hammy
  *
  * Created on November 13, 2012, 9:59 PM
  */
 
-#ifndef __HGE_OBJECTS_H__
-#define	__HGE_OBJECTS_H__
+#ifndef __HGE_GEOMETRIC_H__
+#define	__HGE_GEOMETRIC_H__
 namespace harbinger {
 
 struct s_vertex2d {
@@ -17,7 +17,7 @@ struct s_vertex2d {
 		};
 		float xy[ 2 ];
 	};
-	s_vertex2d() : x( 0.f ), y( 0.f ) {}
+	HL_FASTCALL s_vertex2d() : x( 0.f ), y( 0.f ) {}
 };
 
 struct s_vertex3d {
@@ -29,7 +29,7 @@ struct s_vertex3d {
 		};
 		float xyz[ 3 ];
 	};
-	s_vertex3d() : x( 0.f ), y( 0.f ), z( 0.f ) {}
+	HL_FASTCALL s_vertex3d() : x( 0.f ), y( 0.f ), z( 0.f ) {}
 };
 
 struct s_vertex4d {
@@ -42,7 +42,7 @@ struct s_vertex4d {
 		};
 		float xyzw[ 4 ];
 	};
-	s_vertex4d() : x( 0.f ), y( 0.f ), z( 0.f ), w( 1.f ) {}
+	HL_FASTCALL s_vertex4d() : x( 0.f ), y( 0.f ), z( 0.f ), w( 1.f ) {}
 };
 
 template < unsigned int numVerts >
@@ -66,5 +66,4 @@ class c_mesh {
 };
 
 } // end harbinger namespace
-#endif	/* __HGE_OBJECTS_H__ */
-
+#endif	/* __HGE_GEOMETRIC_H__ */

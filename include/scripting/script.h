@@ -1,7 +1,7 @@
 
 //Scripting prototype (again)
-#ifndef __SCRIPT_TEST_HEADER__
-#define __SCRIPT_TEST_HEADER__
+#ifndef __HGE_SCRIPT_H__
+#define __HGE_SCRIPT_H__
 
 //#include's are located at the bottom of the header.
 
@@ -31,20 +31,11 @@ enum e_scriptVarType : signed int {
 	SCRIPT_VAR_BOOL = 3,
 	SCRIPT_VAR_STRING = 4,
 	SCRIPT_VAR_VEC3 = 5,
+	SCRIPT_VAR_RESOURCE = 6, // defined in "resource.h"
 	
 	SCRIPT_VAR_MAX
 };
-/* None of these are anywhere close to being implemented
-enum e_scriptResourceType {
-	SCRIPT_RES_BITMAP,
-	SCRIPT_RES_SPRITE,
-	SCRIPT_RES_SOUND,
-	SCRIPT_RES_POLYGON,
-	SCRIPT_RES_MESH,
-	SCRIPT_RES_SKELETON,
-	SCRIPT_RES_ANIMATION,
-};
-*/
+
 enum e_scriptFuncType : signed int {
 	SCRIPT_FUNC_INVALID = SCRIPT_INVALID,
 	SCRIPT_FUNC_EVAL = SCRIPT_INVALID,
@@ -67,24 +58,25 @@ class c_scriptVarBase;
 class c_scriptFuncBase;
 
 //variables
-template <typename type> class c_scriptVar; //inherits c_scriptVarBase
-class c_scriptNum; //empty base class, inherits nothing
-class c_scriptInt;
-class c_scriptUint;
-class c_scriptFloat;
-class c_scriptBool;
-class c_scriptString;
-class c_scriptVec3;
+template <typename type> class c_scriptVar; // abstract, inherits c_scriptVarBase
+template <typename type> class c_scriptResource; //abstract, inherits c_scriptVar
+class c_scriptNum; //empty base class, inherits only c_script
+class c_scriptInt; // c_scriptNum
+class c_scriptUint; // Num
+class c_scriptFloat; // Num
+class c_scriptBool; // c_scriptVar
+class c_scriptString; // Var
+class c_scriptVec3; // Var
 
 //functions
-template <typename returnType> class c_scriptFunc; //abstract base,  inherits c_scriptFuncBase
-class c_scriptEvaluation; //abstract, inherits c_scriptFunction, has a boolean result
-class c_scriptNumeric;
-class c_scriptNumEval; //inherits c_scriptEval, has a boolean result
-class c_scriptMiscMath; //inherits c_scriptFunc. has a float result
-class c_scriptArithmetic; //inherits c_scriptFunc. has a c_scriptNum result. takes two arguments (except for the EQL function, which has one)
-class c_scriptTrigonometry; //inherits c_scriptFunc. has a float result in radians. takes one argument
+template <typename returnType> class c_scriptFunc; //abstract,  inherits c_scriptFuncBase
+class c_scriptEvaluation; //abstract, inherits c_scriptFunc, has a boolean result
+class c_scriptNumeric; //abstract, inherits c_scriptFunc, has a float result
+class c_scriptNumEval; //inherits c_scriptEval
+class c_scriptMiscMath; //inherits c_scriptFunc
+class c_scriptArithmetic; //inherits c_scriptFunc
+class c_scriptTrigonometry; //inherits c_scriptFunc
 
 } //end harbinger namespace
 
-#endif //__SCRIPT_TEST_HEADER__
+#endif //__HGE_SCRIPT_H__

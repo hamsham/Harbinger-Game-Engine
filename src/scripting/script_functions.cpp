@@ -43,7 +43,10 @@ void c_scriptEvaluation::read( std::ifstream& fin, scriptMap_t& scrMap ) {
 //file output
 void c_scriptEvaluation::write( std::ofstream& fout ) const {
 	c_scriptFuncBase::write( fout );
-	fout << " " << (bool)returnVal << " " << evalVar << " " << compVar;
+	fout
+		<< " " << (bool)returnVal
+		<< " " << evalVar
+		<< " " << compVar;
 }
 
 int c_scriptEvaluation::getEvalType() const {
@@ -104,7 +107,10 @@ void c_scriptNumeric::read( std::ifstream& fin, scriptMap_t& scrMap ) {
 //file output
 void c_scriptNumeric::write( std::ofstream& fout ) const {
 	c_scriptFuncBase::write( fout );
-	fout << " " << (float)returnVal << " " << evalVar << " " << compVar;
+	fout
+		<< " " << (float)returnVal
+		<< " " << evalVar
+		<< " " << compVar;
 }
 
 int c_scriptNumeric::getEvalType() const {

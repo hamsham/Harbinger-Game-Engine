@@ -5,8 +5,8 @@
  * Created on November 16, 2012, 5:19 PM
  */
 
-#ifndef MISCELLANEOUS_H
-#define	MISCELLANEOUS_H
+#ifndef __HGE_MISC_H__
+#define	__HGE_MISC_H__
 
 	
 //------------------------------------------------------------------------
@@ -39,9 +39,6 @@ s_pair< T1, T2 >::s_pair( const s_pair& pairCopy ) :
 {}
 
 template < typename T1, typename T2 >
-s_pair< T1, T2 >::~s_pair() {}
-
-template < typename T1, typename T2 >
 s_pair< T1, T2 >& s_pair< T1, T2 >::operator =(const s_pair& pairCopy) {
 	a = pairCopy.a;
 	b = pairCopy.b;
@@ -57,5 +54,4 @@ bool s_pair< T1, T2 >::operator !=(const s_pair& pairCopy) {
 	return ((a != pairCopy.a) && (b != pairCopy.b));
 }
 
-#endif	/* MISCELLANEOUS_H */
-
+#endif	/* __HGE_MISC_H__ */

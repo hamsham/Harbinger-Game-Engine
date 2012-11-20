@@ -5,8 +5,8 @@
  * Created on September 25, 2012, 5:18 PM
  */
 
-#ifndef SCRIPT_BASE_H
-#define	SCRIPT_BASE_H
+#ifndef __HGE_SCRIPT_BASE_H__
+#define	__HGE_SCRIPT_BASE_H__
 namespace harbinger {
 
 //-----------------------------------------------------------------------------
@@ -196,6 +196,73 @@ class c_scriptNum : virtual public c_scriptVarBase {
 };
 
 //-----------------------------------------------------------------------------
+//		Script Resource Variables
+//	Any type of object which must be saved or loaded from a file
+//-----------------------------------------------------------------------------
+template <typename type>
+class c_scriptResource : virtual public c_scriptVar< type > {
+	friend class c_scriptManager;
+	friend class c_serialize;
+	
+	enum e_resourceFlags : signed int {
+		RESOURCE_LOADED = 0x1,
+		RESOURCE_MUTABLE = 0x2, // the resource can be edited
+		RESOURCE_COPYABLE = 0x4
+	};
+	
+	private:
+		std::string resourceFile;
+		unsigned int numReferences = 0;
+	
+	protected:
+		e_resourceFlags resourceFlags;
+		
+	public:
+		c_scriptResource() {}
+		c_scriptResource( const c_scriptResource< type >& resCopy );
+		virtual ~c_scriptResource() = 0;
+		
+		virtual e_scriptVarType getScriptSubType() {
+			return SCRIPT_VAR_RESOURCE;
+		}
+		
+		//file handling
+		const char* getResourceFile() const;
+		void setResourceFile( const char* resFile );
+		virtual bool saveResource( const char* fileName ) = 0;
+		virtual bool loadResource( const char* fileName ) = 0;
+		virtual void unloadResource() = 0;
+		
+		// resource management
+		virtual c_scriptResource& operator = ( const c_scriptResource< type >& resCopy ) = 0;
+		virtual const c_scriptResource* getCopy() = 0; // much different than the above
+		const type& getReference() const;
+		void detachReference( type&  );
+		
+		e_resourceFlags getResourceFlags() const;
+		void setResourceFlags( e_resourceFlags );
+};
+
+template <typename type>
+c_scriptResource< type >::c_scriptResource( const c_scriptResource< type >& resCopy ) :
+	c_script( resCopy ),
+	c_scriptVarBase( resCopy ),
+	c_scriptVar< type >( resCopy )
+{
+	*this = this->operator=( resCopy );
+}
+
+template <typename type>
+c_scriptResource< type >::~c_scriptResource() {
+	unloadResource();
+}
+
+template <typename type>
+const type& c_scriptResource< type >::getReference() const {
+	return this->variable;
+}
+
+//-----------------------------------------------------------------------------
 //		Function Base Classes
 //		Abstract
 //-----------------------------------------------------------------------------
@@ -305,4 +372,4 @@ void c_scriptFunc< returnType >::write( std::ofstream& fout ) const {
  */
 
 } // end harbinger namespace
-#endif	/* SCRIPT_BASE_H */
+#endif	/* __HGE_SCRIPT_BASE_H__ */

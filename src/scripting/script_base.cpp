@@ -34,7 +34,12 @@ void c_script::read( std::ifstream& fin, scriptMap_t& scrMap ) {
 }
 
 void c_script::write( std::ofstream& fout ) const {
+#ifdef HL_GNU
+	// As far as I know, only GCC/G++ increments pointers when writing them to files
+	fout << (this - sizeof( void* ));
+#else
 	fout << this;
+#endif
 }
 
 //-----------------------------------------------------------------------------

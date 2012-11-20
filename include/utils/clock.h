@@ -5,9 +5,8 @@
  * Created on September 7, 2012, 7:22 PM
  */
 
-#ifndef		__HGE_CLOCK_H__
+#ifndef	__HGE_CLOCK_H__
 #define	__HGE_CLOCK_H__
-
 namespace harbinger {
 
 class c_clock {

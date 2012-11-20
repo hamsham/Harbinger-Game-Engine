@@ -172,3 +172,11 @@ pip-log.txt
 *.mm
 *.mk
 !/bin/
+!/src/obj/geometric.cpp
+!/include/obj/geometric.h
+!/include/obj/resource.h
+!/include/obj/objects.h
+!/src/obj/objects.cpp
+!/src/obj/resource.cpp
+!/include/obj/
+!/src/obj/

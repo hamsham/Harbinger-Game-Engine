@@ -1,5 +1,5 @@
 /* 
- * File:   s_message.h
+ * File:   message.h
  * Author: hammy
  *
  * Created on September 8, 2012, 3:31 PM
@@ -10,74 +10,132 @@
 namespace harbinger {
 
 //-----------------------------------------------------------------------------
-//		Message (Envelope) Structure
+//		Message (Envelope) Structures
 //-----------------------------------------------------------------------------
-template <typename messenger_type = void* >
+template <typename message_t >
 struct s_message {
-	messenger_type& sender;
-	int messageID = 0;
+	const message_t sender;
+	int messageID;
 	
-	s_message	() {}
-	s_message	( const s_message& msgCopy );
-	s_message	( const messenger_type& messenger, int messageEnum );
-	~s_message() {}
-	s_message& operator = ( const s_message& msgCopy );
+	s_message() :
+		sender(),
+		messageID( 0 )
+	{}
 };
 
-template <typename messenger_type> HGE_INLINE
-s_message< messenger_type >::s_message(const s_message& msgCopy) :
-	sender	( msgCopy.sender ),
-	messageID	( msgCopy.messageID )
-{}
+struct s_logMessage : s_message< void* > {
+	std::string logStr;
+};
 
-template <typename messenger_type> HGE_INLINE
-s_message< messenger_type >::s_message( const messenger_type& messenger, int messageToSend ) :
-	sender	( messenger ),
-	messageID	( messageToSend )
-{}
+typedef s_message< c_resource* > s_resourceMessage;
 
-template <typename messenger_type> HGE_INLINE
-s_message< messenger_type >& s_message< messenger_type >::operator =( const s_message& msgCopy ) {
-	sender	= msgCopy.sender;
-	messageID	= msgCopy.messageID;
-}
+struct s_scriptMessage : s_message< c_scriptFuncBase* > {
+	float timeInterval;
+};
 
 //-----------------------------------------------------------------------------
 //		Messenger Class
 //-----------------------------------------------------------------------------
-template <typename messenger_type = void* >
+template < typename message_t = void >
 class c_messenger {
 	protected:
-		std::queue< s_message< messenger_type > > messageQueue;
+		hamLibs::containers::queue< message_t > messageQueue;
 	
 	public:
-		c_messenger			();
-		c_messenger			(const c_messenger& messengerCopy);
+		c_messenger			() {}
+		c_messenger			( const c_messenger& ) = delete;
 		virtual ~c_messenger	() = 0;
-		void sendMessage		( c_messenger& recipient, int messageEnum ) const;
-		virtual void readMessages() = 0;
-		/*	while (messageStack.front()) {
-		 * 		//do something with the message
-		 * 		//messageStack.pop();
-		 * 	}
+		
+		c_messenger&	operator =	( const c_messenger& ) = delete;
+		
+		void			notify		( const message_t& );
+		virtual void	clearInbox	();
+		size_t		numMessages	() const;
+		bool			hasMessages	() const;
+		virtual void	readMessages	() = 0;
+		/*
+		 *	while (!messageQueue.empty()) {
+		 *		//do something with the message
+		 *		//messageQueue.pop();
+		 *	}
 		 */
 };
 
-template <typename messenger_type>
-c_messenger< messenger_type >::c_messenger() {}
+template < typename message_t >
+c_messenger< message_t >::~c_messenger() {}
 
-template <typename messenger_type>
-c_messenger< messenger_type >::c_messenger(const c_messenger& messengerCopy) {}
-
-template <typename messenger_type>
-c_messenger< messenger_type >::~c_messenger() {}
-
-template <typename messenger_type>
-void c_messenger< messenger_type >::sendMessage(c_messenger& recipient, int messageID) const {
-	recipient.messageQueue.push(
-		s_message< messenger_type >(this, messageID)
-	);
+template < typename message_t >
+void c_messenger< message_t >::notify( const message_t& msgToSend ) {
+	messageQueue.push( msgToSend );
 }
+template < typename message_t >
+void c_messenger< message_t >::clearInbox() {
+	messageQueue.clear();
+}
+template < typename message_t >
+size_t c_messenger< message_t >::numMessages() const {
+	return messageQueue.size();
+}
+
+template < typename message_t >
+bool c_messenger< message_t >::hasMessages() const {
+	return !messageQueue.empty();
+}
+
+//-----------------------------------------------------------------------------
+//		Log Messenger Class
+//-----------------------------------------------------------------------------
+class c_logHandler : public c_messenger< s_logMessage > {
+	enum e_logLogFlags {
+		HGE_LOG_TO_CONSOLE	= 0x1,
+		HGE_LOG_TO_FILE	= 0x2
+	};
+	
+	enum e_logType {
+		HGE_LOG_REGULAR,
+		HGE_LOG_ALERT,
+		HGE_LOG_WARNING,
+		HGE_LOG_ERROR,
+		
+		HGE_LOG_MAX
+	};
+	
+	private:
+		e_logLogFlags logFlags;
+		std::ofstream logStream;
+		std::string logFile;
+		
+	public:
+		c_logHandler		();
+		~c_logHandler		();
+		
+		void setLogFlags	( e_logLogFlags );
+		void setLogFile	( std::string& logFileName );
+		const std::string&	getLogFile() const;
+		
+		void readMessages	();
+		void logToStream	( std::ostream&, const std::string& );
+};
+
+//-----------------------------------------------------------------------------
+//		Resource Handler, not a manager
+//-----------------------------------------------------------------------------
+class c_resourceHandler : public c_messenger< s_resourceMessage > {
+	enum e_resourceTags {
+		RES_LOAD,
+		RES_UNLOAD
+	};
+	
+	public:
+		c_resourceHandler	() {}
+		c_resourceHandler	( const c_resourceHandler& ) = delete;
+		~c_resourceHandler	() { readMessages(); }
+		
+		c_resourceHandler& operator = ( const c_resourceHandler& ) = delete;
+		
+		void		clearInbox	() { readMessages(); }
+		void		readMessages	();
+};
 
 } //end harbinger namespace
 #endif	/* __HGE_MESSAGE_H__ */

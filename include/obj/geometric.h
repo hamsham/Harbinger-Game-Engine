@@ -10,39 +10,36 @@
 namespace harbinger {
 
 struct s_vertex2d {
-	union {
-		struct {
-			float x;
-			float y;
-		};
-		float xy[ 2 ];
-	};
-	HL_FASTCALL s_vertex2d() : x( 0.f ), y( 0.f ) {}
+	float xy[ 2 ];
+	float &x;
+	float &y;
+	HL_FASTCALL s_vertex2d() :
+		xy{ 0.f, 0.f },
+		x( xy[0] ), y( xy[1] )
+	{}
 };
 
 struct s_vertex3d {
-	union {
-		struct {
-			float x;
-			float y;
-			float z;
-		};
-		float xyz[ 3 ];
-	};
-	HL_FASTCALL s_vertex3d() : x( 0.f ), y( 0.f ), z( 0.f ) {}
+	float xyz[ 3 ];
+	float &x;
+	float &y;
+	float &z;
+	HL_FASTCALL s_vertex3d() :
+		xyz{ 0.f, 0.f, 0.f },
+		x( xyz[0] ), y( xyz[1] ), z( xyz[2] )
+	{}
 };
 
 struct s_vertex4d {
-	union {
-		struct {
-			float x;
-			float y;
-			float z;
-			float w;
-		};
-		float xyzw[ 4 ];
-	};
-	HL_FASTCALL s_vertex4d() : x( 0.f ), y( 0.f ), z( 0.f ), w( 1.f ) {}
+	float xyzw[ 4 ];
+	float &x;
+	float &y;
+	float &z;
+	float &w;
+	HL_FASTCALL s_vertex4d() :
+		xyzw{ 0.f, 0.f, 0.f, 0.f },
+		x( xyzw[0] ), y( xyzw[1] ), z( xyzw[2] ), w( xyzw[3] )
+	{}
 };
 
 template < unsigned int numVerts >

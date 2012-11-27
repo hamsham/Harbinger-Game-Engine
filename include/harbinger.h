@@ -53,22 +53,21 @@
 
 #include "obj/resource.h"
 #include "obj/geometric.h"
-#include "obj/bitmap.h"
 
 //-----------------------------------------------------------------------------
 //		Main Engine Calls
 //-----------------------------------------------------------------------------
 namespace harbinger {
 namespace system {
-	
+
 	bool isInitialized();
 	bool initialize();
 	void shutdown();
-	
+
 	double timeSinceStart(); // nanosecond resolution
 
 } // end system namespace
-	
+
 //-----------------------------------------------------------------------------
 //	Static Variables & Constants
 //-----------------------------------------------------------------------------

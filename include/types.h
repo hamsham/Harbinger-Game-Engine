@@ -20,16 +20,15 @@ class	c_object;
 class	c_drawableObj;
 class	c_resource;
 class	c_bitmap;
+class	c_image;
 struct	c_shader;
 class	c_camera;
-struct	material;
 struct	c_vertex;
 class	c_mesh;
 class	c_light;
 class	c_ambientLight;
 class	c_diffuseLight;
 class	c_specularLight;
-struct	compundLight;
 
 /*
  * Macros
@@ -38,17 +37,17 @@ struct	compundLight;
 	#define HGE_NULL nullptr
 #endif
 
-#ifndef ARRAY_SIZE_FROM_ELEMENTS( a )
+#ifndef ARRAY_SIZE_FROM_ELEMENTS
 	#define ARRAY_SIZE_FROM_ELEMENTS( a ) ( sizeof( a ) / sizeof( a[ 0 ] ) )
 #endif
 
 #ifdef DEBUG
-	#ifndef HGE_ASSERT( x )
+	#ifndef HGE_ASSERT
 		#include <cassert>
 		#define HGE_ASSERT( x ) assert( x )
 	#endif
 #else
-	#ifndef HGE_ASSERT( x )
+	#ifndef HGE_ASSERT
 		#define HGE_ASSERT( x )
 	#endif
 #endif

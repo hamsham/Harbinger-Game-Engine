@@ -1,0 +1,60 @@
+/* 
+ * File:   light.cpp
+ * Author: hammy
+ * 
+ * Created on January 1, 2013, 4:37 AM
+ */
+
+#include "light.h"
+
+///////////////////////////////////////////////////////////////////////////////
+//		Lighting Abstraction
+///////////////////////////////////////////////////////////////////////////////
+c_light::c_light() :
+	color( 1.f, 1.f, 1.f, 1.f ),
+	intensity( 1.f )
+{}
+
+c_light::c_light( const c_light& al ) :
+	color( al.color ),
+	intensity( al.intensity )
+{}
+
+c_light::~c_light() {}
+
+///////////////////////////////////////////////////////////////////////////////
+//		Amnbient Lighting
+///////////////////////////////////////////////////////////////////////////////
+c_ambientLight::c_ambientLight() :
+	c_light()
+{}
+
+c_ambientLight::c_ambientLight( const c_ambientLight& al ) :
+	c_light( al )
+{}
+
+///////////////////////////////////////////////////////////////////////////////
+//		Diffuse Lighting
+///////////////////////////////////////////////////////////////////////////////
+c_diffuseLight::c_diffuseLight() :
+	c_light(),
+	dir( 0.f, 0.f, 0.f )
+{}
+
+c_diffuseLight::c_diffuseLight( const c_diffuseLight& dl ) :
+	c_light( dl ),
+	dir( dl.dir )
+{}
+
+///////////////////////////////////////////////////////////////////////////////
+//		Specular Lighting
+///////////////////////////////////////////////////////////////////////////////
+c_specularLight::c_specularLight() :
+	c_light(),
+	shininess( 1.f )
+{}
+
+c_specularLight::c_specularLight( const c_specularLight& sl ) :
+	c_light( sl ),
+	shininess( sl.shininess )
+{}

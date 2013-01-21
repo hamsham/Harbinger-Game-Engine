@@ -10,11 +10,8 @@
  * This test makes more extensive use of transformations and camera controls
 -----------------------------------------------------------------------------*/
 
-#ifndef __HGE_GLOBAL_H__
-#define	__HGE_GLOBAL_H__
-
-#include <GL/glew.h>
-#include <GL/glfw.h>
+#ifndef __HGE_TYPES_H__
+#define	__HGE_TYPES_H__
 
 /*
  * Forward Declarations
@@ -37,16 +34,34 @@ struct	compundLight;
 /*
  * Macros
  */
-#define HGE_NULL nullptr
-#define ARRAY_SIZE_FROM_ELEMENTS( a ) ( sizeof( a ) / sizeof( a[ 0 ] ) )
+#ifndef HGE_NULL
+	#define HGE_NULL nullptr
+#endif
+
+#ifndef ARRAY_SIZE_FROM_ELEMENTS( a )
+	#define ARRAY_SIZE_FROM_ELEMENTS( a ) ( sizeof( a ) / sizeof( a[ 0 ] ) )
+#endif
+
+#ifdef DEBUG
+	#ifndef HGE_ASSERT( x )
+		#include <cassert>
+		#define HGE_ASSERT( x ) assert( x )
+	#endif
+#else
+	#ifndef HGE_ASSERT( x )
+		#define HGE_ASSERT( x )
+	#endif
+#endif
 
 /*
  * Global Typedefs
  */
 typedef unsigned int	uint;
+typedef unsigned long	ulong;
 typedef unsigned char	uchar;
 typedef const char*		cstr;
 typedef unsigned char	byte;
+typedef unsigned long	hgeSize_t;
 
 /*
  * Global Variables
@@ -60,6 +75,6 @@ const float	PI_OVER_2	= PI / 2;
 const float	PI_OVER_4	= PI / 4;
 const float	EPSILON		= 1e-5;
 
-cstr const	RESOURCE_DIR		= "resources/";
+cstr const	RESOURCE_DIR = "resources/";
 
-#endif	/* __HGE_GLOBAL_H__ */
+#endif	/* __HGE_TYPES_H__ */

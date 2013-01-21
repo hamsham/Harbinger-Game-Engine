@@ -8,8 +8,9 @@
 #ifndef __HGE_LIGHT_H__
 #define	__HGE_LIGHT_H__
 
-#include "global.h"
+#include <GL/glew.h>
 #include "hamLibs.h"
+#include "types.h"
 using namespace hamLibs;
 
 ///////////////////////////////////////////////////////////////////////////////

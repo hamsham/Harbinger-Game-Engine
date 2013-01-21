@@ -8,7 +8,9 @@
 #ifndef __HGE_PIPELINE_GL_H__
 #define	__HGE_PIPELINE_GL_H__
 
-#include "global.h"
+#include <GL/glew.h>
+#include <GL/glfw.h>
+#include "types.h"
 
 //Error Messaging
 void printOpenGLError( cstr msg, uint lineNum, cstr sourceFile );

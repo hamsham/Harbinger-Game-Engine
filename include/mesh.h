@@ -8,6 +8,7 @@
 #ifndef __HGE_MESH_H__
 #define	__HGE_MESH_H__
 
+#include <GL/glew.h>
 #include <assimp/scene.h>
 #include "resource.h"
 #include "object.h"

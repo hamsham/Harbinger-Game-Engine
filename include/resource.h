@@ -8,7 +8,7 @@
 #ifndef __HGE_RESOURCE_H__
 #define	__HGE_RESOURCE_H__
 
-#include "global.h"
+#include "types.h"
 
 class c_resource {
 	public:

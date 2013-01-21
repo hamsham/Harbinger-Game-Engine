@@ -8,7 +8,7 @@
 #ifndef __HGE_DISPLAY_H__
 #define	__HGE_DISPLAY_H__
 
-#include "global.h"
+#include "types.h"
 
 ///////////////////////////////////////////////////////////////////////////////
 //		Window/Display Object

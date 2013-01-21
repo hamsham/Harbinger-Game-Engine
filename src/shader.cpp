@@ -1,6 +1,6 @@
 
 #include <iostream>
-#include "global.h"
+#include "types.h"
 #include "pipelineGL.h"
 #include "shader.h"
 using namespace std;

@@ -7,7 +7,7 @@
 
 #include "hamLibs.h"
 
-#include "global.h"
+#include "types.h"
 #include "camera.h"
 
 using namespace hamLibs;

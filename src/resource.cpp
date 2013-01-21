@@ -32,8 +32,8 @@ bool c_resource::fileExists(cstr fileName) {
 /*
  * Get the size (in bytes) of the file
  */
-size_t c_resource::fileSize(cstr fileName) {
-	size_t size(0);
+uint c_resource::fileSize(cstr fileName) {
+	uint size(0);
 	ifstream fin(fileName);
 	if (!fin.good()) {
 		printFileError(fileName);
@@ -49,7 +49,7 @@ size_t c_resource::fileSize(cstr fileName) {
 /*
  * Read the file data into a buffer
  */
-void c_resource::readFile(cstr filename, char* buffer, size_t length) {
+void c_resource::readFile(cstr filename, char* buffer, uint length) {
 	ifstream fin(filename, ios_base::in | ios_base::binary);
 	if (!fin.good()) {
 		printFileError(filename);

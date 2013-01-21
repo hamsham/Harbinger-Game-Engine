@@ -10,7 +10,7 @@
 
 #include <FreeImage.h>
 #include <GL/glew.h>
-#include "global.h"
+#include "types.h"
 #include "resource.h"
 
 //-----------------------------------------------------------------------------

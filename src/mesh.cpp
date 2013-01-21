@@ -8,7 +8,7 @@
 #include <iostream>
 #include <assimp/Importer.hpp>
 #include <assimp/postprocess.h>
-#include "global.h"
+#include "types.h"
 #include "pipelineGL.h"
 #include "shader.h"
 #include "bitmap.h"

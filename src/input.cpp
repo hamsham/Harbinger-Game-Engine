@@ -1,5 +1,7 @@
 
 //input.cpp
+#include <GL/glew.h>
+#include <GL/glfw.h>
 
 #include "hamLibs.h"
 

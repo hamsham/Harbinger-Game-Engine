@@ -157,11 +157,11 @@ void c_bitmap::unload() {
 //	Bitmap - Data Operations
 //-----------------------------------------------------------------------------
 void c_bitmap::makeActive( GLuint texUnit ) const {
-	glActiveTexture( texUnit );
+	//glActiveTexture( texUnit );
 	glBindTexture( GL_TEXTURE_2D, oglTexture );
 }
 
 void c_bitmap::deActivate() const {
-	glActiveTexture( GL_TEXTURE0 );
+	//glActiveTexture( GL_TEXTURE0 );
 	glBindTexture( GL_TEXTURE_2D, 0 );
 }

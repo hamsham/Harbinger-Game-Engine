@@ -8,11 +8,8 @@
 #include "image.h"
 #include "shader.h"
 
-const math::vec3 normalZ( math::vec3( 0.f, 0.f, 1.f ) );
-
 c_image::c_image() :
 	c_resource(),
-	c_bitmap(),
 	c_drawableObj(),
 	vao( 0 ),
 	vbo{ 0 },
@@ -27,18 +24,19 @@ c_image::c_image() :
 		1.f, 1.f,
 		0.f, 0.f,
 		1.f, 0.f
-	}
+	},
+	bmp()
 {}
 
 bool c_image::isLoaded() const {
-	return vao != 0;
+	return ( vao != 0 && bmp.isLoaded() );
 }
 
 bool c_image::load( cstr filename, int flags ) {
 	
 	unload();
 	
-	if ( !c_bitmap::load( filename, flags ) ) {
+	if ( !bmp.load( filename, flags ) ) {
 		unload();
 		return false;
 	}
@@ -68,7 +66,7 @@ bool c_image::load( cstr filename, int flags ) {
 }
 
 void c_image::unload() {
-	c_bitmap::unload();
+	bmp.unload();
 	if ( vao ) {
 		glDeleteVertexArrays( 1, &vao );
 		glDeleteBuffers( 2, vbo );
@@ -79,8 +77,8 @@ void c_image::unload() {
 
 void c_image::draw() const {
 	glBindVertexArray( vao );
-	c_bitmap::makeActive();
+	bmp.makeActive();
 	glDrawArrays( GL_TRIANGLE_STRIP, 0, 4 );
-	c_bitmap::deActivate();
+	bmp.deActivate();
 	glBindVertexArray( 0 );
 }

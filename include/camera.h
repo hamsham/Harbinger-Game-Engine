@@ -162,7 +162,7 @@ inline void c_camera::setOrtho() {
 }
 
 inline void c_camera::setPerspective() {
-	projMat = math::perspective( fov, aspectW / aspectH, zNear, zFar );
+	projMat = math::infinitePerspective( fov, aspectW / aspectH, zNear );
 }
 
 inline void c_camera::setProjection( float inFov, float aspectWidth, float aspectHeight, float inZNear, float inZFar ) {

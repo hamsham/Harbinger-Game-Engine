@@ -13,20 +13,20 @@
 #include "pipelineGL.h"
 
 class c_image :	virtual public c_resource,
-				virtual public c_bitmap,
 				virtual public c_drawableObj {
 	private:
 		GLuint	vao;
 		GLuint	vbo[ 2 ]; //vertex buffer, uv buffer
 		GLfloat	vert[ 12 ];
 		GLfloat	uv[ 12 ];
+		c_bitmap bmp;
 		
 	public:
 		c_image				();
 		~c_image			() { unload(); }
 		
 		bool	isLoaded	() const;
-		bool	load		( cstr filename, int flags = CREATE_MIPMAPS );
+		bool	load		( cstr filename, int flags = c_bitmap::CREATE_MIPMAPS );
 		void	unload		();
 		
 		void	draw		() const;

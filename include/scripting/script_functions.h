@@ -17,8 +17,7 @@
 //		Evaluation Function Base Class
 //		Abstract
 //-----------------------------------------------------------------------------
-class c_scriptEvaluation : virtual public c_scriptFunc< c_scriptBool > {
-	friend class c_scriptManager;
+class HGE_API c_scriptEvaluation : virtual public c_scriptFunc< c_scriptBool > {
 	
 	protected:
 		int evalType;
@@ -51,8 +50,7 @@ class c_scriptEvaluation : virtual public c_scriptFunc< c_scriptBool > {
 //		Math Function Base Class
 //		Abstract
 //-----------------------------------------------------------------------------
-class c_scriptNumeric : virtual public c_scriptFunc< c_scriptFloat > {
-	friend class c_scriptManager;
+class HGE_API c_scriptNumeric : virtual public c_scriptFunc< c_scriptFloat > {
 	
 	protected:
 		int evalType;
@@ -84,8 +82,7 @@ class c_scriptNumeric : virtual public c_scriptFunc< c_scriptFloat > {
 //-----------------------------------------------------------------------------
 //		Numerical Evaluations
 //-----------------------------------------------------------------------------
-class c_scriptNumEval : public c_scriptEvaluation {
-	friend class c_scriptManager;
+class HGE_API c_scriptNumEval : public c_scriptEvaluation {
 		
 	public:
 		enum e_evalType {
@@ -120,8 +117,7 @@ class c_scriptNumEval : public c_scriptEvaluation {
 //-----------------------------------------------------------------------------
 //		Misc. Mathematical Functions
 //-----------------------------------------------------------------------------
-class c_scriptMiscMath : public c_scriptNumeric {
-	friend class c_scriptManager;
+class HGE_API c_scriptMiscMath : public c_scriptNumeric {
 		
 	public:
 		enum e_math {
@@ -150,8 +146,7 @@ class c_scriptMiscMath : public c_scriptNumeric {
 //-----------------------------------------------------------------------------
 //		Numerical Arithmetic
 //-----------------------------------------------------------------------------
-class c_scriptArithmetic : public c_scriptNumeric {
-	friend class c_scriptManager;
+class HGE_API c_scriptArithmetic : public c_scriptNumeric {
 		
 	public:
 		enum e_arithmetic {
@@ -181,8 +176,7 @@ class c_scriptArithmetic : public c_scriptNumeric {
 //-----------------------------------------------------------------------------
 //		Numerical Trigonometry
 //-----------------------------------------------------------------------------
-class c_scriptTrigonometry : public c_scriptNumeric {
-	friend class c_scriptManager;
+class HGE_API c_scriptTrigonometry : public c_scriptNumeric {
 	
 	public:
 		enum e_trigonometry {

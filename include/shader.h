@@ -15,7 +15,7 @@
 ///////////////////////////////////////////////////////////////////////////////
 //		OpenGL Shader Class
 ///////////////////////////////////////////////////////////////////////////////
-class c_shader : virtual public c_resource {
+class HGE_API c_shader : virtual public c_resource {
 	private:
 		std::vector< GLuint > shaderID;
 		GLuint progID;
@@ -42,11 +42,11 @@ class c_shader : virtual public c_resource {
 //		Stock (prebuilt) Shaders
 ///////////////////////////////////////////////////////////////////////////////
 namespace n_stockShaders {
-	bool	init();
-	GLuint	getTexture2dShader();
-	GLuint	getAmbientLightShader();
-	GLuint	getDiffuseLightShader();
-	GLuint	getSpecularLightShader();
+	HGE_API bool	init();
+	HGE_API GLuint	getTexture2dShader();
+	HGE_API GLuint	getAmbientLightShader();
+	HGE_API GLuint	getDiffuseLightShader();
+	HGE_API GLuint	getSpecularLightShader();
 }
 
 #endif	/* __HGE_SHADER_H__ */

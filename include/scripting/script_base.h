@@ -18,8 +18,7 @@ using namespace hamLibs;
 //-----------------------------------------------------------------------------
 //		Script Base Class
 //-----------------------------------------------------------------------------
-class c_script {
-	friend class c_scriptManager;
+class HGE_API c_script {
 	friend class c_serialize;
 
 	public:
@@ -41,8 +40,7 @@ class c_script {
 //		All variables MUST support copy construction & assignment operators
 //-----------------------------------------------------------------------------
 //ADT used for separation of variables and functions
-class c_scriptVarBase : virtual public c_script {
-	friend class c_scriptManager;
+class HGE_API c_scriptVarBase : virtual public c_script {
 	friend class c_serialize;
 	friend class c_scriptFuncBase;
 
@@ -63,8 +61,7 @@ class c_scriptVarBase : virtual public c_script {
 //		All variables MUST support copy construction & assignment operators
 //-----------------------------------------------------------------------------
 template <typename type>
-class c_scriptVar : virtual public c_scriptVarBase {
-	friend class c_scriptManager;
+class HGE_API c_scriptVar : virtual public c_scriptVarBase {
 	friend class c_serialize;
 
 	protected:
@@ -163,8 +160,7 @@ void c_scriptVar< math::vec3 >::write( std::ofstream& ) const;
 //-----------------------------------------------------------------------------
 //		Numerical Variable Base Class
 //-----------------------------------------------------------------------------
-class c_scriptNum : virtual public c_scriptVarBase {
-	friend class c_scriptManager;
+class HGE_API c_scriptNum : virtual public c_scriptVarBase {
 	friend class c_serialize;
 
 	public:
@@ -212,8 +208,7 @@ class c_scriptNum : virtual public c_scriptVarBase {
 //	Any type of object which must be saved or loaded from a file
 //-----------------------------------------------------------------------------
 template <typename type>
-class c_scriptResource : virtual public c_scriptVar< type > {
-	friend class c_scriptManager;
+class HGE_API c_scriptResource : virtual public c_scriptVar< type > {
 	friend class c_serialize;
 
 	enum e_resourceFlags : signed int {
@@ -278,8 +273,7 @@ const type& c_scriptResource< type >::getReference() const {
 //		Function Base Classes
 //		Abstract
 //-----------------------------------------------------------------------------
-class c_scriptFuncBase : virtual public c_script {
-	friend class c_scriptManager;
+class HGE_API c_scriptFuncBase : virtual public c_script {
 	friend class c_serialize;
 
 	protected:
@@ -311,8 +305,7 @@ class c_scriptFuncBase : virtual public c_script {
 //		Abstract
 //-----------------------------------------------------------------------------
 template <typename returnType>
-class c_scriptFunc : virtual public c_scriptFuncBase {
-	friend class c_scriptManager;
+class HGE_API c_scriptFunc : virtual public c_scriptFuncBase {
 	friend class c_serialize;
 
 	protected:

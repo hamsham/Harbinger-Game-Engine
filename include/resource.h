@@ -10,7 +10,7 @@
 
 #include "types.h"
 
-class c_resource {
+class HGE_API c_resource {
 	public:
 		c_resource		() {}
 		~c_resource		() {}

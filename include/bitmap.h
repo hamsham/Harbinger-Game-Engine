@@ -16,7 +16,7 @@
 //-----------------------------------------------------------------------------
 //		OpenGL Bitmaps
 //-----------------------------------------------------------------------------
-class c_bitmap : virtual public c_resource {
+class HGE_API c_bitmap : virtual public c_resource {
 	private:
 		GLuint oglTexture;
 		int bmpWidth, bmpHeight;

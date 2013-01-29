@@ -7,7 +7,7 @@
 
 #include <string>
 #include <fstream>
-#include "hamLibs.h"
+#include "types.h"
 #include "resource.h"
 #include "scripting/script.h"
 #include "scripting/script_base.h"
@@ -19,7 +19,7 @@
 // Script Factories
 //-----------------------------------------------------------------------------
 #define SCRIPTFACTORY( scriptBaseType, scriptvartype )\
-HL_INLINE c_##scriptBaseType* get_##scriptvartype() {\
+HGE_INLINE c_##scriptBaseType* get_##scriptvartype() {\
 		return new( std::nothrow ) c_##scriptvartype();\
 }
 

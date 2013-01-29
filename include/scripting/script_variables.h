@@ -17,9 +17,8 @@ using namespace hamLibs;
 //-----------------------------------------------------------------------------
 //		Integer Variable
 //-----------------------------------------------------------------------------
-class c_scriptInt :	virtual public c_scriptVar<int>,
+class HGE_API c_scriptInt :	virtual public c_scriptVar<int>,
 				virtual public c_scriptNum {
-	friend class c_scriptManager;
 	friend class c_serialize;
 	
 	public:
@@ -67,9 +66,8 @@ class c_scriptInt :	virtual public c_scriptVar<int>,
 //-----------------------------------------------------------------------------
 //		Floating Point Variable
 //-----------------------------------------------------------------------------
-class c_scriptFloat :	virtual public c_scriptVar<float>,
+class HGE_API c_scriptFloat :	virtual public c_scriptVar<float>,
 					virtual public c_scriptNum {
-	friend class c_scriptManager;
 	friend class c_serialize;
 	
 	public:
@@ -117,9 +115,8 @@ class c_scriptFloat :	virtual public c_scriptVar<float>,
 //-----------------------------------------------------------------------------
 //		Unsigned Integer Variable
 //-----------------------------------------------------------------------------
-class c_scriptUint :	virtual public c_scriptVar<unsigned int>,
+class HGE_API c_scriptUint :	virtual public c_scriptVar<unsigned int>,
 					virtual public c_scriptNum {
-	friend class c_scriptManager;
 	friend class c_serialize;
 	
 	public:
@@ -167,8 +164,7 @@ class c_scriptUint :	virtual public c_scriptVar<unsigned int>,
 //-----------------------------------------------------------------------------
 //		Boolean Variable
 //-----------------------------------------------------------------------------
-class c_scriptBool : virtual public c_scriptVar< bool > {
-	friend class c_scriptManager;
+class HGE_API c_scriptBool : virtual public c_scriptVar< bool > {
 	friend class c_serialize;
 	
 	public:
@@ -188,8 +184,7 @@ class c_scriptBool : virtual public c_scriptVar< bool > {
 //-----------------------------------------------------------------------------
 //		Character String Variable
 //-----------------------------------------------------------------------------
-class c_scriptString : virtual public c_scriptVar< std::string > {
-	friend class c_scriptManager;
+class HGE_API c_scriptString : virtual public c_scriptVar< std::string > {
 	friend class c_serialize;
 	
 	public:
@@ -213,8 +208,7 @@ class c_scriptString : virtual public c_scriptVar< std::string > {
 //-----------------------------------------------------------------------------
 //		3D Vector Variable
 //-----------------------------------------------------------------------------
-class c_scriptVec3 : virtual public c_scriptVar< math::vec3 > {
-	friend class c_scriptManager;
+class HGE_API c_scriptVec3 : virtual public c_scriptVar< math::vec3 > {
 	friend class c_serialize;
 	
 	public:

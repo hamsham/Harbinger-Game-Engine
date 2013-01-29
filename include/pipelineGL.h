@@ -13,7 +13,7 @@
 #include "types.h"
 
 //Error Messaging
-void printOpenGLError( cstr msg, uint lineNum, cstr sourceFile );
+HGE_API void printOpenGLError( cstr msg, uint lineNum, cstr sourceFile );
 #ifdef DEBUG
 	#define printGLError( x ) printOpenGLError( x, __LINE__, __FILE__ )
 #else
@@ -23,7 +23,7 @@ void printOpenGLError( cstr msg, uint lineNum, cstr sourceFile );
 //OpenGL pipeline convenience functions
 namespace n_pipelineGL {
 	
-	GLuint genBufferData(
+	HGE_API GLuint genBufferData(
 		GLuint numBuffers, GLuint* pBuffer,
 		GLenum target, GLsizeiptr size,
 		const void* data, GLenum usage

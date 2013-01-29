@@ -12,7 +12,7 @@
 #include "object.h"
 #include "pipelineGL.h"
 
-class c_image :	virtual public c_resource,
+class HGE_API c_image :	virtual public c_resource,
 				virtual public c_drawableObj {
 	private:
 		GLuint	vao;

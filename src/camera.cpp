@@ -5,8 +5,6 @@
  * Created on December 7, 2012, 6:23 PM
  */
 
-#include "hamLibs.h"
-
 #include "types.h"
 #include "camera.h"
 

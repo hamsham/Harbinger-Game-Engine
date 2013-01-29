@@ -8,13 +8,14 @@
 #ifndef __HGE_OBJECT_H__
 #define	__HGE_OBJECT_H__
 
-#include "hamlibs.h"
+#include "types.h"
+#include "math/math.h"
 using namespace hamLibs;
 
 //-----------------------------------------------------------------------------
 //	Basic Object Abstraction
 //-----------------------------------------------------------------------------
-class c_object {
+class HGE_API c_object {
 	public:
 		static const math::vec3 WORLD_AXIS_X;
 		static const math::vec3 WORLD_AXIS_Y;
@@ -47,7 +48,7 @@ class c_object {
 //-----------------------------------------------------------------------------
 //	Drawable Object Abstraction
 //-----------------------------------------------------------------------------
-class c_drawableObj : virtual public c_object {
+class HGE_API c_drawableObj : virtual public c_object {
 	protected:
 		math::vec3 scale;
 		math::quat rot;

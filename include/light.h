@@ -9,14 +9,14 @@
 #define	__HGE_LIGHT_H__
 
 #include <GL/glew.h>
-#include "hamLibs.h"
+#include "math/math.h"
 #include "types.h"
 using namespace hamLibs;
 
 ///////////////////////////////////////////////////////////////////////////////
 //		Lighting Abstraction
 ///////////////////////////////////////////////////////////////////////////////
-class c_light {
+class HGE_API c_light {
 	private:
 		math::vec4	color;
 		float		intensity;
@@ -36,7 +36,7 @@ class c_light {
 ///////////////////////////////////////////////////////////////////////////////
 //		Ambient Lighting
 ///////////////////////////////////////////////////////////////////////////////
-class c_ambientLight : virtual public c_light {
+class HGE_API c_ambientLight : virtual public c_light {
 	public:
 		c_ambientLight		();
 		c_ambientLight		( const c_ambientLight& );
@@ -46,7 +46,7 @@ class c_ambientLight : virtual public c_light {
 ///////////////////////////////////////////////////////////////////////////////
 //		Diffuse Lighting
 ///////////////////////////////////////////////////////////////////////////////
-class c_diffuseLight : virtual public c_light {
+class HGE_API c_diffuseLight : virtual public c_light {
 	private:
 		math::vec3	dir;
 		
@@ -62,7 +62,7 @@ class c_diffuseLight : virtual public c_light {
 ///////////////////////////////////////////////////////////////////////////////
 //		Specular Lighting
 ///////////////////////////////////////////////////////////////////////////////
-class c_specularLight : virtual public c_light {
+class HGE_API c_specularLight : virtual public c_light {
 	private:
 		GLfloat		shininess;
 		

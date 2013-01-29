@@ -8,7 +8,7 @@
 #ifndef __HGE_CAMERA_H__
 #define	__HGE_CAMERA_H__
 
-#include "hamLibs.h"
+#include "math/math.h"
 
 #include "display.h"
 #include "object.h"
@@ -27,7 +27,7 @@ using namespace hamLibs;
 ///////////////////////////////////////////////////////////////////////////////
 //		Camera & View Control
 ///////////////////////////////////////////////////////////////////////////////
-class c_camera : virtual public c_object {
+class HGE_API c_camera : virtual public c_object {
 	public:
 		static const float		DEFAULT_ASPECT_WIDTH;
 		static const float		DEFAULT_ASPECT_HEIGHT;
@@ -157,15 +157,15 @@ class c_camera : virtual public c_object {
 //-----------------------------------------------------------------------------
 //	Camera - Projections
 //-----------------------------------------------------------------------------
-inline void c_camera::setOrtho() {
+HGE_INLINE void c_camera::setOrtho() {
 	projMat = math::ortho( 0.f, aspectW, 0.f, aspectH );
 }
 
-inline void c_camera::setPerspective() {
+HGE_INLINE void c_camera::setPerspective() {
 	projMat = math::infinitePerspective( fov, aspectW / aspectH, zNear );
 }
 
-inline void c_camera::setProjection( float inFov, float aspectWidth, float aspectHeight, float inZNear, float inZFar ) {
+HGE_INLINE void c_camera::setProjection( float inFov, float aspectWidth, float aspectHeight, float inZNear, float inZFar ) {
 	fov = inFov;
 	aspectW = aspectWidth;
 	aspectH = aspectHeight;
@@ -176,7 +176,7 @@ inline void c_camera::setProjection( float inFov, float aspectWidth, float aspec
 //-----------------------------------------------------------------------------
 //	Camera - Rotations
 //-----------------------------------------------------------------------------
-inline void c_camera::rotate( float inPitch, float inYaw, float inRoll ) {
+HGE_INLINE void c_camera::rotate( float inPitch, float inYaw, float inRoll ) {
 	// Pitch, Yaw, and Roll are in Radians. They are reversed due to translation
 	// from world-space into eye-space
 	// No checks are performed to see if the values are less than 0 or greater
@@ -190,7 +190,7 @@ inline void c_camera::rotate( float inPitch, float inYaw, float inRoll ) {
 //-----------------------------------------------------------------------------
 //	Camera - Movement
 //-----------------------------------------------------------------------------
-inline void c_camera::move( float dx, float dy, float dz ) {
+HGE_INLINE void c_camera::move( float dx, float dy, float dz ) {
 	// Displacement values are reset to 0 after "update()" is run.
 	deltaPos.v[0] = dx;
 	deltaPos.v[1] = dy;

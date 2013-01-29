@@ -15,12 +15,12 @@
 ///////////////////////////////////////////////////////////////////////////////
 namespace n_display {
 	
-	bool	initScreen			();
-	void	setWindowTitle		( cstr );
-	cstr	getWindowTitle		();
-	void	setScreenSize		( int x, int y );
-	int		getScreenWidth		();
-	int		getScreenHeight		();
+	HGE_API bool	initScreen			();
+	HGE_API void	setWindowTitle		( cstr );
+	HGE_API cstr	getWindowTitle		();
+	HGE_API void	setScreenSize		( int x, int y );
+	HGE_API int		getScreenWidth		();
+	HGE_API int		getScreenHeight		();
 	
 }
 

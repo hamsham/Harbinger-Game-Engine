@@ -13,22 +13,7 @@
 #ifndef __HGE_TYPES_H__
 #define	__HGE_TYPES_H__
 
-/*
- * Forward Declarations
- */
-class	c_object;
-class	c_drawableObj;
-class	c_resource;
-class	c_bitmap;
-class	c_image;
-struct	c_shader;
-class	c_camera;
-struct	c_vertex;
-class	c_mesh;
-class	c_light;
-class	c_ambientLight;
-class	c_diffuseLight;
-class	c_specularLight;
+#include "defs/preprocessor.h"
 
 /*
  * Macros
@@ -50,6 +35,28 @@ class	c_specularLight;
 	#ifndef HGE_ASSERT
 		#define HGE_ASSERT( x )
 	#endif
+#endif
+
+/*
+ * Dynamic Library Setup
+ */
+#ifdef HGE_API_DYNAMIC
+	#if defined (HL_OS_WINDOWS) && defined (HGE_BUILD_DYNAMIC)
+		#define HGE_API __declspec( dllexport )
+	#elif defined (HL_OS_WINDOWS) && !defined (HGE_BUILD_DYNAMIC)
+		#define HGE_API __declspec( dllimport )
+	#else
+		#define HGE_API
+	#endif
+#else
+	#define HGE_API
+#endif
+
+/*
+ * Function Inlining
+ */
+#ifndef HGE_INLINE
+	#define HGE_INLINE HL_INLINE
 #endif
 
 /*
@@ -75,5 +82,22 @@ const float	PI_OVER_4	= PI / 4;
 const float	EPSILON		= 1e-5;
 
 cstr const	RESOURCE_DIR = "resources/";
+
+/*
+ * Forward Declarations
+ */
+class	c_object;
+class	c_drawableObj;
+class	c_resource;
+class	c_bitmap;
+class	c_image;
+struct	c_shader;
+class	c_camera;
+struct	c_vertex;
+class	c_mesh;
+class	c_light;
+class	c_ambientLight;
+class	c_diffuseLight;
+class	c_specularLight;
 
 #endif	/* __HGE_TYPES_H__ */

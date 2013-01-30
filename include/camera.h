@@ -139,7 +139,7 @@ class HGE_API c_camera : virtual public c_object {
 		float				getZNear	() const						{ return zNear; }
 		void				setZFar		( float inZFar )				{ zFar = inZFar; }
 		float				getZFar		() const						{ return zFar; }
-		void				setCamType	( cameraType  ct )				{ camType = ct; }
+		void				setCamType	( cameraType  ct )				{ camType = ct; target = -zAxis; }
 		cameraType			getCamType	() const						{ return camType; }
 		
 		//static viewing functions

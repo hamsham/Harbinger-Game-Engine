@@ -8,53 +8,80 @@
 #include "light.h"
 
 ///////////////////////////////////////////////////////////////////////////////
-//		Lighting Abstraction
+//		Ambient Lighting
 ///////////////////////////////////////////////////////////////////////////////
-c_light::c_light() :
+s_light::s_light() :
 	color( 1.f, 1.f, 1.f, 1.f ),
 	intensity( 1.f )
 {}
 
-c_light::c_light( const c_light& al ) :
+s_light::s_light( const s_light& al ) :
 	color( al.color ),
 	intensity( al.intensity )
-{}
-
-c_light::~c_light() {}
-
-///////////////////////////////////////////////////////////////////////////////
-//		Amnbient Lighting
-///////////////////////////////////////////////////////////////////////////////
-c_ambientLight::c_ambientLight() :
-	c_light()
-{}
-
-c_ambientLight::c_ambientLight( const c_ambientLight& al ) :
-	c_light( al )
 {}
 
 ///////////////////////////////////////////////////////////////////////////////
 //		Diffuse Lighting
 ///////////////////////////////////////////////////////////////////////////////
-c_diffuseLight::c_diffuseLight() :
-	c_light(),
+s_diffuseLight::s_diffuseLight() :
+	s_light(),
 	dir( 0.f, 0.f, 0.f )
 {}
 
-c_diffuseLight::c_diffuseLight( const c_diffuseLight& dl ) :
-	c_light( dl ),
+s_diffuseLight::s_diffuseLight( const s_diffuseLight& dl ) :
+	s_light( dl ),
 	dir( dl.dir )
 {}
 
 ///////////////////////////////////////////////////////////////////////////////
 //		Specular Lighting
 ///////////////////////////////////////////////////////////////////////////////
-c_specularLight::c_specularLight() :
-	c_light(),
+s_specularLight::s_specularLight() :
+	s_light(),
 	shininess( 1.f )
 {}
 
-c_specularLight::c_specularLight( const c_specularLight& sl ) :
-	c_light( sl ),
+s_specularLight::s_specularLight( const s_specularLight& sl ) :
+	s_light( sl ),
 	shininess( sl.shininess )
+{}
+
+///////////////////////////////////////////////////////////////////////////////
+//		Point Lighting
+///////////////////////////////////////////////////////////////////////////////
+s_pointLight::s_pointLight() :
+	s_light(),
+	pos( 0.f, 0.f, 0.f ),
+	constant( 1.f ),
+	linear( 1.f ),
+	exponential( 1.f )
+{}
+
+s_pointLight::s_pointLight( const s_pointLight& pl ) :
+	s_light( pl ),
+	pos( pl.pos ),
+	constant( pl.constant ),
+	linear( pl.linear ),
+	exponential( pl.exponential )
+{}
+
+///////////////////////////////////////////////////////////////////////////////
+//		Spot Lighting
+///////////////////////////////////////////////////////////////////////////////
+const float s_spotLight::MIN_CONE_ANGLE = math::HL_PI / 3.15f;
+
+s_spotLight::s_spotLight() :
+	s_light(),
+	pos( 0.f, 0.f, 0.f ),
+	dir( 0.f, 0.f, 0.f ),
+	coneAngle( math::HL_PI_OVR2 ),
+	attenuation( 1.f )
+{}
+
+s_spotLight::s_spotLight( const s_spotLight& sl ) :
+	s_light( sl ),
+	pos( sl.pos ),
+	dir( sl.dir ),
+	coneAngle( sl.coneAngle ),
+	attenuation( sl.attenuation )
 {}

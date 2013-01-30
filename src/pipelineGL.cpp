@@ -11,7 +11,6 @@
 //-----------------------------------------------------------------------------
 //	Error Messages
 //-----------------------------------------------------------------------------
-#ifdef DEBUG
 void printOpenGLError( cstr msg, uint lineNum, cstr sourceFile ) {
 		GLenum errorCode( glGetError() );
 		if ( errorCode != GL_NO_ERROR ) {
@@ -44,7 +43,6 @@ void printOpenGLError( cstr msg, uint lineNum, cstr sourceFile ) {
 			std::cerr << std::endl;
 		}
 }
-#endif
 
 //-----------------------------------------------------------------------------
 //	Pipeline Namespace

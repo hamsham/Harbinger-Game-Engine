@@ -47,6 +47,8 @@ namespace n_stockShaders {
 	HGE_API GLuint	getAmbientLightShader();
 	HGE_API GLuint	getDiffuseLightShader();
 	HGE_API GLuint	getSpecularLightShader();
+	HGE_API GLuint	getPointLightShader();
+	HGE_API GLuint	getSpotLightShader();
 }
 
 #endif	/* __HGE_SHADER_H__ */

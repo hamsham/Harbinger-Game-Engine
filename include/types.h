@@ -72,16 +72,15 @@ typedef unsigned long	hgeSize_t;
 /*
  * Global Variables
  */
-
-const float	PROG_UPDATE_SPEED = 1.0f / 60;
-
-const float	PI			= 3.1415926535897932f;
-const float	TWO_PI		= 6.2831853071795864f;
-const float	PI_OVER_2	= PI / 2;
-const float	PI_OVER_4	= PI / 4;
-const float	EPSILON		= 1e-5;
-
-cstr const	RESOURCE_DIR = "resources/";
+const float	PROG_UPDATE_SPEED	= (1.0f / 60);
+const int	MAX_NUM_LIGHTS		= 10;
+const float	PI					= 3.1415926535897932f;
+const float	TWO_PI				= 6.2831853071795864f;
+const float	PI_OVER_2			= (PI / 2);
+const float	PI_OVER_4			= (PI / 4);
+const float	EPSILON				= 1e-5;
+cstr const	RESOURCE_DIR		= "resources/";
+cstr const	WRONG_TEXTURE_FILE	= "resources/wrong.jpg";
 
 /*
  * Forward Declarations
@@ -95,9 +94,10 @@ struct	c_shader;
 class	c_camera;
 struct	c_vertex;
 class	c_mesh;
-class	c_light;
-class	c_ambientLight;
-class	c_diffuseLight;
-class	c_specularLight;
+class	s_light;
+class	s_diffuseLight;
+class	s_specularLight;
+class	s_pointLight;
+class	s_spotLight;
 
 #endif	/* __HGE_TYPES_H__ */

@@ -162,6 +162,8 @@ namespace {
 	c_shader ambient_shdr;
 	c_shader diffuse_shdr;
 	c_shader specular_shdr;
+	c_shader point_shdr;
+	c_shader spot_shdr;
 } // end anonymous namespace
 
 //-----------------------------------------------------------------------------
@@ -208,6 +210,26 @@ bool n_stockShaders::init() {
 		return false;
 	}
 	
+	//Basic Point Lighting
+	if (
+		!point_shdr.load( "shaders/point.vs", GL_VERTEX_SHADER )
+	||	!point_shdr.load( "shaders/point.fs", GL_FRAGMENT_SHADER )
+	||	!point_shdr.compile()
+	) {
+		std::cerr << "Error loading point light shader. Aborting" << std::endl;
+		return false;
+	}
+	
+	//Basic Spot Lighting
+	if (
+		!spot_shdr.load( "shaders/spot.vs", GL_VERTEX_SHADER )
+	||	!spot_shdr.load( "shaders/spot.fs", GL_FRAGMENT_SHADER )
+	||	!spot_shdr.compile()
+	) {
+		std::cerr << "Error loading spot light shader. Aborting" << std::endl;
+		return false;
+	}
+	
 	// all shaders initialized
 	return true;
 }
@@ -219,3 +241,5 @@ GLuint n_stockShaders::getTexture2dShader		() { return texture2d_shdr.getProgram
 GLuint n_stockShaders::getAmbientLightShader	() { return ambient_shdr.getProgramID(); }
 GLuint n_stockShaders::getDiffuseLightShader	() { return diffuse_shdr.getProgramID(); }
 GLuint n_stockShaders::getSpecularLightShader	() { return specular_shdr.getProgramID(); }
+GLuint n_stockShaders::getPointLightShader		() { return point_shdr.getProgramID(); }
+GLuint n_stockShaders::getSpotLightShader		() { return spot_shdr.getProgramID(); }

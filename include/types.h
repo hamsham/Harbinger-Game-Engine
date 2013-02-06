@@ -40,14 +40,10 @@
 /*
  * Dynamic Library Setup
  */
-#ifdef HGE_API_DYNAMIC
-	#if defined (HL_OS_WINDOWS) && defined (HGE_BUILD_DYNAMIC)
-		#define HGE_API __declspec( dllexport )
-	#elif defined (HL_OS_WINDOWS) && !defined (HGE_BUILD_DYNAMIC)
-		#define HGE_API __declspec( dllimport )
-	#else
-		#define HGE_API
-	#endif
+#if (defined (HL_OS_WINDOWS) && defined (HGE_BUILD_DYNAMIC))
+	#define HGE_API __declspec( dllexport )
+#elif (defined (HL_OS_WINDOWS) && defined (HGE_API_DYNAMIC))
+	#define HGE_API __declspec( dllimport )
 #else
 	#define HGE_API
 #endif
@@ -99,5 +95,9 @@ class	s_diffuseLight;
 class	s_specularLight;
 class	s_pointLight;
 class	s_spotLight;
+class	c_timeObject;	// time base class
+class	c_clock;		// general time (counts upwards)
+class	c_timer;		// count down
+class	c_stopwatch;	// count upward, with lapping
 
 #endif	/* __HGE_TYPES_H__ */

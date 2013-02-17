@@ -14,59 +14,12 @@
 #include "scripting/script_variables.h"
 #include "scripting/script_functions.h"
 #include "scripting/script_serializer.h"
+#include "scripting/script_manager.h"
 
-//-----------------------------------------------------------------------------
-// Script Factories
-//-----------------------------------------------------------------------------
-#define SCRIPTFACTORY( scriptBaseType, scriptvartype )\
-HGE_INLINE c_##scriptBaseType* get_##scriptvartype() {\
-		return new( std::nothrow ) c_##scriptvartype();\
-}
-
-//CAUTION: All factories return a script type created using the 'NEW' operator
-// CAUTION: All factory arrays follow the order displayed by their corresponding
-// enumerations listed in the file "script.h"
-#define SCRIPTVARFACTORY( x ) SCRIPTFACTORY( scriptVarBase, x )
-#define SCRIPTFUNCFACTORY( x ) SCRIPTFACTORY( scriptFuncBase, x )
-
-// Variable Factories
-SCRIPTVARFACTORY( scriptInt )
-SCRIPTVARFACTORY( scriptUint )
-SCRIPTVARFACTORY( scriptFloat )
-SCRIPTVARFACTORY( scriptBool )
-SCRIPTVARFACTORY( scriptString )
-SCRIPTVARFACTORY( scriptVec3 )
-
-// Function Factories
-SCRIPTFUNCFACTORY( scriptNumEval )
-SCRIPTFUNCFACTORY( scriptMiscMath )
-SCRIPTFUNCFACTORY( scriptArithmetic )
-SCRIPTFUNCFACTORY( scriptTrigonometry )
-
-//Function pointers to aid in creating script objects.
-// Variable Factories
-typedef c_scriptVarBase* ( *scriptVarFactory )();
-static scriptVarFactory varFactory[] = {
-	get_scriptInt,
-	get_scriptUint,
-	get_scriptFloat,
-	get_scriptBool,
-	get_scriptString,
-	get_scriptVec3,
-};
-
-// Function Factories
-typedef c_scriptFuncBase* ( *scriptFuncFactory )();
-static scriptFuncFactory funcFactory[] = {
-	get_scriptNumEval,
-	get_scriptMiscMath,
-	get_scriptArithmetic,
-	get_scriptTrigonometry
-};
 //-----------------------------------------------------------------------------
 // Utility functions
 //-----------------------------------------------------------------------------
-e_hgeFileType c_serialize::getFileType( cstr fileName ) const {
+e_hgeFileType c_serializer::getFileType( cstr fileName ) const {
 	std::string fileExt( fileName );
 	std::size_t pos( fileExt.find_last_of('.', fileExt.size()-4) );
 	
@@ -89,7 +42,7 @@ e_hgeFileType c_serialize::getFileType( cstr fileName ) const {
 // SERIALIZATION - SAVING
 // Small enough to not require extra functions
 //-----------------------------------------------------------------------------
-c_serialize::e_fileStatus c_serialize::saveScripts( cstr fileName, const scriptList_t& inScripts, bool overwriteData ) {
+c_serializer::e_fileStatus c_serializer::saveScripts( cstr fileName, const scriptList_t& inScripts, bool overwriteData ) {
 	//read in the file extension
 	e_hgeFileType fileType = getFileType( fileName );
 	
@@ -154,7 +107,7 @@ c_serialize::e_fileStatus c_serialize::saveScripts( cstr fileName, const scriptL
 // SERIALIZATION - LOADING
 // Uses functions to read in the header, footer, variables, and functions
 //-----------------------------------------------------------------------------
-c_serialize::e_fileStatus c_serialize::loadScripts( cstr fileName, scriptList_t& outScripts ) {
+c_serializer::e_fileStatus c_serializer::loadScripts( cstr fileName, scriptList_t& outScripts ) {
 	if ( outScripts.size() != 0 )
 		return FILE_LOAD_OVERWRITE;
 	
@@ -186,14 +139,12 @@ c_serialize::e_fileStatus c_serialize::loadScripts( cstr fileName, scriptList_t&
 		
 		//variable type
 		if ( scrType == SCRIPT_VAR ) {
-			HGE_ASSERT ( (scrSubType > SCRIPT_INVALID && scrSubType < SCRIPT_VAR_MAX) );
-			pScript = varFactory[ scrSubType ](); //function pointer call
+			pScript = c_scriptManager::getVarInstance( scrType );
 			++numVars;
 		}
 		//function type
 		else if ( scrType == SCRIPT_FUNC ) {
-			HGE_ASSERT ( (scrSubType > SCRIPT_INVALID && scrSubType < SCRIPT_FUNC_MAX) );
-			pScript = funcFactory[ scrSubType ](); //function pointer call
+			pScript = c_scriptManager::getFuncInstance( scrType );
 			++numFuncs;
 		}
 		else { // invalid file data
@@ -230,11 +181,11 @@ c_serialize::e_fileStatus c_serialize::loadScripts( cstr fileName, scriptList_t&
 //-----------------------------------------------------------------------------
 // Clear memory in case of error
 //-----------------------------------------------------------------------------
-void c_serialize::unloadData( scriptList_t& inScripts ) {
+void c_serializer::unloadData( scriptList_t& inScripts ) {
 	scriptList_t::iterator iter;
 	
 	for ( iter = inScripts.begin(); iter != inScripts.end(); ++iter ) {
-		delete *iter;
+		c_scriptManager::killInstance( *iter );
 	}
 	inScripts.clear();
 }
@@ -242,7 +193,7 @@ void c_serialize::unloadData( scriptList_t& inScripts ) {
 //-----------------------------------------------------------------------------
 // SERIALIZATION EXTENSION FUNCTIONS
 //-----------------------------------------------------------------------------
-bool c_serialize::readHeader( std::ifstream& fileIO, scriptList_t& scrList ) {
+bool c_serializer::readHeader( std::ifstream& fileIO, scriptList_t& scrList ) {
 	int fileType;
 	std::string inDataType;
 	scriptList_t::size_type numItems( 0 );
@@ -271,7 +222,7 @@ bool c_serialize::readHeader( std::ifstream& fileIO, scriptList_t& scrList ) {
 	return true;
 }
 
-bool c_serialize::readFooter( std::ifstream& fileIO, scriptList_t& scrList, hgeSize_t numVars, hgeSize_t numFuncs ) {
+bool c_serializer::readFooter( std::ifstream& fileIO, scriptList_t& scrList, hgeSize_t numVars, hgeSize_t numFuncs ) {
 	hgeSize_t varVerification( 0 );
 	hgeSize_t funcVerification( 0 );
 	fileIO >> varVerification >> funcVerification;

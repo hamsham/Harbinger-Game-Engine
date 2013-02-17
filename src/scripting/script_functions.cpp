@@ -98,7 +98,7 @@ void c_scriptNumeric::read( std::ifstream& fin, scriptMap_t& scrMap ) {
 	ulong evalPtr( 0 ), compPtr( 0 );
 	float retVal( 0.f );
 	c_scriptFuncBase::read( fin, scrMap );
-	fin >> retVal >> evalPtr >> compPtr;
+	fin >> evalType >> retVal >> evalPtr >> compPtr;
 	returnVal = retVal;
 	evalVar = dynamic_cast< const c_scriptNum* >( scrMap[ evalPtr ] );
 	compVar = dynamic_cast< const c_scriptNum* >( scrMap[ compPtr ] );
@@ -108,6 +108,7 @@ void c_scriptNumeric::read( std::ifstream& fin, scriptMap_t& scrMap ) {
 void c_scriptNumeric::write( std::ofstream& fout ) const {
 	c_scriptFuncBase::write( fout );
 	fout
+		<< " " << evalType
 		<< " " << (float)returnVal
 		<< " " << evalVar
 		<< " " << compVar;

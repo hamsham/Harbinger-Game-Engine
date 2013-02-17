@@ -5,10 +5,9 @@
  * Created on October 27, 2012, 11:24 PM
  */
 
-#ifndef __HGE_SERIALIZE_H__
-#define	__HGE_SERIALIZE_H__
+#ifndef __HGE_SCRIPT_SERIALIZE_H__
+#define	__HGE_SCRIPT_SERIALIZE_H__
 
-#include "../types.h"
 #include "script.h"
 
 //officially supported file types
@@ -17,15 +16,16 @@ enum e_hgeFileType : int {
 	HGE_SCRIPT_RAW_DATA = 0,		// contains a list of scripts to load
 	HGE_SCRIPT_EDITOR_DATA = 1	// contains the above, plus GUI data & names
 };
+
 cstr const HARBINGER_FILE_TYPE[] = {
 	"hsd", // harbinger script data
 	"hed" // harbinger editor data
 };
-		
+
 //------------------------------------------------------------------------
 //	SERIALIZATION CLASS
 //------------------------------------------------------------------------
-class HGE_API c_serialize {
+class HGE_API c_serializer {
 	private:
 		
 		e_hgeFileType getFileType( cstr fileName ) const;
@@ -59,4 +59,4 @@ class HGE_API c_serialize {
 		e_fileStatus loadScripts( cstr fileName, scriptList_t& outScripts );
 }; // end serialization class
 
-#endif	/* __HGE_SERIALIZE_H__ */
+#endif	/* __HGE_SCRIPT_SERIALIZE_H__ */

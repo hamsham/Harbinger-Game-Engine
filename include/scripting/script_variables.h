@@ -19,7 +19,7 @@ using namespace hamLibs;
 //-----------------------------------------------------------------------------
 class HGE_API c_scriptInt :	virtual public c_scriptVar<int>,
 				virtual public c_scriptNum {
-	friend class c_serialize;
+	friend class c_serializer;
 	
 	public:
 		c_scriptInt();
@@ -68,7 +68,7 @@ class HGE_API c_scriptInt :	virtual public c_scriptVar<int>,
 //-----------------------------------------------------------------------------
 class HGE_API c_scriptFloat :	virtual public c_scriptVar<float>,
 					virtual public c_scriptNum {
-	friend class c_serialize;
+	friend class c_serializer;
 	
 	public:
 		c_scriptFloat();
@@ -117,7 +117,7 @@ class HGE_API c_scriptFloat :	virtual public c_scriptVar<float>,
 //-----------------------------------------------------------------------------
 class HGE_API c_scriptUint :	virtual public c_scriptVar<unsigned int>,
 					virtual public c_scriptNum {
-	friend class c_serialize;
+	friend class c_serializer;
 	
 	public:
 		c_scriptUint();
@@ -165,7 +165,7 @@ class HGE_API c_scriptUint :	virtual public c_scriptVar<unsigned int>,
 //		Boolean Variable
 //-----------------------------------------------------------------------------
 class HGE_API c_scriptBool : virtual public c_scriptVar< bool > {
-	friend class c_serialize;
+	friend class c_serializer;
 	
 	public:
 		c_scriptBool();
@@ -185,7 +185,7 @@ class HGE_API c_scriptBool : virtual public c_scriptVar< bool > {
 //		Character String Variable
 //-----------------------------------------------------------------------------
 class HGE_API c_scriptString : virtual public c_scriptVar< std::string > {
-	friend class c_serialize;
+	friend class c_serializer;
 	
 	public:
 		c_scriptString();
@@ -209,7 +209,7 @@ class HGE_API c_scriptString : virtual public c_scriptVar< std::string > {
 //		3D Vector Variable
 //-----------------------------------------------------------------------------
 class HGE_API c_scriptVec3 : virtual public c_scriptVar< math::vec3 > {
-	friend class c_serialize;
+	friend class c_serializer;
 	
 	public:
 		c_scriptVec3();

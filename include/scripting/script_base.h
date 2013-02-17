@@ -19,20 +19,20 @@ using namespace hamLibs;
 //		Script Base Class
 //-----------------------------------------------------------------------------
 class HGE_API c_script {
-	friend class c_serialize;
+	friend class c_serializer;
 
 	public:
 		virtual ~c_script	() = 0;
 
 		virtual c_script&	operator=			( const c_script& scriptCopy );
-		virtual bool		operator==		( const c_script& scriptCopy ) const;
-		virtual bool		operator!=		( const c_script& scriptCopy ) const;
+		virtual bool		operator==			( const c_script& scriptCopy ) const;
+		virtual bool		operator!=			( const c_script& scriptCopy ) const;
 
-		virtual int		getScriptType		() const { return SCRIPT_BASE; }
-		virtual int		getScriptSubType	() const { return SCRIPT_INVALID; }
+		virtual int			getScriptType		() const { return SCRIPT_BASE; }
+		virtual int			getScriptSubType	() const { return SCRIPT_INVALID; }
 
 		virtual void		read				( std::ifstream&, scriptMap_t& );
-		virtual void		write			( std::ofstream& ) const;
+		virtual void		write				( std::ofstream& ) const;
 };
 
 //-----------------------------------------------------------------------------
@@ -41,11 +41,11 @@ class HGE_API c_script {
 //-----------------------------------------------------------------------------
 //ADT used for separation of variables and functions
 class HGE_API c_scriptVarBase : virtual public c_script {
-	friend class c_serialize;
+	friend class c_serializer;
 	friend class c_scriptFuncBase;
 
 	public:
-		virtual ~c_scriptVarBase	() = 0;
+		virtual ~c_scriptVarBase		() = 0;
 
 		int			getScriptType		() const { return SCRIPT_VAR; }
 		virtual int	getScriptSubType	() const { return SCRIPT_INVALID; }
@@ -62,7 +62,7 @@ class HGE_API c_scriptVarBase : virtual public c_script {
 //-----------------------------------------------------------------------------
 template <typename type>
 class HGE_API c_scriptVar : virtual public c_scriptVarBase {
-	friend class c_serialize;
+	friend class c_serializer;
 
 	protected:
 		type variable;
@@ -161,7 +161,7 @@ void c_scriptVar< math::vec3 >::write( std::ofstream& ) const;
 //		Numerical Variable Base Class
 //-----------------------------------------------------------------------------
 class HGE_API c_scriptNum : virtual public c_scriptVarBase {
-	friend class c_serialize;
+	friend class c_serializer;
 
 	public:
 		~c_scriptNum() {}
@@ -209,7 +209,7 @@ class HGE_API c_scriptNum : virtual public c_scriptVarBase {
 //-----------------------------------------------------------------------------
 template <typename type>
 class HGE_API c_scriptResource : virtual public c_scriptVar< type > {
-	friend class c_serialize;
+	friend class c_serializer;
 
 	enum e_resourceFlags : signed int {
 		RESOURCE_LOADED = 0x1,
@@ -274,7 +274,7 @@ const type& c_scriptResource< type >::getReference() const {
 //		Abstract
 //-----------------------------------------------------------------------------
 class HGE_API c_scriptFuncBase : virtual public c_script {
-	friend class c_serialize;
+	friend class c_serializer;
 
 	protected:
 		const c_scriptFuncBase* nextFunc;
@@ -306,7 +306,7 @@ class HGE_API c_scriptFuncBase : virtual public c_script {
 //-----------------------------------------------------------------------------
 template <typename returnType>
 class HGE_API c_scriptFunc : virtual public c_scriptFuncBase {
-	friend class c_serialize;
+	friend class c_serializer;
 
 	protected:
 		returnType returnVal;

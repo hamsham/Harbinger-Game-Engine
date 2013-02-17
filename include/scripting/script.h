@@ -77,6 +77,12 @@ class c_scriptArithmetic; //inherits c_scriptFunc
 class c_scriptTrigonometry; //inherits c_scriptFunc
 
 //-----------------------------------------------------------------------------
+//		Management & Serialization
+//-----------------------------------------------------------------------------
+class c_serializer;
+class c_scriptManager;
+
+//-----------------------------------------------------------------------------
 //		Serialization Support
 //-----------------------------------------------------------------------------
 //Scripting Containers & Structures
@@ -84,6 +90,6 @@ typedef std::map< ulong, c_script* >			scriptMap_t;
 typedef std::map< ulong, c_scriptVarBase* >		scriptVarMap_t;
 typedef std::map< ulong, c_scriptFuncBase* >	scriptFuncMap_t;
 typedef std::vector< c_script* >				scriptList_t;
-typedef scriptList_t::size_type					scriptListhgeSize_t;
+typedef scriptList_t::size_type					scriptListSize_t;
 
 #endif //__HGE_SCRIPT_H__

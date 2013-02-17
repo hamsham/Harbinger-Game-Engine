@@ -49,7 +49,7 @@ bool n_display::initScreen() {
 	glfwOpenWindowHint	(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
 	glfwOpenWindowHint	(GLFW_WINDOW_NO_RESIZE, GL_FALSE);
 	//create a window
-	if (!glfwOpenWindow(displayWidth, displayHeight, 0, 0, 0, 0, 32, 0, GLFW_WINDOW)) {
+	if (!glfwOpenWindow(displayWidth, displayHeight, 8, 8, 8, 8, 16, 16, GLFW_WINDOW)) {
 		std::cerr << "Could not create an OpenGL window using GLFW. Aborting" << std::endl;
 		glfwTerminate();
 		return false;

@@ -39,6 +39,7 @@ class HGE_API c_serializer {
 		//file statuses
 		enum e_fileStatus {
 			FILE_LOAD_ERROR,
+			FILE_LOAD_INVALID_TYPE,
 			FILE_LOAD_INVALID_NAME,
 			FILE_LOAD_INVALID_PATH,
 			FILE_LOAD_IO_ERROR,

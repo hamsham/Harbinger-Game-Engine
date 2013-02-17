@@ -5,27 +5,36 @@
  * Created on October 27, 2012, 11:24 PM
  */
 
+#include <stdexcept>
 #include <string>
 #include <fstream>
+
 #include "types.h"
 #include "resource.h"
-#include "scripting/script.h"
+
 #include "scripting/script_base.h"
 #include "scripting/script_variables.h"
 #include "scripting/script_functions.h"
-#include "scripting/script_serializer.h"
 #include "scripting/script_manager.h"
+#include "scripting/script_serializer.h"
 
 //-----------------------------------------------------------------------------
 // Utility functions
 //-----------------------------------------------------------------------------
 e_hgeFileType c_serializer::getFileType( cstr fileName ) const {
 	std::string fileExt( fileName );
-	std::size_t pos( fileExt.find_last_of('.', fileExt.size()-4) );
-	
-	if ( pos == std::string::npos ) {
+	// attempt to find the type of file based on the filename extension
+	try {
+		// "+1" added in order to remove the leading period
+		fileExt = fileExt.substr( fileExt.find_last_of('.', fileExt.size()-4) +1 );
+	}
+	catch ( const std::out_of_range& oor ) {
 		return HGE_SCRIPT_FILE_INVALID;
 	}
+	
+	fileExt[0] = std::tolower( fileExt[0] );
+	fileExt[1] = std::tolower( fileExt[1] );
+	fileExt[2] = std::tolower( fileExt[2] );
 	
 	if ( fileExt == HARBINGER_FILE_TYPE[ 0 ] ) {
 		return HGE_SCRIPT_RAW_DATA;
@@ -45,9 +54,9 @@ e_hgeFileType c_serializer::getFileType( cstr fileName ) const {
 c_serializer::e_fileStatus c_serializer::saveScripts( cstr fileName, const scriptList_t& inScripts, bool overwriteData ) {
 	//read in the file extension
 	e_hgeFileType fileType = getFileType( fileName );
-	
 	if ( fileType == HGE_SCRIPT_FILE_INVALID )
 		return FILE_SAVE_INVALID_NAME;
+	
 	if ( c_resource::fileExists( fileName ) && overwriteData == false )
 		return FILE_SAVE_OVERWRITE;
 	
@@ -75,10 +84,10 @@ c_serializer::e_fileStatus c_serializer::saveScripts( cstr fileName, const scrip
 	while ( iter != inScripts.end() ) {
 		pScript = (*iter);
 		
-		if ( (*iter)->getScriptType() == SCRIPT_VAR ) {
+		if ( pScript->getScriptType() == SCRIPT_VAR ) {
 			++numVars;
 		}
-		else if ( (*iter)->getScriptType() == SCRIPT_FUNC ) {
+		else if ( pScript->getScriptType() == SCRIPT_FUNC ) {
 			++numFuncs;
 		}
 		else {
@@ -93,6 +102,13 @@ c_serializer::e_fileStatus c_serializer::saveScripts( cstr fileName, const scrip
 			<< pScript->getScriptType() << " "
 			<< pScript->getScriptSubType() << " ";
 		pScript->write( fileIO );
+		
+		// save the editor position if requested
+#ifdef HGE_EDITOR
+		if ( fileType == HGE_SCRIPT_EDITOR_DATA )
+			fileIO << pScript->editorPos[0] << " " << pScript->editorPos[1];
+#endif /* HGE_EDITOR */
+		
 		fileIO << '\n';
 		++iter;
 	} // scriptList iteration loop
@@ -113,9 +129,14 @@ c_serializer::e_fileStatus c_serializer::loadScripts( cstr fileName, scriptList_
 	
 	//open the file and prepare the stream flags
 	std::ifstream fileIO( fileName, std::ios_base::in | std::ios_base::binary );
-	if ( fileIO.good() == false || readHeader( fileIO, outScripts ) == false ) {
-		fileIO.close();
+	if ( !fileIO.good() )
 		return FILE_LOAD_ERROR;
+	
+	// read the file type and header
+	e_hgeFileType fileType = getFileType( fileName );
+	if ( fileType == HGE_SCRIPT_FILE_INVALID || readHeader( fileIO, outScripts ) == false ) {
+		fileIO.close();
+		return FILE_LOAD_INVALID_TYPE;
 	}
 	fileIO.flags( std::ios::skipws | std::ios::fixed );
 	
@@ -162,6 +183,11 @@ c_serializer::e_fileStatus c_serializer::loadScripts( cstr fileName, scriptList_
 			unloadData( outScripts );
 			return FILE_LOAD_IO_ERROR;
 		}
+		// script successfully loaded. Add it to the list
+#ifdef HGE_EDITOR
+		if ( fileType == HGE_SCRIPT_EDITOR_DATA )
+			fileIO >> pScript->editorPos[0] >> pScript->editorPos[1];
+#endif
 		*iter = pScript;
 		++iter;
 	}
@@ -170,7 +196,7 @@ c_serializer::e_fileStatus c_serializer::loadScripts( cstr fileName, scriptList_
 	if ( !fileIO.good()
 	|| !readFooter( fileIO, outScripts, numVars, numFuncs) ) {
 		fileIO.close();
-		unloadData(outScripts );
+		unloadData( outScripts );
 		return FILE_LOAD_ERROR;
 	}
 	

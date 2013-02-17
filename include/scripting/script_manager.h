@@ -18,13 +18,12 @@
 class HGE_API c_scriptManager {
 	private:
 		std::string			scriptFile;
-		scriptMap_t			scriptMap;
 		scriptList_t		scriptList;
 		
 	public:
-		c_scriptManager		();
+		c_scriptManager		() {}
 		c_scriptManager		( const c_scriptManager& );
-		~c_scriptManager	();
+		~c_scriptManager	()				{ clearEntries(); }
 		
 		static c_script*	getVarInstance	( int scriptVarType );
 		static c_script*	getFuncInstance	( int scriptFuncType );
@@ -40,8 +39,12 @@ class HGE_API c_scriptManager {
 		const c_script*		operator[]		( unsigned int ) const;
 		c_script*			operator[]		( unsigned int );
 		
-		void				addEntry		( c_script* );
+		void				addEntry		( c_script* ); // creates a 'new' instance
+		void				manageEntry		( c_script* ); // adds an instance without using 'new'
 		void				popEntry		( unsigned int index );
+		
+		scriptListSize_t	getNumEntries	() const { return scriptList.size(); }
+		void				clearEntries	();
 };
 
 #endif /* __HGE_SCRIPT_MANAGER_H__ */

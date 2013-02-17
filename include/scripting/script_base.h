@@ -14,6 +14,7 @@
 using namespace hamLibs;
 
 #include "../types.h"
+#include "script.h"
 
 //-----------------------------------------------------------------------------
 //		Script Base Class
@@ -22,6 +23,10 @@ class HGE_API c_script {
 	friend class c_serializer;
 
 	public:
+#ifdef HGE_EDITOR
+		math::vec2_t< int > editorPos			= math::vec3< int >( 0 );
+#endif
+		
 		virtual ~c_script	() = 0;
 
 		virtual c_script&	operator=			( const c_script& scriptCopy );

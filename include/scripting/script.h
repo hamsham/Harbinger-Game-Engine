@@ -79,8 +79,8 @@ class c_scriptTrigonometry; //inherits c_scriptFunc
 //-----------------------------------------------------------------------------
 //		Management & Serialization
 //-----------------------------------------------------------------------------
-class c_serializer;
 class c_scriptManager;
+class c_serializer;
 
 //-----------------------------------------------------------------------------
 //		Serialization Support

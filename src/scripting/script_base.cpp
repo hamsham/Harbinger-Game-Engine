@@ -178,7 +178,7 @@ c_scriptNum::operator float() const {
 //		Function Base Class
 //-----------------------------------------------------------------------------
 c_scriptFuncBase::c_scriptFuncBase() :
-	nextFunc( NULL )
+	nextFunc( HGE_NULL )
 {}
 
 c_scriptFuncBase::c_scriptFuncBase( const c_scriptFuncBase& funcCopy ) :
@@ -214,11 +214,11 @@ void c_scriptFuncBase::setNextFunction(const c_scriptFuncBase& next) {
 //-----------------------------------------------------------------------------
 template <>
 c_scriptFunc< void* >::c_scriptFunc() :
-	returnVal( NULL )
+	returnVal( HGE_NULL )
 {}
 
 template <>
 c_scriptFunc< void* >::c_scriptFunc( const c_scriptFunc& funcCopy ) :
 	c_scriptFuncBase( funcCopy ),
-	returnVal( NULL )
+	returnVal( HGE_NULL )
 {}

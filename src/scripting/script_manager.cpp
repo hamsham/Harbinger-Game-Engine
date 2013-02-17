@@ -5,15 +5,17 @@
  * Created on February 16, 2013, 9:48 PM
  */
 
-#include "scripting/script.h"
 #include "scripting/script_base.h"
 #include "scripting/script_variables.h"
 #include "scripting/script_functions.h"
-#include "scripting/script_serializer.h"
 #include "scripting/script_manager.h"
 
+///////////////////////////////////////////////////////////////////////////////
+//		Scripting Manager
+///////////////////////////////////////////////////////////////////////////////
+
 //-----------------------------------------------------------------------------
-// Script Factories
+// Script Manager -- Factories
 //-----------------------------------------------------------------------------
 c_script* getVarInstance( int scriptType ) {
 	switch( scriptType ) {
@@ -30,7 +32,7 @@ c_script* getVarInstance( int scriptType ) {
 		case SCRIPT_VAR_VEC3:
 			return new( std::nothrow ) c_scriptVec3;
 		default:
-			return nullptr;
+			return HGE_NULL;
 	}
 }
 
@@ -45,12 +47,31 @@ c_script* getFuncInstance( int scriptType ) {
 		case SCRIPT_FUNC_NUM_TRIG:
 			return new( std::nothrow ) c_scriptTrigonometry;
 		default:
-			return nullptr;
+			return HGE_NULL;
 	}
 }
 
 void c_scriptManager::killInstance( c_script* s ) {
 	delete s;
-	s = nullptr;
+	s = HGE_NULL;
 }
 
+//-----------------------------------------------------------------------------
+// Script Manager -- Constructor
+//-----------------------------------------------------------------------------
+// design choice -- leaving the copy constructor up to STL
+c_scriptManager::c_scriptManager( const c_scriptManager& sm ) :
+	scriptFile( sm.scriptFile ),
+	scriptList( sm.scriptList )
+{}
+
+//-----------------------------------------------------------------------------
+// Script Manager -- Clearance
+//-----------------------------------------------------------------------------
+void c_scriptManager::clearEntries() {
+	for ( scriptListSize_t i( 0 ); i < scriptList.size(); ++i ) {
+		delete scriptList[ i ];
+		scriptList[ i ] = HGE_NULL;
+	}
+	scriptList.clear();
+}

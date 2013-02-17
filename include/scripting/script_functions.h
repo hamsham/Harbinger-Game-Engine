@@ -10,7 +10,6 @@
 
 #include <fstream>
 #include "script.h"
-#include "script_base.h"
 #include "script_variables.h"
 
 //-----------------------------------------------------------------------------

@@ -289,6 +289,9 @@ class HGE_API c_scriptFuncBase : virtual public c_script {
 		c_scriptFuncBase( const c_scriptFuncBase& funcCopy );
 		virtual ~c_scriptFuncBase() = 0;
 
+		virtual void read ( std::ifstream&, scriptMap_t& );
+		virtual void write ( std::ofstream& ) const;
+
 		virtual void run() = 0;
 		virtual void tick( float timeElapsed = 0 ) {
 			HGE_ASSERT( timeElapsed == 0);
@@ -298,8 +301,8 @@ class HGE_API c_scriptFuncBase : virtual public c_script {
 		int getScriptType() const { return SCRIPT_FUNC; }
 		virtual int getScriptSubType() const { return SCRIPT_INVALID; }
 
-		virtual void read ( std::ifstream&, scriptMap_t& );
-		virtual void write ( std::ofstream& ) const;
+		//virtual void read ( std::ifstream&, scriptMap_t& );
+		//virtual void write ( std::ofstream& ) const;
 
 		const c_scriptFuncBase* getNextFunction() const;
 		void setNextFunction( const c_scriptFuncBase& next );
@@ -314,6 +317,7 @@ class HGE_API c_scriptFunc : virtual public c_scriptFuncBase {
 	friend class c_serializer;
 
 	protected:
+		int evalType;
 		returnType returnVal;
 
 	public:
@@ -321,9 +325,9 @@ class HGE_API c_scriptFunc : virtual public c_scriptFuncBase {
 		c_scriptFunc( const c_scriptFunc& funcCopy );
 		c_scriptFunc( const returnType& retVal );
 		virtual ~c_scriptFunc() = 0;
-
-		virtual void read ( std::ifstream&, scriptMap_t& ) = 0;
-		virtual void write ( std::ofstream& ) const = 0;
+		
+		int getEvalType() const;
+		virtual void setEvalType( int eval = 0 );
 
 		const returnType& getReturnVal() const;
 		void setReturnVal( const returnType& retVal );
@@ -331,13 +335,15 @@ class HGE_API c_scriptFunc : virtual public c_scriptFuncBase {
 
 template <typename returnType>
 c_scriptFunc< returnType >::c_scriptFunc() :
-	returnVal()
+	evalType( 0 ),
+	returnVal( HGE_NULL )
 {}
 
 template <typename returnType>
 c_scriptFunc< returnType >::c_scriptFunc( const c_scriptFunc& funcCopy ) :
 	c_scriptFuncBase( funcCopy ),
-	returnVal( funcCopy.returnVal)
+	evalType( funcCopy.evalType ),
+	returnVal( funcCopy.returnVal )
 {}
 
 template <typename returnType>
@@ -349,6 +355,16 @@ c_scriptFunc< returnType >::c_scriptFunc( const returnType& retVal ) :
 {}
 
 template <typename returnType>
+int c_scriptFunc< returnType >::getEvalType() const {
+	return evalType;
+}
+
+template <typename returnType>
+void c_scriptFunc< returnType >::setEvalType( int eval ) {
+	evalType = eval;
+}
+
+template <typename returnType>
 const returnType& c_scriptFunc< returnType >::getReturnVal() const {
 	return returnVal;
 }
@@ -357,7 +373,7 @@ template <typename returnType>
 void c_scriptFunc< returnType >::setReturnVal( const returnType& retVal ) {
 	returnVal = retVal;
 }
-
+/*
 template <typename returnType>
 void c_scriptFunc< returnType >::read( std::ifstream& fin, scriptMap_t& scrMap ) {
 	c_scriptFuncBase::read( fin, scrMap );
@@ -369,7 +385,7 @@ void c_scriptFunc< returnType >::write( std::ofstream& fout ) const {
 	c_scriptFuncBase::write( fout );
 	fout << " " << returnVal;
 }
-
+*/
 /* NOTE:
  * The s_scriptEval and c_scriptNumeric functions have been moved to the
  * "script_functions.h" header due to compiler errors, even though they are

@@ -210,7 +210,7 @@ c_scriptNum& c_scriptFloat::operator /= ( const c_scriptNum& inVar ) {
 }
 
 c_scriptNum& c_scriptFloat::operator %= ( const c_scriptNum& inVar ) {
-	variable = fmod(variable, (float)inVar);
+	variable = fmod( variable, (float)inVar );
 	return *this;
 }
 		
@@ -425,14 +425,6 @@ c_scriptBool::c_scriptBool( const c_scriptBool& inBool ) :
 {}
 
 c_scriptBool::~c_scriptBool() {}
-
-void c_scriptBool::setTrue() {
-	variable = true;
-}
-
-void c_scriptBool::setFalse() {
-	variable = false;
-}
 
 //-----------------------------------------------------------------------------
 //		Character String Variable

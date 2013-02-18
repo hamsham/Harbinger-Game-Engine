@@ -30,18 +30,13 @@ bool c_script::operator!= ( const c_script& scriptCopy ) const {
 }
 
 void c_script::read( std::ifstream& fin, scriptMap_t& scrMap ) {
-	ulong varPtr( 0 );
+	void* varPtr( HGE_NULL );
 	fin >> varPtr;
 	scrMap[ varPtr ] = this;
 }
 
 void c_script::write( std::ofstream& fout ) const {
-#ifdef __GNUC__
-	// As far as I know, only GCC/G++ increments pointers when writing them to files
-	fout << (this - sizeof( void* ));
-#else
 	fout << this;
-#endif
 }
 
 //-----------------------------------------------------------------------------
@@ -147,18 +142,15 @@ bool c_scriptNum::operator <= ( const c_scriptNum& inVar ) const {
 	return this <= &inVar;
 }
 
-c_scriptNum& c_scriptNum::operator= ( int inVar ) {
-	++inVar;
+c_scriptNum& c_scriptNum::operator= ( int ) {
 	return *this;
 }
 
-c_scriptNum& c_scriptNum::operator= ( unsigned int inVar ) {
-	++inVar;
+c_scriptNum& c_scriptNum::operator= ( unsigned int ) {
 	return *this;
 }
 
-c_scriptNum& c_scriptNum::operator= ( float inVar ) {
-	++inVar;
+c_scriptNum& c_scriptNum::operator= ( float ) {
 	return *this;
 }
 
@@ -189,7 +181,7 @@ c_scriptFuncBase::~c_scriptFuncBase() {}
 
 //file input
 void c_scriptFuncBase::read( std::ifstream& fin, scriptMap_t& scrMap ) {
-	ulong funcPtr( 0 );
+	void* funcPtr( HGE_NULL );
 	c_script::read( fin, scrMap );
 	fin >> funcPtr;
 	nextFunc = dynamic_cast< const c_scriptFuncBase* >( scrMap[ funcPtr ] );

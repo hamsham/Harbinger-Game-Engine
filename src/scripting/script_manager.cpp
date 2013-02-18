@@ -4,7 +4,7 @@
  *
  * Created on February 16, 2013, 9:48 PM
  */
-
+#include <iostream>
 #include "scripting/script_base.h"
 #include "scripting/script_variables.h"
 #include "scripting/script_functions.h"
@@ -15,37 +15,53 @@
 ///////////////////////////////////////////////////////////////////////////////
 
 //-----------------------------------------------------------------------------
-// Script Manager -- Factories
+// Script Manager -- Constructor
 //-----------------------------------------------------------------------------
-c_script* getVarInstance( int scriptType ) {
+c_scriptManager::c_scriptManager() :
+	scriptFile(),
+	scriptMap(),
+	scriptList()
+{}
+
+// design choice -- leaving the copy constructor up to STL
+c_scriptManager::c_scriptManager( const c_scriptManager& sm ) :
+	scriptFile( sm.scriptFile ),
+	scriptMap( sm.scriptMap ),
+	scriptList( sm.scriptList )
+{}
+
+//-----------------------------------------------------------------------------
+// Script Manager Namespace -- Instances
+//-----------------------------------------------------------------------------
+c_script* c_scriptManager::getVarInstance( int scriptType ) {
 	switch( scriptType ) {
 		case SCRIPT_VAR_INT:
-			return new( std::nothrow ) c_scriptInt;
+			return new c_scriptInt;
 		case SCRIPT_VAR_UINT:
-			return new( std::nothrow ) c_scriptUint;
+			return new c_scriptUint;
 		case SCRIPT_VAR_FLOAT:
-			return new( std::nothrow ) c_scriptFloat;
+			return new c_scriptFloat;
 		case SCRIPT_VAR_BOOL:
-			return new( std::nothrow ) c_scriptBool;
+			return new c_scriptBool;
 		case SCRIPT_VAR_STRING:
-			return new( std::nothrow ) c_scriptString;
+			return new c_scriptString;
 		case SCRIPT_VAR_VEC3:
-			return new( std::nothrow ) c_scriptVec3;
+			return new c_scriptVec3;
 		default:
 			return HGE_NULL;
 	}
 }
 
-c_script* getFuncInstance( int scriptType ) {
+c_script* c_scriptManager::getFuncInstance( int scriptType ) {
 	switch( scriptType ) {
 		case SCRIPT_FUNC_NUM_EVAL:
-			return new( std::nothrow ) c_scriptNumEval;
+			return new c_scriptNumEval;
 		case SCRIPT_FUNC_NUM_MISC:
-			return new( std::nothrow ) c_scriptMiscMath;
+			return new c_scriptMiscMath;
 		case SCRIPT_FUNC_NUM_ARITH:
-			return new( std::nothrow ) c_scriptArithmetic;
+			return new c_scriptArithmetic;
 		case SCRIPT_FUNC_NUM_TRIG:
-			return new( std::nothrow ) c_scriptTrigonometry;
+			return new c_scriptTrigonometry;
 		default:
 			return HGE_NULL;
 	}
@@ -57,18 +73,111 @@ void c_scriptManager::killInstance( c_script* s ) {
 }
 
 //-----------------------------------------------------------------------------
-// Script Manager -- Constructor
+// Script Manager -- File Data
 //-----------------------------------------------------------------------------
-// design choice -- leaving the copy constructor up to STL
-c_scriptManager::c_scriptManager( const c_scriptManager& sm ) :
-	scriptFile( sm.scriptFile ),
-	scriptList( sm.scriptList )
-{}
+const std::string& c_scriptManager::getFileName() const {
+	return scriptFile;
+}
+
+void c_scriptManager::setFileName( const std::string& inName ) {
+	scriptFile = inName;
+}
+
+bool c_scriptManager::hasFile() const {
+	return scriptFile.size() > 0;
+}
+
+//-----------------------------------------------------------------------------
+// Script Manager -- Serialization
+//-----------------------------------------------------------------------------
+bool c_scriptManager::save() const {
+	c_serializer::e_fileStatus fileStatus;
+	c_serializer serializer;
+	
+	fileStatus = serializer.saveScripts( scriptFile.c_str(), scriptList, true );
+	
+	if ( fileStatus == c_serializer::FILE_SAVE_SUCCESS ) 
+		return true;
+	
+	std::cerr << "ERROR: Unable to save scriptFile due to error " << fileStatus << std::endl;
+	return false;
+}
+
+bool c_scriptManager::load() {
+	c_serializer::e_fileStatus fileStatus;
+	c_serializer serializer;
+	
+	fileStatus = serializer.loadScripts( scriptFile.c_str(), scriptList );
+	
+	if ( fileStatus == c_serializer::FILE_LOAD_SUCCESS ) 
+		return true;
+	
+	std::cerr << "ERROR: Unable to load scriptFile due to error " << fileStatus << std::endl;
+	return false;
+}
+
+//-----------------------------------------------------------------------------
+// Script Manager -- Data Access
+//-----------------------------------------------------------------------------
+const c_script* c_scriptManager::operator []( uint index ) const {
+	HGE_ASSERT( (index >= 0) && (index < scriptList.size()) );
+	return scriptList[ index ];
+}
+
+c_script* c_scriptManager::operator []( uint index ) {
+	HGE_ASSERT( (index >= 0) && (index < scriptList.size()) );
+	return scriptList[ index ];
+}
+
+//-----------------------------------------------------------------------------
+// Script Manager -- Entry Management
+//-----------------------------------------------------------------------------
+void c_scriptManager::addEntry( c_script* script ) {
+	// check to make sure that "script" isn't already being managed
+	scriptMap_t::iterator iter = scriptMap.find( (void*)script );
+	if ( iter != scriptMap.end() ) return;
+	
+	c_script* pScript( HGE_NULL );
+	if ( script->getScriptType() == SCRIPT_VAR ) {
+		pScript = getVarInstance( script->getScriptSubType() );
+	}
+	else if ( script->getScriptType() == SCRIPT_FUNC ) {
+		pScript = getFuncInstance( script->getScriptSubType() );
+	}
+	
+	if ( pScript == HGE_NULL ) return;
+	
+	*pScript = *script;
+	scriptList.push_back( pScript );
+	scriptMap[ (void*)pScript ] = pScript;
+}
+
+void c_scriptManager::manageEntry( c_script* script ) {
+	// check to make sure that "script" isn't already being managed
+	scriptMap_t::iterator iter = scriptMap.find( (void*)script );
+	if ( iter != scriptMap.end() ) return;
+	
+	scriptList.push_back( script );
+	scriptMap[ (void*)script ] = script;
+}
+
+void c_scriptManager::popEntry( unsigned int index ) {
+	HGE_ASSERT( (index >= 0) && (index < scriptList.size()) );
+	
+	c_script* pScript( HGE_NULL );
+	scriptList_t::iterator listIter = scriptList.begin() + index;
+	pScript = *listIter;
+	scriptMap.erase( (void*)pScript );
+	
+	delete pScript;
+	*listIter = HGE_NULL;
+}
 
 //-----------------------------------------------------------------------------
 // Script Manager -- Clearance
 //-----------------------------------------------------------------------------
 void c_scriptManager::clearEntries() {
+	scriptMap.clear();
 	for ( scriptListSize_t i( 0 ); i < scriptList.size(); ++i ) {
 		delete scriptList[ i ];
 		scriptList[ i ] = HGE_NULL;

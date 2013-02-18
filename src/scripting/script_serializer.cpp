@@ -7,6 +7,7 @@
 
 #include <stdexcept>
 #include <string>
+#include <iostream>
 #include <fstream>
 
 #include "types.h"
@@ -31,7 +32,6 @@ e_hgeFileType c_serializer::getFileType( cstr fileName ) const {
 	catch ( const std::out_of_range& oor ) {
 		return HGE_SCRIPT_FILE_INVALID;
 	}
-	
 	fileExt[0] = std::tolower( fileExt[0] );
 	fileExt[1] = std::tolower( fileExt[1] );
 	fileExt[2] = std::tolower( fileExt[2] );
@@ -129,14 +129,19 @@ c_serializer::e_fileStatus c_serializer::loadScripts( cstr fileName, scriptList_
 	
 	//open the file and prepare the stream flags
 	std::ifstream fileIO( fileName, std::ios_base::in | std::ios_base::binary );
-	if ( !fileIO.good() )
+	if ( !fileIO.good() ) {
 		return FILE_LOAD_ERROR;
+	}
 	
 	// read the file type and header
 	e_hgeFileType fileType = getFileType( fileName );
-	if ( fileType == HGE_SCRIPT_FILE_INVALID || readHeader( fileIO, outScripts ) == false ) {
+	if ( fileType == HGE_SCRIPT_FILE_INVALID ) {
 		fileIO.close();
 		return FILE_LOAD_INVALID_TYPE;
+	}
+	if ( readHeader( fileIO, outScripts ) == false ) {
+		fileIO.close();
+		return FILE_LOAD_INVALID_NAME;
 	}
 	fileIO.flags( std::ios::skipws | std::ios::fixed );
 	
@@ -160,12 +165,12 @@ c_serializer::e_fileStatus c_serializer::loadScripts( cstr fileName, scriptList_
 		
 		//variable type
 		if ( scrType == SCRIPT_VAR ) {
-			pScript = c_scriptManager::getVarInstance( scrType );
+			pScript = c_scriptManager::getVarInstance( scrSubType );
 			++numVars;
 		}
 		//function type
 		else if ( scrType == SCRIPT_FUNC ) {
-			pScript = c_scriptManager::getFuncInstance( scrType );
+			pScript = c_scriptManager::getFuncInstance( scrSubType );
 			++numFuncs;
 		}
 		else { // invalid file data
@@ -181,6 +186,7 @@ c_serializer::e_fileStatus c_serializer::loadScripts( cstr fileName, scriptList_
 		else {
 			fileIO.close();
 			unloadData( outScripts );
+			std::cerr << "Attempting to load script object of type " << scrType << ' ' << scrSubType << std::endl;
 			return FILE_LOAD_IO_ERROR;
 		}
 		// script successfully loaded. Add it to the list
@@ -193,8 +199,7 @@ c_serializer::e_fileStatus c_serializer::loadScripts( cstr fileName, scriptList_
 	}
 	
 	//read in the footer
-	if ( !fileIO.good()
-	|| !readFooter( fileIO, outScripts, numVars, numFuncs) ) {
+	if ( !fileIO.good() || !readFooter( fileIO, outScripts, numVars, numFuncs) ) {
 		fileIO.close();
 		unloadData( outScripts );
 		return FILE_LOAD_ERROR;
@@ -232,7 +237,7 @@ bool c_serializer::readHeader( std::ifstream& fileIO, scriptList_t& scrList ) {
 	}
 		
 	fileIO >> fileType;
-	if ( fileType != HGE_SCRIPT_FILE_INVALID ) {
+	if ( fileType == HGE_SCRIPT_FILE_INVALID ) {
 		return false;
 	}
 	
@@ -253,10 +258,12 @@ bool c_serializer::readFooter( std::ifstream& fileIO, scriptList_t& scrList, hge
 	hgeSize_t funcVerification( 0 );
 	fileIO >> varVerification >> funcVerification;
 
-	if ( (numVars != varVerification) || (numFuncs != funcVerification) )
+	if ( (numVars != varVerification) || (numFuncs != funcVerification) ) {
 		return false;
-	if ( (numVars + numFuncs) != scrList.size() )
+	}
+	if ( (numVars + numFuncs) != scrList.size() ) {
 		return false;
+	}
 	
 	return true;
 }

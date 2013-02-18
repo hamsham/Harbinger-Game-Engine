@@ -86,9 +86,9 @@ class c_serializer;
 //		Serialization Support
 //-----------------------------------------------------------------------------
 //Scripting Containers & Structures
-typedef std::map< ulong, c_script* >			scriptMap_t;
-typedef std::map< ulong, c_scriptVarBase* >		scriptVarMap_t;
-typedef std::map< ulong, c_scriptFuncBase* >	scriptFuncMap_t;
+typedef std::map< void*, c_script* >			scriptMap_t;
+typedef std::map< void*, c_scriptVarBase* >		scriptVarMap_t;
+typedef std::map< void*, c_scriptFuncBase* >	scriptFuncMap_t;
 typedef std::vector< c_script* >				scriptList_t;
 typedef scriptList_t::size_type					scriptListSize_t;
 

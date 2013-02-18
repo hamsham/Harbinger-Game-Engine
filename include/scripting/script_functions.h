@@ -16,10 +16,9 @@
 //		Evaluation Function Base Class
 //		Abstract
 //-----------------------------------------------------------------------------
-class HGE_API c_scriptEvaluation : virtual public c_scriptFunc< c_scriptBool > {
+class HGE_API c_scriptEvaluation : virtual public c_scriptFunc< c_scriptBool* > {
 	
 	protected:
-		int evalType;
 		const c_scriptVarBase *evalVar, *compVar;
 		//The object to evaluate, the object to compare it to
 	
@@ -35,9 +34,6 @@ class HGE_API c_scriptEvaluation : virtual public c_scriptFunc< c_scriptBool > {
 		void read ( std::ifstream&, scriptMap_t& );
 		void write ( std::ofstream& ) const;
 		
-		int getEvalType() const;
-		virtual void setEvalType( int eval = 0 );
-		
 		virtual const c_scriptVarBase* getVarToEvaluate() const;
 		virtual void setVarToEvaluate( const c_scriptVarBase* inVar );
 		
@@ -49,10 +45,9 @@ class HGE_API c_scriptEvaluation : virtual public c_scriptFunc< c_scriptBool > {
 //		Math Function Base Class
 //		Abstract
 //-----------------------------------------------------------------------------
-class HGE_API c_scriptNumeric : virtual public c_scriptFunc< c_scriptFloat > {
+class HGE_API c_scriptNumeric : virtual public c_scriptFunc< c_scriptFloat* > {
 	
 	protected:
-		int evalType;
 		const c_scriptNum *evalVar, *compVar;
 		//The object to evaluate, the object to compare to
 	
@@ -67,9 +62,6 @@ class HGE_API c_scriptNumeric : virtual public c_scriptFunc< c_scriptFloat > {
 		
 		void read ( std::ifstream&, scriptMap_t& );
 		void write ( std::ofstream& ) const;
-		
-		int getEvalType() const;
-		virtual void setEvalType( int eval = 0 );
 		
 		virtual const c_scriptNum* getVarToEvaluate() const;
 		virtual void setVarToEvaluate( const c_scriptNum* inVar );
@@ -99,13 +91,13 @@ class HGE_API c_scriptNumEval : public c_scriptEvaluation {
 		~c_scriptNumEval();
 		
 		void setEvalType( int eval );
-		
+		/*
 		const c_scriptNum* getVarToEvaluate() const;
 		void setVarToEvaluate( const c_scriptNum* inVar );
 		
 		const c_scriptNum* getVarToCompare() const;
 		void setVarToCompare( const c_scriptNum* inVar );
-		
+		*/
 		void run();
 		
 		int getScriptSubType() const {

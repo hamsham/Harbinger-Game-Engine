@@ -176,9 +176,6 @@ class HGE_API c_scriptBool : virtual public c_scriptVar< bool > {
 		int getScriptSubType() {
 			return SCRIPT_VAR_BOOL;
 		}
-		
-		void setTrue();
-		void setFalse();
 };
 
 //-----------------------------------------------------------------------------

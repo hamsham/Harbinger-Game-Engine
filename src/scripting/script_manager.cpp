@@ -6,7 +6,6 @@
  */
 #include <iostream>
 #include "scripting/script_base.h"
-#include "scripting/script_variables.h"
 #include "scripting/script_functions.h"
 #include "scripting/script_manager.h"
 
@@ -33,35 +32,60 @@ c_scriptManager::c_scriptManager( const c_scriptManager& sm ) :
 //-----------------------------------------------------------------------------
 // Script Manager Namespace -- Instances
 //-----------------------------------------------------------------------------
-c_script* c_scriptManager::getVarInstance( int scriptType ) {
+c_script* c_scriptManager::getVarInstance( long scriptType ) {
 	switch( scriptType ) {
 		case SCRIPT_VAR_INT:
-			return new c_scriptInt;
-		case SCRIPT_VAR_UINT:
-			return new c_scriptUint;
+			return new c_varInt;
 		case SCRIPT_VAR_FLOAT:
-			return new c_scriptFloat;
+			return new c_varFloat;
 		case SCRIPT_VAR_BOOL:
-			return new c_scriptBool;
+			return new c_varBool;
 		case SCRIPT_VAR_STRING:
-			return new c_scriptString;
+			return new c_varString;
 		case SCRIPT_VAR_VEC3:
-			return new c_scriptVec3;
+			return new c_varVec3;
 		default:
 			return HGE_NULL;
 	}
 }
 
-c_script* c_scriptManager::getFuncInstance( int scriptType ) {
+c_script* c_scriptManager::getFuncInstance( long scriptType ) {
 	switch( scriptType ) {
-		case SCRIPT_FUNC_NUM_EVAL:
-			return new c_scriptNumEval;
-		case SCRIPT_FUNC_NUM_MISC:
-			return new c_scriptMiscMath;
-		case SCRIPT_FUNC_NUM_ARITH:
-			return new c_scriptArithmetic;
-		case SCRIPT_FUNC_NUM_TRIG:
-			return new c_scriptTrigonometry;
+		
+		case SCRIPT_FUNC_INT_ADD:
+			return new c_fncIntAdd;
+		case SCRIPT_FUNC_INT_SUB:
+			return new c_fncIntSub;
+		case SCRIPT_FUNC_INT_MUL:
+			return new c_fncIntMul;
+		case SCRIPT_FUNC_INT_DIV:
+			return new c_fncIntDiv;
+		case SCRIPT_FUNC_INT_MOD:
+			return new c_fncIntMod;
+		case SCRIPT_FUNC_INT_EQL:
+			return new c_fncIntEql;
+		
+		case SCRIPT_FUNC_FLOAT_ADD:
+			return new c_fncFloatAdd;
+		case SCRIPT_FUNC_FLOAT_SUB:
+			return new c_fncFloatSub;
+		case SCRIPT_FUNC_FLOAT_MUL:
+			return new c_fncFloatMul;
+		case SCRIPT_FUNC_FLOAT_DIV:
+			return new c_fncFloatDiv;
+		case SCRIPT_FUNC_FLOAT_MOD:
+			return new c_fncFloatMod;
+		case SCRIPT_FUNC_FLOAT_EQL:
+			return new c_fncFloatEql;
+			
+		case SCRIPT_FUNC_INT_CAST:
+			return new c_fncIntCast;
+		case SCRIPT_FUNC_FLOAT_CAST:
+			return new c_fncFloatCast;
+			
+		case SCRIPT_FUNC_NUM_ROUND:
+			return new c_fncNumRound;
+			
 		default:
 			return HGE_NULL;
 	}

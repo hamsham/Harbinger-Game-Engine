@@ -8,12 +8,9 @@
 #ifndef __HGE_CAMERA_H__
 #define	__HGE_CAMERA_H__
 
-#include "math/math.h"
-
+#include "types.h"
 #include "display.h"
 #include "object.h"
-
-using namespace hamLibs;
 
 /*
  * NOTE:
@@ -34,7 +31,7 @@ class HGE_API c_camera : virtual public c_object {
 		static const float		DEFAULT_Z_NEAR;
 		static const float		DEFAULT_Z_FAR;
 		static const float		DEFAULT_FOV;
-		static const math::mat4	DEFAULT_PERSPECTIVE;
+		static const mat4	DEFAULT_PERSPECTIVE;
 		
 		enum cameraType {
 			CAM_TYPE_FPS,
@@ -45,24 +42,23 @@ class HGE_API c_camera : virtual public c_object {
 	
 	private:
 		//render system output
-		math::mat4	vpMat;
-		math::mat4	projMat;
-		math::mat4	viewMat;
+		mat4	vpMat;
+		mat4	projMat;
+		mat4	viewMat;
 		//rotation & orientation
-		math::quat	orientation;
-		math::vec3	xAxis;
-		math::vec3	yAxis;
-		math::vec3	zAxis;
+		quat	orientation;
+		vec3	xAxis;
+		vec3	yAxis;
+		vec3	zAxis;
 		//positioning
-		//math::vec3	pos; // "eye" inherited from "object"
-		math::vec3	deltaPos;
-		math::vec3	target; // used for orbiting
-		float		orbitDistance;
+		//vec3	pos; // "eye" inherited from "object"
+		vec3	deltaPos;
+		vec3	target; // used for orbiting
 		//time-based movements
-		math::vec3	posVel;
-		math::vec3	angVel;
-		math::vec3	posAccel;
-		math::vec3	angAccel;
+		vec3	posVel;
+		vec3	angVel;
+		vec3	posAccel;
+		vec3	angAccel;
 		//euler angles
 		float		pitch;
 		float		yaw;
@@ -77,12 +73,12 @@ class HGE_API c_camera : virtual public c_object {
 		
 		//function pointer arrays for movement and rotations
 		void ( c_camera::*rotationFunction[ 4 ] )();
-		void ( c_camera::*moveFunction[ 4 ] )( float );
+		void ( c_camera::*moveFunction[ 4 ] )();
 		
-		void		moveFPS			( float timeElapsed );
-		void		moveSpectator	( float timeElapsed );
-		void		moveFlight		( float timeElapsed );
-		void		moveOrbit		( float timeElapsed );
+		void		moveFPS			();
+		void		moveSpectator	();
+		void		moveFlight		();
+		void		moveOrbit		();
 		void		rotateFPS		();
 		void		rotateSpectator	()									{ rotateFPS(); }
 		void		rotateFlight	();
@@ -94,9 +90,9 @@ class HGE_API c_camera : virtual public c_object {
 		~c_camera		() {}
 		
 		//Render System
-		const math::mat4&	getVPMat	() const						{ return vpMat; }
-		const math::mat4&	getViewMat	() const						{ return viewMat; }
-		const math::mat4&	getProjMat	() const						{ return projMat; }
+		const mat4&	getVPMat	() const						{ return vpMat; }
+		const mat4&	getViewMat	() const						{ return viewMat; }
+		const mat4&	getProjMat	() const						{ return projMat; }
 		void				setOrtho	();
 		void				setPerspective ();
 		void				setProjection (
@@ -108,27 +104,25 @@ class HGE_API c_camera : virtual public c_object {
 							);
 		
 		//rotation & orientation
-		const math::quat&	getOrientation () const						{ return orientation; }
-		const math::vec3&	getAxisX	() const						{ return xAxis; }
-		const math::vec3&	getAxisY	() const						{ return yAxis; }
-		const math::vec3&	getAxisZ	() const						{ return zAxis; }
+		const quat&	getOrientation () const						{ return orientation; }
+		const vec3&	getAxisX	() const						{ return xAxis; }
+		const vec3&	getAxisY	() const						{ return yAxis; }
+		const vec3&	getAxisZ	() const						{ return zAxis; }
 		
 		//Positioning
-		const math::vec3&	getUp		() const						{ return yAxis; }
-		void				setTarget	( const math::vec3& inTarget )	{ target = inTarget; }
-		const math::vec3&	getTarget	() const						{ return target; }
-		void				setOrbit	( float radius )				{ orbitDistance = radius; }
-		float				getOrbit	() const						{ return orbitDistance; }
+		const vec3&	getUp		() const						{ return yAxis; }
+		void				setTarget	( const vec3& inTarget )	{ target = inTarget; }
+		const vec3&	getTarget	() const						{ return target; }
 		
 		//time-based movement
-		void				setPosVel	( const math::vec3& inVel )		{ posVel = inVel; }
-		const math::vec3&	getPosVel	() const						{ return posVel; }
-		void				setAngVel	( const math::vec3& inVel )		{ angVel = inVel; }
-		const math::vec3&	getAngVel	() const						{ return angVel; }
-		void				setPosAccel	( const math::vec3& inAccel )	{ posAccel = inAccel; }
-		const math::vec3&	getPosAccel	() const						{ return posAccel; }
-		void				setAngAccel	( const math::vec3& inAccel )	{ angAccel = inAccel; }
-		const math::vec3&	getAngAccel	() const						{ return angAccel; }
+		void				setPosVel	( const vec3& inVel )		{ posVel = inVel; }
+		const vec3&	getPosVel	() const						{ return posVel; }
+		void				setAngVel	( const vec3& inVel )		{ angVel = inVel; }
+		const vec3&	getAngVel	() const						{ return angVel; }
+		void				setPosAccel	( const vec3& inAccel )	{ posAccel = inAccel; }
+		const vec3&	getPosAccel	() const						{ return posAccel; }
+		void				setAngAccel	( const vec3& inAccel )	{ angAccel = inAccel; }
+		const vec3&	getAngAccel	() const						{ return angAccel; }
 		
 		//viewport
 		void				setFOV		( float inFOV )					{ fov = inFOV; }
@@ -145,8 +139,8 @@ class HGE_API c_camera : virtual public c_object {
 		//static viewing functions
 		
 		//Camera Updating
-		void				look		( const math::vec3& camTarget );
-		void				look		( const math::vec3& camPos, const math::vec3& camTarget, const math::vec3& camUp );
+		void				look		( const vec3& camTarget );
+		void				look		( const vec3& camPos, const vec3& camTarget, const vec3& camUp );
 		void				rotate		( float inPitch, float inYaw, float inRoll = 0.f );
 		void				unRoll		();
 		void				move		( float dx, float dy, float dz );
@@ -158,11 +152,11 @@ class HGE_API c_camera : virtual public c_object {
 //	Camera - Projections
 //-----------------------------------------------------------------------------
 HGE_INLINE void c_camera::setOrtho() {
-	projMat = math::ortho( 0.f, aspectW, 0.f, aspectH );
+	projMat = ortho( -aspectW, aspectW, -aspectH, aspectH, zNear, zFar );
 }
 
 HGE_INLINE void c_camera::setPerspective() {
-	projMat = math::infinitePerspective( fov, aspectW / aspectH, zNear );
+	projMat = infinitePerspective( fov, aspectW / aspectH, zNear );
 }
 
 HGE_INLINE void c_camera::setProjection( float inFov, float aspectWidth, float aspectHeight, float inZNear, float inZFar ) {

@@ -10,22 +10,26 @@
 
 #include <GL/glew.h>
 #include <assimp/scene.h>
+
+#include "types.h"
 #include "resource.h"
 #include "object.h"
 
 ///////////////////////////////////////////////////////////////////////////////
 //	Mesh Verices
 ///////////////////////////////////////////////////////////////////////////////
-struct HGE_API c_vertex {
-	float pos[ 3 ];
-	float uv[ 2 ];
-	float norm[ 3 ];
+struct HGE_API s_vertex {
+	vec3 pos;
+	vec2 uv;
+	vec3 norm;
+	vec3 tangent;
 	
-	c_vertex			();
-	c_vertex			( const c_vertex& );
-	void setPos		( float x, float y, float z );
-	void setUVs		( float u, float v );
-	void setNorm	( float x, float y, float z );
+	s_vertex			();
+	s_vertex			( const s_vertex& );
+	void setPos			( float x, float y, float z );
+	void setUVs			( float u, float v );
+	void setNorm		( float x, float y, float z );
+	void setTangent		( float x, float y, float z );
 };
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -59,18 +63,18 @@ class HGE_API c_mesh : virtual public c_resource, virtual public c_drawableObj {
 		uint					numMeshes;
 		uint					numTextures;
 		GLuint					vao;
-		GLuint					buffers[ 2 ]; // pos, uv, normal, index
+		GLuint					buffers[ 2 ]; // Vertices & Indices
 		meshEntry*				entries;
-		c_bitmap*					textures;
+		c_bitmap*				textures;
 		e_drawMode				drawMode;
 		bool					useTextures;
 		
 		//load all data from Assimp using two passes
 		bool	prepMeshes		( const aiScene*, uint& numVerts, uint& numIndices );
-		bool	loadMeshes		( const aiScene*, c_vertex* vertArray, uint* indexArray );
+		bool	loadMeshes		( const aiScene*, s_vertex* vertArray, uint* indexArray );
 		bool	loadMaterials	( const aiScene*, cstr fileName );
 		bool	loadTexType		( aiMaterial*, aiTextureType, const std::string& directory, uint& texIter );
-		void	loadVao			( c_vertex* vertices, uint numVertices, uint* indices, uint numIndices );
+		void	loadVao			( s_vertex* vertices, uint numVertices, uint* indices, uint numIndices );
 
 	public:
 		c_mesh	();

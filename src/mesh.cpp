@@ -17,33 +17,41 @@
 ///////////////////////////////////////////////////////////////////////////////
 //	Mesh Verices
 ///////////////////////////////////////////////////////////////////////////////
-c_vertex::c_vertex() :
-	pos{ 0.f, 0.f, 0.f },
-	uv{ 0.f, 0.f },
-	norm{ 0.f, 0.f, 0.f }
+s_vertex::s_vertex() :
+	pos(),
+	uv(),
+	norm(),
+	tangent()
 {}
 
-c_vertex::c_vertex( const c_vertex& v ) :
-	pos{ v.pos[ 0 ], v.pos[ 1 ], v.pos[ 2 ] },
-	uv{ v.uv[ 0 ], v.uv[ 1 ] },
-	norm{ v.norm[ 0 ], v.norm[ 1 ], v.norm[ 2 ] }
+s_vertex::s_vertex( const s_vertex& v ) :
+	pos( v.pos ),
+	uv( v.uv ),
+	norm( v.norm ),
+	tangent( v.tangent )
 {}
 
-void c_vertex::setPos( float x, float y, float z ) {
+void s_vertex::setPos( float x, float y, float z ) {
 	pos[ 0 ] = x;
 	pos[ 1 ] = y;
 	pos[ 2 ] = z;
 }
 
-void c_vertex::setUVs( float u, float v ) {
+void s_vertex::setUVs( float u, float v ) {
 	uv[ 0 ] = u;
 	uv[ 1 ] = v;
 }
 
-void c_vertex::setNorm( float x, float y, float z ) {
+void s_vertex::setNorm( float x, float y, float z ) {
 	norm[ 0 ] = x;
 	norm[ 1 ] = y;
 	norm[ 2 ] = z;
+}
+
+void s_vertex::setTangent( float x, float y, float z ) {
+	tangent[ 0 ] = x;
+	tangent[ 1 ] = y;
+	tangent[ 2 ] = z;
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -77,7 +85,10 @@ c_mesh::meshEntry& c_mesh::meshEntry::operator = ( const c_mesh::meshEntry& meCo
 //-----------------------------------------------------------------------------
 // Mesh - Construction & Destruction
 //-----------------------------------------------------------------------------
-const int c_mesh::DEFAULT_MESH_FLAGS( aiProcessPreset_TargetRealtime_MaxQuality );
+const int c_mesh::DEFAULT_MESH_FLAGS(
+	aiProcessPreset_TargetRealtime_MaxQuality |
+	aiProcessPreset_TargetRealtime_Quality
+);
 
 c_mesh::c_mesh() :
 	numMeshes( 0 ),
@@ -135,7 +146,7 @@ bool c_mesh::load( cstr fileName, int flags ) {
 	unload();
 	Assimp::Importer importer;
 	const aiScene* pScene( HGE_NULL );
-	c_vertex* vertArray( HGE_NULL );
+	s_vertex* vertArray( HGE_NULL );
 	uint* indexArray( HGE_NULL );
 	uint numVerts( 0 );
 	uint numIndices( 0 );
@@ -157,7 +168,7 @@ bool c_mesh::load( cstr fileName, int flags ) {
 		std::cout << "\tFailed. Aborting file import." << std::endl;
 		return false;
 	}
-	vertArray = new c_vertex[ numVerts ];
+	vertArray = new s_vertex[ numVerts ];
 	indexArray = new uint[ numIndices ];
 	entries = new meshEntry[ numMeshes ];
 	std::cout << "\tDone\n";
@@ -233,7 +244,7 @@ bool c_mesh::prepMeshes( const aiScene* pScene, uint& numVerts, uint& numIndices
 //-----------------------------------------------------------------------------
 // Mesh - Mesh data loading
 //-----------------------------------------------------------------------------
-bool c_mesh::loadMeshes( const aiScene* pScene, c_vertex* vertArray, uint* indexArray ) {
+bool c_mesh::loadMeshes( const aiScene* pScene, s_vertex* vertArray, uint* indexArray ) {
 	const aiMesh* pMesh( HGE_NULL );
 	uint vertIter( 0 );
 	uint indexIter( 0 );
@@ -256,8 +267,10 @@ bool c_mesh::loadMeshes( const aiScene* pScene, c_vertex* vertArray, uint* index
 		for ( uint j( 0 ); j < pMesh->mNumVertices; ++j ) {
 			aiVector3D* pPos				( &pMesh->mVertices[ j ] );
 			aiVector3D* pNorm				( &pMesh->mNormals[ j ] );
+			aiVector3D* pTangent			( &pMesh->mTangents[ j ] );
 			vertArray[ vertIter ].setPos	( pPos->x, pPos->y, pPos->z );
 			vertArray[ vertIter ].setNorm	( pNorm->x, pNorm->y, pNorm->z );
+			vertArray[ vertIter ].setTangent( pTangent->x, pTangent->y, pTangent->z );
 			
 			if ( pMesh->HasTextureCoords( 0 ) ) {
 				vertArray[ vertIter ].uv[ 0 ] = pMesh->mTextureCoords[ 0 ][ j ].x;
@@ -358,47 +371,58 @@ bool c_mesh::loadTexType(
 // Mesh - Send data to the GPU
 //-----------------------------------------------------------------------------
 void c_mesh::loadVao(
-	c_vertex* vertices, uint numVertices,
+	s_vertex* vertices, uint numVertices,
 	uint* indices, uint numIndices
 ) {
-	// create a buffer for the vertex positions, UVs, and normals
+	// create a buffer for the vertex positions & indices
 	glGenBuffers( ARRAY_SIZE_FROM_ELEMENTS( buffers ), buffers );
 	
 	glBindBuffer( GL_ARRAY_BUFFER, buffers[ 0 ] );
-	glBufferData( GL_ARRAY_BUFFER, sizeof( c_vertex ) * numVertices, vertices, GL_STATIC_DRAW );
+	glBufferData( GL_ARRAY_BUFFER, sizeof( s_vertex ) * numVertices, vertices, GL_STATIC_DRAW );
 	printGLError( "Error while sending mesh data to the GPU.");
 	
 	//send the vertices to opengl
 	glEnableVertexAttribArray( c_shader::VERTEX_ATTRIB );
 	glVertexAttribPointer(
 		c_shader::VERTEX_ATTRIB,
-		ARRAY_SIZE_FROM_ELEMENTS( c_vertex::pos ),
+		ARRAY_SIZE_FROM_ELEMENTS( s_vertex::pos.v ),
 		GL_FLOAT,
 		GL_FALSE, 
-		sizeof( c_vertex ),
-		(GLvoid*)offsetof( c_vertex, pos )
+		sizeof( s_vertex ),
+		(GLvoid*)offsetof( s_vertex, pos.v )
 	);
 	
 	//send the UVs to opengl
 	glEnableVertexAttribArray( c_shader::TEXTURE_ATTRIB );
 	glVertexAttribPointer(
 		c_shader::TEXTURE_ATTRIB,
-		ARRAY_SIZE_FROM_ELEMENTS( c_vertex::uv ),
+		ARRAY_SIZE_FROM_ELEMENTS( s_vertex::uv.v ),
 		GL_FLOAT,
 		GL_FALSE,
-		sizeof( c_vertex ),
-		(GLvoid*)offsetof( c_vertex, uv )
+		sizeof( s_vertex ),
+		(GLvoid*)offsetof( s_vertex, uv.v )
 	);
 	
 	//send the normals to opengl
 	glEnableVertexAttribArray( c_shader::NORMAL_ATTRIB );
 	glVertexAttribPointer(
 		c_shader::NORMAL_ATTRIB,
-		ARRAY_SIZE_FROM_ELEMENTS( c_vertex::norm ),
+		ARRAY_SIZE_FROM_ELEMENTS( s_vertex::norm.v ),
 		GL_FLOAT,
 		GL_FALSE,
-		sizeof( c_vertex ),
-		(GLvoid*)offsetof( c_vertex, norm )
+		sizeof( s_vertex ),
+		(GLvoid*)offsetof( s_vertex, norm.v )
+	);
+	
+	//send the tangents to opengl
+	glEnableVertexAttribArray( c_shader::TANGENT_ATTRIB );
+	glVertexAttribPointer(
+		c_shader::TANGENT_ATTRIB,
+		ARRAY_SIZE_FROM_ELEMENTS( s_vertex::tangent.v ),
+		GL_FLOAT,
+		GL_FALSE,
+		sizeof( s_vertex ),
+		(GLvoid*)offsetof( s_vertex, tangent.v )
 	);
 	printGLError( "Error while sending mesh data to the GPU.");
 	

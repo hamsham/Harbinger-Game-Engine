@@ -15,6 +15,7 @@ const GLuint c_shader::INVALID_UNIFORM	( -1 );
 const GLuint c_shader::VERTEX_ATTRIB		( 0 );
 const GLuint c_shader::TEXTURE_ATTRIB		( 1 );
 const GLuint c_shader::NORMAL_ATTRIB		( 2 );
+const GLuint c_shader::TANGENT_ATTRIB		( 3 );
 		
 //-----------------------------------------------------------------------------
 //	Shader - Shader Structure

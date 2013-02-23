@@ -27,6 +27,7 @@ class HGE_API c_shader : virtual public c_resource {
 		static const GLuint		VERTEX_ATTRIB;
 		static const GLuint		TEXTURE_ATTRIB;
 		static const GLuint		NORMAL_ATTRIB;
+		static const GLuint		TANGENT_ATTRIB;
 		
 		c_shader	();
 		~c_shader	();

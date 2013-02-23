@@ -26,8 +26,8 @@ class HGE_API c_scriptManager {
 		c_scriptManager		( const c_scriptManager& );
 		~c_scriptManager	()				{ clearEntries(); }
 		
-		static c_script*	getVarInstance	( int scriptVarType );
-		static c_script*	getFuncInstance	( int scriptFuncType );
+		static c_script*	getVarInstance	( long scriptVarType );
+		static c_script*	getFuncInstance	( long scriptFuncType );
 		static void			killInstance	( c_script* );
 		
 		const std::string&	getFileName		() const;

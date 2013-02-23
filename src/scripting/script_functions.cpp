@@ -6,368 +6,114 @@
  */
 
 #include <cmath>
-#include "scripting/script.h"
 #include "scripting/script_functions.h"
 
 //-----------------------------------------------------------------------------
-//		Evaluation Function Base Class
+//		Numerical Operations
 //-----------------------------------------------------------------------------
-c_scriptEvaluation::c_scriptEvaluation() :
-	c_scriptFunc( HGE_NULL ),
-	evalVar( HGE_NULL ),
-	compVar( HGE_NULL )
-{}
-
-c_scriptEvaluation::c_scriptEvaluation( const c_scriptEvaluation& evalCopy ) :
-	c_scriptFuncBase( evalCopy ),
-	c_scriptFunc( evalCopy ),
-	evalVar( evalCopy.evalVar ),
-	compVar( evalCopy.compVar )
-{}
-
-c_scriptEvaluation::~c_scriptEvaluation() {}
-
-//file input
-void c_scriptEvaluation::read( std::ifstream& fin, scriptMap_t& scrMap ) {
-	void *evalPtr( HGE_NULL ), *compPtr( HGE_NULL ), *retPtr( HGE_NULL );
-	c_scriptFuncBase::read( fin, scrMap );
-	fin >> evalType >> retPtr >> evalPtr >> compPtr;
-	returnVal = dynamic_cast< c_scriptBool* >( scrMap[ retPtr ] );
-	evalVar = dynamic_cast< const c_scriptVarBase* >( scrMap[ evalPtr ] );
-	compVar = dynamic_cast< const c_scriptVarBase* >( scrMap[ compPtr ] );
-}
-
-//file output
-void c_scriptEvaluation::write( std::ofstream& fout ) const {
-	c_scriptFuncBase::write( fout );
-	fout
-		<< " " << evalType
-		<< " " << static_cast< c_script* >( returnVal )
-		<< " " << static_cast< const c_script* >( evalVar )
-		<< " " << static_cast< const c_script* >( compVar );
-}
-
-const c_scriptVarBase* c_scriptEvaluation::getVarToEvaluate() const {
-	return evalVar;
-}
-
-void c_scriptEvaluation::setVarToEvaluate( const c_scriptVarBase* inVar ) {
-	evalVar = inVar;
-}
-
-const c_scriptVarBase* c_scriptEvaluation::getVarToCompare() const {
-	return compVar;
-}
-
-void c_scriptEvaluation::setVarToCompare( const c_scriptVarBase* inVar ) {
-	compVar = inVar;
-}
-
-//-----------------------------------------------------------------------------
-//		Numerical Function Base Class
-//-----------------------------------------------------------------------------
-c_scriptNumeric::c_scriptNumeric() :
-	c_scriptFunc( HGE_NULL ),
-	evalVar( HGE_NULL ),
-	compVar( HGE_NULL )
-{}
-
-c_scriptNumeric::c_scriptNumeric( const c_scriptNumeric& numFunc ) :
-	c_scriptFuncBase( numFunc ),
-	c_scriptFunc( numFunc ),
-	evalVar( numFunc.evalVar ),
-	compVar( numFunc.compVar )
-{}
-
-c_scriptNumeric::~c_scriptNumeric() {}
-
-//file input
-void c_scriptNumeric::read( std::ifstream& fin, scriptMap_t& scrMap ) {
-	void *evalPtr( HGE_NULL ), *compPtr( HGE_NULL ), *retPtr( HGE_NULL );
-	c_scriptFuncBase::read( fin, scrMap );
-	fin >> evalType >> retPtr >> evalPtr >> compPtr;
-	returnVal = dynamic_cast< c_scriptFloat* >( scrMap[ retPtr ] );
-	evalVar = dynamic_cast< const c_scriptNum* >( scrMap[ evalPtr ] );
-	compVar = dynamic_cast< const c_scriptNum* >( scrMap[ compPtr ] );
-}
-
-//file output
-void c_scriptNumeric::write( std::ofstream& fout ) const {
-	c_scriptFuncBase::write( fout );
-	fout
-		<< " " << evalType
-		<< " " << static_cast< c_script* >( returnVal )
-		<< " " << static_cast< const c_script* >( evalVar )
-		<< " " << static_cast< const c_script* >( compVar );
-}
-
-const c_scriptNum* c_scriptNumeric::getVarToEvaluate() const {
-	return evalVar;
-}
-
-void c_scriptNumeric::setVarToEvaluate( const c_scriptNum* inVar ) {
-	evalVar = inVar;
-}
-
-const c_scriptNum* c_scriptNumeric::getVarToCompare() const {
-	return compVar;
-}
-
-void c_scriptNumeric::setVarToCompare( const c_scriptNum* inVar ) {
-	compVar = inVar;
-}
-
-//-----------------------------------------------------------------------------
-//		Numerical Evaluations
-//-----------------------------------------------------------------------------
-c_scriptNumEval::c_scriptNumEval() {}
-
-c_scriptNumEval::c_scriptNumEval( const c_scriptNumEval& evalCopy ) :
-	c_scriptFuncBase( evalCopy ),
-	c_scriptFunc( evalCopy ),
-	c_scriptEvaluation( evalCopy )
-{}
-
-c_scriptNumEval::~c_scriptNumEval(){}
-/*
-const c_scriptNum* c_scriptNumEval::getVarToEvaluate() const {
-	return reinterpret_cast< const c_scriptNum* >( evalVar );
-}
-
-void c_scriptNumEval::setVarToEvaluate( const c_scriptNum* inVar ) {
-	evalVar = inVar;
-}
-
-const c_scriptNum* c_scriptNumEval::getVarToCompare() const {
-	return reinterpret_cast< const c_scriptNum* >( compVar );
-}
-
-void c_scriptNumEval::setVarToCompare( const c_scriptNum* inVar ) {
-	compVar = inVar;
-}
-*/
-void c_scriptNumEval::setEvalType( int eval ) {
-	HGE_ASSERT( (evalType >= IS_EQUAL && evalType < FUNC_NUM_INVALID) );
-	evalType = eval;
-}
-
-void c_scriptNumEval::run() {
-	//ensure that there are numbers to evaluate
-	if (evalVar == HGE_NULL || compVar == HGE_NULL || returnVal == HGE_NULL)
-		return;
+#ifndef MATH_OP
 	
-	const c_scriptNum* pEval = reinterpret_cast< const c_scriptNum* >( evalVar );
-	const c_scriptNum* pComp = reinterpret_cast< const c_scriptNum* >( compVar );
+	#define MATH_OP( fnc, op, varType, varEnum )\
+	template <>\
+	void fnc::run() {\
+		if ( args[0] == nullptr || args[1] == nullptr || retVal == nullptr ) return;\
+		HGE_ASSERT (\
+			(args[0]->getScriptSubType() == varEnum) &&\
+			(args[1]->getScriptSubType() == varEnum) &&\
+			(retVal->getScriptSubType() == varEnum)\
+		);\
+		varType* pRet = reinterpret_cast< varType* >( retVal );\
+		varType* pArgA = reinterpret_cast< varType* >( args[0] );\
+		varType* pArgB = reinterpret_cast< varType* >( args[1] );\
+		pRet->data = pArgA->data op pArgB->data;\
+	}
+
+	MATH_OP( c_fncIntAdd, +, c_varInt, SCRIPT_VAR_INT )
+	MATH_OP( c_fncIntSub, -, c_varInt, SCRIPT_VAR_INT )
+	MATH_OP( c_fncIntMul, *, c_varInt, SCRIPT_VAR_INT )
+	MATH_OP( c_fncIntDiv, /, c_varInt, SCRIPT_VAR_INT )
+	MATH_OP( c_fncIntMod, %, c_varInt, SCRIPT_VAR_INT )
+	MATH_OP( c_fncIntEql, =, c_varInt, SCRIPT_VAR_INT )
+
+	MATH_OP( c_fncFloatAdd, +, c_varFloat, SCRIPT_VAR_FLOAT )
+	MATH_OP( c_fncFloatSub, -, c_varFloat, SCRIPT_VAR_FLOAT )
+	MATH_OP( c_fncFloatMul, *, c_varFloat, SCRIPT_VAR_FLOAT )
+	MATH_OP( c_fncFloatDiv, /, c_varFloat, SCRIPT_VAR_FLOAT )
+	MATH_OP( c_fncFloatEql, =, c_varFloat, SCRIPT_VAR_FLOAT )
+
+	#undef MATH_OP
+#endif
+
+//-----------------------------------------------------------------------------
+// Floating Point Modulus
+//-----------------------------------------------------------------------------
+template <>
+void c_fncFloatMod::run() {
+	if ( args[0] == nullptr || args[1] == nullptr || retVal == nullptr ) return;
 	
-	switch ( evalType ) {
-		case IS_EQUAL:
-			*returnVal = (*pEval) == (*pComp);
-			break;
-		case IS_NOT_EQUAL:
-			*returnVal = (*pEval) != (*pComp);
-			break;
-		case IS_GREATER:
-			*returnVal = (*pEval) > (*pComp);
-			break;
-		case IS_LESS:
-			*returnVal = (*pEval) < (*pComp);
-			break;
-		case IS_GREATER_OR_EQUAL:
-			*returnVal = (*pEval) >= (*pComp);
-			break;
-		case IS_LESS_OR_EQUAL:
-			*returnVal = (*pEval) <= (*pComp);
-			break;
-		default:
-			*returnVal = false;
-	}
-}
-
-//-----------------------------------------------------------------------------
-//		Misc. Mathematical Functions
-//-----------------------------------------------------------------------------
-c_scriptMiscMath::c_scriptMiscMath() {}
-
-c_scriptMiscMath::c_scriptMiscMath( const c_scriptMiscMath& evalCopy ) :
-	c_scriptFuncBase( evalCopy ),
-	c_scriptFunc( evalCopy ),
-	c_scriptNumeric( evalCopy )
-{}
-
-c_scriptMiscMath::~c_scriptMiscMath() {}
-
-void c_scriptMiscMath::setEvalType( int eval ) {
-	HGE_ASSERT( (evalType >= SQRT && evalType < FUNC_MATH_INVALID) );
-	evalType = eval;
-}
-
-void c_scriptMiscMath::run() {
-	//ensure that there are numbers to evaluate
-	if (evalVar == HGE_NULL || returnVal == HGE_NULL )
-		return;
+	HGE_ASSERT(
+		(args[0]->getScriptSubType() == SCRIPT_VAR_FLOAT) &&
+		(args[1]->getScriptSubType() == SCRIPT_VAR_FLOAT) &&
+		(retVal->getScriptSubType() == SCRIPT_VAR_FLOAT)
+	);
 	
-	//opting for an array of function pointers instead of switch statements
-	float ( *mathFunc[] )( float ) = {
-		std::sqrt,
-		std::log,
-		std::fabs,
-		std::floor,
-		std::ceil
-	};
-	if ( (evalType >= SQRT) && (evalType < FUNC_MATH_INVALID) ) {
-		if ( evalType == RND ) {
-			*returnVal = mathFunc[ evalType ]( floor(*evalVar) + 0.5f );
-		}
-		else {
-			*returnVal = mathFunc[ evalType ]( (float)(*evalVar) );
-		}
-	}
-	else {
-		*returnVal = 0.f;
-	}
-}
-
-//-----------------------------------------------------------------------------
-//		Numerical Math/Arithmetic
-//-----------------------------------------------------------------------------
-c_scriptArithmetic::c_scriptArithmetic() {}
-
-c_scriptArithmetic::c_scriptArithmetic( const c_scriptArithmetic& evalCopy ) :
-	c_scriptFuncBase( evalCopy ),
-	c_scriptFunc( evalCopy ),
-	c_scriptNumeric( evalCopy )
-{}
-
-c_scriptArithmetic::~c_scriptArithmetic() {}
-
-void c_scriptArithmetic::setEvalType( int eval ) {
-	HGE_ASSERT( (evalType >= ADD && evalType < FUNC_ARITH_INVALID) );
-	evalType = eval;
-}
-
-void c_scriptArithmetic::run() {
-	//ensure that there are numbers to evaluate
-	if ( evalVar == HGE_NULL || compVar == HGE_NULL || returnVal == HGE_NULL )
-		return;
+	c_varFloat* pRet = reinterpret_cast< c_varFloat* >( retVal );
+	c_varFloat* pArgA = reinterpret_cast< c_varFloat* >( args[0] );
+	c_varFloat* pArgB = reinterpret_cast< c_varFloat* >( args[1] );
 	
-	switch ( evalType ) {
-		case ADD:
-			*returnVal = (float)(*evalVar) + (float)(*compVar);
-			break;
-		case SUB:
-			*returnVal = (float)(*evalVar) - (float)(*compVar);
-			break;
-		case MUL:
-			*returnVal = (float)(*evalVar) * (float)(*compVar);
-			break;
-		case DIV:
-			*returnVal = (float)(*evalVar) / (float)(*compVar);
-			break;
-		case MOD:
-			*returnVal = std::fmod( (float)(*evalVar), (float)(*compVar) );
-			break;
-		case POW:
-			*returnVal = std::pow( (float)(*evalVar), (float)(*compVar) );
-			break;
-		case EQL:
-			*returnVal = *evalVar;
-			break;
-		default:
-			*returnVal = 0.f;
-	}
+	pRet->data = fmod( pArgA->data, pArgB->data );
 }
 
 //-----------------------------------------------------------------------------
-//		Trigonometric Functinos
+// Type-Casting from Float to Int
 //-----------------------------------------------------------------------------
-c_scriptTrigonometry::c_scriptTrigonometry() {}
-
-c_scriptTrigonometry::c_scriptTrigonometry( const c_scriptTrigonometry& evalCopy ) :
-	c_scriptFuncBase( evalCopy ),
-	c_scriptFunc( evalCopy ),
-	c_scriptNumeric( evalCopy )
-{}
-
-c_scriptTrigonometry::~c_scriptTrigonometry() {}
-
-void c_scriptTrigonometry::setEvalType( int eval ) {
-	HGE_ASSERT( (evalType >= SIN && evalType < FUNC_TRIG_INVALID) );
-	evalType = eval;
+template <>
+void c_fncIntCast::run() {
+	if ( args[0] == nullptr ) return;
+	
+	HGE_ASSERT(
+		(args[0]->getScriptSubType() == SCRIPT_VAR_FLOAT) &&
+		(retVal->getScriptSubType() == SCRIPT_VAR_INT)
+	);
+	
+	c_varInt* pRet = reinterpret_cast< c_varInt* >( retVal );
+	c_varFloat* pArgA = reinterpret_cast< c_varFloat* >( args[0] );
+	
+	pRet->data = static_cast< int >( pArgA->data );
 }
 
-void c_scriptTrigonometry::run() {
-	if (evalVar == HGE_NULL || returnVal == HGE_NULL )
-		return;
+//-----------------------------------------------------------------------------
+// Type-Casting from Int to Float
+//-----------------------------------------------------------------------------
+template <>
+void c_fncFloatCast::run() {
+	if ( args[0] == nullptr ) return;
 	
-	//opting for an array of function pointers instead of switch statements
-	float ( *mathFunc[] )( float ) = {
-		std::sin,
-		std::cos,
-		std::tan,
-		std::asin,
-		std::acos,
-		std::atan,
-		std::sinh,
-		std::cosh,
-		std::tanh,
-	};
+	HGE_ASSERT(
+		(args[0]->getScriptSubType() == SCRIPT_VAR_INT) &&
+		(retVal->getScriptSubType() == SCRIPT_VAR_FLOAT)
+	);
 	
-	if ( (evalType >= SIN) && (evalType < FUNC_TRIG_INVALID) ) {
-		//check if secant, cosecant, or cotangent functions were requested
-		if ( (evalType >= CSC) && (evalType <= COT) ) {
-			float divByZeroCheck( mathFunc[ evalType-3 ]( *evalVar ) );
-			*returnVal = divByZeroCheck ? 1.0f/divByZeroCheck : 0.0f;
-		}
-		else {
-			*returnVal = mathFunc[ evalType ]( (float)(*evalVar) );
-		}
-	}
-	else {
-		*returnVal = 0.f;
-	}
-	/*
-	switch ( evalType ) {
-		case SIN:
-			returnVal = std::sin( (float)(*evalVar) );
-			break;
-		case COS:
-			returnVal = std::cos( (float)(*evalVar) );
-			break;
-		case TAN:
-			returnVal = std::tan( (float)(*evalVar) );
-			break;
-		case CSC:
-			divZeroCheck = std::sin( (float)(*evalVar) );	//runtime error checking
-			returnVal = (divZeroCheck != 0) ? 1.0f/divZeroCheck : 0.0f; //never divide by 0!
-			break;
-		case SEC:
-			divZeroCheck = std::cos( (float)(*evalVar) );
-			returnVal = (divZeroCheck != 0) ? 1.0f/divZeroCheck : 0.0f;
-			break;
-		case COT:
-			divZeroCheck = std::tan( (float)(*evalVar) );
-			returnVal = (divZeroCheck != 0) ? 1.0f/divZeroCheck : 0.0f;
-			break;
-		case ARC_SIN:
-			returnVal = std::asin( (float)(*evalVar) );
-			break;
-		case ARC_COS:
-			returnVal = std::acos( (float)(*evalVar) );
-			break;
-		case ARC_TAN:
-			returnVal = std::atan( (float)(*evalVar) );
-			break;
-		case HYP_SIN:
-			returnVal = std::sinh( (float)(*evalVar) );
-			break;
-		case HYP_COS:
-			returnVal = std::cosh( (float)(*evalVar) );
-			break;
-		case HYP_TAN:
-			returnVal = std::tanh( (float)(*evalVar) );
-			break;
-		default:
-			returnVal = 0.f;
-	}
-	*/
+	c_varFloat* pRet = reinterpret_cast< c_varFloat* >( retVal );
+	c_varInt* pArgA = reinterpret_cast< c_varInt* >( args[0] );
+	
+	pRet->data = static_cast< float >( pArgA->data );
+}
+
+//-----------------------------------------------------------------------------
+// Floating Poiint Rounding
+//-----------------------------------------------------------------------------
+template <>
+void c_fncNumRound::run() {
+	if ( args[0] == nullptr ) return;
+	
+	HGE_ASSERT(
+		(args[0]->getScriptSubType() == SCRIPT_VAR_FLOAT) &&
+		(retVal->getScriptSubType() == SCRIPT_VAR_FLOAT)
+	);
+	
+	c_varFloat* pRet = reinterpret_cast< c_varFloat* >( retVal );
+	c_varFloat* pArgA = reinterpret_cast< c_varFloat* >( args[0] );
+	
+	pRet->data = std::floor( pArgA->data + 0.5f );
 }

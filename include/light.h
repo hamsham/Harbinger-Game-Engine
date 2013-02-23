@@ -11,14 +11,13 @@
 #include <GL/glew.h>
 #include "math/math.h"
 #include "types.h"
-using namespace hamLibs;
 
 ///////////////////////////////////////////////////////////////////////////////
 //		Ambient Lighting
 ///////////////////////////////////////////////////////////////////////////////
 struct HGE_API s_light {
-	math::vec4	color;
-	float		intensity;
+	vec4	color;
+	float	intensity;
 
 	s_light			();
 	s_light			( const s_light& );
@@ -29,7 +28,7 @@ struct HGE_API s_light {
 //		Diffuse Lighting
 ///////////////////////////////////////////////////////////////////////////////
 struct HGE_API s_diffuseLight : s_light {
-	math::vec3	dir;
+	vec3	dir;
 
 	s_diffuseLight		();
 	s_diffuseLight		( const s_diffuseLight& );
@@ -40,7 +39,7 @@ struct HGE_API s_diffuseLight : s_light {
 //		Specular Lighting
 ///////////////////////////////////////////////////////////////////////////////
 struct HGE_API s_specularLight : s_light {
-	GLfloat		shininess;
+	GLfloat	shininess;
 
 	s_specularLight		();
 	s_specularLight		( const s_specularLight& );
@@ -51,10 +50,10 @@ struct HGE_API s_specularLight : s_light {
 //		Point Lighting
 ///////////////////////////////////////////////////////////////////////////////
 struct HGE_API s_pointLight : s_light {
-	math::vec3 pos;
-	float constant;
-	float linear;
-	float exponential;
+	vec3	pos;
+	float	constant;
+	float	linear;
+	float	exponential;
 
 	s_pointLight		();
 	s_pointLight		( const s_pointLight& );
@@ -66,11 +65,10 @@ struct HGE_API s_pointLight : s_light {
 ///////////////////////////////////////////////////////////////////////////////
 struct HGE_API s_spotLight : s_light {
 	static const float MIN_CONE_ANGLE;
-
-	math::vec3 pos;
-	math::vec3 dir;
-	float coneAngle;
-	float attenuation;
+	vec3	pos;
+	vec3	dir;
+	float	coneAngle;
+	float	attenuation;
 
 	s_spotLight			();
 	s_spotLight			( const s_spotLight& );

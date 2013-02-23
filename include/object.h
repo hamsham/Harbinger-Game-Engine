@@ -9,22 +9,20 @@
 #define	__HGE_OBJECT_H__
 
 #include "types.h"
-#include "math/math.h"
-using namespace hamLibs;
 
 //-----------------------------------------------------------------------------
 //	Basic Object Abstraction
 //-----------------------------------------------------------------------------
 class HGE_API c_object {
 	public:
-		static const math::vec3 WORLD_AXIS_X;
-		static const math::vec3 WORLD_AXIS_Y;
-		static const math::vec3 WORLD_AXIS_Z;
-		static const math::mat4 WORLD_MATRIX;
+		static const vec3 WORLD_AXIS_X;
+		static const vec3 WORLD_AXIS_Y;
+		static const vec3 WORLD_AXIS_Z;
+		static const mat4 WORLD_MATRIX;
 		
 	protected:
-		math::vec3 pos;
-		math::vec3 deltaPos;
+		vec3 pos;
+		vec3 deltaPos;
 		
 	public:
 		c_object() :
@@ -37,12 +35,12 @@ class HGE_API c_object {
 		
 		virtual ~c_object	() = 0;
 		
-		const math::vec3&	getPos	() const						{ return pos; }
-		void				setPos	( const math::vec3& inPos )		{ pos = inPos; }
-		void				move	( const math::vec3& amount )	{ deltaPos = amount; }
+		const vec3&		getPos	() const				{ return pos; }
+		void			setPos	( const vec3& inPos )	{ pos = inPos; }
+		void			move	( const vec3& amount )	{ deltaPos = amount; }
 		
-		virtual void		update	() = 0;
-		virtual void		tick	( float timeElapsed ) = 0;
+		virtual void	update	() = 0;
+		virtual void	tick	( float timeElapsed ) = 0;
 };
 
 //-----------------------------------------------------------------------------
@@ -50,9 +48,9 @@ class HGE_API c_object {
 //-----------------------------------------------------------------------------
 class HGE_API c_drawableObj : virtual public c_object {
 	protected:
-		math::vec3 scale;
-		math::quat rot;
-		math::mat4 worldMat;
+		vec3 scale;
+		quat rot;
+		mat4 worldMat;
 		
 	public:
 		c_drawableObj() :
@@ -71,17 +69,17 @@ class HGE_API c_drawableObj : virtual public c_object {
 		
 		virtual ~c_drawableObj() = 0;
 		
-		const math::vec3&	getScale	() const				{ return scale; }
-		const math::quat&	getRotation () const				{ return rot; }
-		const math::mat4&	getMatrix	() const				{ return worldMat; }
+		const vec3&		getScale	() const				{ return scale; }
+		const quat&		getRotation () const				{ return rot; }
+		const mat4&		getMatrix	() const				{ return worldMat; }
 		
-		void				setScale	( const math::vec3& s )	{ scale = s; }
-		void				setRotation	( const math::vec3& angles );
-		void				rotate		( const math::vec3& angles );
+		void			setScale	( const vec3& s )		{ scale = s; }
+		void			setRotation	( const vec3& angles );
+		void			rotate		( const vec3& angles );
 		
-		virtual void		update		();
-		virtual void		tick		( float ) { update(); }
-		virtual void		draw		() const= 0;
+		virtual void	update		();
+		virtual void	tick		( float )				{ update(); }
+		virtual void	draw		() const= 0;
 };
 
 #endif	/* __HGE_OBJECT_H__ */

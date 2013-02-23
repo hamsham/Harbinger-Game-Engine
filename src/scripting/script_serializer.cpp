@@ -14,7 +14,6 @@
 #include "resource.h"
 
 #include "scripting/script_base.h"
-#include "scripting/script_variables.h"
 #include "scripting/script_functions.h"
 #include "scripting/script_manager.h"
 #include "scripting/script_serializer.h"
@@ -148,8 +147,8 @@ c_serializer::e_fileStatus c_serializer::loadScripts( cstr fileName, scriptList_
 	//type verifications
 	scriptMap_t scrMap;
 	c_script* pScript( HGE_NULL );
-	int scrType( 0 );
-	int scrSubType( 0 );
+	long scrType( 0 );
+	long scrSubType( 0 );
 	hgeSize_t numVars( 0 ); // numVars & numFuncs count the amount of scripts that have been processed
 	hgeSize_t numFuncs( 0 );// not the amount of scripts that are in "varMap" or "funcMap"
 	
@@ -202,6 +201,11 @@ c_serializer::e_fileStatus c_serializer::loadScripts( cstr fileName, scriptList_
 	if ( !fileIO.good() || !readFooter( fileIO, outScripts, numVars, numFuncs) ) {
 		fileIO.close();
 		unloadData( outScripts );
+		std::cerr
+			<< "\n\t" << fileIO.bad()
+			<< ' ' << fileIO.eof()
+			<< ' ' << fileIO.fail()
+			<< '\n'  << numVars << ' ' << numFuncs << std::endl;
 		return FILE_LOAD_ERROR;
 	}
 	

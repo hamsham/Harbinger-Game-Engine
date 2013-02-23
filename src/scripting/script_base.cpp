@@ -5,9 +5,6 @@
  * Created on September 25, 2012, 5:18 PM
  */
 
-#include "math/math.h"
-using namespace hamLibs;
-
 #include "scripting/script.h"
 #include "scripting/script_base.h"
 
@@ -16,201 +13,97 @@ using namespace hamLibs;
 //-----------------------------------------------------------------------------
 c_script::~c_script() {}
 
-c_script& c_script::operator= ( const c_script& scriptCopy ) {
-	HGE_ASSERT( scriptCopy.getScriptSubType() != SCRIPT_INVALID );
-	return *this;
+void c_script::read( std::istream& stin, scriptMap_t& scriptMap ) {
+	void* ptr( nullptr );
+	stin >> ptr >> xPos >> yPos;
+	scriptMap[ ptr ] = this;
 }
 
-bool c_script::operator== ( const c_script& scriptCopy ) const {
-	return (this == &scriptCopy);
-}
-
-bool c_script::operator!= ( const c_script& scriptCopy ) const {
-	return (this != &scriptCopy);
-}
-
-void c_script::read( std::ifstream& fin, scriptMap_t& scrMap ) {
-	void* varPtr( HGE_NULL );
-	fin >> varPtr;
-	scrMap[ varPtr ] = this;
-}
-
-void c_script::write( std::ofstream& fout ) const {
-	fout << this;
+void c_script::write( std::ostream& stout ) const {
+	stout << this << ' ' << xPos << ' ' << yPos;
 }
 
 //-----------------------------------------------------------------------------
 //		Variable Base Class
 //-----------------------------------------------------------------------------
-c_scriptVarBase::~c_scriptVarBase() {}
-
-c_scriptVarBase& c_scriptVarBase::operator = (const c_scriptVarBase& varCopy) {
-	HGE_ASSERT( varCopy.getScriptSubType() != SCRIPT_INVALID );
-	return *this;
-}
-
-bool c_scriptVarBase::operator == (const c_scriptVarBase& varCopy) const {
-	return (this == &varCopy);
-}
-
-bool c_scriptVarBase::operator != (const c_scriptVarBase& varCopy) const {
-	return (this != &varCopy);
-}
+c_varBase::~c_varBase() {}
 
 //-----------------------------------------------------------------------------
 //		Variable Interface Classe
 //		Abstract
-//		All variables MUST support copy construction & assignment operators
+//		All datas MUST support copy construction & assignment operators
 //-----------------------------------------------------------------------------
 template <>
-void c_scriptVar< math::vec3 >::read( std::ifstream& fin, scriptMap_t& scrMap ) {
-	c_script::read( fin, scrMap );
-	fin >> variable[0] >> variable[1] >> variable[2];
+void c_varBool::read( std::istream& fin, scriptMap_t& scrMap ) {
+	c_var::read( fin, scrMap );
+	int inVar( 0 );
+	fin >> inVar;
+	data = (inVar == 0); // a file I/O bug occurred due to uninitialized data
 }
 
 template <>
-void c_scriptVar< math::vec3 >::write( std::ofstream& fout ) const {
-	c_script::write( fout );
-	fout << " " << variable[0] << " " << variable[1] << " " << variable[2];
+void c_varBool::write( std::ostream& fout ) const {
+	c_var::write( fout );
+	fout << " " << (data != 0); // a file I/O bug occurred due to uninitialized data
 }
 
-//-----------------------------------------------------------------------------
-//		Number Variable Base Class
-//-----------------------------------------------------------------------------
-c_scriptNum c_scriptNum::operator + ( const c_scriptNum& inVar ) const {
-	return inVar;
-}
-c_scriptNum c_scriptNum::operator - ( const c_scriptNum& inVar ) const {
-	return inVar;
-}
-c_scriptNum c_scriptNum::operator * ( const c_scriptNum& inVar ) const {
-	return inVar;
-}
-c_scriptNum c_scriptNum::operator / ( const c_scriptNum& inVar ) const {
-	return inVar;
-}
-c_scriptNum c_scriptNum::operator % ( const c_scriptNum& inVar ) const {
-	return inVar;
+template <>
+void c_varVec3::read( std::istream& fin, scriptMap_t& scrMap ) {
+	c_var::read( fin, scrMap );
+	fin >> data[0] >> data[1] >> data[2];
 }
 
-c_scriptNum& c_scriptNum::operator = ( const c_scriptNum& inVar ) {
-	HGE_ASSERT( inVar.getScriptType() != SCRIPT_INVALID );
-	return *this;
-}
-c_scriptNum& c_scriptNum::operator += ( const c_scriptNum& inVar ) {
-	*this = ( *this + inVar );
-	return *this;
-}
-c_scriptNum& c_scriptNum::operator -= ( const c_scriptNum& inVar ) {
-	*this = ( *this - inVar );
-	return *this;
-}
-c_scriptNum& c_scriptNum::operator *= ( const c_scriptNum& inVar ) {
-	*this = ( *this * inVar );
-	return *this;
-}
-c_scriptNum& c_scriptNum::operator /= ( const c_scriptNum& inVar ) {
-	*this = ( *this / inVar );
-	return *this;
-}
-c_scriptNum& c_scriptNum::operator %= ( const c_scriptNum& inVar ) {
-	*this = ( *this % inVar );
-	return *this;
+template <>
+void c_varVec3::write( std::ostream& fout ) const {
+	c_var::write( fout );
+	fout << " " << data[0] << " " << data[1] << " " << data[2];
 }
 
-bool c_scriptNum::operator == ( const c_scriptNum& inVar ) const {
-	return this == &inVar;
+template <>
+void c_varString::read( std::istream& fin, scriptMap_t& scrMap ) {
+	c_var::read( fin, scrMap );
+	
+	std::string::size_type strSize( 0 );
+	std::string::size_type iter( 0 );
+	fin >> strSize;
+	if ( strSize == 0 )
+		return;
+	fin.get(); // discard the next whitespace before reading in the string
+	data.resize( strSize );
+	while ( iter < strSize ) {
+		data[ iter ] = fin.get();
+		++iter;
+	}
 }
 
-bool c_scriptNum::operator != ( const c_scriptNum& inVar ) const {
-	return this != &inVar;
-}
-
-bool c_scriptNum::operator > ( const c_scriptNum& inVar ) const {
-	return this > &inVar;
-}
-
-bool c_scriptNum::operator < ( const c_scriptNum& inVar ) const {
-	return this < &inVar;
-}
-
-bool c_scriptNum::operator >= ( const c_scriptNum& inVar ) const {
-	return this >= &inVar;
-}
-
-bool c_scriptNum::operator <= ( const c_scriptNum& inVar ) const {
-	return this <= &inVar;
-}
-
-c_scriptNum& c_scriptNum::operator= ( int ) {
-	return *this;
-}
-
-c_scriptNum& c_scriptNum::operator= ( unsigned int ) {
-	return *this;
-}
-
-c_scriptNum& c_scriptNum::operator= ( float ) {
-	return *this;
-}
-
-c_scriptNum::operator int() const {
-	return 0;
-}
-
-c_scriptNum::operator unsigned int() const {
-	return 0;
-}
-
-c_scriptNum::operator float() const {
-	return 0.f;
+template <>
+void c_varString::write( std::ostream& fout ) const {
+	c_var::write( fout );
+	
+	fout << " " << data.size();
+	if ( data.size() != 0 )
+		fout << " " << data.data();
 }
 
 //-----------------------------------------------------------------------------
 //		Function Base Class
 //-----------------------------------------------------------------------------
-c_scriptFuncBase::c_scriptFuncBase() :
-	nextFunc( HGE_NULL )
-{}
+c_funcBase::~c_funcBase() {}
 
-c_scriptFuncBase::c_scriptFuncBase( const c_scriptFuncBase& funcCopy ) :
-	nextFunc( funcCopy.nextFunc )
-{}
-
-c_scriptFuncBase::~c_scriptFuncBase() {}
-
-//file input
-void c_scriptFuncBase::read( std::ifstream& fin, scriptMap_t& scrMap ) {
-	void* funcPtr( HGE_NULL );
-	c_script::read( fin, scrMap );
-	fin >> funcPtr;
-	nextFunc = dynamic_cast< const c_scriptFuncBase* >( scrMap[ funcPtr ] );
+void c_funcBase::read( std::istream& stin, scriptMap_t& scriptMap ) {
+	void* nextPtr( nullptr );
+	void* retPtr( nullptr );
+	
+	c_script::read( stin, scriptMap );
+	stin >> nextPtr >> retPtr;
+	
+	nextFunc = dynamic_cast< c_funcBase* >( scriptMap[ nextPtr ] ); 
+	retVal = dynamic_cast< c_varBase* >( scriptMap[ retPtr ] ); 
 }
 
-//file output
-void c_scriptFuncBase::write( std::ofstream& fout ) const {
-	c_script::write( fout );
-	fout << " " << nextFunc;
+void c_funcBase::write( std::ostream& stout ) const {
+	c_script::write( stout );
+	stout
+		<< ' ' << static_cast< c_script* >( nextFunc )
+		<< ' ' << static_cast< c_script* >( retVal );
 }
-
-const c_scriptFuncBase* c_scriptFuncBase::getNextFunction() const {
-	return nextFunc;
-}
-
-void c_scriptFuncBase::setNextFunction(const c_scriptFuncBase& next) {
-	nextFunc = &next;
-}
-
-//-----------------------------------------------------------------------------
-//		Function Class (Template Specializations)
-//-----------------------------------------------------------------------------
-template <>
-c_scriptFunc< void* >::c_scriptFunc() :
-	returnVal( HGE_NULL )
-{}
-
-template <>
-c_scriptFunc< void* >::c_scriptFunc( const c_scriptFunc& funcCopy ) :
-	c_scriptFuncBase( funcCopy ),
-	returnVal( HGE_NULL )
-{}

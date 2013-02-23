@@ -68,13 +68,13 @@ s_pointLight::s_pointLight( const s_pointLight& pl ) :
 ///////////////////////////////////////////////////////////////////////////////
 //		Spot Lighting
 ///////////////////////////////////////////////////////////////////////////////
-const float s_spotLight::MIN_CONE_ANGLE = math::HL_PI / 3.15f;
+const float s_spotLight::MIN_CONE_ANGLE = HL_PI / 3.15f;
 
 s_spotLight::s_spotLight() :
 	s_light(),
 	pos( 0.f, 0.f, 0.f ),
 	dir( 0.f, 0.f, 0.f ),
-	coneAngle( math::HL_PI_OVR2 ),
+	coneAngle( HL_PI_OVR2 ),
 	attenuation( 1.f )
 {}
 

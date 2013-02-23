@@ -34,45 +34,54 @@ void test2( c_scriptManager& sm, const std::string& file  ) {
 	std::cout << "Success" << std::endl;
 }
 
+///////////////////////////////////////////////////////////////////////////////
+//		Main
+///////////////////////////////////////////////////////////////////////////////
 int main() {
-	c_scriptFloat*			testFloatA( new c_scriptFloat );
-	c_scriptFloat*			testFloatB( new c_scriptFloat );
-	c_scriptFloat*			testFloatC( new c_scriptFloat );
-	c_scriptBool*			testBool( new c_scriptBool );
-	c_scriptVec3*			testVec3( new c_scriptVec3 );
-	c_scriptString*			testString( new c_scriptString );
-	c_scriptArithmetic*		testArithmetic( new c_scriptArithmetic );
-	c_scriptManager			scriptManager;
 	
-	scriptManager.manageEntry( testFloatA );
-	scriptManager.manageEntry( testFloatB );
-	scriptManager.manageEntry( testFloatC );
-	scriptManager.manageEntry( testBool );
-	scriptManager.manageEntry( testVec3 );
-	scriptManager.manageEntry( testString );
-	scriptManager.manageEntry( testArithmetic );
+	std::cout << "Creating Objects...";
+	c_scriptManager scriptManager;
+	c_varFloat* testNumA = new c_varFloat;
+	c_varFloat* testNumB = new c_varFloat;
+	c_varFloat* testNumC = new c_varFloat;
+	c_fncFloatMod* mathFunc = new c_fncFloatMod;
+	std::cout << "Done\n";
 	
-	testFloatA->data() = 4.2f;
-	testFloatB->data() = 7.7f;
-	testFloatC->data() = 0.f;
-	testBool->data() = true;
-	testString->data() = "Hello World!";
+	std::cout << "Adding Objects to the manager...";
+	scriptManager.manageEntry( testNumA );
+	scriptManager.manageEntry( testNumB );
+	scriptManager.manageEntry( testNumC );
+	scriptManager.manageEntry( mathFunc );
+	std::cout << "Done\n";
 	
-	testArithmetic->setEvalType( c_scriptArithmetic::MOD );
-	testArithmetic->setVarToCompare( testFloatA );
-	testArithmetic->setVarToEvaluate( testFloatB );
-	testArithmetic->setReturnVal( testFloatC );
-	testArithmetic->run();
+	std::cout << "Setting Object values...";
+	testNumA->data = 42.f;
+	testNumB->data = 7.7f;
+	testNumC->data = 0.f;
+	std::cout << "Done\n";
 	
-	test1( scriptManager, "testScriptFile.hsd" );
+	std::cout << "Saving to the first file...";
+	test1( scriptManager, "testScriptFile.hsd");
+	std::cout << "\n";
+	
+	std::cout << "Setting up the test function...";
+	mathFunc->attachArg( 0, *testNumA );
+	mathFunc->attachArg( 1, *testNumB );
+	mathFunc->attachRet( *testNumC );
+	mathFunc->run();
+	std::cout << "Done\n";
+	
+	std::cout << "Saving to the second file...";
+	test1( scriptManager, "testScriptFile2.hsd");
+	std::cout << "Done\n";
+	
+	std::cout << "Unloading data from the manager...";
 	scriptManager.clearEntries();
-	test2( scriptManager, "testScriptFile.hsd" );
+	std::cout << "Done\n";
 	
-	test1( scriptManager, "testScriptFile2.hsd" );
-	scriptManager.clearEntries();
-	test2( scriptManager, "testScriptFile2.hsd" );
-	
-	std::cin.get();
+	std::cout << "Loading from the second file...";
+	test2( scriptManager, "testScriptFile2.hsd");
+	std::cout << "Done.";
 	
 	return 0;
 }

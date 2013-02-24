@@ -25,8 +25,8 @@ typedef c_var< SCRIPT_VAR_BOOL, std::string >	c_varString;
 ///////////////////////////////////////////////////////////////////////////////
 //		Specializations
 ///////////////////////////////////////////////////////////////////////////////
-template <>	void HGE_API c_varBool::read	( std::istream&, scriptMap_t& );
-template <>	void HGE_API c_varBool::write	( std::ostream& ) const;
+template <> void HGE_API c_varBool::read	( std::istream&, scriptMap_t& );
+template <> void HGE_API c_varBool::write	( std::ostream& ) const;
 
 template <> void HGE_API c_varVec3::read	( std::istream&, scriptMap_t& );
 template <> void HGE_API c_varVec3::write	( std::ostream& ) const;

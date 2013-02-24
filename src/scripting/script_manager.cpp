@@ -5,14 +5,15 @@
  * Created on February 16, 2013, 9:48 PM
  */
 #include <iostream>
+#include "scripting/script.h"
 #include "scripting/script_base.h"
-#include "scripting/script_functions.h"
+#include "scripting/script_serializer.h"
+#include "scripting/script_factory.h"
 #include "scripting/script_manager.h"
 
 ///////////////////////////////////////////////////////////////////////////////
 //		Scripting Manager
 ///////////////////////////////////////////////////////////////////////////////
-
 //-----------------------------------------------------------------------------
 // Script Manager -- Constructor
 //-----------------------------------------------------------------------------
@@ -28,73 +29,6 @@ c_scriptManager::c_scriptManager( const c_scriptManager& sm ) :
 	scriptMap( sm.scriptMap ),
 	scriptList( sm.scriptList )
 {}
-
-//-----------------------------------------------------------------------------
-// Script Manager Namespace -- Instances
-//-----------------------------------------------------------------------------
-c_script* c_scriptManager::getVarInstance( long scriptType ) {
-	switch( scriptType ) {
-		case SCRIPT_VAR_INT:
-			return new c_varInt;
-		case SCRIPT_VAR_FLOAT:
-			return new c_varFloat;
-		case SCRIPT_VAR_BOOL:
-			return new c_varBool;
-		case SCRIPT_VAR_STRING:
-			return new c_varString;
-		case SCRIPT_VAR_VEC3:
-			return new c_varVec3;
-		default:
-			return HGE_NULL;
-	}
-}
-
-c_script* c_scriptManager::getFuncInstance( long scriptType ) {
-	switch( scriptType ) {
-		
-		case SCRIPT_FUNC_INT_ADD:
-			return new c_fncIntAdd;
-		case SCRIPT_FUNC_INT_SUB:
-			return new c_fncIntSub;
-		case SCRIPT_FUNC_INT_MUL:
-			return new c_fncIntMul;
-		case SCRIPT_FUNC_INT_DIV:
-			return new c_fncIntDiv;
-		case SCRIPT_FUNC_INT_MOD:
-			return new c_fncIntMod;
-		case SCRIPT_FUNC_INT_EQL:
-			return new c_fncIntEql;
-		
-		case SCRIPT_FUNC_FLOAT_ADD:
-			return new c_fncFloatAdd;
-		case SCRIPT_FUNC_FLOAT_SUB:
-			return new c_fncFloatSub;
-		case SCRIPT_FUNC_FLOAT_MUL:
-			return new c_fncFloatMul;
-		case SCRIPT_FUNC_FLOAT_DIV:
-			return new c_fncFloatDiv;
-		case SCRIPT_FUNC_FLOAT_MOD:
-			return new c_fncFloatMod;
-		case SCRIPT_FUNC_FLOAT_EQL:
-			return new c_fncFloatEql;
-			
-		case SCRIPT_FUNC_INT_CAST:
-			return new c_fncIntCast;
-		case SCRIPT_FUNC_FLOAT_CAST:
-			return new c_fncFloatCast;
-			
-		case SCRIPT_FUNC_NUM_ROUND:
-			return new c_fncNumRound;
-			
-		default:
-			return HGE_NULL;
-	}
-}
-
-void c_scriptManager::killInstance( c_script* s ) {
-	delete s;
-	s = HGE_NULL;
-}
 
 //-----------------------------------------------------------------------------
 // Script Manager -- File Data
@@ -163,10 +97,10 @@ void c_scriptManager::addEntry( c_script* script ) {
 	
 	c_script* pScript( HGE_NULL );
 	if ( script->getScriptType() == SCRIPT_VAR ) {
-		pScript = getVarInstance( script->getScriptSubType() );
+		pScript = n_scriptFactory::getVarInstance( script->getScriptSubType() );
 	}
 	else if ( script->getScriptType() == SCRIPT_FUNC ) {
-		pScript = getFuncInstance( script->getScriptSubType() );
+		pScript = n_scriptFactory::getFuncInstance( script->getScriptSubType() );
 	}
 	
 	if ( pScript == HGE_NULL ) return;
@@ -203,7 +137,7 @@ void c_scriptManager::popEntry( unsigned int index ) {
 void c_scriptManager::clearEntries() {
 	scriptMap.clear();
 	for ( scriptListSize_t i( 0 ); i < scriptList.size(); ++i ) {
-		delete scriptList[ i ];
+		n_scriptFactory::killInstance( scriptList[ i ] );
 		scriptList[ i ] = HGE_NULL;
 	}
 	scriptList.clear();

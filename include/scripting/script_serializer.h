@@ -33,7 +33,6 @@ class HGE_API c_serializer {
 		bool readFooter( std::ifstream&, scriptList_t& inScripts, hgeSize_t numVars, hgeSize_t numFuncs );
 		
 		void unloadData( scriptList_t& ); //in case of a file read error, clear memory
-		//void closeStream();
 		
 	public:
 		//file statuses

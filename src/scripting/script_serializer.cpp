@@ -15,7 +15,7 @@
 
 #include "scripting/script_base.h"
 #include "scripting/script_functions.h"
-#include "scripting/script_manager.h"
+#include "scripting/script_factory.h"
 #include "scripting/script_serializer.h"
 
 //-----------------------------------------------------------------------------
@@ -68,8 +68,8 @@ c_serializer::e_fileStatus c_serializer::saveScripts( cstr fileName, const scrip
 	
 	//print a header
 	fileIO
-		<< HARBINGER_FILE_TYPE[ fileType ] << " "
-		<< fileType << " "
+		<< HARBINGER_FILE_TYPE[ fileType ] << ' '
+		<< fileType << ' '
 		<< inScripts.size() << '\n';
 	
 	//prep a footer
@@ -91,21 +91,21 @@ c_serializer::e_fileStatus c_serializer::saveScripts( cstr fileName, const scrip
 		}
 		else {
 			//an invalid file type was found while saving. write the footer and quit
-			fileIO << numVars << " " << numFuncs;
+			fileIO << numVars << ' ' << numFuncs;
 			fileIO.close();
 			return FILE_SAVE_INVALID_DATA;
 		}
 		
 		//write the script object to the file
 		fileIO
-			<< pScript->getScriptType() << " "
-			<< pScript->getScriptSubType() << " ";
+			<< pScript->getScriptType() << ' '
+			<< pScript->getScriptSubType() << ' ';
 		pScript->write( fileIO );
 		
 		// save the editor position if requested
 #ifdef HGE_EDITOR
 		if ( fileType == HGE_SCRIPT_EDITOR_DATA )
-			fileIO << pScript->editorPos[0] << " " << pScript->editorPos[1];
+			fileIO << ' ' << pScript->editorPos[0] << ' ' << pScript->editorPos[1];
 #endif /* HGE_EDITOR */
 		
 		fileIO << '\n';
@@ -113,7 +113,7 @@ c_serializer::e_fileStatus c_serializer::saveScripts( cstr fileName, const scrip
 	} // scriptList iteration loop
 	
 	//print the footer
-	fileIO << numVars << " " << numFuncs;
+	fileIO << numVars << ' ' << numFuncs;
 	fileIO.close();
 	return FILE_SAVE_SUCCESS;
 }
@@ -164,12 +164,12 @@ c_serializer::e_fileStatus c_serializer::loadScripts( cstr fileName, scriptList_
 		
 		//variable type
 		if ( scrType == SCRIPT_VAR ) {
-			pScript = c_scriptManager::getVarInstance( scrSubType );
+			pScript = n_scriptFactory::getVarInstance( scrSubType );
 			++numVars;
 		}
 		//function type
 		else if ( scrType == SCRIPT_FUNC ) {
-			pScript = c_scriptManager::getFuncInstance( scrSubType );
+			pScript = n_scriptFactory::getFuncInstance( scrSubType );
 			++numFuncs;
 		}
 		else { // invalid file data
@@ -220,7 +220,7 @@ void c_serializer::unloadData( scriptList_t& inScripts ) {
 	scriptList_t::iterator iter;
 	
 	for ( iter = inScripts.begin(); iter != inScripts.end(); ++iter ) {
-		c_scriptManager::killInstance( *iter );
+		n_scriptFactory::killInstance( *iter );
 	}
 	inScripts.clear();
 }

@@ -11,54 +11,15 @@
 //-----------------------------------------------------------------------------
 //		Script Base Class
 //-----------------------------------------------------------------------------
-#ifdef HGE_EDITOR
-	void c_script::read( std::istream& stin, scriptMap_t& scriptMap ) {
-		void* ptr( nullptr );
-		stin >> ptr >> xPos >> yPos;
-		scriptMap[ ptr ] = this;
-	}
+void c_script::read( std::istream& stin, scriptMap_t& scriptMap ) {
+	void* ptr( nullptr );
+	stin >> ptr;
+	scriptMap[ ptr ] = this;
+}
 
-	void c_script::write( std::ostream& stout ) const {
-		stout << this << ' ' << xPos << ' ' << yPos;
-	}
-/*
-	c_script& c_script::operator = ( const c_script& script ) {
-		pos = script.pos;
-		return *this;
-	}
-	
-	bool c_script::operator == ( const c_script& script ) {
-		return pos == script.pos;
-	}
-	
-	bool c_script::operator != ( const c_script& script ) {
-		return pos != script.pos;
-	}
-*/
-#else
-/*
-	c_script& c_script::operator = ( const c_script& script ) {
-		return *this;
-	}
-	
-	bool c_script::operator == ( const c_script& script ) {
-		return this == &script;
-	}
-	
-	bool c_script::operator != ( const c_script& script ) {
-		return this != script;
-	}
-*/
-	void c_script::read( std::istream& stin, scriptMap_t& scriptMap ) {
-		void* ptr( nullptr );
-		stin >> ptr;
-		scriptMap[ ptr ] = this;
-	}
-
-	void c_script::write( std::ostream& stout ) const {
-		stout << this;
-	}
-#endif /* ifdef HGE_EDITOR */
+void c_script::write( std::ostream& stout ) const {
+	stout << this;
+}
 
 //-----------------------------------------------------------------------------
 //		Function Base Class

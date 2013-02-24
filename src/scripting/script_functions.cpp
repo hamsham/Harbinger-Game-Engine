@@ -101,7 +101,7 @@ void c_fncFloatCast::run() {
 }
 
 //-----------------------------------------------------------------------------
-// Floating Poiint Rounding
+// Floating Point Rounding
 //-----------------------------------------------------------------------------
 template <>
 void c_fncNumRound::run() {

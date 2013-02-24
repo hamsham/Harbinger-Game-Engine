@@ -8,7 +8,7 @@
 #ifndef __HGE_SCRIPT_BASE_H__
 #define	__HGE_SCRIPT_BASE_H__
 
-#include <fstream>
+#include <iostream>
 
 #include "../types.h"
 #include "script.h"
@@ -19,19 +19,20 @@
 class HGE_API c_script {
 #ifdef HGE_EDITOR
 	private:
-		vec2i pos;
+		vec2i editorPos;
 		
 	public:
-		c_script			() : pos() {}
-		c_script			( const c_script& b ) : pos( b.pos ) {}
+		c_script			() : editorPos() {}
+		c_script			( const c_script& b ) : editorPos( b.pos ) {}
 		
-		void				setPos			( const vec2i& inPos )	{ pos = inPos; }
-		const vec2i			getPos			() const				{ return pos; }
+		void				setPos			( const vec2i& inPos )	{ editorPos = inPos; }
+		const vec2i&		getPos			() const				{ return editorPos; }
 #else
 	public:
 		c_script			() {}
 		c_script			( const c_script& ) {}
 #endif /* ifdef HGE_EDITOR */
+		
 		~c_script			() {}
 		
 		virtual long int	getScriptType	() const = 0;

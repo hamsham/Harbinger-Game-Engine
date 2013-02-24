@@ -11,85 +11,58 @@
 //-----------------------------------------------------------------------------
 //		Script Base Class
 //-----------------------------------------------------------------------------
-c_script::~c_script() {}
-
-void c_script::read( std::istream& stin, scriptMap_t& scriptMap ) {
-	void* ptr( nullptr );
-	stin >> ptr >> xPos >> yPos;
-	scriptMap[ ptr ] = this;
-}
-
-void c_script::write( std::ostream& stout ) const {
-	stout << this << ' ' << xPos << ' ' << yPos;
-}
-
-//-----------------------------------------------------------------------------
-//		Variable Base Class
-//-----------------------------------------------------------------------------
-c_varBase::~c_varBase() {}
-
-//-----------------------------------------------------------------------------
-//		Variable Interface Classe
-//		Abstract
-//		All datas MUST support copy construction & assignment operators
-//-----------------------------------------------------------------------------
-template <>
-void c_varBool::read( std::istream& fin, scriptMap_t& scrMap ) {
-	c_var::read( fin, scrMap );
-	int inVar( 0 );
-	fin >> inVar;
-	data = (inVar == 0); // a file I/O bug occurred due to uninitialized data
-}
-
-template <>
-void c_varBool::write( std::ostream& fout ) const {
-	c_var::write( fout );
-	fout << " " << (data != 0); // a file I/O bug occurred due to uninitialized data
-}
-
-template <>
-void c_varVec3::read( std::istream& fin, scriptMap_t& scrMap ) {
-	c_var::read( fin, scrMap );
-	fin >> data[0] >> data[1] >> data[2];
-}
-
-template <>
-void c_varVec3::write( std::ostream& fout ) const {
-	c_var::write( fout );
-	fout << " " << data[0] << " " << data[1] << " " << data[2];
-}
-
-template <>
-void c_varString::read( std::istream& fin, scriptMap_t& scrMap ) {
-	c_var::read( fin, scrMap );
-	
-	std::string::size_type strSize( 0 );
-	std::string::size_type iter( 0 );
-	fin >> strSize;
-	if ( strSize == 0 )
-		return;
-	fin.get(); // discard the next whitespace before reading in the string
-	data.resize( strSize );
-	while ( iter < strSize ) {
-		data[ iter ] = fin.get();
-		++iter;
+#ifdef HGE_EDITOR
+	void c_script::read( std::istream& stin, scriptMap_t& scriptMap ) {
+		void* ptr( nullptr );
+		stin >> ptr >> xPos >> yPos;
+		scriptMap[ ptr ] = this;
 	}
-}
 
-template <>
-void c_varString::write( std::ostream& fout ) const {
-	c_var::write( fout );
+	void c_script::write( std::ostream& stout ) const {
+		stout << this << ' ' << xPos << ' ' << yPos;
+	}
+/*
+	c_script& c_script::operator = ( const c_script& script ) {
+		pos = script.pos;
+		return *this;
+	}
 	
-	fout << " " << data.size();
-	if ( data.size() != 0 )
-		fout << " " << data.data();
-}
+	bool c_script::operator == ( const c_script& script ) {
+		return pos == script.pos;
+	}
+	
+	bool c_script::operator != ( const c_script& script ) {
+		return pos != script.pos;
+	}
+*/
+#else
+/*
+	c_script& c_script::operator = ( const c_script& script ) {
+		return *this;
+	}
+	
+	bool c_script::operator == ( const c_script& script ) {
+		return this == &script;
+	}
+	
+	bool c_script::operator != ( const c_script& script ) {
+		return this != script;
+	}
+*/
+	void c_script::read( std::istream& stin, scriptMap_t& scriptMap ) {
+		void* ptr( nullptr );
+		stin >> ptr;
+		scriptMap[ ptr ] = this;
+	}
+
+	void c_script::write( std::ostream& stout ) const {
+		stout << this;
+	}
+#endif /* ifdef HGE_EDITOR */
 
 //-----------------------------------------------------------------------------
 //		Function Base Class
 //-----------------------------------------------------------------------------
-c_funcBase::~c_funcBase() {}
-
 void c_funcBase::read( std::istream& stin, scriptMap_t& scriptMap ) {
 	void* nextPtr( nullptr );
 	void* retPtr( nullptr );
@@ -106,4 +79,22 @@ void c_funcBase::write( std::ostream& stout ) const {
 	stout
 		<< ' ' << static_cast< c_script* >( nextFunc )
 		<< ' ' << static_cast< c_script* >( retVal );
+}
+		
+c_funcBase& c_funcBase::operator = ( const c_funcBase& func ) {
+	retVal = func.retVal;
+	nextFunc = func.nextFunc;
+	return *this;
+}
+
+bool c_funcBase::operator == ( const c_funcBase& func ) {
+	if ( (retVal != func.retVal ) || (nextFunc != func.nextFunc) )
+		return false;
+	return true;
+}
+
+bool c_funcBase::operator != ( const c_funcBase& func ) {
+	if ( (retVal == func.retVal ) && (nextFunc == func.nextFunc) )
+		return false;
+	return true;
 }

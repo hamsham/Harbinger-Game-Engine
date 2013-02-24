@@ -8,15 +8,38 @@
 #ifndef __HGE_SCRIPT_FUNCTIONS_H__
 #define	__HGE_SCRIPT_FUNCTIONS_H__
 
-#include <fstream>
+#include "script.h"
 #include "script_base.h"
+#include "script_variables.h"
 
 ///////////////////////////////////////////////////////////////////////////////
-//		Function Class Template Spectializations
+//		Typedefs
 ///////////////////////////////////////////////////////////////////////////////
-/*
- * Numerical Ops
- */
+// Integer Functions
+typedef c_func< SCRIPT_FUNC_INT_ADD, 2, c_varInt >			c_fncIntAdd;
+typedef c_func< SCRIPT_FUNC_INT_SUB, 2, c_varInt >			c_fncIntSub;
+typedef c_func< SCRIPT_FUNC_INT_MUL, 2, c_varInt >			c_fncIntMul;
+typedef c_func< SCRIPT_FUNC_INT_DIV, 2, c_varInt >			c_fncIntDiv;
+typedef c_func< SCRIPT_FUNC_INT_MOD, 2, c_varInt >			c_fncIntMod;
+typedef c_func< SCRIPT_FUNC_INT_EQL, 2, c_varInt >			c_fncIntEql;
+
+// Float Functions
+typedef c_func< SCRIPT_FUNC_FLOAT_ADD, 2, c_varFloat >		c_fncFloatAdd;
+typedef c_func< SCRIPT_FUNC_FLOAT_SUB, 2, c_varFloat >		c_fncFloatSub;
+typedef c_func< SCRIPT_FUNC_FLOAT_MUL, 2, c_varFloat >		c_fncFloatMul;
+typedef c_func< SCRIPT_FUNC_FLOAT_DIV, 2, c_varFloat >		c_fncFloatDiv;
+typedef c_func< SCRIPT_FUNC_FLOAT_MOD, 2, c_varFloat >		c_fncFloatMod;
+typedef c_func< SCRIPT_FUNC_FLOAT_EQL, 2, c_varFloat >		c_fncFloatEql;
+
+typedef c_func< SCRIPT_FUNC_INT_CAST, 1, c_varInt >			c_fncIntCast;
+typedef c_func< SCRIPT_FUNC_FLOAT_CAST, 1, c_varFloat >		c_fncFloatCast;
+
+typedef c_func< SCRIPT_FUNC_NUM_ROUND, 1, c_varFloat >		c_fncNumRound;
+
+///////////////////////////////////////////////////////////////////////////////
+//		Function Class Specializations
+///////////////////////////////////////////////////////////////////////////////
+// Numerical Operations
 template <> void HGE_API c_fncIntAdd::run();
 template <> void HGE_API c_fncIntSub::run();
 template <> void HGE_API c_fncIntMul::run();

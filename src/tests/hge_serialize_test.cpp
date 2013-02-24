@@ -10,9 +10,10 @@
 
 #include "scripting/script.h"
 #include "scripting/script_base.h"
+#include "scripting/script_variables.h"
+#include "scripting/script_functions.h"
 #include "scripting/script_serializer.h"
 #include "scripting/script_manager.h"
-#include "scripting/script_functions.h"
 
 void test1( c_scriptManager& sm, const std::string& file ) {
 	sm.setFileName( file );
@@ -41,10 +42,15 @@ int main() {
 	
 	std::cout << "Creating Objects...";
 	c_scriptManager scriptManager;
+	std::cout << "1";
 	c_varFloat* testNumA = new c_varFloat;
+	std::cout << ", 2";
 	c_varFloat* testNumB = new c_varFloat;
+	std::cout << ", 3";
 	c_varFloat* testNumC = new c_varFloat;
+	std::cout << ", 4";
 	c_fncFloatMod* mathFunc = new c_fncFloatMod;
+	std::cout << ", 5 ";
 	std::cout << "Done\n";
 	
 	std::cout << "Adding Objects to the manager...";
@@ -73,7 +79,7 @@ int main() {
 	
 	std::cout << "Saving to the second file...";
 	test1( scriptManager, "testScriptFile2.hsd");
-	std::cout << "Done\n";
+	std::cout << "\n";
 	
 	std::cout << "Unloading data from the manager...";
 	scriptManager.clearEntries();
@@ -81,7 +87,7 @@ int main() {
 	
 	std::cout << "Loading from the second file...";
 	test2( scriptManager, "testScriptFile2.hsd");
-	std::cout << "Done.";
+	std::cout << "\n";
 	
 	return 0;
 }

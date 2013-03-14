@@ -41,16 +41,14 @@ void c_varString::read( std::istream& fin, scriptMap_t& scrMap ) {
 	c_var::read( fin, scrMap );
 	
 	std::string::size_type strSize( 0 );
-	std::string::size_type iter( 0 );
 	fin >> strSize;
-	if ( strSize == 0 )
-		return;
+	if ( strSize == 0 ) return;
+    
 	fin.get(); // discard the next whitespace before reading in the string
 	data.resize( strSize );
-	while ( iter < strSize ) {
-		data[ iter ] = fin.get();
-		++iter;
-	}
+        
+    for ( std::string::size_type iter( 0 ); iter < strSize; ++iter )
+        data[ iter ] = fin.get();
 }
 
 template <>

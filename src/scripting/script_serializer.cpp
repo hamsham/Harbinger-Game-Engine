@@ -147,8 +147,8 @@ c_serializer::e_fileStatus c_serializer::loadScripts( cstr fileName, scriptList_
 	//type verifications
 	scriptMap_t scrMap;
 	c_script* pScript( HGE_NULL );
-	long scrType( 0 );
-	long scrSubType( 0 );
+	ulong scrType( 0 );
+	ulong scrSubType( 0 );
 	hgeSize_t numVars( 0 ); // numVars & numFuncs count the amount of scripts that have been processed
 	hgeSize_t numFuncs( 0 );// not the amount of scripts that are in "varMap" or "funcMap"
 	

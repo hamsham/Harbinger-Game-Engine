@@ -10,17 +10,17 @@
 #include "utils/hash.h"
 using hamLibs::utils::constHash;
 
-#define HASHED_ENUM( x ) x = (unsigned short)constHash( HL_STRINGIFY( x ) )
+#define HASHED_ENUM( x ) x = constHash( HL_STRINGIFY( x ) )
 
 ///////////////////////////////////////////////////////////////////////////////
 //		Object Types
 ///////////////////////////////////////////////////////////////////////////////
-enum e_objType : long int {
+enum e_objType : ulong {
 	HASHED_ENUM( SCRIPT_VAR ),
 	HASHED_ENUM( SCRIPT_FUNC )
 };
 
-enum e_varType : long int {
+enum e_varType : ulong {
 	HASHED_ENUM( SCRIPT_VAR_INT ),
 	HASHED_ENUM( SCRIPT_VAR_FLOAT ),
 	HASHED_ENUM( SCRIPT_VAR_BOOL ),
@@ -28,7 +28,7 @@ enum e_varType : long int {
 	HASHED_ENUM( SCRIPT_VAR_STRING )
 };
 
-enum e_funcType : long int {
+enum e_funcType : ulong {
 	HASHED_ENUM( SCRIPT_FUNC_INT_ADD ),
 	HASHED_ENUM( SCRIPT_FUNC_INT_SUB ),
 	HASHED_ENUM( SCRIPT_FUNC_INT_MUL ),
@@ -59,7 +59,7 @@ class c_funcBase;
 template < e_varType varType, typename dataType >
 class c_var;
 
-template < e_funcType, int numArgs, typename returntype >
+template < e_funcType, int numArgs >
 class c_func;
 
 //-----------------------------------------------------------------------------

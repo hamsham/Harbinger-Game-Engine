@@ -29,6 +29,8 @@ namespace n_pipelineGL {
 		const void* data, GLenum usage
 	);
 	
+	//void setMVP( const mat4& modelMatrix, const mat4& viewProjectionMatrix );
+	
 }
 
 #endif	/* __HGE_PIPELINE_GL_H__ */

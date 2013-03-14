@@ -16,7 +16,7 @@
 	#define MATH_OP( fnc, op, varType, varEnum )\
 	template <>\
 	void fnc::run() {\
-		if ( args[0] == nullptr || args[1] == nullptr || retVal == nullptr ) return;\
+		if ( args[0] == HGE_NULL || args[1] == HGE_NULL || retVal == HGE_NULL ) return;\
 		HGE_ASSERT (\
 			(args[0]->getScriptSubType() == varEnum) &&\
 			(args[1]->getScriptSubType() == varEnum) &&\
@@ -49,7 +49,7 @@
 //-----------------------------------------------------------------------------
 template <>
 void c_fncFloatMod::run() {
-	if ( args[0] == nullptr || args[1] == nullptr || retVal == nullptr ) return;
+	if ( args[0] == HGE_NULL || args[1] == HGE_NULL || retVal == HGE_NULL ) return;
 	
 	HGE_ASSERT(
 		(args[0]->getScriptSubType() == SCRIPT_VAR_FLOAT) &&
@@ -69,7 +69,7 @@ void c_fncFloatMod::run() {
 //-----------------------------------------------------------------------------
 template <>
 void c_fncIntCast::run() {
-	if ( args[0] == nullptr ) return;
+	if ( args[0] == HGE_NULL ) return;
 	
 	HGE_ASSERT(
 		(args[0]->getScriptSubType() == SCRIPT_VAR_FLOAT) &&
@@ -87,7 +87,7 @@ void c_fncIntCast::run() {
 //-----------------------------------------------------------------------------
 template <>
 void c_fncFloatCast::run() {
-	if ( args[0] == nullptr ) return;
+	if ( args[0] == HGE_NULL ) return;
 	
 	HGE_ASSERT(
 		(args[0]->getScriptSubType() == SCRIPT_VAR_INT) &&
@@ -105,7 +105,7 @@ void c_fncFloatCast::run() {
 //-----------------------------------------------------------------------------
 template <>
 void c_fncNumRound::run() {
-	if ( args[0] == nullptr ) return;
+	if ( args[0] == HGE_NULL ) return;
 	
 	HGE_ASSERT(
 		(args[0]->getScriptSubType() == SCRIPT_VAR_FLOAT) &&

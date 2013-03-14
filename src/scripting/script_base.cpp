@@ -12,12 +12,30 @@
 //		Script Base Class
 //-----------------------------------------------------------------------------
 void c_script::read( std::istream& stin, scriptMap_t& scriptMap ) {
+#ifdef HGE_EDITOR
+	std::string::size_type strSize( 0 );
+	fin >> strSize;
+    
+	if ( strSize != 0 ) {
+        fin.get(); // discard the next whitespace before reading in the string
+        data.resize( strSize );
+        
+        for ( std::string::size_type iter( 0 ); iter < strSize; ++iter )
+            data[ iter ] = fin.get();
+    }
+    
+    stin >> editorPos[0] >> editorPos[1];
+#endif
 	void* ptr( nullptr );
 	stin >> ptr;
 	scriptMap[ ptr ] = this;
 }
 
 void c_script::write( std::ostream& stout ) const {
+#ifdef HGE_EDITOR
+    stout << editorName.size() << ' ' << editorName;
+    stout << editorPos[0] << ' ' << editorPos[1] << ' ';
+#endif
 	stout << this;
 }
 
@@ -49,13 +67,9 @@ c_funcBase& c_funcBase::operator = ( const c_funcBase& func ) {
 }
 
 bool c_funcBase::operator == ( const c_funcBase& func ) {
-	if ( (retVal != func.retVal ) || (nextFunc != func.nextFunc) )
-		return false;
-	return true;
+	return (retVal == func.retVal ) && (nextFunc == func.nextFunc);
 }
 
 bool c_funcBase::operator != ( const c_funcBase& func ) {
-	if ( (retVal == func.retVal ) && (nextFunc == func.nextFunc) )
-		return false;
-	return true;
+	return (retVal != func.retVal ) && (nextFunc != func.nextFunc);
 }

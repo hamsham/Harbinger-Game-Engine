@@ -13,50 +13,36 @@
 #include "script_variables.h"
 
 ///////////////////////////////////////////////////////////////////////////////
+//		Convenience Macro
+///////////////////////////////////////////////////////////////////////////////
+#define REGISTER_SCRIPT_FUNCTION( func_hash, numArgs, func_name )\
+typedef c_func< func_hash, numArgs > func_name;\
+template <> void HGE_API func_name::run()
+
+///////////////////////////////////////////////////////////////////////////////
 //		Typedefs
 ///////////////////////////////////////////////////////////////////////////////
 // Integer Functions
-typedef c_func< SCRIPT_FUNC_INT_ADD, 2, c_varInt >			c_fncIntAdd;
-typedef c_func< SCRIPT_FUNC_INT_SUB, 2, c_varInt >			c_fncIntSub;
-typedef c_func< SCRIPT_FUNC_INT_MUL, 2, c_varInt >			c_fncIntMul;
-typedef c_func< SCRIPT_FUNC_INT_DIV, 2, c_varInt >			c_fncIntDiv;
-typedef c_func< SCRIPT_FUNC_INT_MOD, 2, c_varInt >			c_fncIntMod;
-typedef c_func< SCRIPT_FUNC_INT_EQL, 2, c_varInt >			c_fncIntEql;
+REGISTER_SCRIPT_FUNCTION( SCRIPT_FUNC_INT_ADD, 2, c_fncIntAdd );
+REGISTER_SCRIPT_FUNCTION( SCRIPT_FUNC_INT_SUB, 2, c_fncIntSub );
+REGISTER_SCRIPT_FUNCTION( SCRIPT_FUNC_INT_MUL, 2, c_fncIntMul );
+REGISTER_SCRIPT_FUNCTION( SCRIPT_FUNC_INT_DIV, 2, c_fncIntDiv );
+REGISTER_SCRIPT_FUNCTION( SCRIPT_FUNC_INT_MOD, 2, c_fncIntMod );
+REGISTER_SCRIPT_FUNCTION( SCRIPT_FUNC_INT_EQL, 2, c_fncIntEql );
 
 // Float Functions
-typedef c_func< SCRIPT_FUNC_FLOAT_ADD, 2, c_varFloat >		c_fncFloatAdd;
-typedef c_func< SCRIPT_FUNC_FLOAT_SUB, 2, c_varFloat >		c_fncFloatSub;
-typedef c_func< SCRIPT_FUNC_FLOAT_MUL, 2, c_varFloat >		c_fncFloatMul;
-typedef c_func< SCRIPT_FUNC_FLOAT_DIV, 2, c_varFloat >		c_fncFloatDiv;
-typedef c_func< SCRIPT_FUNC_FLOAT_MOD, 2, c_varFloat >		c_fncFloatMod;
-typedef c_func< SCRIPT_FUNC_FLOAT_EQL, 2, c_varFloat >		c_fncFloatEql;
+REGISTER_SCRIPT_FUNCTION( SCRIPT_FUNC_FLOAT_ADD, 2, c_fncFloatAdd );
+REGISTER_SCRIPT_FUNCTION( SCRIPT_FUNC_FLOAT_SUB, 2, c_fncFloatSub );
+REGISTER_SCRIPT_FUNCTION( SCRIPT_FUNC_FLOAT_MUL, 2, c_fncFloatMul );
+REGISTER_SCRIPT_FUNCTION( SCRIPT_FUNC_FLOAT_DIV, 2, c_fncFloatDiv );
+REGISTER_SCRIPT_FUNCTION( SCRIPT_FUNC_FLOAT_MOD, 2, c_fncFloatMod );
+REGISTER_SCRIPT_FUNCTION( SCRIPT_FUNC_FLOAT_EQL, 2, c_fncFloatEql );
 
-typedef c_func< SCRIPT_FUNC_INT_CAST, 1, c_varInt >			c_fncIntCast;
-typedef c_func< SCRIPT_FUNC_FLOAT_CAST, 1, c_varFloat >		c_fncFloatCast;
+// Type-Casting
+REGISTER_SCRIPT_FUNCTION( SCRIPT_FUNC_INT_CAST, 1, c_fncIntCast );
+REGISTER_SCRIPT_FUNCTION( SCRIPT_FUNC_FLOAT_CAST, 1, c_fncFloatCast );
 
-typedef c_func< SCRIPT_FUNC_NUM_ROUND, 1, c_varFloat >		c_fncNumRound;
-
-///////////////////////////////////////////////////////////////////////////////
-//		Function Class Specializations
-///////////////////////////////////////////////////////////////////////////////
-// Numerical Operations
-template <> void HGE_API c_fncIntAdd::run();
-template <> void HGE_API c_fncIntSub::run();
-template <> void HGE_API c_fncIntMul::run();
-template <> void HGE_API c_fncIntDiv::run();
-template <> void HGE_API c_fncIntMod::run();
-template <> void HGE_API c_fncIntEql::run();
-
-template <> void HGE_API c_fncFloatAdd::run();
-template <> void HGE_API c_fncFloatSub::run();
-template <> void HGE_API c_fncFloatMul::run();
-template <> void HGE_API c_fncFloatDiv::run();
-template <> void HGE_API c_fncFloatMod::run();
-template <> void HGE_API c_fncFloatEql::run();
-
-template <> void HGE_API c_fncIntCast::run();
-template <> void HGE_API c_fncFloatCast::run();
-
-template <> void HGE_API c_fncNumRound::run();
+// Misc Numerical Ops
+REGISTER_SCRIPT_FUNCTION( SCRIPT_FUNC_NUM_ROUND, 1, c_fncNumRound );
 
 #endif	/* __HGE_SCRIPT_FUNCTIONS_H__ */

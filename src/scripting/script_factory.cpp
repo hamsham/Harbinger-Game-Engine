@@ -7,7 +7,7 @@
 typedef std::map< int, c_script* (*)() > scriptFactoryMap_t;
 
 #define REGISTERED_FACTORY( num, type )	\
-	{ num, []() ->c_script* { return new( std::nothrow ) type(); } }
+	{ num, []()->c_script* { return new( std::nothrow ) type(); } }
 
 namespace {
 	/*
@@ -48,14 +48,14 @@ namespace {
 #undef REGISTERED_FACTORY
 } // end anonymous namespace
 
-c_script* n_scriptFactory::getVarInstance( long scriptType ) {
+c_script* n_scriptFactory::getVarInstance( ulong scriptType ) {
 	return varFactory[ scriptType ]();
 }
 
-c_script* n_scriptFactory::getFuncInstance( long scriptType ) {
+c_script* n_scriptFactory::getFuncInstance( ulong scriptType ) {
 	return funcFactory[ scriptType ]();
 }
 
-void c_scriptFactorykillInstance( c_script* script ) {
+void n_scriptFactory::killInstance( c_script* script ) {
 	delete script;
 }

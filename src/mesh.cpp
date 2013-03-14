@@ -97,8 +97,7 @@ c_mesh::c_mesh() :
 	buffers{ 0 },
 	entries( HGE_NULL ),
 	textures( HGE_NULL ),
-	drawMode( DRAW_FILLED ),
-	useTextures( true )
+	drawMode( DRAW_FILLED )
 {}
 
 c_mesh::~c_mesh() {
@@ -188,7 +187,7 @@ bool c_mesh::load( cstr fileName, int flags ) {
 	std::cout << "\tLoading texture & material data..\n";
 	textures = new c_bitmap [ pScene->mNumMaterials ];
 	numTextures = pScene->mNumMaterials;
-	if ( !loadMaterials( pScene, fileName ) ) {
+	if ( !loadTextures( pScene, fileName ) ) {
 		std::cout << "\t\tWarning: Unable to load all associated materials.\n";
 		delete [] textures;
 		textures = HGE_NULL;
@@ -292,9 +291,9 @@ bool c_mesh::loadMeshes( const aiScene* pScene, s_vertex* vertArray, uint* index
 }
 
 //-----------------------------------------------------------------------------
-// Mesh - Material/Texture Loading
+// Mesh - Texture Loading
 //-----------------------------------------------------------------------------
-bool c_mesh::loadMaterials( const aiScene* pScene, cstr fileName ) {
+bool c_mesh::loadTextures( const aiScene* pScene, cstr fileName ) {
 	std::string matDir;
 	std::string currDir = fileName;
 	std::string::size_type slash = currDir.find_last_of("/\\");
@@ -442,26 +441,16 @@ void c_mesh::draw() const {
 		
 		const uint matIndex = entries[ i ].matIndex;
 		
-		if ( useTextures && textures ) {
-			textures[ matIndex ].makeActive();		
-			glDrawElementsBaseVertex(
-				( GLuint )drawMode,
-				entries[ i ].numIndices,
-				GL_UNSIGNED_INT,
-				( GLvoid* )( sizeof( uint ) * entries[ i ].baseIndex ),
-				entries[ i ].baseVertex
-			);
-			textures[ matIndex ].deActivate();
-		}
-		else {	
-			glDrawElementsBaseVertex(
-				( GLuint )drawMode,
-				entries[ i ].numIndices,
-				GL_UNSIGNED_INT,
-				( GLvoid* )( sizeof( uint ) * entries[ i ].baseIndex ),
-				entries[ i ].baseVertex
-			);
-		}
+		if ( textures )
+			textures[ matIndex ].makeActive();	
+		
+		glDrawElementsBaseVertex(
+			( GLuint )drawMode,
+			entries[ i ].numIndices,
+			GL_UNSIGNED_INT,
+			( GLvoid* )( sizeof( uint ) * entries[ i ].baseIndex ),
+			entries[ i ].baseVertex
+		);
 	}
 	glBindVertexArray( 0 );
 }

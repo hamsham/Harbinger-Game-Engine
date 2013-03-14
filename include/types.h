@@ -39,8 +39,8 @@ constexpr float	TWO_PI				= 6.2831853071795864f;
 constexpr float	PI_OVER_2			= (PI / 2);
 constexpr float	PI_OVER_4			= (PI / 4);
 constexpr float	EPSILON				= 1e-5;
-constexpr char*	RESOURCE_DIR		= "resources/";
-constexpr char*	WRONG_TEXTURE_FILE	= "resources/wrong.jpg";
+cstr const		RESOURCE_DIR		= "resources/";
+cstr const		WRONG_TEXTURE_FILE	= "resources/wrong.jpg";
 
 /*
  * Forward Declarations

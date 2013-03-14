@@ -16,8 +16,8 @@
 
 namespace n_scriptFactory {
 	
-	c_script*	HGE_API getVarInstance	( long scriptType );
-	c_script*	HGE_API getFuncInstance	( long scriptType );
+	c_script*	HGE_API getVarInstance	( ulong scriptType );
+	c_script*	HGE_API getFuncInstance	( ulong scriptType );
 	void		HGE_API killInstance	( c_script* );
 	
 };

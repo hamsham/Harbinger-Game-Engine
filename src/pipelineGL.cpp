@@ -12,36 +12,39 @@
 //	Error Messages
 //-----------------------------------------------------------------------------
 void printOpenGLError( cstr msg, uint lineNum, cstr sourceFile ) {
-		GLenum errorCode( glGetError() );
-		if ( errorCode != GL_NO_ERROR ) {
-			std::cerr << '\n'
-				<< "An OpenGL error has occurred:\n"
-				<< "\tInfo: " << msg << '\n'
-				<< "\tFile: " << sourceFile << '\n'
-				<< "\tLine: " << lineNum << '\n'
-				<< "\tCode: 0x" << errorCode << '\n'
-				<< "\tStat: " << (int)glGetError() << '\n'
-				<< "\tMsg:  ";
+	GLenum errorCode( glGetError() );
+	if ( errorCode == GL_NO_ERROR )
+		return;
 	
-			switch( errorCode ) {
-				case GL_INVALID_ENUM:
-					std::cerr << "GL_INVALID_ENUM";
-					break;
-				case GL_INVALID_VALUE:
-					std::cerr << "GL_INVALID_VALUE";
-					break;
-				case GL_INVALID_OPERATION:
-					std::cerr << "GL_INVALID_OPERATION";
-					break;
-				case GL_INVALID_FRAMEBUFFER_OPERATION:
-					std::cerr << "GL_INVALID_FRAMEBUFFER_OPERATION";
-					break;
-				case GL_OUT_OF_MEMORY:
-					std::cerr << "GL_OUT_OF_MEMORY";
-					break;
-			}
-			std::cerr << std::endl;
-		}
+	std::cerr << '\n'
+		<< "An OpenGL error has occurred:\n"
+		<< "\tInfo: " << msg << '\n'
+		<< "\tFile: " << sourceFile << '\n'
+		<< "\tLine: " << lineNum << '\n'
+		<< "\tCode: 0x" << errorCode << '\n'
+		<< "\tStat: " << (int)glGetError() << '\n'
+		<< "\tMsg:  ";
+
+	switch( errorCode ) {
+		case GL_INVALID_ENUM:
+			std::cerr << "GL_INVALID_ENUM";
+			break;
+		case GL_INVALID_VALUE:
+			std::cerr << "GL_INVALID_VALUE";
+			break;
+		case GL_INVALID_OPERATION:
+			std::cerr << "GL_INVALID_OPERATION";
+			break;
+		case GL_INVALID_FRAMEBUFFER_OPERATION:
+			std::cerr << "GL_INVALID_FRAMEBUFFER_OPERATION";
+			break;
+		case GL_OUT_OF_MEMORY:
+			std::cerr << "GL_OUT_OF_MEMORY";
+			break;
+		default:
+			std::cerr << "Unknown Error";
+	}
+	std::cerr << std::endl;
 }
 
 //-----------------------------------------------------------------------------

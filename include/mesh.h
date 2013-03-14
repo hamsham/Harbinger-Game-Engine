@@ -58,7 +58,7 @@ class HGE_API c_mesh : virtual public c_resource, virtual public c_drawableObj {
 
 			meshEntry& operator= ( const meshEntry& );
 		};
-		
+
 		//Private Members
 		uint					numMeshes;
 		uint					numTextures;
@@ -67,12 +67,11 @@ class HGE_API c_mesh : virtual public c_resource, virtual public c_drawableObj {
 		meshEntry*				entries;
 		c_bitmap*				textures;
 		e_drawMode				drawMode;
-		bool					useTextures;
 		
 		//load all data from Assimp using two passes
 		bool	prepMeshes		( const aiScene*, uint& numVerts, uint& numIndices );
 		bool	loadMeshes		( const aiScene*, s_vertex* vertArray, uint* indexArray );
-		bool	loadMaterials	( const aiScene*, cstr fileName );
+		bool	loadTextures	( const aiScene*, cstr fileName );
 		bool	loadTexType		( aiMaterial*, aiTextureType, const std::string& directory, uint& texIter );
 		void	loadVao			( s_vertex* vertices, uint numVertices, uint* indices, uint numIndices );
 
@@ -94,12 +93,11 @@ class HGE_API c_mesh : virtual public c_resource, virtual public c_drawableObj {
 		// render modifications
 		void	setDrawMode		( e_drawMode mode )				{ drawMode = mode; }
 		e_drawMode getDrawMode	() const						{ return drawMode; }
-		void	renderTextures	( bool allowTextures = true )	{ useTextures = allowTextures; }
-		bool	usingTextures	() const						{ return useTextures; }
 		
 		// drawing
 		void	tick			( float timeElapsed )			{ c_drawableObj::tick( timeElapsed ); }
 		void	draw			() const;
+		void	draw			( const c_camera& ) const;
 };
 
 #endif	/* __HGE_MESH_H__ */

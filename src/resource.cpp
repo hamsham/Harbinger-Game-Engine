@@ -4,6 +4,8 @@
 #include "resource.h"
 using namespace std;
 
+namespace hge {
+
 //-----------------------------------------------------------------------------
 //	Error Messaging
 //-----------------------------------------------------------------------------
@@ -58,3 +60,5 @@ void c_resource::readFile(cstr filename, char* buffer, uint length) {
 	fin.read(buffer, length);
 	fin.close();
 }
+
+} // end hge namespace

@@ -7,6 +7,8 @@
 
 #include "object.h"
 
+namespace hge {
+
 //-----------------------------------------------------------------------------
 //	Object - Basic Object Abstraction
 //-----------------------------------------------------------------------------
@@ -59,3 +61,5 @@ void c_drawableObj::update() {
 	worldMat[3][2] = pos.v[2];
 	worldMat[3][3] = 1.f;
 }
+
+} // end hge namespace

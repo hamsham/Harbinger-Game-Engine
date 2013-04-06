@@ -8,6 +8,8 @@
 #include "image.h"
 #include "shader.h"
 
+namespace hge {
+
 c_image::c_image() :
 	c_resource(),
 	c_drawableObj(),
@@ -82,3 +84,5 @@ void c_image::draw() const {
 	bmp.deActivate();
 	glBindVertexArray( 0 );
 }
+
+} // end hge namespace

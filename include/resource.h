@@ -10,6 +10,8 @@
 
 #include "types.h"
 
+namespace hge {
+
 class HGE_API c_resource {
 	public:
 		c_resource		() {}
@@ -24,5 +26,6 @@ class HGE_API c_resource {
 		static void		readFile	( cstr filename, char* buffer, uint length );
 };
 
-#endif	/* __HGE_RESOURCE_H__ */
+} // end hge namespace
 
+#endif	/* __HGE_RESOURCE_H__ */

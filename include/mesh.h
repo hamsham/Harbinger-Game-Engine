@@ -15,6 +15,8 @@
 #include "resource.h"
 #include "object.h"
 
+namespace hge {
+
 ///////////////////////////////////////////////////////////////////////////////
 //	Mesh Verices
 ///////////////////////////////////////////////////////////////////////////////
@@ -99,5 +101,7 @@ class HGE_API c_mesh : virtual public c_resource, virtual public c_drawableObj {
 		void	draw			() const;
 		void	draw			( const c_camera& ) const;
 };
+
+} // end hge namespace
 
 #endif	/* __HGE_MESH_H__ */

@@ -6,7 +6,9 @@
  */
 
 #include <iostream>
-#include "pipelineGL.h"
+#include "pipeline.h"
+
+namespace hge {
 
 //-----------------------------------------------------------------------------
 //	Error Messages
@@ -50,7 +52,7 @@ void printOpenGLError( cstr msg, uint lineNum, cstr sourceFile ) {
 //-----------------------------------------------------------------------------
 //	Pipeline Namespace
 //-----------------------------------------------------------------------------
-GLuint n_pipelineGL::genBufferData(
+GLuint n_pipeline::genBufferData(
 	GLuint numBuffers, GLuint* pBuffer,
 	GLenum target, GLsizeiptr size,
 	const void* data, GLenum usage
@@ -61,3 +63,4 @@ GLuint n_pipelineGL::genBufferData(
 	return *pBuffer;
 }
 
+} // end hge namespace

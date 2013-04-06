@@ -12,6 +12,8 @@
 #include "math/math.h"
 #include "types.h"
 
+namespace hge {
+
 ///////////////////////////////////////////////////////////////////////////////
 //		Ambient Lighting
 ///////////////////////////////////////////////////////////////////////////////
@@ -75,5 +77,6 @@ struct HGE_API s_spotLight : s_light {
 	~s_spotLight		() {}
 };
 
-#endif	/* __HGE_LIGHT_H__ */
+} // end hge namespace
 
+#endif	/* __HGE_LIGHT_H__ */

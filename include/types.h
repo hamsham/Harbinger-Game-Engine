@@ -15,7 +15,10 @@
 
 #include "setup.h"
 #include "math/math.h"
-using namespace hamLibs::math;
+
+namespace hge {
+
+    using namespace hamLibs::math;
 
 /*
  * Global Typedefs
@@ -32,13 +35,6 @@ typedef vec2_t< int >	vec2i;
 /*
  * Global Variables
  */
-constexpr float	PROG_UPDATE_SPEED	= (1.0f / 60);
-constexpr int	MAX_NUM_LIGHTS		= 10;
-constexpr float	PI					= 3.1415926535897932f;
-constexpr float	TWO_PI				= 6.2831853071795864f;
-constexpr float	PI_OVER_2			= (PI / 2);
-constexpr float	PI_OVER_4			= (PI / 4);
-constexpr float	EPSILON				= 1e-5;
 cstr const		RESOURCE_DIR		= "resources/";
 cstr const		WRONG_TEXTURE_FILE	= "resources/wrong.jpg";
 
@@ -64,4 +60,5 @@ class	c_clock;		// general time (counts upwards)
 class	c_timer;		// count down
 class	c_stopwatch;	// count upward, with lapping
 
+} // end hge namespace
 #endif	/* __HGE_TYPES_H__ */

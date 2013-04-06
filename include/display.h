@@ -10,19 +10,30 @@
 
 #include "types.h"
 
+namespace hge {
+
 ///////////////////////////////////////////////////////////////////////////////
 //		Window/Display Object
+//      It is recommended to manage the display through GLFW directly
+//      These are just helper functions
 ///////////////////////////////////////////////////////////////////////////////
 namespace n_display {
+    // Variables
+    const int DEFAULT_WINDOW_WIDTH  = 640;
+    const int DEFAULT_WINDOW_HEIGHT = 480;
 	
-	HGE_API bool	initScreen			();
-	HGE_API void	setWindowTitle		( cstr );
-	HGE_API cstr	getWindowTitle		();
-	HGE_API void	setScreenSize		( int x, int y );
-	HGE_API int		getScreenWidth		();
-	HGE_API int		getScreenHeight		();
+    //Functions
+	HGE_API bool	init            (   int windowWidth = DEFAULT_WINDOW_WIDTH,
+                                        int windowHeight = DEFAULT_WINDOW_HEIGHT
+                                    );
+    HGE_API void    terminate       ();
+    
+    HGE_API void    resizeWindow    ( int w, int h );
+	HGE_API int		getScreenWidth	();
+	HGE_API int		getScreenHeight ();
 	
 }
 
-#endif	/* __HGE_DISPLAY_H__ */
+} // end hge namespace
 
+#endif	/* __HGE_DISPLAY_H__ */

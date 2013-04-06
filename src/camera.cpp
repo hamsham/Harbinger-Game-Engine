@@ -8,6 +8,8 @@
 #include "types.h"
 #include "camera.h"
 
+namespace hge {
+
 //-----------------------------------------------------------------------------
 //	Camera - Construction
 //-----------------------------------------------------------------------------
@@ -139,18 +141,15 @@ void c_camera::rotateFlight() {
 }
 
 void c_camera::rotateOrbit() {
-	orientation
-		= orientation
-		* fromAxisAngle( zAxis, roll )
-		* fromAxisAngle( yAxis, yaw )
-		* fromAxisAngle( xAxis, pitch );
-	
-	// Stripped down version of the LookAt function
-	viewMat[0][0] = xAxis.v[0]; viewMat[1][0] = xAxis.v[1]; viewMat[2][0] = xAxis.v[2];
-	viewMat[0][1] = yAxis.v[0]; viewMat[1][1] = yAxis.v[1]; viewMat[2][1] = yAxis.v[2];
-	viewMat[0][2] = zAxis.v[0]; viewMat[1][2] = zAxis.v[1]; viewMat[2][2] = zAxis.v[2];
-	
-	viewMat = quatToMat4( orientation ) * viewMat;
+    rotateFlight();
+/*
+    // Stripped down version of the LookAt function
+    viewMat[0][0] = xAxis.v[0]; viewMat[1][0] = xAxis.v[1]; viewMat[2][0] = xAxis.v[2];
+    viewMat[0][1] = yAxis.v[0]; viewMat[1][1] = yAxis.v[1]; viewMat[2][1] = yAxis.v[2];
+    viewMat[0][2] = zAxis.v[0]; viewMat[1][2] = zAxis.v[1]; viewMat[2][2] = zAxis.v[2];
+
+    viewMat = quatToMat4( orientation ) * viewMat;
+*/
 }
 
 void c_camera::unRoll() {
@@ -189,7 +188,7 @@ void c_camera::moveFlight() {
 }
 
 void c_camera::moveOrbit() {
-	pos -= ( target + zAxis ) * deltaPos.v[2];
+	//pos -= ( target + zAxis ) * deltaPos.v[2];
 }
 
 //-----------------------------------------------------------------------------
@@ -201,30 +200,33 @@ void c_camera::tick( float timeElapsed ) {
 	float timeSquared( timeElapsed * timeElapsed );
 	
 	// Rotation
-	pitch -= ( angVel.v[0] * timeElapsed ) - ( angAccel.v[0] * timeSquared );
-	yaw -= ( angVel.v[1] * timeElapsed ) - ( angAccel.v[1] * timeSquared );
-	roll -= ( angVel.v[2] * timeElapsed ) - ( angAccel.v[2] * timeSquared );
+	pitch   -= ( angVel.v[0] * timeElapsed ) - ( angAccel.v[0] * timeSquared );
+	yaw     -= ( angVel.v[1] * timeElapsed ) - ( angAccel.v[1] * timeSquared );
+	roll    -= ( angVel.v[2] * timeElapsed ) - ( angAccel.v[2] * timeSquared );
 	
 	( this->*rotationFunction[ camType ] )();
 	orientation = normalize( orientation );
-	//pitch = yaw = roll = 0.f;
+	pitch = yaw = roll = 0.f;
 	
 	//Movement
 	deltaPos += ( posVel * timeElapsed ) + ( posAccel * timeSquared );
 	( this->*moveFunction[ camType ] )();
-	deltaPos = 0.f;
+    
+    viewMat = quatToMat4( orientation );
+    xAxis = vec3( viewMat[0][0], viewMat[1][0], viewMat[2][0] );
+    yAxis = vec3( viewMat[0][1], viewMat[1][1], viewMat[2][1] );
+    zAxis = vec3( viewMat[0][2], viewMat[1][2], viewMat[2][2] );
 	
 	//update the view matrix
-	if ( camType != CAM_TYPE_ORBIT ) {
-		viewMat = quatToMat4( orientation );
-		xAxis = vec3( viewMat[0][0], viewMat[1][0], viewMat[2][0] );
-		yAxis = vec3( viewMat[0][1], viewMat[1][1], viewMat[2][1] );
-		zAxis = vec3( viewMat[0][2], viewMat[1][2], viewMat[2][2] );
-	}
-	
-	viewMat[3][0] = -dot( xAxis, pos );
-	viewMat[3][1] = -dot( yAxis, pos );
-	viewMat[3][2] = -dot( zAxis, pos );
-	
+	if ( camType == CAM_TYPE_ORBIT )
+        pos -= ( target + zAxis ) * deltaPos.v[2];
+    deltaPos = 0.f;
+    
+    viewMat[3][0] = -dot( xAxis, pos );
+    viewMat[3][1] = -dot( yAxis, pos );
+    viewMat[3][2] = -dot( zAxis, pos );
+    
 	vpMat = viewMat * projMat;
 }
+
+} // end hge namespace

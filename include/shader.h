@@ -12,6 +12,8 @@
 #include <GL/glew.h>
 #include "resource.h"
 
+namespace hge {
+
 ///////////////////////////////////////////////////////////////////////////////
 //		OpenGL Shader Class
 ///////////////////////////////////////////////////////////////////////////////
@@ -33,23 +35,13 @@ class HGE_API c_shader : virtual public c_resource {
         ~c_shader           ();
 
         bool    isLoaded    () const { return (progID) ? true : false; }
-        bool    load        (cstr shaderFilePath, int shaderType);
+        bool    load        ( cstr shaderFilePath, int shaderType );
+        bool    loadBuffer  ( cstr shaderBuffer, int length, int shaderType );
         bool    compile     ();
         void    unload      ();
         GLuint  getProgramID () const { return progID; }
 };
 
-///////////////////////////////////////////////////////////////////////////////
-//		Stock (prebuilt) Shaders
-///////////////////////////////////////////////////////////////////////////////
-namespace n_stockShaders {
-    HGE_API bool init();
-    HGE_API GLuint getPlainShader();
-    HGE_API GLuint getAmbientLightShader();
-    HGE_API GLuint getDiffuseLightShader();
-    HGE_API GLuint getSpecularLightShader();
-    HGE_API GLuint getPointLightShader();
-    HGE_API GLuint getSpotLightShader();
-}
+} // end hge namespace
 
 #endif	/* __HGE_SHADER_H__ */

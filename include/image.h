@@ -10,10 +10,12 @@
 
 #include "bitmap.h"
 #include "object.h"
-#include "pipelineGL.h"
+#include "pipeline.h"
+
+namespace hge {
 
 class HGE_API c_image :	virtual public c_resource,
-				virtual public c_drawableObj {
+virtual public c_drawableObj {
 	private:
 		GLuint	vao;
 		GLuint	vbo[ 2 ]; //vertex buffer, uv buffer
@@ -23,14 +25,15 @@ class HGE_API c_image :	virtual public c_resource,
 		
 	public:
 		c_image				();
-		~c_image			() { unload(); }
+		~c_image			() { bmp.unload(); }
 		
 		bool	isLoaded	() const;
-		bool	load		( cstr filename, int flags = c_bitmap::CREATE_MIPMAPS );
+		bool	load		( cstr filename, int flags );
 		void	unload		();
 		
 		void	draw		() const;
 };
 
-#endif	/* __HGE_IMAGE_H__ */
+} // end hge namespace
 
+#endif	/* __HGE_IMAGE_H__ */

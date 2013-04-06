@@ -6,9 +6,89 @@
  */
 
 #include <iostream>
-#include "pipelineGL.h"
+#include "pipeline.h"
 #include "bitmap.h"
-using namespace std;
+
+namespace hge {
+
+namespace {
+//-----------------------------------------------------------------------------
+//	Private Functions
+//-----------------------------------------------------------------------------
+void printImageLoadError( FREE_IMAGE_FORMAT fif, const char *msg );
+
+FREE_IMAGE_FORMAT deduceImageFormat( cstr inFile );
+
+int setBitmapFlags( FREE_IMAGE_FORMAT inFormat );
+
+GLuint sendToOpenGL( const void* buffer, int flags, int w, int h );
+
+//-----------------------------------------------------------------------------
+//	Printing an error using FreeImage
+//-----------------------------------------------------------------------------
+void printImageLoadError( FREE_IMAGE_FORMAT fif, const char *msg ) {
+	std::cerr
+		<< "An error occurred when attempting to load an image:"
+		<< "\n\tFormat: " << FreeImage_GetFormatFromFIF( fif )
+		<< "\n\tOutput: " << msg
+		<< std::endl;
+}
+
+//-----------------------------------------------------------------------------
+//	Deducing a file format
+//-----------------------------------------------------------------------------
+FREE_IMAGE_FORMAT deduceImageFormat( cstr inFile ) {
+	FREE_IMAGE_FORMAT outFormat = FreeImage_GetFileType( inFile, 0 );
+	if ( outFormat == FIF_UNKNOWN )
+		outFormat = FreeImage_GetFIFFromFilename( inFile );
+    return outFormat;
+}
+
+//-----------------------------------------------------------------------------
+//	Setting flags that affect FreeImage Loading
+//-----------------------------------------------------------------------------
+int setBitmapFlags( FREE_IMAGE_FORMAT inFormat ) {
+	switch( inFormat ) {
+		case FIF_JPEG:  return JPEG_FAST | JPEG_EXIFROTATE;
+		case FIF_TARGA: return TARGA_LOAD_RGB888;
+		case FIF_ICO:   return ICO_MAKEALPHA;
+		default:        return 0;
+	}
+}
+
+//-----------------------------------------------------------------------------
+//	Sending Image Data to OpenGL
+//-----------------------------------------------------------------------------
+GLuint sendToOpenGL( const void* buffer, int flags, int w, int h ) {
+	// Create the OpenGL texture
+    GLuint texture( 0 );
+	glGenTextures( 1, &texture );
+    if ( !texture )
+        return 0;
+	glBindTexture( GL_TEXTURE_2D, texture );
+	
+	//Transfer the image data
+	glTexImage2D(
+		GL_TEXTURE_2D, 0, GL_RGBA, w, h, 0, GL_BGRA, GL_UNSIGNED_BYTE, buffer
+	);
+	
+	//clamp each texture to the borders of whatever geometry holds it
+	glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE );
+	glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE );
+	
+	// Create Mip Maps (if requested), then delete the FreeImage data,
+	if ( flags & c_bitmap::CREATE_MIPMAPS ) {
+		glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_NEAREST );
+		glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR );
+		glGenerateMipmap( GL_TEXTURE_2D );
+	}
+	
+	printGLError( "Texture Loading" );
+	glBindTexture( GL_TEXTURE_2D, 0 );
+    return texture;
+}
+
+} // end anonymous namespace
 
 //-----------------------------------------------------------------------------
 //	Bitmap - Con/Destruction
@@ -40,67 +120,36 @@ c_bitmap& c_bitmap::operator =( const c_bitmap& bmpCopy ) {
 }
 
 //-----------------------------------------------------------------------------
-//	Bitmap - Misc Private Functions
-//-----------------------------------------------------------------------------
-void printImageLoadError(FREE_IMAGE_FORMAT fif, const char *msg) {
-	std::cerr
-		<< "An error occurred when attempting to load an image:"
-		<< "\n\tFormat: " << FreeImage_GetFormatFromFIF( fif )
-		<< "\n\tOutput: " << msg
-		<< std::endl;
-}
-
-void c_bitmap::deduceImageFormat( cstr inFile, FREE_IMAGE_FORMAT& inFormat ) const {
-	if (inFile == 0)
-		inFormat = FIF_UNKNOWN;
-	
-	inFormat = FreeImage_GetFileType( inFile, 0 );
-	if ( inFormat == FIF_UNKNOWN )
-		inFormat = FreeImage_GetFIFFromFilename( inFile );
-}
-
-void c_bitmap::setBitmapFlags( FREE_IMAGE_FORMAT inFormat, int& outFlags ) {
-	switch( inFormat ) {
-		case FIF_JPEG:
-			outFlags = JPEG_FAST | JPEG_EXIFROTATE;
-			break;
-		case FIF_TARGA:
-			outFlags = TARGA_LOAD_RGB888;
-			break;
-		case FIF_ICO:
-			outFlags = ICO_MAKEALPHA;
-			break;
-		default:
-			outFlags = 0;
-	}
-}
-
-//-----------------------------------------------------------------------------
-//	Bitmap - Memory-Based Operations
+//	Bitmap - Check if an image is loaded within OpenGL
 //-----------------------------------------------------------------------------
 bool c_bitmap::isLoaded() const {
 	return ( oglTexture != 0 );
 }
 
+//-----------------------------------------------------------------------------
+//	Bitmap - Loading an image file
+//-----------------------------------------------------------------------------
 bool c_bitmap::load( cstr fileName, int imageFlags ) {
 	FIBITMAP* image( HGE_NULL );
 	FREE_IMAGE_FORMAT imageFormat( FIF_UNKNOWN );
 	int FreeImageFlags( 0 );
 	
 	unload();
+    if ( !fileName )
+        return false;
 	FreeImage_SetOutputMessage( printImageLoadError );
 	
-	deduceImageFormat( fileName, imageFormat );
+	imageFormat = deduceImageFormat( fileName );
 	if ( imageFormat == FIF_UNKNOWN
 	|| FreeImage_FIFSupportsReading( imageFormat ) == false ) {
 		return false;
 	}
 	
 	// Load the file
-	setBitmapFlags( imageFormat, FreeImageFlags );
+	FreeImageFlags = setBitmapFlags( imageFormat );
 	image = FreeImage_Load( imageFormat, fileName, FreeImageFlags );
 	
-	if (!image) {
+	if ( !image ) {
 		return false;
 	}
 	
@@ -115,36 +164,19 @@ bool c_bitmap::load( cstr fileName, int imageFlags ) {
 	}
 	
 	// All checks gave finished properly. Load the rest of the image
-	bmpWidth = FreeImage_GetWidth( image );
-	bmpHeight = FreeImage_GetHeight( image );
-	
-	// Create the OpenGL texture
-	glGenTextures( 1, &oglTexture );
-	glBindTexture( GL_TEXTURE_2D, oglTexture );
-	
-	//create the image
-	glTexImage2D(
-		GL_TEXTURE_2D, 0, GL_RGBA, bmpWidth, bmpHeight, 0,
-		GL_BGRA, GL_UNSIGNED_BYTE, FreeImage_GetBits( image )
-	);
-	
-	//clamp each texture to the borders of whatever geometry holds it
-	glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE );
-	glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE );
-	
-	// Create Mip Maps (if requested), then delete the FreeImage data,
-	if ( imageFlags & CREATE_MIPMAPS ) {
-		glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_NEAREST );
-		glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR );
-		glGenerateMipmap( GL_TEXTURE_2D );
-	}
+	bmpWidth    = FreeImage_GetWidth( image );
+	bmpHeight   = FreeImage_GetHeight( image );
+	oglTexture  = sendToOpenGL(
+        FreeImage_GetBits( image ), imageFlags, bmpWidth, bmpHeight
+    );
 	FreeImage_Unload( image );
-	
-	printGLError( fileName );
-	glBindTexture( GL_TEXTURE_2D, 0 );
+    
 	return true;
 }
 
+//-----------------------------------------------------------------------------
+//	Bitmap - Unloading
+//-----------------------------------------------------------------------------
 void c_bitmap::unload() {
 	if ( oglTexture != 0 )
 		glDeleteTextures( 1, &oglTexture );
@@ -154,14 +186,19 @@ void c_bitmap::unload() {
 }
 
 //-----------------------------------------------------------------------------
-//	Bitmap - Data Operations
+//	Bitmap - Enable a texture within OpenGL
 //-----------------------------------------------------------------------------
 void c_bitmap::makeActive( GLuint texUnit ) const {
 	//glActiveTexture( texUnit );
 	glBindTexture( GL_TEXTURE_2D, oglTexture );
 }
 
+//-----------------------------------------------------------------------------
+//	Bitmap - Disable an OpenGL texture
+//-----------------------------------------------------------------------------
 void c_bitmap::deActivate() const {
 	//glActiveTexture( GL_TEXTURE0 );
 	glBindTexture( GL_TEXTURE_2D, 0 );
 }
+
+} // end hge namespace

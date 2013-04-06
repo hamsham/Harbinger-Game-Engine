@@ -7,6 +7,8 @@
 
 #include "light.h"
 
+namespace hge {
+
 ///////////////////////////////////////////////////////////////////////////////
 //		Ambient Lighting
 ///////////////////////////////////////////////////////////////////////////////
@@ -85,3 +87,5 @@ s_spotLight::s_spotLight( const s_spotLight& sl ) :
 	coneAngle( sl.coneAngle ),
 	attenuation( sl.attenuation )
 {}
+
+} // end hge namespace

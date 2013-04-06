@@ -10,6 +10,8 @@
 
 #include "types.h"
 
+namespace hge {
+
 //-----------------------------------------------------------------------------
 //	Basic Object Abstraction
 //-----------------------------------------------------------------------------
@@ -81,5 +83,7 @@ class HGE_API c_drawableObj : virtual public c_object {
 		virtual void	tick		( float )				{ update(); }
 		virtual void	draw		() const= 0;
 };
+
+} // end hge namespace
 
 #endif	/* __HGE_OBJECT_H__ */

@@ -2,6 +2,8 @@
 #include "timeObject.h"
 using namespace std::chrono;
 
+namespace hge {
+
 ///////////////////////////////////////////////////////////////////////////////
 //		TIME OBJECT BASE CLASS
 ///////////////////////////////////////////////////////////////////////////////
@@ -308,3 +310,5 @@ void c_stopwatch::lap() {
 	laps.push_back( currTime );
 	currTime = 0.0;
 }
+
+} // end hge namespace

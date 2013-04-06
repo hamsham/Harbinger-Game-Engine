@@ -19,19 +19,15 @@
 	#define HGE_NULL nullptr
 #endif
 
+// Returns the number of elements in a statically allocated array.
+// This will not work for dynamic arrays (will return 1)
 #ifndef ARRAY_SIZE_FROM_ELEMENTS
 	#define ARRAY_SIZE_FROM_ELEMENTS( a ) ( sizeof( a ) / sizeof( a[ 0 ] ) )
 #endif
 
-#ifdef DEBUG
-	#ifndef HGE_ASSERT
-		#include <cassert>
-		#define HGE_ASSERT( x ) assert( x )
-	#endif
-#else
-	#ifndef HGE_ASSERT
-		#define HGE_ASSERT( x )
-	#endif
+// HL_ASSERT is only defined when 'DEBUG' has also been defined
+#ifndef HGE_ASSERT
+    #define HGE_ASSERT( x ) HL_ASSERT( x )
 #endif
 
 /*

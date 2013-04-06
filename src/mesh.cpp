@@ -9,10 +9,12 @@
 #include <assimp/Importer.hpp>
 #include <assimp/postprocess.h>
 #include "types.h"
-#include "pipelineGL.h"
+#include "pipeline.h"
 #include "shader.h"
 #include "bitmap.h"
 #include "mesh.h"
+
+namespace hge {
 
 ///////////////////////////////////////////////////////////////////////////////
 //	Mesh Verices
@@ -454,3 +456,5 @@ void c_mesh::draw() const {
 	}
 	glBindVertexArray( 0 );
 }
+
+} // end hge namespace

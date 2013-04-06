@@ -7,6 +7,8 @@
 #include <ctime>
 #include "types.h"
 
+namespace hge {
+
 ///////////////////////////////////////////////////////////////////////////////
 //		TIME OBJECT BASE CLASS
 ///////////////////////////////////////////////////////////////////////////////
@@ -129,5 +131,7 @@ class HGE_API c_stopwatch : virtual public c_timeObject {
 		
 		void			lap			();
 };
+
+} // end hge namespace
 
 #endif /* __HGE_TIME_OBJECT_H__ */

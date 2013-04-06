@@ -13,16 +13,16 @@
 #include "types.h"
 #include "resource.h"
 
+namespace hge {
+
 //-----------------------------------------------------------------------------
 //		OpenGL Bitmaps
 //-----------------------------------------------------------------------------
 class HGE_API c_bitmap : virtual public c_resource {
 	private:
-		GLuint oglTexture;
-		int bmpWidth, bmpHeight;
-		
-		void	deduceImageFormat	( cstr fileName, FREE_IMAGE_FORMAT& ) const;
-		void	setBitmapFlags		( FREE_IMAGE_FORMAT inFormat, int& outFlags );
+		GLuint  oglTexture;
+		int     bmpWidth;
+        int     bmpHeight;
 
 	public:
 		enum BMP_FLAGS {
@@ -49,4 +49,5 @@ class HGE_API c_bitmap : virtual public c_resource {
 		void	deActivate	() const;
 };
 
+} // end hge namespace
 #endif	/* __HGE_BITMAP_H__ */

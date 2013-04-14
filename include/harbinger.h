@@ -8,15 +8,12 @@
 #ifndef __HARBINGER_H__
 #define	__HARBINGER_H__
 
-#include <GL/glew.h>
-#include <GL/glfw.h>
-#include <assimp/scene.h>
-
 #include "setup.h"
 #include "types.h"
 
 #include "pipeline.h"
 #include "display.h"
+#include "input.h"
 #include "resource.h"
 #include "object.h"
 #include "shader.h"
@@ -29,10 +26,8 @@
 
 namespace hge {
     
-    inline bool init() {
-        FreeImage_Initialise(true);
-        return n_display::init();
-    }
+    bool    init();
+    void    terminate();
     
 } // end hge namespace
 

@@ -9,7 +9,7 @@
 #define __HGE_SHADER_H__
 
 #include <vector>
-#include <GL/glew.h>
+#include "pipeline.h"
 #include "resource.h"
 
 namespace hge {

@@ -43,18 +43,21 @@ cstr const		WRONG_TEXTURE_FILE	= "resources/wrong.jpg";
  */
 class	c_object;
 class	c_drawableObj;
+
 class	c_resource;
 class	c_bitmap;
 class	c_image;
+class	c_mesh;
 class	c_shader;
 class	c_camera;
 struct	s_vertex;
-class	c_mesh;
+
 struct	s_light;
 struct	s_diffuseLight;
 struct	s_specularLight;
 struct	s_pointLight;
 struct	s_spotLight;
+
 class	c_timeObject;	// time base class
 class	c_clock;		// general time (counts upwards)
 class	c_timer;		// count down

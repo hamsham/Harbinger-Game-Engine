@@ -37,7 +37,6 @@ c_camera::c_camera() :
 	xAxis( 1.f, 0.f, 0.f ),
 	yAxis( 0.f, 1.f, 0.f ),
 	zAxis( 0.f, 0.f, 1.f ),
-	deltaPos( 0.f, 0.f, 0.f ),
 	target( 0.f, 0.f, 0.f ),
 	posVel( 0.f, 0.f, 0.f ),
 	angVel( 0.f, 0.f, 0.f ),
@@ -67,7 +66,6 @@ c_camera::c_camera( const c_camera& camCopy ) :
 	xAxis( camCopy.xAxis ),
 	yAxis( camCopy.yAxis ),
 	zAxis( camCopy.zAxis ),
-	deltaPos( camCopy.deltaPos ),
 	target( camCopy.target ),
 	posVel( camCopy.posVel ),
 	angVel( camCopy.angVel ),
@@ -211,7 +209,12 @@ void c_camera::tick( float timeElapsed ) {
 	//Movement
 	deltaPos += ( posVel * timeElapsed ) + ( posAccel * timeSquared );
 	( this->*moveFunction[ camType ] )();
-    
+}
+
+//-----------------------------------------------------------------------------
+//	Camera - View Updates
+//-----------------------------------------------------------------------------
+void c_camera::update() {
     viewMat = quatToMat4( orientation );
     xAxis = vec3( viewMat[0][0], viewMat[1][0], viewMat[2][0] );
     yAxis = vec3( viewMat[0][1], viewMat[1][1], viewMat[2][1] );

@@ -8,7 +8,6 @@
 #ifndef __HGE_BITMAP_H__
 #define	__HGE_BITMAP_H__
 
-#include <FreeImage.h>
 #include <GL/glew.h>
 #include "types.h"
 #include "resource.h"

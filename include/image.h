@@ -10,7 +10,6 @@
 
 #include "bitmap.h"
 #include "object.h"
-#include "pipeline.h"
 
 namespace hge {
 

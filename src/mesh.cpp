@@ -6,6 +6,7 @@
  */
 
 #include <iostream>
+#include <assimp/scene.h>
 #include <assimp/Importer.hpp>
 #include <assimp/postprocess.h>
 #include "types.h"
@@ -346,7 +347,7 @@ bool c_mesh::loadTextures( const aiScene* pScene, cstr fileName ) {
 //-----------------------------------------------------------------------------
 bool c_mesh::loadTexType(
 	aiMaterial* pMat,
-	aiTextureType texType,
+	int texType,
 	const std::string& directory,
 	uint& texIter
 ) {
@@ -354,13 +355,15 @@ bool c_mesh::loadTexType(
 	std::string filePath;
 	
 	uint iter( 0 );
-	while ( pMat->GetTexture( texType, iter, &path ) == AI_SUCCESS ) {
+	while ( pMat->GetTexture( (aiTextureType)texType, iter, &path ) == AI_SUCCESS ) {
 		filePath = directory + path.data;
 		std::cout << "\t\t" << texIter << ": " << filePath.c_str() << "...";
+        
 		if ( !textures[ texIter ].load( filePath.c_str() ) ) {
 			std::cout << "Failed.\n";
 			return false;
 		}
+        
 		std::cout << "Ok.\n";
 		++iter;
 		++texIter;

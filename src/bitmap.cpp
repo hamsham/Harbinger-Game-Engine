@@ -6,6 +6,7 @@
  */
 
 #include <iostream>
+#include <FreeImage.h>
 #include "pipeline.h"
 #include "bitmap.h"
 

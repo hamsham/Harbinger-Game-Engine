@@ -8,12 +8,15 @@
 #ifndef __HGE_MESH_H__
 #define	__HGE_MESH_H__
 
-#include <GL/glew.h>
-#include <assimp/scene.h>
-
+#include <string>
+#include "pipeline.h"
 #include "types.h"
 #include "resource.h"
 #include "object.h"
+
+// Forward Declarations
+struct aiScene;
+struct aiMaterial;
 
 namespace hge {
 
@@ -74,7 +77,7 @@ class HGE_API c_mesh : virtual public c_resource, virtual public c_drawableObj {
 		bool	prepMeshes		( const aiScene*, uint& numVerts, uint& numIndices );
 		bool	loadMeshes		( const aiScene*, s_vertex* vertArray, uint* indexArray );
 		bool	loadTextures	( const aiScene*, cstr fileName );
-		bool	loadTexType		( aiMaterial*, aiTextureType, const std::string& directory, uint& texIter );
+		bool	loadTexType		( aiMaterial*, int textureType, const std::string& directory, uint& texIter );
 		void	loadVao			( s_vertex* vertices, uint numVertices, uint* indices, uint numIndices );
 
 	public:

@@ -8,8 +8,6 @@
 #ifndef __HGE_LIGHT_H__
 #define	__HGE_LIGHT_H__
 
-#include <GL/glew.h>
-#include "math/math.h"
 #include "types.h"
 
 namespace hge {
@@ -41,7 +39,7 @@ struct HGE_API s_diffuseLight : s_light {
 //		Specular Lighting
 ///////////////////////////////////////////////////////////////////////////////
 struct HGE_API s_specularLight : s_light {
-	GLfloat	shininess;
+	float	shininess;
 
 	s_specularLight		();
 	s_specularLight		( const s_specularLight& );

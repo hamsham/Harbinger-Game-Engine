@@ -9,7 +9,6 @@
 #define	__HGE_CAMERA_H__
 
 #include "types.h"
-#include "display.h"
 #include "object.h"
 
 namespace hge {
@@ -53,7 +52,6 @@ class HGE_API c_camera : virtual public c_object {
 		vec3        yAxis;
 		vec3        zAxis;
 		//positioning
-		vec3        deltaPos;
 		vec3        target; // used for orbiting
 		//time-based movements
 		vec3        posVel;
@@ -144,8 +142,7 @@ class HGE_API c_camera : virtual public c_object {
 		void		look		( const vec3& camPos, const vec3& camTarget, const vec3& camUp );
 		void		rotate		( float inPitch, float inYaw, float inRoll = 0.f );
 		void		unRoll		();
-		void		move		( float dx, float dy, float dz );
-		void		update		() { tick( 1.f ); }
+		void		update		();
 		void		tick		( float timeElapsed );
 };
 
@@ -153,11 +150,14 @@ class HGE_API c_camera : virtual public c_object {
 //	Camera - Projections
 //-----------------------------------------------------------------------------
 HGE_INLINE void c_camera::setOrtho() {
-	projMat = ortho( -aspectW, aspectW, -aspectH, aspectH, zNear, zFar );
+	//projMat = ortho( -aspectW, aspectW, -aspectH, aspectH, zNear, zFar );
+	projMat = ortho( -aspectW, aspectW, -aspectH, aspectH );
+    update();
 }
 
 HGE_INLINE void c_camera::setPerspective() {
 	projMat = infinitePerspective( fov, aspectW / aspectH, zNear );
+    update();
 }
 
 HGE_INLINE void c_camera::setProjection( float inFov, float aspectWidth, float aspectHeight, float inZNear, float inZFar ) {
@@ -180,16 +180,6 @@ HGE_INLINE void c_camera::rotate( float inPitch, float inYaw, float inRoll ) {
 	pitch = -inPitch;
 	yaw = -inYaw;
 	roll = -inRoll;
-}
-
-//-----------------------------------------------------------------------------
-//	Camera - Movement
-//-----------------------------------------------------------------------------
-HGE_INLINE void c_camera::move( float dx, float dy, float dz ) {
-	// Displacement values are reset to 0 after "update()" is run.
-	deltaPos.v[0] = dx;
-	deltaPos.v[1] = dy;
-	deltaPos.v[2] = dz;
 }
 
 } // end hge namespace

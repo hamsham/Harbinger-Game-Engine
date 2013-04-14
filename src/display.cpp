@@ -7,70 +7,80 @@
 
 #include <iostream>
 #include <string>
+#include <vector>
 #include "pipeline.h"
 #include "display.h"
 
-namespace hge {
+using std::string;
 
 //-----------------------------------------------------------------------------
 //	Display Object - Private Variables & functions
 //-----------------------------------------------------------------------------
 namespace {
-	
-	int displayWidth( 0 );
-	int displayHeight( 0 );
-	
-//-----------------------------------------------------------------------------
-//	GLFW - Window Context Initialization (private)
-//-----------------------------------------------------------------------------
-bool initGLFW( int w, int h ) {
-	if ( !glfwInit() ) {
-		std::cerr << "GLFW failed to initialize." << std::endl;
-		return false;
-	}
-	
-	glfwOpenWindowHint	( GLFW_OPENGL_VERSION_MAJOR, 3);
-	glfwOpenWindowHint	( GLFW_OPENGL_VERSION_MINOR, 3 );
-	glfwOpenWindowHint	( GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE );
-	glfwOpenWindowHint	( GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE );
-	glfwOpenWindowHint	( GLFW_WINDOW_NO_RESIZE, GL_FALSE );
     
-	//create a window
-	if ( !glfwOpenWindow( w, h, 8, 8, 8, 8, 16, 16, GLFW_WINDOW ) ) {
-		std::cerr << "Failed to create an OpenGL context using GLFW." << std::endl;
-		glfwTerminate();
+    bool    displayInitialized  = false;
+    bool    displayFullscreen   = false;
+    int     displayWidth        = hge::display::DEFAULT_WINDOW_WIDTH;
+    int     displayHeight       = hge::display::DEFAULT_WINDOW_HEIGHT;
+    
+    const int MAX_VIDEO_MODES   = 100;
+    std::vector< hge::s_videoMode > vidModes;
+    
+}// end anonymous namespace
+
+namespace hge {
+	
+//-----------------------------------------------------------------------------
+//	Window Creation
+//-----------------------------------------------------------------------------
+bool display::createWindow(
+    int w, int h,
+    bool resizeable,
+    bool fullscreen,
+    bool useVsync
+) {
+    if ( isWindowOpen() == true )
+        return true;
+    
+    /*/
+     * Create a new window using GLFW
+    /*/
+	glfwOpenWindowHint( GLFW_OPENGL_VERSION_MAJOR, 3 );
+	glfwOpenWindowHint( GLFW_OPENGL_VERSION_MINOR, 3 );
+	glfwOpenWindowHint( GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE );
+	glfwOpenWindowHint( GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE );
+	glfwOpenWindowHint( GLFW_WINDOW_NO_RESIZE, (resizeable ? GL_TRUE : GL_FALSE) );
+    
+	if ( !glfwOpenWindow(
+            w, h, 8, 8, 8, 8, 16, 16,
+            fullscreen ? GLFW_FULLSCREEN : GLFW_WINDOW
+    ) ) {
+		std::cerr << "Failed to create an OpenGL context." << std::endl;
         return false;
 	}
     
-	glfwSwapInterval( 0 ); // disables VSync
+    glfwGetWindowSize( &displayWidth, &displayHeight );
+    glfwSetWindowPos( 0, 0 );
     
-    // using a lambda to set the window resize callback
-	glfwSetWindowSizeCallback(
-        []( int width, int height )->void {
-            glViewport( 0, 0, width, height );
-            displayWidth = width;
-            displayHeight = height;
-        }
-    );
+	if ( useVsync == false )
+        glfwSwapInterval( 0 );
     
-	printGLError( "GLFW Error" );
-    
-    return true;
-}
-
-//-----------------------------------------------------------------------------
-//	GLEW - OpenGL 3.3 Initialization (private)
-//-----------------------------------------------------------------------------
-bool initGLEW() {
+	/*/
+	 * Initialize GLEW
+	/*/
 	glewExperimental = GL_TRUE;
 	if ( glewInit() != GLEW_OK ) {
-		std::cerr << "GLEW failed to initialize" << std::endl;
+		std::cerr << "Post-window creation error" << std::endl;
+        closeWindow();
 		return false;
 	}
-	std::cout << "Initialized GLEW with status code " << glGetError() << std::endl;
+	std::cout
+        << "Created a window. OpenGL 3.3 initialized."
+        << glGetError()
+        << std::endl;
 	
 	/*/
-	 * Initialize OpenGL
+	 * Default OpenGL parameters
 	/*/
 	glClearColor( 0.5f, 0.5f, 0.5f, 1.0f );
 	glEnable    ( GL_CULL_FACE );		// Occlusion Culling
@@ -78,38 +88,135 @@ bool initGLEW() {
 	glFrontFace ( GL_CCW );
 	glEnable    ( GL_DEPTH_TEST );		// Depth/Z-Buffer
 	glDepthFunc ( GL_LESS );
+    
+    displayFullscreen = fullscreen;
+    
     return true;
 }
 
-}// end anonymous namespace
+//-----------------------------------------------------------------------------
+//	Window Termination
+//-----------------------------------------------------------------------------
+void display::closeWindow() {
+    glfwCloseWindow();
+    displayFullscreen = false;
+}
 
 //-----------------------------------------------------------------------------
-//	Display Object - Initialization & Termination
+//	Window Open-ness check
 //-----------------------------------------------------------------------------
-bool n_display::init( int w, int h ) {
-	if ( !initGLFW( w, h ) || !initGLEW() ) {
-        return false;
+bool display::isWindowOpen() {
+    return glfwGetWindowParam(GLFW_OPENED) == GL_TRUE;
+}
+
+//-----------------------------------------------------------------------------
+//	Display Initialization & Termination
+//-----------------------------------------------------------------------------
+bool display::init() {
+    if ( displayInitialized )
+        return true;
+    
+    displayInitialized = glfwInit();
+	if ( displayInitialized == false ) {
+		std::cerr << "Display failed to initialize." << std::endl;
+		return false;
     }
-    return true;
+    
+    std::cout << "Acquiring display modes...";
+    GLFWvidmode modeList[ MAX_VIDEO_MODES ];
+    int numModes = glfwGetVideoModes( modeList, MAX_VIDEO_MODES );
+    vidModes.resize( numModes );
+    
+    for ( int i = 0; i < numModes; ++i ) {
+        s_videoMode* pMode = &vidModes[ i ];
+        
+        pMode->bpp
+            = modeList[ i ].BlueBits
+            + modeList[ i ].GreenBits
+            + modeList[ i ].RedBits;
+        
+        pMode->width = modeList[i].Width;
+        pMode->height = modeList[i].Height;
+    }
+    std::cout << "Done. Acquired " << numModes << " video modes." << std::endl;
+    
+    return displayInitialized;
 }
 
-void n_display::terminate() {
+void display::terminate() {
+    display::closeWindow();
     glfwTerminate();
+    vidModes.clear();
+    displayInitialized = false;
+}
+
+void display::flip() {
+    glfwSwapBuffers();
 }
 
 //-----------------------------------------------------------------------------
 //	Display Object - Screen Size Manipulation
 //-----------------------------------------------------------------------------
-void n_display::resizeWindow( int w, int h ) {
-    glfwSetWindowSize( w, h );
+void display::resizeWindow( int w, int h ) {
+    // Get the display size that matches an acquired display mode
+    for ( int i = 0; i < vidModes.size(); ++i ) {
+        if (
+            w == vidModes[i].width &&
+            h == vidModes[i].height
+        ) {
+            glfwSetWindowSize( w, h );
+            glViewport( 0, 0, w, h );
+            glfwGetWindowSize( &displayWidth, &displayHeight );
+            break;
+        }
+    }
 }
 
-int n_display::getScreenWidth() {
+int display::getScreenWidth() {
+    glfwGetWindowSize( &displayWidth, &displayHeight );
 	return displayWidth;
 }
 
-int n_display::getScreenHeight() {
+int display::getScreenHeight() {
+    glfwGetWindowSize( &displayWidth, &displayHeight );
 	return displayHeight;
+}
+
+void display::setResizeCallback( void(*callback)( int w, int h ) ) {
+    glfwSetWindowSizeCallback( callback );
+}
+
+//-----------------------------------------------------------------------------
+//	Window View Manipulation
+//-----------------------------------------------------------------------------
+void display::raiseWindow() {
+    glfwRestoreWindow();
+    
+}
+
+void display::lowerWindow() {
+    glfwIconifyWindow();
+    
+}
+
+//-----------------------------------------------------------------------------
+//	Window View Manipulation
+//-----------------------------------------------------------------------------
+void display::setWindowTitle( const char* str ) {
+    glfwSetWindowTitle( str );
+}
+
+//-----------------------------------------------------------------------------
+//	Desktop Video Modes
+//-----------------------------------------------------------------------------
+int display::getNumVideoModes() {
+    return vidModes.size();
+}
+
+const s_videoMode* display::getVideoMode( int i ) {
+    return ( (i > 0) && (i <= vidModes.size()) )
+        ? &vidModes[i]
+        : HGE_NULL;
 }
 
 } // end hge namespace

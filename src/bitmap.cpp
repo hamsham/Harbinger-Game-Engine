@@ -84,7 +84,7 @@ GLuint sendToOpenGL( const void* buffer, int flags, int w, int h ) {
 		glGenerateMipmap( GL_TEXTURE_2D );
 	}
 	
-	printGLError( "Texture Loading" );
+	printGlError( "Texture Loading" );
 	glBindTexture( GL_TEXTURE_2D, 0 );
     return texture;
 }

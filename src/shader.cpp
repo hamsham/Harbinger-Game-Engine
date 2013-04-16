@@ -5,20 +5,52 @@
 #include "shader.h"
 using namespace std;
 
-namespace hge {
+namespace {
+//-----------------------------------------------------------------------------
+//	Shader - Error Handling
+//-----------------------------------------------------------------------------
+void printShaderError(GLuint programId, GLuint shaderId ) {
+    printGlError("Error with shader subroutine");
+
+    int infoLogLength = 0;
+    GLchar* programInfoLog = 0;
+    GLchar* shaderInfoLog = 0;
+
+    if (programId) {
+        //get the program info log, followed by the shader information log
+        glGetProgramiv(programId, GL_INFO_LOG_LENGTH, &infoLogLength);
+        programInfoLog = new GLchar[ infoLogLength + 1 ];
+        programInfoLog [infoLogLength ] = 0;
+
+        glGetProgramInfoLog(programId, infoLogLength, HGE_NULL, programInfoLog);
+        std::cout << "Program error log:\t";
+        std::cout << programInfoLog << "\n";
+        delete [] programInfoLog;
+    }
+
+    if (shaderId) {
+        //Print the shader information log after getting its length
+        glGetShaderiv(shaderId, GL_INFO_LOG_LENGTH, &infoLogLength);
+        shaderInfoLog = new GLchar[ infoLogLength + 1 ];
+        shaderInfoLog[ infoLogLength ] = 0;
+
+        glGetShaderInfoLog(shaderId, infoLogLength, HGE_NULL, shaderInfoLog);
+        std::cout << "Shader error log:\n";
+        std::cout << "Program: " << programId << "\n";
+        std::cout << "Shader: " << shaderId << "\n";
+        std::cout << shaderInfoLog;
+
+        delete [] shaderInfoLog;
+    }
+    std::cout << std::endl;
+}
+
+} // end anonymous namespace
 
 ///////////////////////////////////////////////////////////////////////////////
 //		OpenGL Shader Class
 ///////////////////////////////////////////////////////////////////////////////
-//-----------------------------------------------------------------------------
-//	Shader - Static Variables
-//-----------------------------------------------------------------------------
-const GLuint c_shader::INVALID_UNIFORM(-1);
-const GLuint c_shader::VERTEX_ATTRIB(0);
-const GLuint c_shader::TEXTURE_ATTRIB(1);
-const GLuint c_shader::NORMAL_ATTRIB(2);
-const GLuint c_shader::TANGENT_ATTRIB(3);
-
+namespace hge {
 //-----------------------------------------------------------------------------
 //	Shader - Shader Structure
 //-----------------------------------------------------------------------------
@@ -31,48 +63,8 @@ c_shader::~c_shader() {
 }
 
 //-----------------------------------------------------------------------------
-//	Shader - Error Handling
-//-----------------------------------------------------------------------------
-void c_shader::printError(GLuint shdrID) const {
-    printGLError("Error with shader subroutine");
-
-    int infoLogLength = 0;
-    GLchar* programInfoLog = 0;
-    GLchar* shaderInfoLog = 0;
-
-    if (progID) {
-        //get the program info log, followed by the shader information log
-        glGetProgramiv(progID, GL_INFO_LOG_LENGTH, &infoLogLength);
-        programInfoLog = new GLchar[ infoLogLength + 1 ];
-        programInfoLog [infoLogLength ] = 0;
-
-        glGetProgramInfoLog(progID, infoLogLength, HGE_NULL, programInfoLog);
-        std::cout << "Program error log:\t";
-        std::cout << programInfoLog << "\n";
-        delete [] programInfoLog;
-    }
-
-    if (shdrID) {
-        //Print the shader information log after getting its length
-        glGetShaderiv(shdrID, GL_INFO_LOG_LENGTH, &infoLogLength);
-        shaderInfoLog = new GLchar[ infoLogLength + 1 ];
-        shaderInfoLog[ infoLogLength ] = 0;
-
-        glGetShaderInfoLog(shdrID, infoLogLength, HGE_NULL, shaderInfoLog);
-        std::cout << "Shader error log:\n";
-        std::cout << "Program: " << progID << "\n";
-        std::cout << "Shader: " << shdrID << "\n";
-        std::cout << shaderInfoLog;
-
-        delete [] shaderInfoLog;
-    }
-    std::cout << std::endl;
-}
-
-//-----------------------------------------------------------------------------
 //	Shader - Compilation
 //-----------------------------------------------------------------------------
-
 bool c_shader::compile() {
     if (shaderID.empty()) {
         std::cerr << "WARNING: Attempted to compile a shader program without input" << std::endl;
@@ -80,7 +72,8 @@ bool c_shader::compile() {
     }
 
     if (progID) {
-        unload();
+        glDeleteProgram(progID);
+        progID = 0;
     }
     progID = glCreateProgram();
     GLint shaderStatus(0);
@@ -92,12 +85,12 @@ bool c_shader::compile() {
         glGetProgramiv(progID, GL_LINK_STATUS, &shaderStatus);
         if (shaderStatus != GL_TRUE) {
             std::cerr << "\nWARNING: A GLSL Shader Error has occurred\n";
-            printError(shaderID[ i ]);
+            printShaderError(progID, shaderID[ i ]);
             return false;
         }
     }
 
-    printGLError("Error compiling shader");
+    printGlError("Error compiling shader");
     return true;
 }
 
@@ -140,20 +133,19 @@ bool c_shader::loadBuffer( cstr buffer, int length, int shaderType ) {
     glGetShaderiv( shader, GL_COMPILE_STATUS, &shaderStatus );
 
     if ( shaderStatus != GL_TRUE ) {
-        printError( shader );
+        printShaderError( 0, shader );
         return false;
     }
     
     shaderID.push_back( shader );
 
-    printGLError("General shader loading error");
+    printGlError("General shader loading error");
     return true;
 }
 
 //-----------------------------------------------------------------------------
-//	Shader - Shader Unoading
+//	Shader - Shader Unloading
 //-----------------------------------------------------------------------------
-
 void c_shader::unload() {
     for (uint i(0); i < shaderID.size(); ++i) {
         glDetachShader(progID, shaderID[ i ]);
@@ -167,4 +159,4 @@ void c_shader::unload() {
     }
 }
 
-} // end hge namespace
+} // End hge namespace

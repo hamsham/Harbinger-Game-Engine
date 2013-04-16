@@ -22,24 +22,24 @@ class HGE_API c_shader : virtual public c_resource {
         std::vector< GLuint > shaderID;
         GLuint progID;
 
-        void printError(GLuint shdrID = 0) const;
-
     public:
-        static const GLuint INVALID_UNIFORM;
-        static const GLuint VERTEX_ATTRIB;
-        static const GLuint TEXTURE_ATTRIB;
-        static const GLuint NORMAL_ATTRIB;
-        static const GLuint TANGENT_ATTRIB;
+        enum e_attributes : GLint {
+            INVALID_UNIFORM = -1,
+            VERTEX_ATTRIB   = 0,
+            TEXTURE_ATTRIB  = 1,
+            NORMAL_ATTRIB   = 2,
+            TANGENT_ATTRIB  = 3
+        };
 
-        c_shader            ();
-        ~c_shader           ();
+        c_shader        ();
+        ~c_shader       ();
 
-        bool    isLoaded    () const { return (progID) ? true : false; }
-        bool    load        ( cstr shaderFilePath, int shaderType );
-        bool    loadBuffer  ( cstr shaderBuffer, int length, int shaderType );
-        bool    compile     ();
-        void    unload      ();
-        GLuint  getProgramID () const { return progID; }
+        bool            isLoaded        () const { return (progID) ? true : false; }
+        bool            load            ( cstr shaderFilePath, int shaderType );
+        bool            loadBuffer      ( cstr shaderBuffer, int length, int shaderType );
+        bool            compile         ();
+        void            unload          ();
+        GLuint          getProgramID    () const { return progID; }
 };
 
 } // end hge namespace

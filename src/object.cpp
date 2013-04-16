@@ -54,12 +54,12 @@ void c_drawableObj::update() {
 		0.f, 0.f, 0.f, 1.f
 	);
 	
-	worldMat = quatToMat4( rot ) * scaleMat;
+	modelMat = quatToMat4( rot ) * scaleMat;
 
-	worldMat[3][0] = pos.v[0];
-	worldMat[3][1] = pos.v[1];
-	worldMat[3][2] = pos.v[2];
-	worldMat[3][3] = 1.f;
+	modelMat[3][0] = pos.v[0];
+	modelMat[3][1] = pos.v[1];
+	modelMat[3][2] = pos.v[2];
+	modelMat[3][3] = 1.f;
 }
 
 } // end hge namespace

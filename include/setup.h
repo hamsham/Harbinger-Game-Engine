@@ -11,6 +11,7 @@
 #define	__HGE_SETUP_H__
 
 #include "defs/preprocessor.h"
+#include "utils/assert.h"
 
 /*
  * Macros
@@ -26,8 +27,10 @@
 #endif
 
 // HL_ASSERT is only defined when 'DEBUG' has also been defined
-#ifndef HGE_ASSERT
-    #define HGE_ASSERT( x ) HL_ASSERT( x )
+#ifdef DEBUG
+    #define HGE_ASSERT( x ) ASSERT_WARN( x )
+#else
+    #define HGE_ASSERT( X ) ASSERT_FATAL( x )
 #endif
 
 /*

@@ -91,13 +91,17 @@ bool display::createWindow(
     
     displayFullscreen = fullscreen;
     
-    return true;
+    // Initialize all successive operations which required the window to be open
+    return pipeline::init();
 }
 
 //-----------------------------------------------------------------------------
 //	Window Termination
 //-----------------------------------------------------------------------------
 void display::closeWindow() {
+    // Close all OpenGL-dependant functions
+    pipeline::terminate();
+    
     glfwCloseWindow();
     displayFullscreen = false;
 }
@@ -144,7 +148,8 @@ bool display::init() {
 }
 
 void display::terminate() {
-    display::closeWindow();
+    if ( isWindowOpen() )
+        display::closeWindow();
     glfwTerminate();
     vidModes.clear();
     displayInitialized = false;

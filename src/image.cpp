@@ -45,20 +45,20 @@ bool c_image::load( cstr filename, int flags ) {
 	
 	glGenVertexArrays( 1, &vao );
 	glBindVertexArray( vao );
-	printGLError( "Image VAO error" );
+	printGlError( "Image VAO error" );
 	glGenBuffers( 2, vbo );
 	
 	glBindBuffer( GL_ARRAY_BUFFER, vbo[0] );
 	glEnableVertexAttribArray( c_shader::VERTEX_ATTRIB );
 	glBufferData( GL_ARRAY_BUFFER, sizeof( vert ), vert, GL_STATIC_DRAW );
 	glVertexAttribPointer( c_shader::VERTEX_ATTRIB, 3, GL_FLOAT, GL_FALSE, 0, 0 );
-	printGLError( "Image vertex error" );
+	printGlError( "Image vertex error" );
 	
 	glBindBuffer( GL_ARRAY_BUFFER, vbo[1] );
 	glEnableVertexAttribArray( c_shader::TEXTURE_ATTRIB );
 	glBufferData( GL_ARRAY_BUFFER, sizeof( uv ), uv, GL_STATIC_DRAW );
 	glVertexAttribPointer( c_shader::TEXTURE_ATTRIB, 2, GL_FLOAT, GL_FALSE,  0, 0 );
-	printGLError( "Image uv error" );
+	printGlError( "Image uv error" );
 	
 	glDisableVertexAttribArray( c_shader::NORMAL_ATTRIB );
 	

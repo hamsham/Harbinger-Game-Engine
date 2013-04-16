@@ -6,14 +6,156 @@
  */
 
 #include <iostream>
+#include "math/math.h"
 #include "pipeline.h"
+#include "camera.h"
+#include "display.h"
+#include "shader.h"
 
-namespace hge {
+using namespace hamLibs;
+using namespace hge;
 
-//-----------------------------------------------------------------------------
-//	Error Messages
-//-----------------------------------------------------------------------------
-void printOpenGLError( cstr msg, uint lineNum, cstr sourceFile ) {
+/******************************************************************************
+ * Private matrices for initial stack population
+******************************************************************************/
+namespace {
+    GLuint ubo = 0;
+    GLuint matrixIndexId = GL_INVALID_INDEX;
+    GLuint currShader = 0;
+    
+    // Creating an array of four 4x4 Matrices. Model, View, Projection, and MVP
+    math::mat4 transforms[ 4 ] = {
+        math::mat4( 1.f ),
+        math::mat4( 1.f ),
+        math::perspective(
+            c_camera::DEFAULT_FOV,
+            c_camera::DEFAULT_ASPECT_WIDTH / c_camera::DEFAULT_ASPECT_HEIGHT,
+            c_camera::DEFAULT_Z_NEAR, c_camera::DEFAULT_Z_FAR
+        ),
+        math::mat4( 1.f ),
+    };
+    
+    const char* matrixNames[] = {
+        "matrixBlock.modelMatrix",
+        "matrixBlock.viewMatrix",
+        "matrixBlock.projMatrix",
+        "matrixBlock.mvpMatrix"
+    };
+    
+    GLuint matrixIndices[4] = { 0 };
+    GLuint matrixStrides[4] = { 0 };
+    GLuint matrixOffsets[4] = { 0 };
+}
+
+/******************************************************************************
+ * Pushing to the matrix stack
+******************************************************************************/
+void pipeline::applyMatrix( e_matrixState s, const math::mat4& m ) {
+    
+    transforms[ s ] = m;
+    
+    // Update the current MVP matrix
+    transforms[ 3 ] // MVP Matrix
+        = transforms[ HGE_MODEL_MAT ]
+        * transforms[ HGE_VIEW_MAT ]
+        * transforms[ HGE_PROJ_MAT ];
+    
+    // Check if there's a current shader
+    if ( !currShader )
+        return;
+    
+    // Upload the matrix data to the current shader
+    glUniformBlockBinding( currShader, matrixIndexId, HGE_PIPELINE_MATRIX_BINDING );
+    glBindBuffer( GL_UNIFORM_BUFFER, ubo );
+    glBindBufferBase( GL_UNIFORM_BUFFER, HGE_PIPELINE_MATRIX_BINDING, ubo );
+    
+    if ( s == HGE_MODEL_MAT ) {
+        glBufferSubData(
+            GL_UNIFORM_BUFFER, sizeof( math::mat4 ) * 0,
+            sizeof( math::mat4 ), &transforms[s]
+        );
+    }
+    else if ( s == HGE_VIEW_MAT ) {
+        glBufferSubData(
+            GL_UNIFORM_BUFFER, sizeof( math::mat4 ) * 1,
+            sizeof( math::mat4 ), &transforms[s]
+        );
+    }
+    else if ( s == HGE_PROJ_MAT ) {
+        glBufferSubData(
+            GL_UNIFORM_BUFFER, sizeof( math::mat4 ) * 2,
+            sizeof( math::mat4 ), &transforms[s]
+        );
+    }
+    
+    // Pass the MVP Matrix
+    glBufferSubData(
+        GL_UNIFORM_BUFFER, sizeof( math::mat4 ) * 3,
+            sizeof( math::mat4 ), &transforms[3]
+    );
+    
+}
+
+/******************************************************************************
+ * Popping off a matrix from the stack
+******************************************************************************/
+void pipeline::removeMatrix( e_matrixState s ) {
+    // Default perspective projection matrix
+    if ( s == HGE_PROJ_MAT ) {
+        transforms[ s ] = math::perspective(
+            c_camera::DEFAULT_FOV,
+            (float)display::getScreenWidth() / display::getScreenHeight(),
+            c_camera::DEFAULT_Z_NEAR, c_camera::DEFAULT_Z_FAR
+        );
+    }
+    // Default model & view matrices
+    else {
+        transforms[ s ] = math::mat4( 1.f );
+    }
+}
+
+/******************************************************************************
+ * Shader Management
+******************************************************************************/
+void pipeline::applyShader( GLuint programId ) {
+    currShader = programId;
+    
+    if ( !currShader ) {
+        matrixIndexId = GL_INVALID_INDEX;
+        return;
+    }
+    
+    glUseProgram( currShader );
+    printGlError( "Applying a shader to the pipeline" );
+    
+    glBindBuffer( GL_UNIFORM_BUFFER, ubo );
+    glBindBufferBase( GL_UNIFORM_BUFFER, HGE_PIPELINE_MATRIX_BINDING, ubo );
+    glBufferData( GL_UNIFORM_BUFFER, sizeof( transforms ), transforms, GL_DYNAMIC_DRAW );
+    
+    matrixIndexId = glGetUniformBlockIndex( currShader, "matrixBlock" );
+    printGlError( "Accessing the Matrix Uniform Block" );
+    
+    if ( matrixIndexId == GL_INVALID_INDEX ) {
+        std::cerr
+            << "ERROR: Incompatible shader detected. "
+            << "Please ensure that the current shader has a uniform block "
+            << "titled \"matrixBlock\" which contains the mat4 identifiers "
+            << "\"modelMatrix\", \"viewMatrix\", "
+            << "\"projMatrix\", and \"mvpMatrix\"."
+            << std::endl;
+        
+        return;
+    }
+    
+    glUniformBlockBinding( currShader, matrixIndexId, HGE_PIPELINE_MATRIX_BINDING );
+    printGlError( "Sending Matrix Uniform Binding" );
+    glBindBuffer( GL_UNIFORM_BUFFER, 0 );
+}
+
+/******************************************************************************
+ * Error Messages
+******************************************************************************/
+void pipeline::printGlErrorMsg( cstr msg, uint lineNum, cstr sourceFile ) {
 	GLenum errorCode( glGetError() );
 	if ( errorCode == GL_NO_ERROR )
 		return;
@@ -49,18 +191,23 @@ void printOpenGLError( cstr msg, uint lineNum, cstr sourceFile ) {
 	std::cerr << std::endl;
 }
 
-//-----------------------------------------------------------------------------
-//	Pipeline Namespace
-//-----------------------------------------------------------------------------
-GLuint n_pipeline::genBufferData(
-	GLuint numBuffers, GLuint* pBuffer,
-	GLenum target, GLsizeiptr size,
-	const void* data, GLenum usage
-) {
-	glGenBuffers( numBuffers, pBuffer );
-	glBindBuffer( target, *pBuffer );
-	glBufferData( target, size, data, usage );
-	return *pBuffer;
+/******************************************************************************
+ * Pipeline Initialization
+******************************************************************************/
+bool pipeline::init() {
+    if ( ubo == 0 ) {
+        glGenBuffers( 1, &ubo );
+        printGlError( "Creating pipeline uniform block" );
+    }
+    return ubo != 0;
 }
 
-} // end hge namespace
+/******************************************************************************
+ * Pipeline Termination
+******************************************************************************/
+void pipeline::terminate() {
+    if ( ubo != 0 )
+        glDeleteBuffers( 1, &ubo );
+    ubo = currShader = 0;
+    matrixIndexId = GL_INVALID_INDEX;
+}

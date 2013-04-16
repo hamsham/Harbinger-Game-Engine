@@ -1,41 +1,53 @@
 /* 
- * File:   pipeline_gl_3_3.h
+ * File:   pipeline.h
  * Author: hammy
  *
  * Created on December 21, 2012, 1:49 PM
  */
 
-#ifndef __HGE_PIPELINE_GL_H__
-#define	__HGE_PIPELINE_GL_H__
+#ifndef __HGE_GL_PIPELINE_H__
+#define	__HGE_GL_PIPELINE_H__
 
 #include <GL/glew.h>
 #include <GL/glfw.h>
 #include "types.h"
 
+#ifndef HGE_PIPELINE_MATRIX_BINDING
+#define HGE_PIPELINE_MATRIX_BINDING 1
+#endif /* HGE_PIPELINE_MATRIX_BINDING */
+
+/******************************************************************************
+ * OpenGL graphics pipeline functions
+******************************************************************************/
 namespace hge {
+namespace pipeline {
 
-//Error Messaging
-HGE_API void printOpenGLError( cstr msg, uint lineNum, cstr sourceFile );
+enum e_matrixState : uint {
+    HGE_MODEL_MAT,
+    HGE_VIEW_MAT,
+    HGE_PROJ_MAT
+};
 
-//OpenGL pipeline convenience functions
-namespace n_pipeline {
-	
-	HGE_API GLuint genBufferData(
-		GLuint numBuffers, GLuint* pBuffer,
-		GLenum target, GLsizeiptr size,
-		const void* data, GLenum usage
-	);
-	
-	//void setMVP( const mat4& modelMatrix, const mat4& viewProjectionMatrix );
-	
-}
+// The matrix stack will only hold (at most) a built-in default matrix
+// or one single user-applied matrix. Pass a NULL mat4 pointer to use the
+// default system matrices (no scaling, rotation, or translation).
+HGE_API void applyMatrix( e_matrixState s, const hamLibs::math::mat4& m = NULL );
+HGE_API void removeMatrix( e_matrixState s );
+HGE_API void applyShader( GLuint programId );
+HGE_API void printGlErrorMsg( cstr msg, uint lineNum, cstr sourceFile );
+HGE_API bool init();
+HGE_API void terminate();
 
+} // end pipeline namespace
 } // end hge namespace
 
+/******************************************************************************
+ * OpenGL convenience function for error printing
+******************************************************************************/
 #ifdef DEBUG
-	#define printGLError( x ) hge::printOpenGLError( x, __LINE__, __FILE__ )
+	#define printGlError( x ) hge::pipeline::printGlErrorMsg( x, __LINE__, __FILE__ )
 #else
-	#define printGLError( x )
+	#define printGlError( x )
 #endif
 
-#endif	/* __HGE_PIPELINE_GL_H__ */
+#endif	/* __HGE_GL_PIPELINE_H__ */

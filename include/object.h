@@ -52,28 +52,28 @@ class HGE_API c_drawableObj : virtual public c_object {
 	protected:
 		vec3 scale;
 		quat rot;
-		mat4 worldMat;
+		mat4 modelMat;
 		
 	public:
 		c_drawableObj() :
 			c_object(),
 			scale( 1.f, 1.f, 1.f ),
 			rot( 0.f, 0.f, 0.f, 1.f ),
-			worldMat( 1.f )
+			modelMat( 1.f )
 		{}
 			
 		c_drawableObj( const c_drawableObj& obj ) :
 			c_object( obj ),
 			scale( obj.scale ),
 			rot( obj.rot ),
-			worldMat( obj.worldMat )
+			modelMat( obj.modelMat )
 		{}
 		
 		virtual ~c_drawableObj() = 0;
 		
 		const vec3&		getScale	() const				{ return scale; }
 		const quat&		getRotation () const				{ return rot; }
-		const mat4&		getMatrix	() const				{ return worldMat; }
+		const mat4&		getMatrix	() const				{ return modelMat; }
 		
 		void			setScale	( const vec3& s )		{ scale = s; }
 		void			setRotation	( const vec3& angles );

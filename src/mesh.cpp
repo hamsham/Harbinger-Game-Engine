@@ -360,7 +360,7 @@ bool c_mesh::loadTexType(
 		std::cout << "\t\t" << texIter << ": " << filePath.c_str() << "...";
         
 		if ( !textures[ texIter ].load( filePath.c_str() ) ) {
-			std::cout << "Failed.\n";
+			std::cout << "Failed to load " << filePath.c_str() << ".\n";
 			return false;
 		}
         
@@ -383,7 +383,7 @@ void c_mesh::loadVao(
 	
 	glBindBuffer( GL_ARRAY_BUFFER, buffers[ 0 ] );
 	glBufferData( GL_ARRAY_BUFFER, sizeof( s_vertex ) * numVertices, vertices, GL_STATIC_DRAW );
-	printGLError( "Error while sending mesh data to the GPU.");
+	printGlError( "Error while sending mesh data to the GPU.");
 	
 	//send the vertices to opengl
 	glEnableVertexAttribArray( c_shader::VERTEX_ATTRIB );
@@ -428,12 +428,12 @@ void c_mesh::loadVao(
 		sizeof( s_vertex ),
 		(GLvoid*)offsetof( s_vertex, tangent.v )
 	);
-	printGLError( "Error while sending mesh data to the GPU.");
+	printGlError( "Error while sending mesh data to the GPU.");
 	
 	// create an index buffer to the current set of data
 	glBindBuffer( GL_ELEMENT_ARRAY_BUFFER, buffers[ 1 ] );
 	glBufferData( GL_ELEMENT_ARRAY_BUFFER, sizeof( indices[0] ) * numIndices, indices, GL_STATIC_DRAW );
-	printGLError( "Error while sending mesh data to the GPU.");
+	printGlError( "Error while sending mesh data to the GPU.");
 }
 
 //-----------------------------------------------------------------------------

@@ -73,7 +73,7 @@ class HGE_API c_drawableObj : virtual public c_object {
 		
 		const vec3&		getScale	() const				{ return scale; }
 		const quat&		getRotation () const				{ return rot; }
-		const mat4&		getMatrix	() const				{ return modelMat; }
+		const mat4&		getModelMatrix	() const			{ return modelMat; }
 		
 		void			setScale	( const vec3& s )		{ scale = s; }
 		void			setRotation	( const vec3& angles );

@@ -30,7 +30,6 @@ const mat4 c_camera::DEFAULT_PERSPECTIVE(
 
 c_camera::c_camera() :
 	c_object(),
-	vpMat(),
 	projMat( DEFAULT_PERSPECTIVE ),
 	viewMat(),
 	orientation( 0.f, 0.f, 0.f, 1.f ),
@@ -59,7 +58,6 @@ c_camera::c_camera() :
 
 c_camera::c_camera( const c_camera& camCopy ) :
 	c_object( camCopy ),
-	vpMat( camCopy.vpMat ),
 	projMat( camCopy.projMat ),
 	viewMat( camCopy.viewMat ),
 	orientation( camCopy.orientation ),
@@ -209,12 +207,7 @@ void c_camera::tick( float timeElapsed ) {
 	//Movement
 	deltaPos += ( posVel * timeElapsed ) + ( posAccel * timeSquared );
 	( this->*moveFunction[ camType ] )();
-}
-
-//-----------------------------------------------------------------------------
-//	Camera - View Updates
-//-----------------------------------------------------------------------------
-void c_camera::update() {
+    
     viewMat = quatToMat4( orientation );
     xAxis = vec3( viewMat[0][0], viewMat[1][0], viewMat[2][0] );
     yAxis = vec3( viewMat[0][1], viewMat[1][1], viewMat[2][1] );
@@ -228,8 +221,6 @@ void c_camera::update() {
     viewMat[3][0] = -dot( xAxis, pos );
     viewMat[3][1] = -dot( yAxis, pos );
     viewMat[3][2] = -dot( zAxis, pos );
-    
-	vpMat = viewMat * projMat;
 }
 
 } // end hge namespace

@@ -23,6 +23,7 @@
 #include "bitmap.h"
 #include "image.h"
 #include "timeObject.h"
+#include "font.h"
 
 namespace hge {
     

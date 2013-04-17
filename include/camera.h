@@ -43,7 +43,6 @@ class HGE_API c_camera : virtual public c_object {
 	
 	private:
 		//render system output
-		mat4        vpMat;
 		mat4        projMat;
 		mat4        viewMat;
 		//rotation & orientation
@@ -89,7 +88,7 @@ class HGE_API c_camera : virtual public c_object {
 		~c_camera	() {}
 		
 		//Render System
-		const mat4&	getVPMat        () const					{ return vpMat; }
+		const mat4	getVPMat        () const					{ return viewMat * projMat; }
 		const mat4&	getViewMat      () const					{ return viewMat; }
 		const mat4&	getProjMat      () const					{ return projMat; }
 		void		setOrtho        ();
@@ -142,7 +141,7 @@ class HGE_API c_camera : virtual public c_object {
 		void		look		( const vec3& camPos, const vec3& camTarget, const vec3& camUp );
 		void		rotate		( float inPitch, float inYaw, float inRoll = 0.f );
 		void		unRoll		();
-		void		update		();
+		void		update		() { tick( 1.f ); }
 		void		tick		( float timeElapsed );
 };
 

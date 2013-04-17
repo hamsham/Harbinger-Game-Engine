@@ -26,10 +26,17 @@
 #include "font.h"
 
 namespace hge {
+
+#ifdef __cplusplus
+    extern "C" {
+#endif
     
-    bool    init();
-    void    terminate();
+    HGE_API bool    init();
+    HGE_API void    terminate();
     
+#ifdef __cplusplus
+    }
+#endif
 } // end hge namespace
 
 #endif	/* __HARBINGER_H__ */

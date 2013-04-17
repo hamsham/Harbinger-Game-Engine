@@ -19,7 +19,7 @@ struct FT_FaceRec_;
 
 namespace hge {
 
-class c_font : virtual public c_drawableObj, virtual public c_resource {
+class HGE_API c_font : virtual public c_drawableObj, virtual public c_resource {
 
     typedef std::vector< unsigned char > vboArray;
     

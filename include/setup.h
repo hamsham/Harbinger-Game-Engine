@@ -36,12 +36,20 @@
 /*
  * Dynamic Library Setup
  */
-#if (defined (HL_OS_WINDOWS) && defined (HGE_BUILD_DYNAMIC))
-	#define HGE_API __declspec( dllexport )
-#elif (defined (HL_OS_WINDOWS) && defined (HGE_API_DYNAMIC))
-	#define HGE_API __declspec( dllimport )
-#else
-	#define HGE_API
+#ifdef HL_OS_WINDOWS
+    #if defined(HGE_BUILD_DYNAMIC)
+        #define HGE_API __declspec( dllexport )
+    #elif defined(HGE_API_DYNAMIC)
+        #define HGE_API __declspec( dllimport )
+    #else
+    	#define HGE_API
+    #endif
+#endif
+
+#ifdef HGE_API_DYNAMIC
+    #ifdef HGE_BUILD_DYNAMIC
+        #undef HGE_BUILD_DYNAMIC
+    #endif
 #endif
 
 /*

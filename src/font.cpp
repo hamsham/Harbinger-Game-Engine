@@ -7,6 +7,9 @@
 
 #include <iostream>
 
+#include <ft2build.h>
+#include FT_FREETYPE_H
+
 #include "font.h"
 #include "pipeline.h"
 
@@ -113,7 +116,7 @@ inline int getMax( int x, int y ) {
     return x>y ? x:y;
 }
 
-void c_font::createCharBitmap( FT_Face& face, int index, vboArray& vboData ) {
+void c_font::createCharBitmap( FT_Face face, int index, vboArray& vboData ) {
     
     FT_Load_Glyph( face, FT_Get_Char_Index( face, index ), FT_LOAD_DEFAULT );
     

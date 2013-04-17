@@ -10,13 +10,12 @@
 
 #include <vector>
 
-#include <ft2build.h>
-#include FT_FREETYPE_H
-
 #include "types.h"
 #include "object.h"
 #include "resource.h"
 #include "math/math.h"
+
+struct FT_FaceRec_;
 
 namespace hge {
 
@@ -43,7 +42,7 @@ class c_font : virtual public c_drawableObj, virtual public c_resource {
         const char* text = HGE_NULL;
         charTexture charList[ 256 ];
         
-        void createCharBitmap( FT_Face&, int index, vboArray& );
+        void createCharBitmap( FT_FaceRec_*, int index, vboArray& );
         void generateCharTexture( charTexture&, int w, int h, const void* data );
         void unloadCharTexture( charTexture& );
         

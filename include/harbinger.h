@@ -11,32 +11,26 @@
 #include "setup.h"
 #include "types.h"
 
-#include "pipeline.h"
-#include "display.h"
-#include "input.h"
-#include "resource.h"
-#include "object.h"
-#include "shader.h"
-#include "camera.h"
-#include "mesh.h"
-#include "light.h"
 #include "bitmap.h"
-#include "image.h"
-#include "timeObject.h"
+#include "camera.h"
+#include "display.h"
 #include "font.h"
+#include "input.h"
+#include "light.h"
+#include "mesh.h"
+#include "object.h"
+#include "pipeline.h"
+#include "primitives.h"
+#include "resource.h"
+#include "shader.h"
+#include "shadowMap.h"
+#include "timeObject.h"
 
 namespace hge {
 
-#ifdef __cplusplus
-    extern "C" {
-#endif
-    
-    HGE_API bool    init();
-    HGE_API void    terminate();
-    
-#ifdef __cplusplus
-    }
-#endif
+HGE_API bool    init();
+HGE_API void    terminate();
+
 } // end hge namespace
 
 #endif	/* __HARBINGER_H__ */

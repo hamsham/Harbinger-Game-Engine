@@ -5,6 +5,7 @@
  * Created on December 4, 2012, 6:48 PM
  */
 
+#include "pipeline.h"
 #include "object.h"
 
 namespace hge {
@@ -12,16 +13,6 @@ namespace hge {
 //-----------------------------------------------------------------------------
 //	Object - Basic Object Abstraction
 //-----------------------------------------------------------------------------
-const vec3 c_object::WORLD_AXIS_X( 1.f, 0.f, 0.f );
-const vec3 c_object::WORLD_AXIS_Y( 0.f, 1.f, 0.f );
-const vec3 c_object::WORLD_AXIS_Z( 0.f, 0.f, 1.f );
-const mat4 c_object::WORLD_MATRIX(
-	1.f, 0.f, 0.f, 0.f,
-	0.f, 1.f, 0.f, 0.f,
-	0.f, 0.f, 1.f, 0.f,
-	0.f, 0.f, 0.f, 1.f
-);
-
 c_object::~c_object() {}
 
 //-----------------------------------------------------------------------------
@@ -31,17 +22,17 @@ c_drawableObj::~c_drawableObj() {}
 
 void c_drawableObj::setRotation( const vec3& angles ) {
 	rot = normalize (
-		fromAxisAngle( WORLD_AXIS_Z, angles.v[2] ) *
-		fromAxisAngle( WORLD_AXIS_Y, angles.v[1] ) *
-		fromAxisAngle( WORLD_AXIS_X, angles.v[0] )
+		fromAxisAngle( pipeline::getWorldAxisZ(), angles.v[2] ) *
+		fromAxisAngle( pipeline::getWorldAxisY(), angles.v[1] ) *
+		fromAxisAngle( pipeline::getWorldAxisX(), angles.v[0] )
 	);
 }
 
 void c_drawableObj::rotate( const vec3& angles ) {
 	rot = normalize (
-		fromAxisAngle( WORLD_AXIS_Z, angles.v[2] ) *
-		fromAxisAngle( WORLD_AXIS_Y, angles.v[1] ) *
-		fromAxisAngle( WORLD_AXIS_X, angles.v[0] ) *
+		fromAxisAngle( pipeline::getWorldAxisZ(), angles.v[2] ) *
+		fromAxisAngle( pipeline::getWorldAxisY(), angles.v[1] ) *
+		fromAxisAngle( pipeline::getWorldAxisX(), angles.v[0] ) *
 		rot
 	);
 }

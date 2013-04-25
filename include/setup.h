@@ -44,12 +44,8 @@
     #else
     	#define HGE_API
     #endif
-#endif
-
-#ifdef HGE_API_DYNAMIC
-    #ifdef HGE_BUILD_DYNAMIC
-        #undef HGE_BUILD_DYNAMIC
-    #endif
+#else
+    #define HGE_API
 #endif
 
 /*

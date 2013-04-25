@@ -54,8 +54,8 @@ class HGE_API c_font : virtual public c_drawableObj, virtual public c_resource {
         bool isLoaded() const;
         void unload();
         
-        //void draw( const char*, float size, GLuint, const hamLibs::math:: mat4& );
-        //void drawOrtho( const char*, float size, GLuint );
+        void update() {}
+        void tick( float ) {}
         void draw() const;
         
         void setText( const char* str ) { text = str; }

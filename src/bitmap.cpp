@@ -60,7 +60,7 @@ int setBitmapFlags( FREE_IMAGE_FORMAT inFormat ) {
 //-----------------------------------------------------------------------------
 //	Sending Image Data to OpenGL
 //-----------------------------------------------------------------------------
-GLuint sendToOpenGL( const void* buffer, int flags, int w, int h ) {
+uint sendToOpenGL( const void* buffer, int flags, int w, int h ) {
 	// Create the OpenGL texture
     GLuint texture( 0 );
 	glGenTextures( 1, &texture );
@@ -172,7 +172,7 @@ bool c_bitmap::load( cstr fileName, int imageFlags ) {
     );
 	FreeImage_Unload( image );
     
-	return true;
+	return oglTexture != 0;
 }
 
 //-----------------------------------------------------------------------------
@@ -189,8 +189,8 @@ void c_bitmap::unload() {
 //-----------------------------------------------------------------------------
 //	Bitmap - Enable a texture within OpenGL
 //-----------------------------------------------------------------------------
-void c_bitmap::makeActive( GLuint texUnit ) const {
-	//glActiveTexture( texUnit );
+void c_bitmap::makeActive( int texUnit ) const {
+	glActiveTexture( texUnit );
 	glBindTexture( GL_TEXTURE_2D, oglTexture );
 }
 
@@ -198,7 +198,7 @@ void c_bitmap::makeActive( GLuint texUnit ) const {
 //	Bitmap - Disable an OpenGL texture
 //-----------------------------------------------------------------------------
 void c_bitmap::deActivate() const {
-	//glActiveTexture( GL_TEXTURE0 );
+	glActiveTexture( GL_TEXTURE0 );
 	glBindTexture( GL_TEXTURE_2D, 0 );
 }
 

@@ -252,11 +252,8 @@ void c_font::draw() const {
         
         else {
             glActiveTexture( GL_TEXTURE0 );
-        printGlError("Font Active Texture Error");
             glBindTexture( GL_TEXTURE_2D, ct.textureId );
-        printGlError("Font texture binding error");
             glBindSampler( 0, ct.samplerId );
-        printGlError("Font sampler error");
             
             hge::pipeline::applyMatrix(
                 hge::pipeline::HGE_MODEL_MAT,
@@ -265,7 +262,6 @@ void c_font::draw() const {
             );
 
             glDrawArrays( GL_TRIANGLE_STRIP, currChar*4, 4  );
-        printGlError("Font drawing error");
             xPos += (ct.advX - ct.bearX) * fontScaleX;
         }
     }

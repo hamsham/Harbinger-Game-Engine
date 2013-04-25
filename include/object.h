@@ -16,12 +16,6 @@ namespace hge {
 //	Basic Object Abstraction
 //-----------------------------------------------------------------------------
 class HGE_API c_object {
-	public:
-		static const vec3 WORLD_AXIS_X;
-		static const vec3 WORLD_AXIS_Y;
-		static const vec3 WORLD_AXIS_Z;
-		static const mat4 WORLD_MATRIX;
-		
 	protected:
 		vec3 pos;
 		vec3 deltaPos;

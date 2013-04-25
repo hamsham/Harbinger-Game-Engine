@@ -11,6 +11,7 @@
 #include "camera.h"
 #include "display.h"
 #include "shader.h"
+#include "primitives.h"
 
 using namespace hamLibs;
 using namespace hge;
@@ -195,19 +196,41 @@ void pipeline::printGlErrorMsg( cstr msg, uint lineNum, cstr sourceFile ) {
  * Pipeline Initialization
 ******************************************************************************/
 bool pipeline::init() {
-    if ( ubo == 0 ) {
-        glGenBuffers( 1, &ubo );
-        printGlError( "Creating pipeline uniform block" );
+    if ( ubo != 0 ) {
+        // Return if the pipeline is already initialized
+        return true;
     }
-    return ubo != 0;
+
+    glGenBuffers( 1, &ubo );
+    printGlError( "Creating pipeline uniform block" );
+
+    if ( ubo == 0 ) {
+        std::cerr
+            << "An error occurred while initializing the graphics pipeline."
+            << std::endl;
+        return false;
+    }
+    
+    // PRIMITIVE INITIALIZATION
+    if ( !c_quad::init() || !c_triangle::init() ) {
+        terminate();
+        return false;
+    }
+    
+    return true;
 }
 
 /******************************************************************************
  * Pipeline Termination
 ******************************************************************************/
 void pipeline::terminate() {
-    if ( ubo != 0 )
-        glDeleteBuffers( 1, &ubo );
+    if ( ubo == 0 )
+        return;
+    
+    glDeleteBuffers( 1, &ubo );
     ubo = currShader = 0;
     matrixIndexId = GL_INVALID_INDEX;
+    
+    c_triangle::terminate();
+    c_quad::terminate();
 }

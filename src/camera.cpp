@@ -5,7 +5,7 @@
  * Created on December 7, 2012, 6:23 PM
  */
 
-#include "types.h"
+#include "pipeline.h"
 #include "camera.h"
 
 namespace hge {
@@ -123,9 +123,9 @@ void c_camera::look( const vec3& camPos, const vec3& camTarget, const vec3& camU
 void c_camera::rotateFPS() {
 	orientation
 		= orientation
-		* fromAxisAngle( c_object::WORLD_AXIS_X, pitch )
-		* fromAxisAngle( c_object::WORLD_AXIS_Y, yaw )
-		* fromAxisAngle( c_object::WORLD_AXIS_Z, roll );
+		* fromAxisAngle( pipeline::getWorldAxisX(), pitch )
+		* fromAxisAngle( pipeline::getWorldAxisY(), yaw )
+		* fromAxisAngle( pipeline::getWorldAxisZ(), roll );
 }
 
 void c_camera::rotateFlight() {
@@ -153,7 +153,7 @@ void c_camera::unRoll() {
 		look( pos, target, vec3( 0.f, 1.f, 0.f ) );
 	}
 	else {
-		look( pos, pos - zAxis, c_object::WORLD_AXIS_Y );
+		look( pos, pos - zAxis, pipeline::getWorldAxisY() );
 	}
 }
 
@@ -161,19 +161,19 @@ void c_camera::unRoll() {
 //	Camera - Movement
 //-----------------------------------------------------------------------------
 void c_camera::moveFPS() {
-	vec3 forwards( cross( c_object::WORLD_AXIS_Y, xAxis ) );
-	vec3 strafe( cross( c_object::WORLD_AXIS_Y, zAxis ) );
+	vec3 forwards( cross( pipeline::getWorldAxisY(), xAxis ) );
+	vec3 strafe( cross( pipeline::getWorldAxisY(), zAxis ) );
 	
 	pos += strafe * deltaPos.v[0];
-	pos += c_object::WORLD_AXIS_Y * deltaPos.v[1];
+	pos += pipeline::getWorldAxisY() * deltaPos.v[1];
 	pos += forwards * deltaPos.v[2];
 }
 
 void c_camera::moveSpectator() {
-	vec3 strafe( cross( c_object::WORLD_AXIS_Y, zAxis ) );
+	vec3 strafe( cross( pipeline::getWorldAxisY(), zAxis ) );
 	
 	pos += strafe * deltaPos.v[0];
-	pos += c_object::WORLD_AXIS_Y * deltaPos.v[1];
+	pos += pipeline::getWorldAxisY() * deltaPos.v[1];
 	pos -= zAxis * deltaPos.v[2];
 }
 

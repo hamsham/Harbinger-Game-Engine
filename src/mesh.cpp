@@ -11,7 +11,6 @@
 #include <assimp/postprocess.h>
 #include "types.h"
 #include "pipeline.h"
-#include "shader.h"
 #include "bitmap.h"
 #include "mesh.h"
 
@@ -188,8 +187,23 @@ bool c_mesh::load( cstr fileName, int flags ) {
 	
 	// load all material data from the file
 	std::cout << "\tLoading texture & material data..\n";
-	textures = new c_bitmap [ pScene->mNumMaterials ];
-	numTextures = pScene->mNumMaterials;
+    numTextures = 0;
+    for ( unsigned i(0); i < pScene->mNumMaterials; ++i ) {
+        numTextures += pScene->mMaterials[ i ]->GetTextureCount( aiTextureType_DIFFUSE );
+		numTextures += pScene->mMaterials[ i ]->GetTextureCount( aiTextureType_SPECULAR );
+		numTextures += pScene->mMaterials[ i ]->GetTextureCount( aiTextureType_AMBIENT );
+		numTextures += pScene->mMaterials[ i ]->GetTextureCount( aiTextureType_EMISSIVE );
+		numTextures += pScene->mMaterials[ i ]->GetTextureCount( aiTextureType_HEIGHT );
+		numTextures += pScene->mMaterials[ i ]->GetTextureCount( aiTextureType_NORMALS );
+		numTextures += pScene->mMaterials[ i ]->GetTextureCount( aiTextureType_SHININESS );
+		numTextures += pScene->mMaterials[ i ]->GetTextureCount( aiTextureType_OPACITY );
+		numTextures += pScene->mMaterials[ i ]->GetTextureCount( aiTextureType_DISPLACEMENT );
+		numTextures += pScene->mMaterials[ i ]->GetTextureCount( aiTextureType_LIGHTMAP );
+		numTextures += pScene->mMaterials[ i ]->GetTextureCount( aiTextureType_REFLECTION );
+		numTextures += pScene->mMaterials[ i ]->GetTextureCount( aiTextureType_UNKNOWN );
+    }
+    
+	textures = new c_bitmap [ numTextures ];
 	if ( !loadTextures( pScene, fileName ) ) {
 		std::cout << "\t\tWarning: Unable to load all associated materials.\n";
 		delete [] textures;
@@ -319,7 +333,7 @@ bool c_mesh::loadTextures( const aiScene* pScene, cstr fileName ) {
 	std::cout << "\t\t# Textures: " << numTextures << "\n";
 	
 	//get a list of all the textures associated with each meshEntry
-	for ( uint i( 0 ); i < pScene->mNumMaterials; ++i ) {
+	for ( uint i( 0 ); i < numTextures; ++i ) {
 		pMaterial = pScene->mMaterials[ i ];
 		if (
 			!loadTexType( pMaterial, aiTextureType_DIFFUSE, matDir, texIter )
@@ -365,8 +379,8 @@ bool c_mesh::loadTexType(
 		}
         
 		std::cout << "Ok.\n";
-		++iter;
-		++texIter;
+        ++iter;
+        ++texIter;
 	}
 	return true;
 }
@@ -386,9 +400,9 @@ void c_mesh::loadVao(
 	printGlError( "Error while sending mesh data to the GPU.");
 	
 	//send the vertices to opengl
-	glEnableVertexAttribArray( c_shader::VERTEX_ATTRIB );
+	glEnableVertexAttribArray( pipeline::VERTEX_ATTRIB );
 	glVertexAttribPointer(
-		c_shader::VERTEX_ATTRIB,
+		pipeline::VERTEX_ATTRIB,
 		ARRAY_SIZE_FROM_ELEMENTS( s_vertex::pos.v ),
 		GL_FLOAT,
 		GL_FALSE, 
@@ -397,9 +411,9 @@ void c_mesh::loadVao(
 	);
 	
 	//send the UVs to opengl
-	glEnableVertexAttribArray( c_shader::TEXTURE_ATTRIB );
+	glEnableVertexAttribArray( pipeline::TEXTURE_ATTRIB );
 	glVertexAttribPointer(
-		c_shader::TEXTURE_ATTRIB,
+		pipeline::TEXTURE_ATTRIB,
 		ARRAY_SIZE_FROM_ELEMENTS( s_vertex::uv.v ),
 		GL_FLOAT,
 		GL_FALSE,
@@ -408,9 +422,9 @@ void c_mesh::loadVao(
 	);
 	
 	//send the normals to opengl
-	glEnableVertexAttribArray( c_shader::NORMAL_ATTRIB );
+	glEnableVertexAttribArray( pipeline::NORMAL_ATTRIB );
 	glVertexAttribPointer(
-		c_shader::NORMAL_ATTRIB,
+		pipeline::NORMAL_ATTRIB,
 		ARRAY_SIZE_FROM_ELEMENTS( s_vertex::norm.v ),
 		GL_FLOAT,
 		GL_FALSE,
@@ -419,9 +433,9 @@ void c_mesh::loadVao(
 	);
 	
 	//send the tangents to opengl
-	glEnableVertexAttribArray( c_shader::TANGENT_ATTRIB );
+	glEnableVertexAttribArray( pipeline::TANGENT_ATTRIB );
 	glVertexAttribPointer(
-		c_shader::TANGENT_ATTRIB,
+		pipeline::TANGENT_ATTRIB,
 		ARRAY_SIZE_FROM_ELEMENTS( s_vertex::tangent.v ),
 		GL_FLOAT,
 		GL_FALSE,
@@ -447,12 +461,10 @@ void c_mesh::draw() const {
 		const uint matIndex = entries[ i ].matIndex;
 		
 		if ( textures )
-			textures[ matIndex ].makeActive();	
+            textures[ matIndex ].makeActive( pipeline::HGE_TEXTURE_DIFFUSE );	
 		
 		glDrawElementsBaseVertex(
-			( GLuint )drawMode,
-			entries[ i ].numIndices,
-			GL_UNSIGNED_INT,
+			( GLuint )drawMode, entries[ i ].numIndices, GL_UNSIGNED_INT,
 			( GLvoid* )( sizeof( uint ) * entries[ i ].baseIndex ),
 			entries[ i ].baseVertex
 		);

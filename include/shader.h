@@ -23,14 +23,6 @@ class HGE_API c_shader : virtual public c_resource {
         GLuint progID;
 
     public:
-        enum e_attributes : GLint {
-            INVALID_UNIFORM = -1,
-            VERTEX_ATTRIB   = 0,
-            TEXTURE_ATTRIB  = 1,
-            NORMAL_ATTRIB   = 2,
-            TANGENT_ATTRIB  = 3
-        };
-
         c_shader        ();
         ~c_shader       ();
 

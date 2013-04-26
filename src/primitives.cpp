@@ -11,6 +11,23 @@
 namespace hge {
 
 /******************************************************************************
+ *      PRIMITIVE SETUP
+******************************************************************************/
+bool initPrimitives() {
+    if ( !c_quad::init() || !c_triangle::init() || !c_line::init() ) {
+        terminatePrimitives();
+        return false;
+    }
+    return true;
+}
+
+void terminatePrimitives() {
+    c_quad::terminate();
+    c_triangle::terminate();
+    c_line::terminate();
+}
+
+/******************************************************************************
  *      STATIC MEMBER CONSTRUCTION
 ******************************************************************************/
 GLuint c_quad::vao( 0 );
@@ -20,6 +37,9 @@ s_vertex c_quad::verts[ 4 ];
 GLuint c_triangle::vao( 0 );
 GLuint c_triangle::vbo( 0 );
 s_vertex c_triangle::verts[ 3 ];
+
+GLuint c_line::vao( 0 );
+GLuint c_line::vbo( 0 );
 
 /******************************************************************************
  *      QUADS
@@ -181,6 +201,58 @@ void c_triangle::terminate() {
     glDeleteBuffers( 1, &vbo );
 
     vao = vbo = 0;
+}
+
+/******************************************************************************
+ *      LINES
+******************************************************************************/
+bool c_line::init() {
+    if ( vao )
+        return true;
+    
+    glGenVertexArrays( 1, &vao );
+    if ( !vao ) {
+        std::cerr << "Unable to create a line VAO." << std::endl;
+        return false;
+    }
+    
+    glBindVertexArray( vao );
+    glGenBuffers( 1, &vbo );
+    
+    glBindBuffer( GL_ARRAY_BUFFER, vbo );
+    
+    glBufferData(
+        GL_ARRAY_BUFFER, sizeof( c_line().points ),
+        &c_line().points[0].v, GL_STREAM_DRAW
+    );
+    printGlError( "Initializing a line primitive" );
+    glVertexAttribPointer( pipeline::VERTEX_ATTRIB, 3, GL_FLOAT, GL_FALSE, 0, 0 );
+    glEnableVertexAttribArray( pipeline::VERTEX_ATTRIB );
+    
+    glBindVertexArray( 0 );
+    return true;
+}
+
+void c_line::terminate() {
+    glDeleteVertexArrays( 1, &vao );
+    glDeleteBuffers( 1, &vbo );
+    
+    vao = vbo = 0;
+}
+
+void c_line::setVertPos( int index, const vec3& pos ) {
+    HL_ASSERT( (index > 0) && (index < 2) );
+    points[ index ] = pos;
+    
+    glBindVertexArray( vao );
+    glBindBuffer( GL_ARRAY_BUFFER, vbo );
+    glBufferData( GL_ARRAY_BUFFER, sizeof( points ), &points[0].v, GL_STREAM_DRAW );
+}
+
+void c_line::draw() const {
+    glBindVertexArray( vao );
+    glDrawArrays( GL_LINES, 0, 2 );
+    glBindVertexArray( 0 );
 }
 
 } // end hge namespace

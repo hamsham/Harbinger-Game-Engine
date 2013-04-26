@@ -212,7 +212,7 @@ bool pipeline::init() {
     }
     
     // PRIMITIVE INITIALIZATION
-    if ( !c_quad::init() || !c_triangle::init() ) {
+    if ( !initPrimitives() ) {
         terminate();
         return false;
     }
@@ -231,6 +231,5 @@ void pipeline::terminate() {
     ubo = currShader = 0;
     matrixIndexId = GL_INVALID_INDEX;
     
-    c_triangle::terminate();
-    c_quad::terminate();
+    terminatePrimitives();
 }

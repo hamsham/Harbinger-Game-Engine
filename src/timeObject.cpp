@@ -34,8 +34,9 @@ c_timeObject::~c_timeObject() {}
 //-----------------
 // Global Times
 //-----------------
+
 std::tm* c_timeObject::getGlobalTimeInfo() {
-	time_t currTime = hr_clock::to_time_t( hr_clock::now() );
+	time_t currTime = system_clock::to_time_t( system_clock::now() );
 	return localtime( &currTime );
 }
 
@@ -99,29 +100,29 @@ void c_timeObject::stop() {
 //-----------------
 // Get Time
 //-----------------
-c_timeObject::hr_precision c_timeObject::getCurrTime() const {
+c_timeObject::hr_prec c_timeObject::getCurrTime() const {
 	return currTime;
 }
 
-void c_timeObject::setCurrTime( c_timeObject::hr_precision c ) {
+void c_timeObject::setCurrTime( c_timeObject::hr_prec c ) {
 	currTime = c;
 }
 
-c_timeObject::hr_precision c_timeObject::getTimeSinceUpdate() const {
+c_timeObject::hr_prec c_timeObject::getTimeSinceUpdate() const {
 	return duration_cast< hr_duration >(
 		hr_clock::now() - currPoint
 	).count();
 }
 
-c_timeObject::hr_precision c_timeObject::getTickDuration() const {
+c_timeObject::hr_prec c_timeObject::getTickDuration() const {
 	return tickTime;
 }
 
-void c_timeObject::setStopTime( hr_precision st ) {
+void c_timeObject::setStopTime( hr_prec st ) {
 	stopTime = st;
 }
 
-c_timeObject::hr_precision c_timeObject::getStopTime() const {
+c_timeObject::hr_prec c_timeObject::getStopTime() const {
 	return stopTime;
 }
 
@@ -162,7 +163,7 @@ void c_timeObject::update() {
 		timeFlags |= TIMEOBJ_PAUSED;
 }
 
-void c_timeObject::tick( c_timeObject::hr_precision timeElapsed ) {
+void c_timeObject::tick( c_timeObject::hr_prec timeElapsed ) {
 	if ( isPaused() )
 		return;
 	
@@ -218,11 +219,11 @@ void c_timer::start() {
 	currPoint = c_timeObject::hr_clock::now();
 }
 
-void c_timer::setStartTime( c_timeObject::hr_precision st ) {
+void c_timer::setStartTime( c_timeObject::hr_prec st ) {
 	startTime = st;
 }
 
-c_timeObject::hr_precision c_timer::getStartTime() const {
+c_timeObject::hr_prec c_timer::getStartTime() const {
 	return startTime;
 }
 
@@ -255,7 +256,7 @@ void c_timer::update() {
 		timeFlags |= TIMEOBJ_PAUSED;
 }
 
-void c_timer::tick( c_timeObject::hr_precision timeElapsed ) {
+void c_timer::tick( c_timeObject::hr_prec timeElapsed ) {
 	if ( isPaused() )
 		return;
 		
@@ -289,7 +290,7 @@ c_stopwatch::c_stopwatch( const c_stopwatch& sw ) :
 //-----------------
 // Laps
 //-----------------
-c_timeObject::hr_precision c_stopwatch::getLapTime( unsigned int lapIndex ) const {
+c_timeObject::hr_prec c_stopwatch::getLapTime( unsigned int lapIndex ) const {
 	if ( lapIndex > laps.size() )
 		return 0.0;
 	return laps[ lapIndex ];

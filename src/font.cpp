@@ -49,9 +49,9 @@ bool c_font::load( const char* filename, int fontsize ) {
     FT_Set_Pixel_Sizes( ftFace, fontsize, fontsize );
     
     // Prepare OpenGL for the font data
-    glGenVertexArrays( 1, (GLuint*)&vao );
+    glGenVertexArrays( 1, &vao );
     glBindVertexArray( vao );
-    glGenBuffers( 1, (GLuint*)&vbo );
+    glGenBuffers( 1, &vbo );
     glBindBuffer( GL_ARRAY_BUFFER, vbo );
     
     vboArray vboData;
@@ -88,8 +88,8 @@ void c_font::unload() {
     for ( int i = 0; i < 256; ++i )
         unloadCharTexture( charList[ i ] );
     
-    if ( vbo ) glDeleteBuffers( 1, (GLuint*)&vbo );
-    if ( vao ) glDeleteVertexArrays( 1, (GLuint*)&vao );
+    glDeleteBuffers( 1, &vbo );
+    glDeleteVertexArrays( 1, &vao );
     
     vao = vbo = lineHeight = 0;
     pos = scale = vec3( 0.f );
@@ -143,7 +143,7 @@ void c_font::createCharBitmap( FT_Face face, int index, vboArray& vboData ) {
     // calculate the glyph data
     charList[ index ].advX = face->glyph->advance.x >> 6;
     charList[ index ].bearX = face->glyph->metrics.horiBearingX >> 6;
-    int advY            =
+    int advY =
         (face->glyph->metrics.height - face->glyph->metrics.horiBearingY) >> 6;
     newLine = getMax(newLine, (int)face->glyph->metrics.height>>6);
     
@@ -210,8 +210,8 @@ void c_font::generateCharTexture(
 // FONT -- UNLOADING CHAR TEXTURES
 ///////////////////////////////////////////////////////////////////////////////
 void c_font::unloadCharTexture( c_font::charTexture& ct ) {
-    if ( ct.textureId ) glDeleteTextures( 1, &ct.textureId );
-    if ( ct.samplerId ) glDeleteSamplers( 1, &ct.samplerId );
+    glDeleteTextures( 1, &ct.textureId );
+    glDeleteSamplers( 1, &ct.samplerId );
     ct.width = ct.height = ct.samplerId = ct.textureId = 0;
     ct.advX = ct.bearX = 0;
 }

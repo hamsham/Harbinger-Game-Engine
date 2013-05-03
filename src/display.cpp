@@ -6,12 +6,9 @@
  */
 
 #include <iostream>
-#include <string>
 #include <vector>
 #include "pipeline.h"
 #include "display.h"
-
-using std::string;
 
 //-----------------------------------------------------------------------------
 //	Display Object - Private Variables & functions
@@ -49,7 +46,7 @@ bool display::createWindow(
 	glfwOpenWindowHint( GLFW_OPENGL_VERSION_MINOR, 3 );
 	glfwOpenWindowHint( GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE );
 	glfwOpenWindowHint( GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE );
-	glfwOpenWindowHint( GLFW_WINDOW_NO_RESIZE, (resizeable ? GL_TRUE : GL_FALSE) );
+	glfwOpenWindowHint( GLFW_WINDOW_NO_RESIZE, (resizeable ? GL_FALSE : GL_TRUE) );
     
 	if ( !glfwOpenWindow(
             w, h, 8, 8, 8, 8, 16, 16,
@@ -75,13 +72,14 @@ bool display::createWindow(
 		return false;
 	}
 	std::cout
-        << "Created a window. OpenGL 3.3 initialized."
-        << glGetError()
-        << std::endl;
+        << "Created a window. OpenGL 3.3 initialized.\n\t0x"
+        << std::hex << glGetError()
+        << std::dec << std::endl;
 	
 	/*/
 	 * Default OpenGL parameters
 	/*/
+    glViewport( 0, 0, displayWidth, displayHeight );
 	glClearColor( 0.5f, 0.5f, 0.5f, 1.0f );
 	glEnable    ( GL_CULL_FACE );		// Occlusion Culling
 	glCullFace  ( GL_BACK );

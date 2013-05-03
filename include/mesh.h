@@ -42,7 +42,7 @@ struct HGE_API s_vertex {
 ///////////////////////////////////////////////////////////////////////////////
 class HGE_API c_mesh : virtual public c_resource, virtual public c_drawableObj {
 	public:
-		enum e_drawMode {
+		enum e_drawMode : GLuint {
 			DRAW_FILLED	= GL_TRIANGLES,
 			DRAW_LINES	= GL_LINES,
 			DRAW_POINTS	= GL_POINTS

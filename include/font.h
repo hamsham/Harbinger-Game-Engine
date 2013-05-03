@@ -10,7 +10,7 @@
 
 #include <vector>
 
-#include "types.h"
+#include "pipeline.h"
 #include "object.h"
 #include "resource.h"
 #include "math/math.h"
@@ -35,8 +35,8 @@ class HGE_API c_font : virtual public c_drawableObj, virtual public c_resource {
     private:
         static const int SPACES_PER_TAB = 5;
         
-        int vao = 0;
-        int vbo = 0;
+        GLuint vao = 0;
+        GLuint vbo = 0;
         int newLine = 0;
         int lineHeight = 0;
         const char* text = HGE_NULL;

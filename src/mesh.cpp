@@ -96,7 +96,7 @@ c_mesh::c_mesh() :
 	numMeshes( 0 ),
 	numTextures( 0 ),
 	vao( 0 ),
-	buffers{ 0 },
+	buffers{ 0, 0 },
 	entries( HGE_NULL ),
 	textures( HGE_NULL ),
 	drawMode( DRAW_FILLED )
@@ -120,15 +120,12 @@ void c_mesh::unload() {
 		textures = HGE_NULL;
 		numTextures = 0;
 	}
-	if ( vao != 0 ) {
-		glDeleteVertexArrays( 1, &vao );
-		vao = 0;
-	}
-	if ( buffers[ 0 ] != 0 ) {
-		glDeleteBuffers( ARRAY_SIZE_FROM_ELEMENTS( buffers ), buffers );
-		for ( uint i( 0 ); i < ARRAY_SIZE_FROM_ELEMENTS( buffers ); ++i )
-			buffers[ i ] = i;
-	}
+    
+	glDeleteVertexArrays( 1, &vao );
+	vao = 0;
+    
+	glDeleteBuffers( 2, buffers );
+    buffers[ 0 ] = buffers[ 1 ] = 0;
 }
 
 //-----------------------------------------------------------------------------
@@ -283,11 +280,14 @@ bool c_mesh::loadMeshes( const aiScene* pScene, s_vertex* vertArray, uint* index
 		for ( uint j( 0 ); j < pMesh->mNumVertices; ++j ) {
 			aiVector3D* pPos				( &pMesh->mVertices[ j ] );
 			aiVector3D* pNorm				( &pMesh->mNormals[ j ] );
-			aiVector3D* pTangent			( &pMesh->mTangents[ j ] );
 			vertArray[ vertIter ].setPos	( pPos->x, pPos->y, pPos->z );
 			vertArray[ vertIter ].setNorm	( pNorm->x, pNorm->y, pNorm->z );
-			vertArray[ vertIter ].setTangent( pTangent->x, pTangent->y, pTangent->z );
-			
+            
+            if ( pMesh->HasTangentsAndBitangents() ) {
+                aiVector3D* pTangent( &pMesh->mTangents[ j ] );
+                vertArray[ vertIter ].setTangent( pTangent->x, pTangent->y, pTangent->z );
+            }
+            
 			if ( pMesh->HasTextureCoords( 0 ) ) {
 				vertArray[ vertIter ].uv[ 0 ] = pMesh->mTextureCoords[ 0 ][ j ].x;
 				vertArray[ vertIter ].uv[ 1 ] = pMesh->mTextureCoords[ 0 ][ j ].y;
@@ -302,6 +302,7 @@ bool c_mesh::loadMeshes( const aiScene* pScene, s_vertex* vertArray, uint* index
 			indexArray[ indexIter++ ] = face->mIndices[ 1 ];
 			indexArray[ indexIter++ ] = face->mIndices[ 2 ];
 		}
+        std::cout << "\n\t\tLoaded sub-mesh " << i << ".\n";
 	}
 	
 	return true;
@@ -393,7 +394,7 @@ void c_mesh::loadVao(
 	uint* indices, uint numIndices
 ) {
 	// create a buffer for the vertex positions & indices
-	glGenBuffers( ARRAY_SIZE_FROM_ELEMENTS( buffers ), buffers );
+	glGenBuffers( 2, buffers );
 	
 	glBindBuffer( GL_ARRAY_BUFFER, buffers[ 0 ] );
 	glBufferData( GL_ARRAY_BUFFER, sizeof( s_vertex ) * numVertices, vertices, GL_STATIC_DRAW );
@@ -464,7 +465,7 @@ void c_mesh::draw() const {
             textures[ matIndex ].makeActive( pipeline::HGE_TEXTURE_DIFFUSE );	
 		
 		glDrawElementsBaseVertex(
-			( GLuint )drawMode, entries[ i ].numIndices, GL_UNSIGNED_INT,
+			drawMode, entries[ i ].numIndices, GL_UNSIGNED_INT,
 			( GLvoid* )( sizeof( uint ) * entries[ i ].baseIndex ),
 			entries[ i ].baseVertex
 		);

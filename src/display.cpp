@@ -163,10 +163,7 @@ void display::flip() {
 void display::resizeWindow( int w, int h ) {
     // Get the display size that matches an acquired display mode
     for ( int i = 0; i < vidModes.size(); ++i ) {
-        if (
-            w == vidModes[i].width &&
-            h == vidModes[i].height
-        ) {
+        if ( w == vidModes[i].width && h == vidModes[i].height ) {
             glfwSetWindowSize( w, h );
             glViewport( 0, 0, w, h );
             glfwGetWindowSize( &displayWidth, &displayHeight );

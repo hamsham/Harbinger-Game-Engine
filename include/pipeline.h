@@ -70,9 +70,9 @@ enum e_texType : GLint {
 };
 
 enum e_matrixState : int {
-    HGE_MODEL_MAT,
-    HGE_VIEW_MAT,
-    HGE_PROJ_MAT
+    HGE_MODEL_MAT   = 0,
+    HGE_VIEW_MAT    = 1,
+    HGE_PROJ_MAT    = 2
 };
 
 // The matrix stack will only hold (at most) a built-in default matrix

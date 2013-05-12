@@ -25,161 +25,101 @@ namespace hge {
 ///////////////////////////////////////////////////////////////////////////////
 //		Camera & View Control
 ///////////////////////////////////////////////////////////////////////////////
+
 class HGE_API c_camera : virtual public c_object {
-	public:
+    
+    public:
+        enum e_viewMode : unsigned {
+            VIEW_NORMAL = 0,
+            VIEW_ORBIT  = 1
+        };
+        
 		static const float	DEFAULT_ASPECT_WIDTH;
 		static const float	DEFAULT_ASPECT_HEIGHT;
 		static const float	DEFAULT_Z_NEAR;
 		static const float	DEFAULT_Z_FAR;
 		static const float	DEFAULT_FOV;
 		static const mat4   DEFAULT_PERSPECTIVE;
-		
-		enum cameraType {
-			CAM_TYPE_FPS,
-			CAM_TYPE_SPECTATOR,
-			CAM_TYPE_FLIGHT,
-			CAM_TYPE_ORBIT
-		};
-	
-	private:
-		//render system output
-		mat4        projMat;
-		mat4        viewMat;
-		//rotation & orientation
-		quat        orientation;
-		vec3        xAxis;
-		vec3        yAxis;
-		vec3        zAxis;
-		//positioning
-		vec3        target; // used for orbiting
-		//time-based movements
-		vec3        posVel;
-		vec3        angVel;
-		vec3        posAccel;
-		vec3        angAccel;
-		//euler angles
-		float		pitch;
-		float		yaw;
-		float		roll;
-		//viewport settings
-		float		fov;
-		float		aspectW; // for orthographic scenes
-		float		aspectH;
-		float		zNear;
-		float		zFar;
-		cameraType  camType;
-		
+    
+    private:
 		//function pointer arrays for movement and rotations
-		void ( c_camera::*rotationFunction[ 4 ] )();
-		void ( c_camera::*moveFunction[ 4 ] )();
-		
-		void		moveFPS			();
-		void		moveSpectator	();
-		void		moveFlight		();
-		void		moveOrbit		();
-		void		rotateFPS		();
-		void		rotateSpectator	()							{ rotateFPS(); }
-		void		rotateFlight	();
-		void		rotateOrbit		();
-		
-	public:
-		c_camera	();
-		c_camera	( const c_camera& orig );
-		~c_camera	() {}
-		
-		//Render System
-		const mat4	getVPMat        () const					{ return viewMat * projMat; }
-		const mat4&	getViewMat      () const					{ return viewMat; }
-		const mat4&	getProjMat      () const					{ return projMat; }
-		void		setOrtho        ();
-		void		setPerspective  ();
-		void		setProjection   (
-						float inFov         = DEFAULT_FOV,
-						float aspectWidth   = DEFAULT_ASPECT_WIDTH,
-						float aspectHeight  = DEFAULT_ASPECT_HEIGHT,
-						float inZNear       = DEFAULT_Z_NEAR,
-						float inZFar        = DEFAULT_Z_FAR
+		void ( c_camera::*rotateFunction[ 2 ] )( const vec3& );
+		void ( c_camera::*updateFunction[ 2 ] )();
+        
+        e_viewMode viewMode = VIEW_NORMAL;
+        float fov       = 45.f;
+        float aspectW   = 4.f;
+        float aspectH   = 3.f;
+        float zNear     = 0.1f;
+        float zFar      = 100.f;
+        
+        float orbitDist = 1.f;
+        
+        vec3 target;
+        vec3 xAxis;
+        vec3 yAxis;
+        vec3 zAxis;
+        vec3 angles;
+        
+        quat orientation;
+        mat4 viewMatrix;
+        mat4 projMatrix;
+        
+        void        rotateUnlockedY( const vec3& amount );
+        void        rotateLockedY( const vec3& amount );
+        void        rotateOrbitUnlockedY( const vec3& amount );
+        void        rotateOrbitLockedY( const vec3& amount );
+        void        updateNormal();
+        void        updateOrbit();
+        
+    public:
+        c_camera    ();
+        c_camera    ( const c_camera& );
+        ~c_camera   () {}
+        
+        float       getOrbitDist() const                    { return orbitDist; }
+        void        setOrbitDist( float d )                 { orbitDist = std::fabs(d); }
+        
+        const vec3& getDir      () const                    { return zAxis; }
+        void        setDir      ( const vec3& d )           { look( d ); }
+        const vec3& getTarget   () const                    { return target; }
+        void        setTarget   ( const vec3& t )           { target = t; }
+        
+        const vec3& getUp       () const                    { return yAxis; }
+        void        setUp       ( const vec3& up )          { yAxis = up; }
+        const mat4& getViewMatrix() const                   { return viewMatrix; }
+        const mat4& getProjMatrix() const                   { return projMatrix; }
+        mat4        getVPMatrix () const                    { return viewMatrix * projMatrix; }
+        
+        void        setAspect   ( float w, float h )        { aspectW = w; aspectH = h; }
+        float       getAspect   () const                    { return aspectW / aspectH; }
+        void        setZNear    ( float inZNear )           { zNear = inZNear; }
+        float       getZNear    () const                    { return zNear; }
+        void        setZFar     ( float inZFar )            { zFar = inZFar; }
+        float       getZFar     () const                    { return zFar; }
+        
+        void        setViewMode ( e_viewMode m )            { viewMode = m; }
+        e_viewMode  getViewMode () const                    { return viewMode; }
+        
+        void        setOrtho    ();
+        void        setPerspective();
+        void        setProjection(
+                                float inFov,
+                                float aspectWidth, float aspectHeight,
+                                float near, float far
                     );
-		
-		//rotation & orientation
-		const quat&	getOrientation() const						{ return orientation; }
-		const vec3&	getAxisX	() const						{ return xAxis; }
-		const vec3&	getAxisY	() const						{ return yAxis; }
-		const vec3&	getAxisZ	() const						{ return zAxis; }
-		
-		//Positioning
-		const vec3&	getUp		() const						{ return yAxis; }
-		void		setTarget	( const vec3& inTarget )        { target = inTarget; }
-		const vec3&	getTarget	() const						{ return target; }
-		
-		//time-based movement
-		void		setPosVel	( const vec3& inVel )           { posVel = inVel; }
-		const vec3&	getPosVel	() const						{ return posVel; }
-		void		setAngVel	( const vec3& inVel )           { angVel = inVel; }
-		const vec3&	getAngVel	() const						{ return angVel; }
-		void        setPosAccel	( const vec3& inAccel )         { posAccel = inAccel; }
-		const vec3&	getPosAccel	() const						{ return posAccel; }
-		void		setAngAccel	( const vec3& inAccel )         { angAccel = inAccel; }
-		const vec3&	getAngAccel	() const						{ return angAccel; }
-		
-		//viewport
-		void		setFOV		( float inFOV )					{ fov = inFOV; }
-		float		getFOV		() const						{ return fov; }
-		void		setAspect	( float width, float height )	{ aspectW = width; aspectH = height; }
-		float		getAspect	() const						{ return aspectW / aspectH; }
-		void		setZNear	( float inZNear )				{ zNear = inZNear; }
-		float		getZNear	() const						{ return zNear; }
-		void		setZFar		( float inZFar )				{ zFar = inZFar; }
-		float		getZFar		() const						{ return zFar; }
-		void		setCamType	( cameraType  ct )				{ camType = ct; target = -zAxis; }
-		cameraType	getCamType	() const						{ return camType; }
-		
-		//static viewing functions
-		
-		//Camera Updating
-		void		look		( const vec3& camTarget );
-		void		look		( const vec3& camPos, const vec3& camTarget, const vec3& camUp );
-		void		rotate		( float inPitch, float inYaw, float inRoll = 0.f );
-		void		unRoll		();
-		void		update		() { tick( 1.f ); }
-		void		tick		( float timeElapsed );
+        
+        void        lockYAxis   ( bool );
+        
+        void        look        ( const vec3& eye, const vec3& point, const vec3& up );
+        void        look        ( const vec3& point );
+        void        move        ( const vec3& amount );
+        void        rotate      ( const vec3& amount );
+        void        unroll      ();
+        
+        void        update      ();
+        void        tick        ( float )                   { update(); }
 };
-
-//-----------------------------------------------------------------------------
-//	Camera - Projections
-//-----------------------------------------------------------------------------
-HGE_INLINE void c_camera::setOrtho() {
-	//projMat = ortho( -aspectW, aspectW, -aspectH, aspectH, zNear, zFar );
-	projMat = ortho( -aspectW, aspectW, -aspectH, aspectH );
-    update();
-}
-
-HGE_INLINE void c_camera::setPerspective() {
-	projMat = infinitePerspective( fov, aspectW / aspectH, zNear );
-    update();
-}
-
-HGE_INLINE void c_camera::setProjection( float inFov, float aspectWidth, float aspectHeight, float inZNear, float inZFar ) {
-	fov = inFov;
-	aspectW = aspectWidth;
-	aspectH = aspectHeight;
-	zNear = inZNear;
-	zFar = inZFar;
-}
-
-//-----------------------------------------------------------------------------
-//	Camera - Rotations
-//-----------------------------------------------------------------------------
-HGE_INLINE void c_camera::rotate( float inPitch, float inYaw, float inRoll ) {
-	// Pitch, Yaw, and Roll are in Radians. They are reversed due to translation
-	// from world-space into eye-space
-	// No checks are performed to see if the values are less than 0 or greater
-	// than 2*pi since camera orientations are based on a per-update basis
-	// Rotation values are reset to 0 after "update()" is run.
-	pitch = -inPitch;
-	yaw = -inYaw;
-	roll = -inRoll;
-}
 
 } // end hge namespace
 

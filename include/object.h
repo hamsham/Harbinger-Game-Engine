@@ -18,7 +18,6 @@ namespace hge {
 class HGE_API c_object {
 	protected:
 		vec3 pos;
-		vec3 deltaPos;
 		
 	public:
 		c_object() :
@@ -33,7 +32,7 @@ class HGE_API c_object {
 		
 		const vec3&		getPos	() const				{ return pos; }
 		void			setPos	( const vec3& inPos )	{ pos = inPos; }
-		void			move	( const vec3& amount )	{ deltaPos = amount; }
+		virtual void	move	( const vec3& amount )	{ pos += amount; }
 		
 		virtual void	update	() = 0;
 		virtual void	tick	( float timeElapsed ) = 0;

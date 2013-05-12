@@ -10,9 +10,6 @@
 
 namespace hge {
 
-//-----------------------------------------------------------------------------
-//	Camera - Construction
-//-----------------------------------------------------------------------------
 const float c_camera::DEFAULT_ASPECT_WIDTH( 4.f );
 const float c_camera::DEFAULT_ASPECT_HEIGHT( 3.f );
 const float c_camera::DEFAULT_Z_NEAR( 0.1f );
@@ -29,198 +26,164 @@ const mat4 c_camera::DEFAULT_PERSPECTIVE(
 );
 
 c_camera::c_camera() :
-	c_object(),
-	projMat( DEFAULT_PERSPECTIVE ),
-	viewMat(),
-	orientation( 0.f, 0.f, 0.f, 1.f ),
-	xAxis( 1.f, 0.f, 0.f ),
-	yAxis( 0.f, 1.f, 0.f ),
-	zAxis( 0.f, 0.f, 1.f ),
-	target( 0.f, 0.f, 0.f ),
-	posVel( 0.f, 0.f, 0.f ),
-	angVel( 0.f, 0.f, 0.f ),
-	posAccel( 0.f, 0.f, 0.f ),
-	angAccel( 0.f, 0.f, 0.f ),
-	pitch( 0.f ),
-	yaw( 0.f ),
-	roll( 0.f ),
-	fov( DEFAULT_FOV ),
-	aspectW( DEFAULT_ASPECT_WIDTH ),
-	aspectH( DEFAULT_ASPECT_HEIGHT ),
-	zNear( DEFAULT_Z_NEAR ),
-	zFar( DEFAULT_Z_FAR ),
-	camType( CAM_TYPE_FPS ),
-	// the "rotationFunction" and "moveFunction" function pointer arrays must
-	// correspond to the "cameraType" enumeration
-	rotationFunction{ &c_camera::rotateFPS, &c_camera::rotateSpectator, &c_camera::rotateFlight, &c_camera::rotateOrbit },
-	moveFunction{ &c_camera::moveFPS, &c_camera::moveSpectator, &c_camera::moveFlight, &c_camera::moveOrbit }
-{}
+    c_object(),
+    rotateFunction{ &c_camera::rotateLockedY, &c_camera::rotateOrbitLockedY },
+    updateFunction{ &c_camera::updateNormal, &c_camera::updateOrbit },
+    viewMode( VIEW_NORMAL ),
+    fov( DEFAULT_FOV ),
+    aspectW( DEFAULT_ASPECT_WIDTH ),
+    aspectH( DEFAULT_ASPECT_HEIGHT ),
+    zNear( DEFAULT_Z_NEAR ),
+    zFar( DEFAULT_Z_FAR ),
+    orbitDist( 1.f ),
+    target( 0.f ),
+    xAxis( pipeline::getWorldAxisX() ),
+    yAxis( pipeline::getWorldAxisY() ),
+    zAxis( pipeline::getWorldAxisZ() ),
+    angles( vec3( 0.f, 0.f, 0.f ) ),
+    orientation( quat( 0.f, 0.f, 0.f, 1.f ) ),
+    viewMatrix( mat4( 1.f ) ),
+    projMatrix(
+        infinitePerspective( DEFAULT_FOV, DEFAULT_ASPECT_WIDTH/DEFAULT_ASPECT_HEIGHT, DEFAULT_Z_NEAR )
+    )
+    {}
 
-c_camera::c_camera( const c_camera& camCopy ) :
-	c_object( camCopy ),
-	projMat( camCopy.projMat ),
-	viewMat( camCopy.viewMat ),
-	orientation( camCopy.orientation ),
-	xAxis( camCopy.xAxis ),
-	yAxis( camCopy.yAxis ),
-	zAxis( camCopy.zAxis ),
-	target( camCopy.target ),
-	posVel( camCopy.posVel ),
-	angVel( camCopy.angVel ),
-	posAccel( camCopy.posAccel ),
-	angAccel( camCopy.angAccel ),
-	pitch( camCopy.pitch ),
-	yaw( camCopy.yaw ),
-	roll( camCopy.roll ),
-	fov( camCopy.fov ),
-	aspectW( camCopy.aspectW ),
-	aspectH( camCopy.aspectH ),
-	zNear( camCopy.zNear ),
-	zFar( camCopy.zFar ),
-	camType( camCopy.camType ),
-	// the "rotationFunction" and "moveFunction" function pointer arrays must
-	// correspond to the "cameraType" enumeration
-	rotationFunction{ &c_camera::rotateFPS, &c_camera::rotateSpectator, &c_camera::rotateFlight, &c_camera::rotateOrbit },
-	moveFunction{ &c_camera::moveFPS, &c_camera::moveSpectator, &c_camera::moveFlight, &c_camera::moveOrbit }
+c_camera::c_camera( const c_camera& c ) :
+    c_object( c ),
+    rotateFunction{ &c_camera::rotateLockedY, &c_camera::rotateOrbitLockedY },
+    updateFunction{ &c_camera::updateNormal, &c_camera::updateOrbit },
+    viewMode( c.viewMode ),
+    fov( c.fov ),
+    aspectW( c.aspectW ),
+    aspectH( c.aspectH ),
+    zNear( c.zNear ),
+    zFar( c.zFar ),
+    orbitDist( c.orbitDist ),
+    target( c.target ),
+    xAxis( c.xAxis ),
+    yAxis( c.yAxis ),
+    zAxis( c.zAxis ),
+    angles( c.angles ),
+    orientation( c.orientation ),
+    viewMatrix( c.viewMatrix ),
+    projMatrix( c.projMatrix )
 {}
-
-//-----------------------------------------------------------------------------
-//	Camera - Looking
-//-----------------------------------------------------------------------------
-void c_camera::look( const vec3& camTarget ) {
-	look( pos, camTarget, yAxis );
+        
+void c_camera::setOrtho() {
+    //projMatrix = hamLibs::ortho( -aspectW, aspectW, -aspectH, aspectH, zNear, zFar );
+    projMatrix = ortho( -aspectW, aspectW, -aspectH, aspectH );
 }
 
-void c_camera::look( const vec3& camPos, const vec3& camTarget, const vec3& camUp ) {
-	pos = camPos;
-	target = camTarget;
-	
+void c_camera::setPerspective() {
+    projMatrix = infinitePerspective(
+        fov, aspectW/aspectH, zNear
+    );
+}
+
+void c_camera::setProjection(
+    float inFov, float aspectWidth, float aspectHeight, float near, float far
+) {
+    fov = inFov;
+    aspectW = aspectWidth;
+    aspectH = aspectHeight;
+    zNear = near;
+    zFar = far;
+}
+
+void c_camera::lockYAxis( bool isLocked ) {
+    rotateFunction[ VIEW_NORMAL ] = ( isLocked )
+        ? &c_camera::rotateLockedY
+        : &c_camera::rotateUnlockedY;
+    
+    rotateFunction[ VIEW_ORBIT ] = ( isLocked )
+        ? &c_camera::rotateOrbitLockedY
+        : &c_camera::rotateOrbitUnlockedY;
+    
+}
+
+void c_camera::look( const vec3& eye, const vec3& point, const vec3& up ) {
+    pos = eye;
+    target = point;
+    
 	zAxis = normalize( pos - target );
-	xAxis = normalize( cross( camUp, zAxis ) );
+	xAxis = normalize( cross( up, zAxis ) );
 	yAxis = normalize( cross( zAxis, xAxis ) );
-
-	viewMat[0][0] = xAxis.v[0];
-	viewMat[1][0] = xAxis.v[1];
-	viewMat[2][0] = xAxis.v[2];
-	viewMat[3][0] = -dot( xAxis, pos );
 	
-	viewMat[0][1] = yAxis.v[0];
-	viewMat[1][1] = yAxis.v[1];
-	viewMat[2][1] = yAxis.v[2];
-	viewMat[3][1] = -dot( yAxis, pos );
-	
-	viewMat[0][2] = zAxis.v[0];
-	viewMat[1][2] = zAxis.v[1];
-	viewMat[2][2] = zAxis.v[2];
-	viewMat[3][2] = -dot( zAxis, pos );
-	
-	orientation = matToQuat( viewMat );
-}
-
-//-----------------------------------------------------------------------------
-//	Camera - Rotations
-//-----------------------------------------------------------------------------
-void c_camera::rotateFPS() {
-	orientation
-		= orientation
-		* fromAxisAngle( pipeline::getWorldAxisX(), pitch )
-		* fromAxisAngle( pipeline::getWorldAxisY(), yaw )
-		* fromAxisAngle( pipeline::getWorldAxisZ(), roll );
-}
-
-void c_camera::rotateFlight() {
-	orientation
-		= fromAxisAngle( zAxis, roll )
-		* fromAxisAngle( yAxis, yaw )
-		* fromAxisAngle( xAxis, pitch )
-		* orientation;
-}
-
-void c_camera::rotateOrbit() {
-    rotateFlight();
-/*
-    // Stripped down version of the LookAt function
-    viewMat[0][0] = xAxis.v[0]; viewMat[1][0] = xAxis.v[1]; viewMat[2][0] = xAxis.v[2];
-    viewMat[0][1] = yAxis.v[0]; viewMat[1][1] = yAxis.v[1]; viewMat[2][1] = yAxis.v[2];
-    viewMat[0][2] = zAxis.v[0]; viewMat[1][2] = zAxis.v[1]; viewMat[2][2] = zAxis.v[2];
-
-    viewMat = quatToMat4( orientation ) * viewMat;
-*/
-}
-
-void c_camera::unRoll() {
-	if ( camType == CAM_TYPE_ORBIT ) {
-		look( pos, target, vec3( 0.f, 1.f, 0.f ) );
-	}
-	else {
-		look( pos, pos - zAxis, pipeline::getWorldAxisY() );
-	}
-}
-
-//-----------------------------------------------------------------------------
-//	Camera - Movement
-//-----------------------------------------------------------------------------
-void c_camera::moveFPS() {
-	vec3 forwards( cross( pipeline::getWorldAxisY(), xAxis ) );
-	vec3 strafe( cross( pipeline::getWorldAxisY(), zAxis ) );
-	
-	pos += strafe * deltaPos.v[0];
-	pos += pipeline::getWorldAxisY() * deltaPos.v[1];
-	pos += forwards * deltaPos.v[2];
-}
-
-void c_camera::moveSpectator() {
-	vec3 strafe( cross( pipeline::getWorldAxisY(), zAxis ) );
-	
-	pos += strafe * deltaPos.v[0];
-	pos += pipeline::getWorldAxisY() * deltaPos.v[1];
-	pos -= zAxis * deltaPos.v[2];
-}
-
-void c_camera::moveFlight() {
-	pos += xAxis * deltaPos.v[0];
-	pos += yAxis * deltaPos.v[1];
-	pos -= zAxis * deltaPos.v[2];
-}
-
-void c_camera::moveOrbit() {
-	//pos -= ( target + zAxis ) * deltaPos.v[2];
-}
-
-//-----------------------------------------------------------------------------
-//	Camera - Final Updates
-//-----------------------------------------------------------------------------
-void c_camera::tick( float timeElapsed ) {
-	
-	// Caution: Function pointers are used to handle movement & rotation functions
-	float timeSquared( timeElapsed * timeElapsed );
-	
-	// Rotation
-	pitch   -= ( angVel.v[0] * timeElapsed ) - ( angAccel.v[0] * timeSquared );
-	yaw     -= ( angVel.v[1] * timeElapsed ) - ( angAccel.v[1] * timeSquared );
-	roll    -= ( angVel.v[2] * timeElapsed ) - ( angAccel.v[2] * timeSquared );
-	
-	( this->*rotationFunction[ camType ] )();
-	orientation = normalize( orientation );
-	pitch = yaw = roll = 0.f;
-	
-	//Movement
-	deltaPos += ( posVel * timeElapsed ) + ( posAccel * timeSquared );
-	( this->*moveFunction[ camType ] )();
+    viewMatrix[0][0] = xAxis.v[0];
+    viewMatrix[1][0] = xAxis.v[1];
+    viewMatrix[2][0] = xAxis.v[2];
     
-    viewMat = quatToMat4( orientation );
-    xAxis = vec3( viewMat[0][0], viewMat[1][0], viewMat[2][0] );
-    yAxis = vec3( viewMat[0][1], viewMat[1][1], viewMat[2][1] );
-    zAxis = vec3( viewMat[0][2], viewMat[1][2], viewMat[2][2] );
-	
-	//update the view matrix
-	if ( camType == CAM_TYPE_ORBIT )
-        pos -= ( target + zAxis ) * deltaPos.v[2];
-    deltaPos = 0.f;
+    viewMatrix[0][1] = yAxis.v[0];
+    viewMatrix[1][1] = yAxis.v[1];
+    viewMatrix[2][1] = yAxis.v[2];
     
-    viewMat[3][0] = -dot( xAxis, pos );
-    viewMat[3][1] = -dot( yAxis, pos );
-    viewMat[3][2] = -dot( zAxis, pos );
+    viewMatrix[0][2] = zAxis.v[0];
+    viewMatrix[1][2] = zAxis.v[1];
+    viewMatrix[2][2] = zAxis.v[2];
+    
+    orientation = matToQuat( viewMatrix );
+}
+        
+void c_camera::look( const vec3& point ) {
+    look( pos, point, yAxis );
+}
+
+void c_camera::move( const vec3& amount ) {
+    pos -= xAxis * amount[0];
+    pos -= yAxis * amount[1];
+    pos -= zAxis * amount[2];
+}
+
+void c_camera::rotate( const vec3& amount ) {
+    ( this->*rotateFunction[ viewMode ] )( amount );
+}
+
+void c_camera::rotateUnlockedY( const vec3& amount ) {
+    orientation *= fromEuler( -amount );
+}
+
+void c_camera::rotateLockedY( const vec3& amount ) {
+    orientation
+        = fromAxisAngle( zAxis, -amount[2] )
+        * fromAxisAngle( vec3( 0.f, 1.f, 0.f), -amount[0] )
+        * fromAxisAngle( xAxis, -amount[1] )
+        * orientation;
+}
+
+void c_camera::rotateOrbitUnlockedY( const vec3& amount ) {
+    pos -= xAxis * amount[0];
+    pos -= yAxis * amount[1];
+    pos -= zAxis * amount[2];
+}
+
+void c_camera::rotateOrbitLockedY( const vec3& amount ) {
+    rotateOrbitUnlockedY( amount );
+    look( pos, target, vec3( 0.f, 1.f, 0.f ) );
+}
+
+void c_camera::unroll() {
+	if ( viewMode == VIEW_ORBIT )   look( pos, target, vec3( 0.f, 1.f, 0.f ) );
+	else                            look( pos, pos - zAxis, vec3( 0.f, 1.f, 0.f ) );
+}
+
+void c_camera::updateNormal() {
+    viewMatrix = quatToMat4( orientation );
+    
+    xAxis = vec3( viewMatrix[0][0], viewMatrix[1][0], viewMatrix[2][0] );
+    yAxis = vec3( viewMatrix[0][1], viewMatrix[1][1], viewMatrix[2][1] );
+    zAxis = vec3( viewMatrix[0][2], viewMatrix[1][2], viewMatrix[2][2] );
+}
+
+void c_camera::updateOrbit() {
+    pos = normalize( pos - target ) * orbitDist;
+    look( target );
+}
+
+void c_camera::update() {
+    ( this->*updateFunction[ viewMode ] )();
+    viewMatrix[3][0] = -dot( xAxis, pos );
+    viewMatrix[3][1] = -dot( yAxis, pos );
+    viewMatrix[3][2] = -dot( zAxis, pos );
 }
 
 } // end hge namespace

@@ -56,7 +56,7 @@ void pipeline::applyMatrix( e_matrixState s, const math::mat4& m ) {
     transforms[ s ] = m;
     
     // Update the current MVP matrix
-    transforms[ 3 ] // MVP Matrix
+    transforms[ 3 ]
         = transforms[ HGE_MODEL_MAT ]
         * transforms[ HGE_VIEW_MAT ]
         * transforms[ HGE_PROJ_MAT ];
@@ -69,32 +69,9 @@ void pipeline::applyMatrix( e_matrixState s, const math::mat4& m ) {
     glUniformBlockBinding( currShader, matrixIndexId, HGE_PIPELINE_MATRIX_BINDING );
     glBindBuffer( GL_UNIFORM_BUFFER, ubo );
     glBindBufferBase( GL_UNIFORM_BUFFER, HGE_PIPELINE_MATRIX_BINDING, ubo );
-    
-    if ( s == HGE_MODEL_MAT ) {
-        glBufferSubData(
-            GL_UNIFORM_BUFFER, sizeof( math::mat4 ) * 0,
-            sizeof( math::mat4 ), &transforms[s]
-        );
-    }
-    else if ( s == HGE_VIEW_MAT ) {
-        glBufferSubData(
-            GL_UNIFORM_BUFFER, sizeof( math::mat4 ) * 1,
-            sizeof( math::mat4 ), &transforms[s]
-        );
-    }
-    else if ( s == HGE_PROJ_MAT ) {
-        glBufferSubData(
-            GL_UNIFORM_BUFFER, sizeof( math::mat4 ) * 2,
-            sizeof( math::mat4 ), &transforms[s]
-        );
-    }
-    
-    // Pass the MVP Matrix
-    glBufferSubData(
-        GL_UNIFORM_BUFFER, sizeof( math::mat4 ) * 3,
-            sizeof( math::mat4 ), &transforms[3]
+    glBufferData(
+        GL_UNIFORM_BUFFER, sizeof( transforms ), transforms, GL_DYNAMIC_DRAW
     );
-    
 }
 
 /******************************************************************************
@@ -121,10 +98,8 @@ void pipeline::removeMatrix( e_matrixState s ) {
 void pipeline::applyShader( GLuint programId ) {
     currShader = programId;
     
-    if ( !currShader ) {
-        matrixIndexId = GL_INVALID_INDEX;
+    if ( !currShader )
         return;
-    }
     
     glUseProgram( currShader );
     printGlError( "Applying a shader to the pipeline" );

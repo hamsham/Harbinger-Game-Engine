@@ -89,6 +89,37 @@ class HGE_API c_line : virtual public c_drawableObj {
         void setVertPos( int index, const vec3& pos );
 };
 
+
+/******************************************************************************
+ * Sphere Primitive
+******************************************************************************/
+class HGE_API c_sphere : virtual public c_drawableObj {
+    private:
+        GLuint vao = 0;
+        GLuint vbo[ 2 ] = { 0, 0 };
+        
+        s_vertex* vertices = nullptr;
+        unsigned numVerts = 0;
+        
+        GLuint* indices = nullptr;
+        unsigned numIndices = 0;
+        
+        bool sendToOpenGL();
+        
+    public:
+        c_sphere() {}
+        ~c_sphere();
+        
+        bool createSphere( int rings, int sectors );
+        void destroySphere();
+        
+        void draw() const {
+            glBindVertexArray( vao );
+            glDrawElements( GL_TRIANGLE_STRIP, numIndices, GL_UNSIGNED_INT, nullptr );
+            glBindVertexArray( 0 );
+        }
+};
+
 } // end hge namespace
 
 #endif	/* __HGE_PRIMITIVES_H__ */

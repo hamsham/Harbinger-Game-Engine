@@ -69,18 +69,18 @@ c_camera::c_camera( const c_camera& c ) :
     projMatrix( c.projMatrix )
 {}
         
-void c_camera::setOrtho() {
+void c_camera::makeOrtho() {
     //projMatrix = hamLibs::ortho( -aspectW, aspectW, -aspectH, aspectH, zNear, zFar );
     projMatrix = ortho( -aspectW, aspectW, -aspectH, aspectH );
 }
 
-void c_camera::setPerspective() {
+void c_camera::makePerspective() {
     projMatrix = infinitePerspective(
         fov, aspectW/aspectH, zNear
     );
 }
 
-void c_camera::setProjection(
+void c_camera::setProjectionParams(
     float inFov, float aspectWidth, float aspectHeight, float near, float far
 ) {
     fov = inFov;

@@ -255,4 +255,130 @@ void c_line::draw() const {
     glBindVertexArray( 0 );
 }
 
+/******************************************************************************
+ *      SPHERES
+******************************************************************************/
+c_sphere::~c_sphere() {
+    destroySphere();
+}
+
+bool c_sphere::sendToOpenGL() {
+	glGenVertexArrays( 1, &vao );
+	glBindVertexArray( vao );
+	glGenBuffers( 2, vbo );
+    
+    if ( !vao || !vbo[0] || !vbo[1] ) {
+        std::cerr
+            << "An error occurred while initializing the sphere primitives"
+            << std::endl;
+        destroySphere();
+        return false;
+    }
+	
+	glBindBuffer( GL_ARRAY_BUFFER, vbo[0] );
+    glBufferData( GL_ARRAY_BUFFER, numVerts * sizeof( s_vertex ), vertices, GL_STATIC_DRAW );
+	printGlError( "Error while sending sphere primitive data to the GPU.");
+    
+	glEnableVertexAttribArray( pipeline::VERTEX_ATTRIB );
+	glVertexAttribPointer(
+		pipeline::VERTEX_ATTRIB,
+		ARRAY_SIZE_FROM_ELEMENTS( s_vertex::pos.v ), GL_FLOAT, GL_FALSE,
+        sizeof( s_vertex ), (GLvoid*)offsetof( s_vertex, pos.v )
+	);
+    
+	glEnableVertexAttribArray( pipeline::TEXTURE_ATTRIB );
+	glVertexAttribPointer(
+		pipeline::TEXTURE_ATTRIB,
+		ARRAY_SIZE_FROM_ELEMENTS( s_vertex::uv.v ), GL_FLOAT, GL_FALSE,
+        sizeof( s_vertex ), (GLvoid*)offsetof( s_vertex, uv.v )
+	);
+    
+	glEnableVertexAttribArray( pipeline::NORMAL_ATTRIB );
+	glVertexAttribPointer(
+		pipeline::NORMAL_ATTRIB,
+		ARRAY_SIZE_FROM_ELEMENTS( s_vertex::norm.v ), GL_FLOAT, GL_FALSE,
+        sizeof( s_vertex ), (GLvoid*)offsetof( s_vertex, norm.v )
+	);
+    
+	glEnableVertexAttribArray( pipeline::TANGENT_ATTRIB );
+	glVertexAttribPointer(
+		pipeline::TANGENT_ATTRIB,
+		ARRAY_SIZE_FROM_ELEMENTS( s_vertex::tangent.v ), GL_FLOAT, GL_FALSE,
+        sizeof( s_vertex ), (GLvoid*)offsetof( s_vertex, tangent.v )
+	);
+    
+    glBindBuffer( GL_ELEMENT_ARRAY_BUFFER, vbo[1] );
+    glBufferData( GL_ELEMENT_ARRAY_BUFFER, numIndices * sizeof( GLuint ), indices, GL_STATIC_DRAW );
+	
+	glBindVertexArray( 0 );
+    
+	return true;
+}
+
+bool c_sphere::createSphere( int rings, int sectors ) {
+    float const R = 1.f / (float)(rings-1);
+    float const S = 1.f / (float)(sectors-1);
+    
+    destroySphere();
+    
+    numVerts = rings * sectors;
+    numIndices = rings * sectors * 4;
+    
+    vertices = new( std::nothrow ) s_vertex[ rings * sectors ];
+    if ( !vertices )
+        return false;
+        
+    indices = new( std::nothrow ) GLuint[ rings * sectors * 4 ];
+    if ( !indices ) {
+        delete [] vertices;
+        vertices = nullptr;
+        return false;
+    }
+    
+    for( int r = 0, i = 0; r < rings; r++ ) {
+        for( int s = 0; s < sectors; s++ ) {
+            float const y = std::sin( -HL_PI_OVR2 + HL_PI * r * R );
+            float const x = std::cos( HL_TWO_PI * s * S ) * std::sin( HL_PI * r * R );
+            float const z = std::sin( HL_TWO_PI * s * S ) * std::sin( HL_PI * r * R );
+            
+            vertices[ i ].uv[0] = s*S;
+            vertices[ i ].uv[1] = r*R;
+            
+            vertices[ i ].pos[0] = x;
+            vertices[ i ].pos[1] = y;
+            vertices[ i ].pos[2] = z;
+            
+            vertices[ i ].norm[0] = x;
+            vertices[ i ].norm[1] = y;
+            vertices[ i ].norm[2] = z;
+            ++i;
+        }
+    }
+    
+    for( int r = 0, i = 0; r < rings; r++ ) {
+        for( int s = 0; s < sectors; s++ ) {
+            indices[ i++ ] = r * sectors + s;
+            indices[ i++ ] = (r+1) * sectors + s;
+            indices[ i++ ] = r * sectors + (s+1);
+            indices[ i++ ] = (r+1) * sectors + (s+1);
+        }
+    }
+    
+    
+    return sendToOpenGL();
+}
+
+void c_sphere::destroySphere() {
+    glDeleteVertexArrays( 1, &vao );
+    glDeleteBuffers( 2, vbo );
+
+    vao = vbo[0] = vbo[1] = 0;
+    
+    if ( vertices ) delete [] vertices;
+    if ( indices )  delete [] indices;
+    vertices = nullptr;
+    indices = nullptr;
+    numVerts = numIndices = 0;
+}
+
 } // end hge namespace

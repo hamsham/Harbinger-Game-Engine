@@ -77,48 +77,50 @@ class HGE_API c_camera : virtual public c_object {
         c_camera    ( const c_camera& );
         ~c_camera   () {}
         
-        float       getOrbitDist() const                    { return orbitDist; }
-        void        setOrbitDist( float d )                 { orbitDist = std::fabs(d); }
-        
-        const vec3& getDir      () const                    { return zAxis; }
-        void        setDir      ( const vec3& d )           { look( d ); }
-        const vec3& getTarget   () const                    { return target; }
-        void        setTarget   ( const vec3& t )           { target = t; }
-        
-        const vec3& getUp       () const                    { return yAxis; }
-        void        setUp       ( const vec3& up )          { yAxis = up; }
-        const mat4& getViewMatrix() const                   { return viewMatrix; }
-        const mat4& getProjMatrix() const                   { return projMatrix; }
-        mat4        getVPMatrix () const                    { return viewMatrix * projMatrix; }
-        
-        void        setAspect   ( float w, float h )        { aspectW = w; aspectH = h; }
-        float       getAspect   () const                    { return aspectW / aspectH; }
-        void        setZNear    ( float inZNear )           { zNear = inZNear; }
-        float       getZNear    () const                    { return zNear; }
-        void        setZFar     ( float inZFar )            { zFar = inZFar; }
-        float       getZFar     () const                    { return zFar; }
-        
-        void        setViewMode ( e_viewMode m )            { viewMode = m; }
-        e_viewMode  getViewMode () const                    { return viewMode; }
-        
-        void        setOrtho    ();
-        void        setPerspective();
-        void        setProjection(
-                                float inFov,
-                                float aspectWidth, float aspectHeight,
-                                float near, float far
+        void        makeOrtho       ();
+        void        makePerspective ();
+        void        setProjectionParams(
+                                float inFov                 = DEFAULT_FOV,
+                                float aspectWidth           = DEFAULT_ASPECT_WIDTH,
+                                float aspectHeight          = DEFAULT_ASPECT_HEIGHT,
+                                float near                  = DEFAULT_Z_NEAR,
+                                float far                   = DEFAULT_Z_FAR
                     );
         
-        void        lockYAxis   ( bool );
+        float       getOrbitDist    () const                { return orbitDist; }
+        void        setOrbitDist    ( float d )             { orbitDist = std::fabs(d); }
         
-        void        look        ( const vec3& eye, const vec3& point, const vec3& up );
-        void        look        ( const vec3& point );
-        void        move        ( const vec3& amount );
-        void        rotate      ( const vec3& amount );
-        void        unroll      ();
+        const vec3& getDir          () const                { return zAxis; }
+        void        setDir          ( const vec3& d )       { look( d ); }
+        const vec3& getTarget       () const                { return target; }
+        void        setTarget       ( const vec3& t )       { target = t; }
         
-        void        update      ();
-        void        tick        ( float )                   { update(); }
+        const vec3& getUp           () const                { return yAxis; }
+        void        setUp           ( const vec3& up )      { yAxis = up; }
+        const mat4& getViewMatrix   () const                { return viewMatrix; }
+        const mat4& getProjMatrix   () const                { return projMatrix; }
+        mat4        getVPMatrix     () const                { return viewMatrix * projMatrix; }
+        
+        void        setAspect       ( float w, float h )    { aspectW = w; aspectH = h; }
+        float       getAspect       () const                { return aspectW / aspectH; }
+        void        setZNear        ( float inZNear )       { zNear = inZNear; }
+        float       getZNear        () const                { return zNear; }
+        void        setZFar         ( float inZFar )        { zFar = inZFar; }
+        float       getZFar         () const                { return zFar; }
+        
+        void        setViewMode     ( e_viewMode m )        { viewMode = m; }
+        e_viewMode  getViewMode     () const                { return viewMode; }
+        
+        void        lockYAxis       ( bool );
+        
+        void        look            ( const vec3& eye, const vec3& point, const vec3& up );
+        void        look            ( const vec3& point );
+        void        move            ( const vec3& amount );
+        void        rotate          ( const vec3& amount );
+        void        unroll          ();
+        
+        void        update          ();
+        void        tick            ( float )               { update(); }
 };
 
 } // end hge namespace

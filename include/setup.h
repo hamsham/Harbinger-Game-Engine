@@ -26,7 +26,6 @@
 	#define ARRAY_SIZE_FROM_ELEMENTS( a ) ( sizeof( a ) / sizeof( a[ 0 ] ) )
 #endif
 
-// HL_ASSERT is only defined when 'DEBUG' has also been defined
 #ifdef DEBUG
     #define HGE_ASSERT( x ) ASSERT_WARN( x )
 #else

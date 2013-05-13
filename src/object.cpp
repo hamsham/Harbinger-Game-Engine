@@ -21,31 +21,23 @@ c_object::~c_object() {}
 c_drawableObj::~c_drawableObj() {}
 
 void c_drawableObj::setRotation( const vec3& angles ) {
-	rot = normalize (
-		fromAxisAngle( pipeline::getWorldAxisZ(), angles.v[2] ) *
-		fromAxisAngle( pipeline::getWorldAxisY(), angles.v[1] ) *
-		fromAxisAngle( pipeline::getWorldAxisX(), angles.v[0] )
-	);
+	rot = fromEuler( angles );
 }
 
 void c_drawableObj::rotate( const vec3& angles ) {
-	rot = normalize (
-		fromAxisAngle( pipeline::getWorldAxisZ(), angles.v[2] ) *
-		fromAxisAngle( pipeline::getWorldAxisY(), angles.v[1] ) *
-		fromAxisAngle( pipeline::getWorldAxisX(), angles.v[0] ) *
-		rot
-	);
+	rot *= fromEuler( angles );
 }
 
 void c_drawableObj::update() {
-	const mat4 scaleMat(
-		scale.v[0], 0.f, 0.f, 0.f,
-		0.f, scale.v[1], 0.f, 0.f,
-		0.f, 0.f, scale.v[2], 0.f,
-		0.f, 0.f, 0.f, 1.f
-	);
 	
-	modelMat = quatToMat4( rot ) * scaleMat;
+	modelMat
+        = quatToMat4( rot )
+        * mat4(
+            scale.v[0], 0.f, 0.f, 0.f,
+            0.f, scale.v[1], 0.f, 0.f,
+            0.f, 0.f, scale.v[2], 0.f,
+            0.f, 0.f, 0.f, 1.f
+	);
 
 	modelMat[3][0] = pos.v[0];
 	modelMat[3][1] = pos.v[1];

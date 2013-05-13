@@ -13,9 +13,6 @@
 #include "font.h"
 #include "pipeline.h"
 
-using hamLibs::math::mat4;
-using hamLibs::math::vec3;
-
 void printFontError( const char* msg, int error ) {
     std::cerr << msg;
     if ( error ) std::cerr << error;

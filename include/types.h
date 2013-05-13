@@ -35,33 +35,46 @@ typedef vec2_t< int >	vec2i;
 /*
  * Global Variables
  */
-cstr const		RESOURCE_DIR		= "resources/";
-cstr const		WRONG_TEXTURE_FILE	= "resources/wrong.jpg";
 
 /*
  * Forward Declarations
  */
-class	c_object;
-class	c_drawableObj;
+// Miscellaneous Structures
+struct  s_videoMode;
+struct  s_vertex;
 
-class	c_resource;
-class	c_bitmap;
-class	c_image;
-class	c_mesh;
-class	c_shader;
-class	c_camera;
-struct	s_vertex;
+// Abstract Base Classes
+class   c_object;
+class   c_drawableObj;
+class   c_resource;
 
-struct	s_light;
-struct	s_diffuseLight;
-struct	s_specularLight;
-struct	s_pointLight;
-struct	s_spotLight;
+// Visual-Related
+class   c_bitmap;
+class   c_camera;
+class   c_cubeMap;
+class   c_font;
+class   c_mesh;
+class   c_shader;
+class   c_skyBox;
 
-class	c_timeObject;	// time base class
-class	c_clock;		// general time (counts upwards)
-class	c_timer;		// count down
-class	c_stopwatch;	// count upward, with lapping
+// Drawable Primitives
+class   c_line;
+class   c_quad;
+class   c_sphere;
+class   c_triangle;
+
+// Lighting types
+struct  s_light;
+struct  s_diffuseLight;
+struct  s_specularLight;
+struct  s_pointLight;
+struct  s_spotLight;
+
+// Time Types
+class   c_timeObject;	// time base class
+class   c_clock;		// general time (counts upwards)
+class   c_timer;		// count down
+class   c_stopwatch;	// count upward, with lapping
 
 } // end hge namespace
 #endif	/* __HGE_TYPES_H__ */

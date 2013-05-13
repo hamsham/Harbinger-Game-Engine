@@ -23,6 +23,8 @@ class HGE_API c_shader : virtual public c_resource {
         GLuint progID;
 
     public:
+        enum : GLint { INVALID_UNIFORM = -1 };
+        
         c_shader        ();
         ~c_shader       ();
 
@@ -31,7 +33,8 @@ class HGE_API c_shader : virtual public c_resource {
         bool            loadBuffer      ( cstr shaderBuffer, int length, int shaderType );
         bool            compile         ();
         void            unload          ();
-        GLuint          getProgramID    () const { return progID; }
+        GLuint          getProgramId    () const { return progID; }
+        GLint           getVariableId   ( const char* v ) { return glGetUniformLocation( progID, v ); }
 };
 
 } // end hge namespace

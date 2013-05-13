@@ -24,6 +24,7 @@
 #include "resource.h"
 #include "shader.h"
 #include "shadowMap.h"
+#include "skybox.h"
 #include "timeObject.h"
 
 namespace hge {

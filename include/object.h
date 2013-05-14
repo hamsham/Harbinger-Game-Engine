@@ -74,7 +74,7 @@ class HGE_API c_drawableObj : virtual public c_object {
 		
 		virtual void	update		();
 		virtual void	tick		( float )				{ update(); }
-		virtual void	draw		() const= 0;
+		virtual void	draw		() const = 0;
 };
 
 } // end hge namespace

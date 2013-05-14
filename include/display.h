@@ -46,8 +46,10 @@ namespace display {
     HGE_API bool    isWindowOpen    ();
     
     HGE_API void    resizeWindow    ( int w, int h );
-	HGE_API int		getScreenWidth	();
-	HGE_API int		getScreenHeight ();
+	HGE_API int		getWindowWidth	();
+	HGE_API int		getWindowHeight ();
+    HGE_API int     getDesktopWidth ();
+    HGE_API int     getDesktopHeight();
     HGE_API void    setResizeCallback( void (*callback)(int w, int h) );
     
     HGE_API void    raiseWindow     ();

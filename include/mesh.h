@@ -41,14 +41,6 @@ struct HGE_API s_vertex {
 //	Mesh Scene & Structure
 ///////////////////////////////////////////////////////////////////////////////
 class HGE_API c_mesh : virtual public c_resource, virtual public c_drawableObj {
-	public:
-		enum e_drawMode : GLuint {
-			DRAW_FILLED	= GL_TRIANGLES,
-			DRAW_LINES	= GL_LINES,
-			DRAW_POINTS	= GL_POINTS
-		};
-		static const int		DEFAULT_MESH_FLAGS;
-	
 	private:
 		// Mesh Structure
 		struct meshEntry {
@@ -71,7 +63,6 @@ class HGE_API c_mesh : virtual public c_resource, virtual public c_drawableObj {
 		GLuint					buffers[ 2 ]; // Vertices & Indices
 		meshEntry*				entries;
 		c_bitmap*				textures;
-		e_drawMode				drawMode;
 		
 		//load all data from Assimp using two passes
 		bool	prepMeshes		( const aiScene*, uint& numVerts, uint& numIndices );
@@ -82,7 +73,7 @@ class HGE_API c_mesh : virtual public c_resource, virtual public c_drawableObj {
 
 	public:
 		c_mesh	();
-		~c_mesh	();
+		~c_mesh	() { unload(); }
 		
 		//deleted member functions
 		c_mesh	( const c_mesh& )	= delete;
@@ -92,17 +83,11 @@ class HGE_API c_mesh : virtual public c_resource, virtual public c_drawableObj {
 		
 		//data loading and unloading
 		bool	isLoaded		() const;
-		bool	load			( cstr fileName, int flags = DEFAULT_MESH_FLAGS );
+		bool	load			( cstr fileName, int flags = 0 );
 		void	unload			();
 		
-		// render modifications
-		void	setDrawMode		( e_drawMode mode )				{ drawMode = mode; }
-		e_drawMode getDrawMode	() const						{ return drawMode; }
-		
 		// drawing
-		void	tick			( float timeElapsed )			{ c_drawableObj::tick( timeElapsed ); }
 		void	draw			() const;
-		void	draw			( const c_camera& ) const;
 };
 
 } // end hge namespace

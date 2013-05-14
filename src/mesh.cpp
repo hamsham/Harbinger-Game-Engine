@@ -87,24 +87,14 @@ c_mesh::meshEntry& c_mesh::meshEntry::operator = ( const c_mesh::meshEntry& meCo
 //-----------------------------------------------------------------------------
 // Mesh - Construction & Destruction
 //-----------------------------------------------------------------------------
-const int c_mesh::DEFAULT_MESH_FLAGS(
-	aiProcessPreset_TargetRealtime_MaxQuality |
-	aiProcessPreset_TargetRealtime_Quality
-);
-
 c_mesh::c_mesh() :
 	numMeshes( 0 ),
 	numTextures( 0 ),
 	vao( 0 ),
 	buffers{ 0, 0 },
 	entries( HGE_NULL ),
-	textures( HGE_NULL ),
-	drawMode( DRAW_FILLED )
+	textures( HGE_NULL )
 {}
-
-c_mesh::~c_mesh() {
-	unload();
-}
 
 //-----------------------------------------------------------------------------
 // Mesh - Unloading
@@ -153,7 +143,7 @@ bool c_mesh::load( cstr fileName, int flags ) {
 	glBindVertexArray( vao );
 	
 	std::cout << "\tReading data from the file...\n";
-	pScene = importer.ReadFile( fileName, flags );
+	pScene = importer.ReadFile( fileName, aiProcessPreset_TargetRealtime_MaxQuality );
 	if ( pScene == HGE_NULL ) {
 		std::cout << "\tFailed. " << importer.GetErrorString() << std::endl;
 		return false;
@@ -465,7 +455,7 @@ void c_mesh::draw() const {
             textures[ matIndex ].makeActive( pipeline::HGE_TEXTURE_DIFFUSE );	
 		
 		glDrawElementsBaseVertex(
-			drawMode, entries[ i ].numIndices, GL_UNSIGNED_INT,
+			GL_TRIANGLES, entries[ i ].numIndices, GL_UNSIGNED_INT,
 			( GLvoid* )( sizeof( uint ) * entries[ i ].baseIndex ),
 			entries[ i ].baseVertex
 		);

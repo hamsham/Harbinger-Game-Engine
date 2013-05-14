@@ -13,6 +13,9 @@
 #include "font.h"
 #include "pipeline.h"
 
+using hamLibs::math::mat4;
+using hamLibs::math::vec3;
+
 void printFontError( const char* msg, int error ) {
     std::cerr << msg;
     if ( error ) std::cerr << error;
@@ -45,30 +48,24 @@ bool c_font::load( const char* filename, int fontsize ) {
     // Modify the font's size
     FT_Set_Pixel_Sizes( ftFace, fontsize, fontsize );
     
-    // Prepare OpenGL for the font data
-    glGenVertexArrays( 1, &vao );
-    glBindVertexArray( vao );
-    glGenBuffers( 1, &vbo );
-    glBindBuffer( GL_ARRAY_BUFFER, vbo );
+    s_vertex* vertArray = new s_vertex[ HGE_MAX_NUM_GLYPHS * 4 ];
     
-    vboArray vboData;
-    for ( int i(0); i < 256; ++i ) {
-        createCharBitmap( ftFace, i, vboData );
+    for ( int i(0); i < HGE_MAX_NUM_GLYPHS; ++i ) {
+        createCharBitmap( ftFace, i, vertArray );
     }
     
-    // send the data to OpenGL
-    glBufferData( GL_ARRAY_BUFFER, vboData.size(), &vboData[0], GL_STATIC_DRAW );
-    glEnableVertexAttribArray( 0 );
-    glVertexAttribPointer( 0, 2, GL_FLOAT, GL_FALSE, sizeof( vec2 )*2, 0 );
-    glEnableVertexAttribArray( 1 );
-    glVertexAttribPointer( 1, 2, GL_FLOAT, GL_FALSE, sizeof( vec2 )*2, (void*)(sizeof(vec2)) );
-    lineHeight = fontsize;
-    scale = vec3( fontsize );
+    int ret = sendVerticesToGPU( vertArray );
+    if ( !ret )
+        unload();
+    
+    scale = vec3( 1.f );
+    c_drawableObj::update();
     
     FT_Done_Face( ftFace );
     FT_Done_FreeType( ftLib );
+    delete [] vertArray;
     
-    return true;
+    return ret;
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -82,13 +79,16 @@ bool c_font::isLoaded() const {
 // FONT -- UNLOADING
 ///////////////////////////////////////////////////////////////////////////////
 void c_font::unload() {
-    for ( int i = 0; i < 256; ++i )
+    for ( int i = 0; i < HGE_MAX_NUM_GLYPHS; ++i )
         unloadCharTexture( charList[ i ] );
     
     glDeleteBuffers( 1, &vbo );
     glDeleteVertexArrays( 1, &vao );
     
-    vao = vbo = lineHeight = 0;
+//    glDeleteBuffers( 1, &ibo );
+//    ibo = 0;
+    
+    vao = vbo = 0;
     pos = scale = vec3( 0.f );
     text = HGE_NULL;
 }
@@ -113,17 +113,22 @@ inline int getMax( int x, int y ) {
     return x>y ? x:y;
 }
 
-void c_font::createCharBitmap( FT_Face face, int index, vboArray& vboData ) {
+void c_font::createCharBitmap( FT_Face face, int index, s_vertex* vertArray ) {
     
     FT_Load_Glyph( face, FT_Get_Char_Index( face, index ), FT_LOAD_DEFAULT );
     
     FT_Render_Glyph( face->glyph, FT_RENDER_MODE_NORMAL );
-    FT_Bitmap* ftBitmap = &face->glyph->bitmap;
     
-    // create an array for the character bitmap data
-    int width       = nextPow2( ftBitmap->width );
-    int height      = nextPow2( ftBitmap->rows );
-    GLubyte* data   = new GLubyte[ width*height ];
+    FT_Bitmap* ftBitmap = &face->glyph->bitmap;
+    s_vertex* currVert  = vertArray + (index * 4);
+    int& width          = charList[ index ].width;
+    int& height         = charList[ index ].height;
+    int& advX           = charList[ index ].advX;
+    int& advY           = charList[ index ].advY;
+    int& bearX          = charList[ index ].bearX;
+    width               = nextPow2( ftBitmap->width );
+    height              = nextPow2( ftBitmap->rows );
+    GLubyte* data       = new GLubyte[ width*height ];
     
     // copy bitmap data into a format suitable for opengl
     for ( int h(0); h < height; ++h ) {
@@ -135,60 +140,49 @@ void c_font::createCharBitmap( FT_Face face, int index, vboArray& vboData ) {
     }
     
     //generate a texture for the current character
-    generateCharTexture( charList[ index ], width, height, data );
+    sendTexturesToGPU( charList[ index ], data );
     
     // calculate the glyph data
-    charList[ index ].advX = face->glyph->advance.x >> 6;
-    charList[ index ].bearX = face->glyph->metrics.horiBearingX >> 6;
-    int advY =
-        (face->glyph->metrics.height - face->glyph->metrics.horiBearingY) >> 6;
+    advX    = face->glyph->advance.x >> 6;
+    bearX   = face->glyph->metrics.horiBearingX >> 6;
+    advY    = (face->glyph->metrics.height - face->glyph->metrics.horiBearingY) >> 6;
+    advY    = -advY;
     newLine = getMax(newLine, (int)face->glyph->metrics.height>>6);
-    
-    vec2 coords[] = {
-        vec2( 0.f, float(-advY+height) ),
-        vec2( 0.f, float(-advY) ),
-        vec2( float(width), float(-advY+height) ),
-        vec2( float(width), float(-advY) )
-    };
-    vec2 texQuad[] = {
-        vec2( 0.f, 1.f ),
-        vec2( 0.f, 0.f ),
-        vec2( 1.f, 1.f ),
-        vec2( 1.f, 0.f )
-    };
-    
-    for ( int i = 0; i < 4; ++i ) {
-        vboData.insert(
-            vboData.end(),
-            (unsigned char*)&coords[i],
-            (unsigned char*)&coords[i] + sizeof( vec2 )
-        );
-        vboData.insert(
-            vboData.end(),
-            (unsigned char*)&texQuad[i],
-            (unsigned char*)&texQuad[i] + sizeof( vec2 )
-        );
-    }
+        
+    currVert[ 0 ].pos = vec3( 0.f,          float(advY+height), 0.f );
+    currVert[ 1 ].pos = vec3( 0.f,          float(advY),        0.f );
+    currVert[ 2 ].pos = vec3( float(width), float(advY+height), 0.f );
+    currVert[ 3 ].pos = vec3( float(width), float(advY),        0.f );
+
+    currVert[ 0 ].uv = vec2( 0.f, 1.f );
+    currVert[ 1 ].uv = vec2( 0.f, 0.f );
+    currVert[ 2 ].uv = vec2( 1.f, 1.f );
+    currVert[ 3 ].uv = vec2( 1.f, 0.f );
+
+    currVert[0].norm =
+        currVert[1].norm =
+            currVert[2].norm =
+                currVert[3].norm = vec3( 0.f, 0.f, -1.f );
+
+    currVert[0].tangent =
+        currVert[1].tangent =
+            currVert[2].tangent =
+                currVert[3].tangent = vec3( 0.5f, 0.f, 0.5f );
     
     delete [] data;
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-// FONT -- GENERATING CHAR STRUCTURE TEXTURES
+// FONT -- UPLOADING CHARACTER TEXTURES TO THE GPU
 ///////////////////////////////////////////////////////////////////////////////
-void c_font::generateCharTexture(
-    c_font::charTexture& ct,
-    int w,
-    int h,
-    const void* data
-) {
+void c_font::sendTexturesToGPU( c_font::charTexture& ct, const void* data ) {
     GLuint tex(0), sampler(0);
     glGenTextures( 1, &tex );
     glBindTexture( GL_TEXTURE_2D, tex );
     
     glTexImage2D(
         GL_TEXTURE_2D, 0, GL_DEPTH_COMPONENT,
-        w, h, 0, GL_DEPTH_COMPONENT, GL_UNSIGNED_BYTE, data
+        ct.width, ct.height, 0, GL_DEPTH_COMPONENT, GL_UNSIGNED_BYTE, data
     );
     
     glGenSamplers( 1, &sampler );
@@ -197,10 +191,68 @@ void c_font::generateCharTexture(
     glSamplerParameteri( sampler, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE );
     glSamplerParameteri( sampler, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE );
     
-    ct.width = w;
-    ct.height = h;
     ct.textureId = tex;
     ct.samplerId = sampler;
+}
+
+///////////////////////////////////////////////////////////////////////////////
+// FONT -- UPLOADING VERTEX DATA TO THE GPU
+///////////////////////////////////////////////////////////////////////////////
+bool c_font::sendVerticesToGPU( const s_vertex* vertArray ) {
+	
+	glGenVertexArrays( 1, &vao );
+	glBindVertexArray( vao );
+	glGenBuffers( 1, &vbo );
+//	glGenBuffers( 1, &ibo );
+    
+    if ( !vao || !vbo ) {
+        std::cerr
+            << "An error occurred while loading font vertices"
+            << std::endl;
+        return false;
+    }
+	
+	glBindBuffer( GL_ARRAY_BUFFER, vbo );
+    glBufferData(
+        GL_ARRAY_BUFFER, sizeof( s_vertex ) * 4 * HGE_MAX_NUM_GLYPHS,
+        vertArray, GL_STATIC_DRAW
+    );
+	printGlError( "Error while sending primitive data to the GPU.");
+    
+	glEnableVertexAttribArray( pipeline::VERTEX_ATTRIB );
+	glVertexAttribPointer(
+		pipeline::VERTEX_ATTRIB,
+		ARRAY_SIZE_FROM_ELEMENTS( s_vertex::pos.v ), GL_FLOAT, GL_FALSE,
+        sizeof( s_vertex ), (GLvoid*)offsetof( s_vertex, pos.v )
+	);
+    
+	glEnableVertexAttribArray( pipeline::TEXTURE_ATTRIB );
+	glVertexAttribPointer(
+		pipeline::TEXTURE_ATTRIB,
+		ARRAY_SIZE_FROM_ELEMENTS( s_vertex::uv.v ), GL_FLOAT, GL_FALSE,
+        sizeof( s_vertex ), (GLvoid*)offsetof( s_vertex, uv.v )
+	);
+    
+	glEnableVertexAttribArray( pipeline::NORMAL_ATTRIB );
+	glVertexAttribPointer(
+		pipeline::NORMAL_ATTRIB,
+		ARRAY_SIZE_FROM_ELEMENTS( s_vertex::norm.v ), GL_FLOAT, GL_FALSE,
+        sizeof( s_vertex ), (GLvoid*)offsetof( s_vertex, norm.v )
+	);
+    
+	glEnableVertexAttribArray( pipeline::TANGENT_ATTRIB );
+	glVertexAttribPointer(
+		pipeline::TANGENT_ATTRIB,
+		ARRAY_SIZE_FROM_ELEMENTS( s_vertex::tangent.v ), GL_FLOAT, GL_FALSE,
+        sizeof( s_vertex ), (GLvoid*)offsetof( s_vertex, tangent.v )
+	);
+    
+//    unsigned short indices[ 4 ] = { 0, 1, 2, 3 };
+//	glBindBuffer( GL_ELEMENT_ARRAY_BUFFER, ibo );
+//	glBufferData( GL_ELEMENT_ARRAY_BUFFER, sizeof( indices ), indices, GL_STATIC_DRAW );
+	
+	glBindVertexArray( 0 );
+    return true;
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -210,61 +262,60 @@ void c_font::unloadCharTexture( c_font::charTexture& ct ) {
     glDeleteTextures( 1, &ct.textureId );
     glDeleteSamplers( 1, &ct.samplerId );
     ct.width = ct.height = ct.samplerId = ct.textureId = 0;
-    ct.advX = ct.bearX = 0;
+    ct.advX = ct.advY = ct.bearX = 0;
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-// FONT -- DRAWING TEST
+// FONT -- DRAWING
 ///////////////////////////////////////////////////////////////////////////////
 void c_font::draw() const {
-    if ( !isLoaded() )
-        return;
+    float xPos          = pos.v[0];
+    float yPos          = pos.v[1];
+    float fontScaleX    = scale.v[0];
+    float fontScaleY    = scale.v[1];
+    unsigned iter       = 0;
+    int currChar        = 0;
+    mat4&& rotMatrix    = quatToMat4( rot );
     
-    float xPos = pos.v[0];
-    float yPos = pos.v[1];
-    float fontScaleX = scale.v[0]/lineHeight;
-    float fontScaleY = scale.v[1]/lineHeight;
-    unsigned iter = 0;
-    int currChar = 0;
-    
-    mat4 rotMatrix( quatToMat4( rot ) );
-    
-    glBindVertexArray( vao );
-    glEnable( GL_BLEND );
-    glBlendFunc( GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA );
-	glDisable(GL_DEPTH_TEST);
+    glBindVertexArray   ( vao );
+    glEnable            ( GL_BLEND );
+    glBlendFunc         ( GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA );
+	glDisable           ( GL_DEPTH_TEST );
     
     while ( text[ iter ] != '\0' ) {
         currChar = (int)text[ iter++ ];
         const charTexture& ct = charList[ currChar ];
         
-        if ( currChar == '\n' || currChar == '\r' ) {
-            xPos = pos.v[0];
-            yPos -= newLine*fontScaleY;
-        }
-        
-        else if ( currChar == '\t' ) {
-            xPos += ((charList[' '].advX - charList[' '].bearX) * SPACES_PER_TAB ) * fontScaleX;
-        }
-        
-        else {
-            glActiveTexture( GL_TEXTURE0 );
-            glBindTexture( GL_TEXTURE_2D, ct.textureId );
-            glBindSampler( 0, ct.samplerId );
-            
-            hge::pipeline::applyMatrix(
-                hge::pipeline::HGE_MODEL_MAT,
-                translate( modelMat, vec3( xPos, yPos, 0.f ) )
-                * rotMatrix
-            );
+        switch( currChar ) {
+            case '\n':  case '\r':
+                xPos = pos.v[0];
+                yPos -= newLine*fontScaleY;
+                break;
+            case '\t':
+                xPos += ((charList[' '].advX - charList[' '].bearX) * SPACES_PER_TAB ) * fontScaleX;
+                break;
+            default:
+                glActiveTexture( GL_TEXTURE0 );
+                glBindTexture( GL_TEXTURE_2D, ct.textureId );
+                glBindSampler( 0, ct.samplerId );
 
-            glDrawArrays( GL_TRIANGLE_STRIP, currChar*4, 4  );
-            xPos += (ct.advX - ct.bearX) * fontScaleX;
+                hge::pipeline::applyMatrix(
+                    hge::pipeline::HGE_MODEL_MAT,
+                    translate( modelMat, vec3( xPos, yPos, 0.f ) )
+                    * rotMatrix
+                );
+
+                glDrawArrays( GL_TRIANGLE_STRIP, currChar*4, 4  );
+//                glDrawElementsBaseVertex(
+//                    GL_TRIANGLE_STRIP, 4, GL_UNSIGNED_SHORT, 0, currChar*4
+//                );
+                xPos += (ct.advX - ct.bearX) * fontScaleX;
         }
     }
-    glDisable( GL_BLEND );
-	glEnable(GL_DEPTH_TEST);
-    glBindTexture( GL_TEXTURE_2D, 0 );
+    glDisable       ( GL_BLEND );
+	glEnable        ( GL_DEPTH_TEST );
+    glPolygonOffset ( 0.f, 0.f );
+    glBindTexture   ( GL_TEXTURE_2D, 0 );
 }
 
 } // End Harbinger namespace

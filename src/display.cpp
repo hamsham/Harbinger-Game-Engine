@@ -17,8 +17,10 @@ namespace {
     
     bool    displayInitialized  = false;
     bool    displayFullscreen   = false;
-    int     displayWidth        = hge::display::DEFAULT_WINDOW_WIDTH;
-    int     displayHeight       = hge::display::DEFAULT_WINDOW_HEIGHT;
+    int     windowWidth         = hge::display::DEFAULT_WINDOW_WIDTH;
+    int     windowHeight        = hge::display::DEFAULT_WINDOW_HEIGHT;
+    int     deskWidth           = 0;
+    int     deskHeight          = 0;
     
     const int MAX_VIDEO_MODES   = 100;
     std::vector< hge::s_videoMode > vidModes;
@@ -49,14 +51,14 @@ bool display::createWindow(
 	glfwOpenWindowHint( GLFW_WINDOW_NO_RESIZE, (resizeable ? GL_FALSE : GL_TRUE) );
     
 	if ( !glfwOpenWindow(
-            w, h, 8, 8, 8, 8, 16, 16,
+            w, h, 8, 8, 8, 8, 24, 24,
             fullscreen ? GLFW_FULLSCREEN : GLFW_WINDOW
     ) ) {
 		std::cerr << "Failed to create an OpenGL context." << std::endl;
         return false;
 	}
     
-    glfwGetWindowSize( &displayWidth, &displayHeight );
+    glfwGetWindowSize( &windowWidth, &windowHeight );
     glfwSetWindowPos( 0, 0 );
     
 	if ( useVsync == false )
@@ -79,7 +81,7 @@ bool display::createWindow(
 	/*/
 	 * Default OpenGL parameters
 	/*/
-    glViewport( 0, 0, displayWidth, displayHeight );
+    glViewport( 0, 0, windowWidth, windowHeight );
 	glClearColor( 0.5f, 0.5f, 0.5f, 1.0f );
 	glEnable    ( GL_CULL_FACE );		// Occlusion Culling
 	glCullFace  ( GL_BACK );
@@ -124,6 +126,11 @@ bool display::init() {
 		return false;
     }
     
+    GLFWvidmode deskMode;
+    glfwGetDesktopMode( &deskMode );
+    deskWidth = deskMode.Width;
+    deskHeight = deskMode.Height;
+    
     std::cout << "Acquiring display modes...";
     GLFWvidmode modeList[ MAX_VIDEO_MODES ];
     int numModes = glfwGetVideoModes( modeList, MAX_VIDEO_MODES );
@@ -151,6 +158,7 @@ void display::terminate() {
     glfwTerminate();
     vidModes.clear();
     displayInitialized = false;
+    deskWidth = deskHeight = 0;
 }
 
 void display::flip() {
@@ -166,20 +174,28 @@ void display::resizeWindow( int w, int h ) {
         if ( w == vidModes[i].width && h == vidModes[i].height ) {
             glfwSetWindowSize( w, h );
             glViewport( 0, 0, w, h );
-            glfwGetWindowSize( &displayWidth, &displayHeight );
             break;
         }
     }
+    glfwGetWindowSize( &windowWidth, &windowHeight );
 }
 
-int display::getScreenWidth() {
-    glfwGetWindowSize( &displayWidth, &displayHeight );
-	return displayWidth;
+int display::getWindowWidth() {
+    glfwGetWindowSize( &windowWidth, &windowHeight );
+	return windowWidth;
 }
 
-int display::getScreenHeight() {
-    glfwGetWindowSize( &displayWidth, &displayHeight );
-	return displayHeight;
+int display::getWindowHeight() {
+    glfwGetWindowSize( &windowWidth, &windowHeight );
+	return windowHeight;
+}
+
+int display::getDesktopWidth() {
+	return deskWidth;
+}
+
+int display::getDesktopHeight() {
+	return deskHeight;
 }
 
 void display::setResizeCallback( void(*callback)( int w, int h ) ) {

@@ -84,7 +84,7 @@ HGE_API     void terminate();
 
 // The matrix stack will only hold (at most) a single user-applied matrix of
 // each type (model, view, and projection).
-HGE_API     void applyMatrix( e_matrixState s, const mat4& m = NULL );
+HGE_API     void applyMatrix( e_matrixState s, const mat4& m = mat4( 1.f ) );
 HGE_API     void applyMatrix( const c_drawableObj&, const c_camera& );
 HGE_API     void removeMatrix( e_matrixState s );
 

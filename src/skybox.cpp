@@ -10,7 +10,12 @@
 namespace hge {
 
 bool c_skyBox::load( const char* skyFiles[ 6 ] ) {
-    if (    !cubeMap.loadTextures( skyFiles )
+    if (    !cubeMap.load( skyFiles[ 0 ], 0 )
+    ||      !cubeMap.load( skyFiles[ 1 ], 1 )
+    ||      !cubeMap.load( skyFiles[ 2 ], 2 )
+    ||      !cubeMap.load( skyFiles[ 3 ], 3 )
+    ||      !cubeMap.load( skyFiles[ 4 ], 4 )
+    ||      !cubeMap.load( skyFiles[ 5 ], 5 )
     ||      !spherePrim.createSphere( 10, 10 )
     ) {
         unload();

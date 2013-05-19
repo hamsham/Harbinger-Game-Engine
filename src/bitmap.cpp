@@ -19,7 +19,7 @@ FREE_IMAGE_FORMAT deduceImageFormat( const char* inFile );
 
 int setBitmapFlags( FREE_IMAGE_FORMAT inFormat );
 
-GLuint send2DToOpenGL( const void* buffer, int flags, int w, int h );
+void send2DToOpenGL( const void* buffer, int w, int h );
 
 void send3DToOpenGL( unsigned index, const void* buffer, int w, int h );
 
@@ -59,13 +59,7 @@ int setBitmapFlags( FREE_IMAGE_FORMAT inFormat ) {
 //-----------------------------------------------------------------------------
 //	Sending 2D Image Data to OpenGL
 //-----------------------------------------------------------------------------
-GLuint send2DToOpenGL( const void* buffer, int flags, int w, int h ) {
-	// Create the OpenGL texture
-    GLuint texture( 0 );
-	glGenTextures( 1, &texture );
-    if ( !texture )
-        return 0;
-	glBindTexture( GL_TEXTURE_2D, texture );
+void send2DToOpenGL( const void* buffer, int w, int h ) {
 	
 	//Transfer the image data
 	glTexImage2D(
@@ -77,15 +71,11 @@ GLuint send2DToOpenGL( const void* buffer, int flags, int w, int h ) {
 	glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE );
 	
 	// Create Mip Maps (if requested), then delete the FreeImage data,
-	if ( flags & hge::c_bitmap::CREATE_MIPMAPS ) {
-		glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR );
-		glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR );
-		glGenerateMipmap( GL_TEXTURE_2D );
-	}
+    glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR );
+    glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR );
+    glGenerateMipmap( GL_TEXTURE_2D );
 	
 	printGlError( "Texture Loading" );
-	glBindTexture( GL_TEXTURE_2D, 0 );
-    return texture;
 }
 
 //-----------------------------------------------------------------------------
@@ -152,12 +142,12 @@ bool c_bitmap::isLoaded() const {
 //-----------------------------------------------------------------------------
 //	Bitmap - Loading an image file
 //-----------------------------------------------------------------------------
-bool c_bitmap::load( cstr fileName, int imageFlags ) {
+bool c_bitmap::load( cstr fileName, int ) {
+    
 	FIBITMAP* image( HGE_NULL );
 	FREE_IMAGE_FORMAT imageFormat( FIF_UNKNOWN );
 	int FreeImageFlags( 0 );
 	
-	unload();
     if ( !fileName )
         return false;
 	FreeImage_SetOutputMessage( printImageLoadError );
@@ -185,16 +175,24 @@ bool c_bitmap::load( cstr fileName, int imageFlags ) {
 			return false;
 		}
 	}
+    
+	glGenTextures( 1, &oglTexture );
+    if ( !oglTexture ) {
+        unload();
+        return false;
+    }
 	
 	// All checks gave finished properly. Load the rest of the image
 	bmpWidth    = FreeImage_GetWidth( image );
 	bmpHeight   = FreeImage_GetHeight( image );
-	oglTexture  = send2DToOpenGL(
-        FreeImage_GetBits( image ), imageFlags, bmpWidth, bmpHeight
-    );
+    
+	glBindTexture( GL_TEXTURE_2D, oglTexture );
+    send2DToOpenGL( FreeImage_GetBits( image ), bmpWidth, bmpHeight );
+	glBindTexture( GL_TEXTURE_2D, 0 );
+    
 	FreeImage_Unload( image );
     
-	return oglTexture != 0;
+	return true;
 }
 
 //-----------------------------------------------------------------------------
@@ -205,13 +203,14 @@ void c_bitmap::unload() {
 	oglTexture = 0; // insurance
 	bmpWidth = 0;
 	bmpHeight = 0;
+    textureUnit = pipeline::HGE_TEXTURE_DEFAULT;
 }
 
 //-----------------------------------------------------------------------------
 //	Bitmap - Enable a texture within OpenGL
 //-----------------------------------------------------------------------------
-void c_bitmap::makeActive( int texUnit ) const {
-	glActiveTexture( texUnit );
+void c_bitmap::makeActive() const {
+	glActiveTexture( textureUnit );
 	glBindTexture( GL_TEXTURE_2D, oglTexture );
 }
 
@@ -219,7 +218,7 @@ void c_bitmap::makeActive( int texUnit ) const {
 //	Bitmap - Disable an OpenGL texture
 //-----------------------------------------------------------------------------
 void c_bitmap::deActivate() const {
-	glActiveTexture( GL_TEXTURE0 );
+	glActiveTexture( textureUnit );
 	glBindTexture( GL_TEXTURE_2D, 0 );
 }
 
@@ -241,79 +240,68 @@ c_cubeMap& c_cubeMap::operator =( c_cubeMap&& bmpCopy ) {
 //-----------------------------------------------------------------------------
 //	Main Cubemap loading function
 //-----------------------------------------------------------------------------
-bool c_cubeMap::loadTextures( const char* texFiles[ 6 ] ) {
-    if ( textureObj != 0 )
-        unload();
+bool c_cubeMap::load( const char* texFile, int cubeIndex ) {
     
 	FIBITMAP* image( HGE_NULL );
 	FREE_IMAGE_FORMAT imageFormat( FIF_UNKNOWN );
 	int FreeImageFlags( 0 );
-	
-	unload();
-    
-    glGenTextures( 1, &textureObj );
-    if ( !textureObj ) {
-        std::cerr
-            << "ERROR: Unable to reserve a cube map texture on the GPU"
-            << std::endl;
-        return false;
-    }
-    glBindTexture( GL_TEXTURE_CUBE_MAP, textureObj );
     
 	FreeImage_SetOutputMessage( printImageLoadError );
     
-    for ( unsigned i = 0; i < 6; ++i ) {
-        
-        imageFormat = deduceImageFormat( texFiles[ i ] );
-        
-        if (    imageFormat == FIF_UNKNOWN
-        ||      FreeImage_FIFSupportsReading( imageFormat ) == false
-        ) {
-            std::cerr
-                << "ERROR: Unable to determine to file format of "
-                << "the cubemap texture " << texFiles[ i ]
-                << std::endl;
-            unload();
-            return false;
-        }
+    imageFormat = deduceImageFormat( texFile );
 
-        // Load the file
-        FreeImageFlags = setBitmapFlags( imageFormat );
-        image = FreeImage_Load( imageFormat, texFiles[ i ], FreeImageFlags );
+    if (    imageFormat == FIF_UNKNOWN
+    ||      FreeImage_FIFSupportsReading( imageFormat ) == false
+    ) {
+        std::cerr
+            << "ERROR: Unable to determine to file format of "
+            << "the cubemap texture " << texFile
+            << std::endl;
+        unload();
+        return false;
+    }
 
+    // Load the file
+    FreeImageFlags = setBitmapFlags( imageFormat );
+    image = FreeImage_Load( imageFormat, texFile, FreeImageFlags );
+
+    if ( !image ) {
+        std::cerr
+            << "ERROR: Unable to load the cubemap texture "
+            << texFile
+            << std::endl;
+        unload();
+        return false;
+    }
+
+    // Convert the image to RGBA. Unload if it cannot be converted
+    if ( FreeImage_GetColorType( image ) != FIC_RGBALPHA ) {
+        FIBITMAP* temp = image;
+        image = FreeImage_ConvertTo32Bits( temp );
+        FreeImage_Unload( temp );
         if ( !image ) {
             std::cerr
-                << "ERROR: Unable to load the cubemap texture "
-                << texFiles[ i ]
+                << "ERROR: Unable to convert the cubemap texture "
+                << texFile << " to RGBA format."
                 << std::endl;
             unload();
             return false;
         }
-
-        // Convert the image to RGBA. Unload if it cannot be converted
-        if ( FreeImage_GetColorType( image ) != FIC_RGBALPHA ) {
-            FIBITMAP* temp = image;
-            image = FreeImage_ConvertTo32Bits( temp );
-            FreeImage_Unload( temp );
-            if ( !image ) {
-                std::cerr
-                    << "ERROR: Unable to convert the cubemap texture "
-                    << texFiles[ i ] << " to RGBA format."
-                    << std::endl;
-                unload();
-                return false;
-            }
-        }
-
-        // All checks gave finished properly. Load the rest of the image
-        send3DToOpenGL( i, FreeImage_GetBits( image ),
-            FreeImage_GetWidth( image ), FreeImage_GetHeight( image )
-        );
-        
-        FreeImage_Unload( image );
     }
     
+    if ( !textureObj )
+        glGenTextures( 1, &textureObj );
+    
+    // All checks gave finished properly. Load the rest of the image
+    glBindTexture( GL_TEXTURE_CUBE_MAP, textureObj );
+    send3DToOpenGL( cubeIndex, FreeImage_GetBits( image ),
+        FreeImage_GetWidth( image ), FreeImage_GetHeight( image )
+    );
+    glBindTexture( GL_TEXTURE_3D, 0 );
     glBindTexture( GL_TEXTURE_CUBE_MAP, 0 );
+
+    FreeImage_Unload( image );
+    
     return true;
 }
 
@@ -323,18 +311,19 @@ bool c_cubeMap::loadTextures( const char* texFiles[ 6 ] ) {
 void c_cubeMap::unload() {
     glDeleteTextures( 1, &textureObj );
     textureObj = 0;
+    textureUnit = pipeline::HGE_TEXTURE_DEFAULT;
 }
 
 //-----------------------------------------------------------------------------
 //	Cubemap Binding
 //-----------------------------------------------------------------------------
-void c_cubeMap::activate( int texUnit ) const {
-    glActiveTexture( texUnit );
+void c_cubeMap::activate() const {
+    glActiveTexture( textureUnit );
     glBindTexture( GL_TEXTURE_CUBE_MAP, textureObj );
 }
 
 void c_cubeMap::deActivate() const {
-	glActiveTexture( GL_TEXTURE0 );
+	glActiveTexture( textureUnit );
 	glBindTexture( GL_TEXTURE_CUBE_MAP, 0 );
 }
 

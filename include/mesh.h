@@ -57,22 +57,22 @@ class HGE_API c_mesh : virtual public c_resource, virtual public c_drawableObj {
 		};
 
 		//Private Members
-		uint					numMeshes;
-		uint					numTextures;
-		GLuint					vao;
-		GLuint					buffers[ 2 ]; // Vertices & Indices
-		meshEntry*				entries;
-		c_bitmap*				textures;
+		uint					numMeshes       = 0;
+		uint					numTextures     = 0;
+		GLuint					vao             = 0u;
+		GLuint					buffers[ 2 ]    = { 0u, 0u }; // Vertices & Indices
+		meshEntry*				entries         = HGE_NULL;
+		c_bitmap*				textures        = HGE_NULL;
 		
 		//load all data from Assimp using two passes
 		bool	prepMeshes		( const aiScene*, uint& numVerts, uint& numIndices );
 		bool	loadMeshes		( const aiScene*, s_vertex* vertArray, uint* indexArray );
 		bool	loadTextures	( const aiScene*, cstr fileName );
-		bool	loadTexType		( aiMaterial*, int textureType, const std::string& directory, uint& texIter );
+		void	loadTexType		( int index, const aiMaterial*, int textureType, const std::string& directory );
 		void	loadVao			( s_vertex* vertices, uint numVertices, uint* indices, uint numIndices );
 
 	public:
-		c_mesh	();
+		c_mesh	() {}
 		~c_mesh	() { unload(); }
 		
 		//deleted member functions

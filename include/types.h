@@ -5,11 +5,6 @@
  * Created on August 13, 2012, 9:13 PM
  */
 
-/*-----------------------------------------------------------------------------
- * This is the Second OpenGL Graphics Test using GLEW
- * This test makes more extensive use of transformations and camera controls
------------------------------------------------------------------------------*/
-
 #ifndef __HGE_TYPES_H__
 #define	__HGE_TYPES_H__
 

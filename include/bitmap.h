@@ -18,6 +18,7 @@ namespace hge {
 ******************************************************************************/
 class HGE_API c_bitmap : virtual public c_resource {
     private:
+        GLint textureUnit   = pipeline::HGE_TEXTURE_DEFAULT;
         uint oglTexture     = 0;
         int bmpWidth        = 0;
         int bmpHeight       = 0;
@@ -38,7 +39,7 @@ class HGE_API c_bitmap : virtual public c_resource {
 
         // memory-based operations
         bool    isLoaded    () const;
-        bool    load        ( cstr filename, int flags = CREATE_MIPMAPS );
+        bool    load        ( cstr filename, int unused = 0 );
         void    unload      ();
 
         // data operations
@@ -46,15 +47,18 @@ class HGE_API c_bitmap : virtual public c_resource {
         uint    getHeight   () const { return bmpHeight; }
         uint    getTexID    () const { return oglTexture; }
 
-        void    makeActive  ( int texUnit = pipeline::HGE_TEXTURE_DEFAULT ) const;
+        void    makeActive  () const;
         void    deActivate  () const;
+        
+        void    setTexUnit  ( GLint texUnit = pipeline::HGE_TEXTURE_DEFAULT ) { textureUnit = texUnit; }
 };
 
 /******************************************************************************
  *      3D Textures (Cube Maps)
 ******************************************************************************/
-class HGE_API c_cubeMap {
+class HGE_API c_cubeMap : virtual public c_resource {
     private:
+        GLint       textureUnit     = pipeline::HGE_TEXTURE_DEFAULT;
         GLuint      textureObj      = 0;
 
     public:
@@ -65,11 +69,13 @@ class HGE_API c_cubeMap {
         c_cubeMap&  operator = ( const c_cubeMap& ) = delete;
         c_cubeMap&  operator = ( c_cubeMap&& );
         
-        bool        loadTextures    ( const char* texFiles[ 6 ] );
+        bool        load            ( const char* texFile, int cubeIndex );
         bool        isLoaded        () const { return textureObj != 0; }
         void        unload          ();
-        void        activate        ( int texUnit = hge::pipeline::HGE_TEXTURE_DEFAULT ) const;
+        void        activate        () const;
         void        deActivate      () const;
+        
+        void        setTexUnit      ( GLint texUnit = pipeline::HGE_TEXTURE_DEFAULT ) { textureUnit = texUnit; }
 };
 
 } // end hge namespace

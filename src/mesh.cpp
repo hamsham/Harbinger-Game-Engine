@@ -85,18 +85,6 @@ c_mesh::meshEntry& c_mesh::meshEntry::operator = ( const c_mesh::meshEntry& meCo
 //	Mesh Resources
 ///////////////////////////////////////////////////////////////////////////////
 //-----------------------------------------------------------------------------
-// Mesh - Construction & Destruction
-//-----------------------------------------------------------------------------
-c_mesh::c_mesh() :
-	numMeshes( 0 ),
-	numTextures( 0 ),
-	vao( 0 ),
-	buffers{ 0, 0 },
-	entries( HGE_NULL ),
-	textures( HGE_NULL )
-{}
-
-//-----------------------------------------------------------------------------
 // Mesh - Unloading
 //-----------------------------------------------------------------------------
 void c_mesh::unload() {
@@ -173,23 +161,8 @@ bool c_mesh::load( cstr fileName, int flags ) {
 	std::cout << "\tDone\n";
 	
 	// load all material data from the file
-	std::cout << "\tLoading texture & material data..\n";
-    numTextures = 0;
-    for ( unsigned i(0); i < pScene->mNumMaterials; ++i ) {
-        numTextures += pScene->mMaterials[ i ]->GetTextureCount( aiTextureType_DIFFUSE );
-		numTextures += pScene->mMaterials[ i ]->GetTextureCount( aiTextureType_SPECULAR );
-		numTextures += pScene->mMaterials[ i ]->GetTextureCount( aiTextureType_AMBIENT );
-		numTextures += pScene->mMaterials[ i ]->GetTextureCount( aiTextureType_EMISSIVE );
-		numTextures += pScene->mMaterials[ i ]->GetTextureCount( aiTextureType_HEIGHT );
-		numTextures += pScene->mMaterials[ i ]->GetTextureCount( aiTextureType_NORMALS );
-		numTextures += pScene->mMaterials[ i ]->GetTextureCount( aiTextureType_SHININESS );
-		numTextures += pScene->mMaterials[ i ]->GetTextureCount( aiTextureType_OPACITY );
-		numTextures += pScene->mMaterials[ i ]->GetTextureCount( aiTextureType_DISPLACEMENT );
-		numTextures += pScene->mMaterials[ i ]->GetTextureCount( aiTextureType_LIGHTMAP );
-		numTextures += pScene->mMaterials[ i ]->GetTextureCount( aiTextureType_REFLECTION );
-		numTextures += pScene->mMaterials[ i ]->GetTextureCount( aiTextureType_UNKNOWN );
-    }
-    
+	std::cout << "\tLoading texture & material data...\n";
+    numTextures = pScene->mNumMaterials;
 	textures = new c_bitmap [ numTextures ];
 	if ( !loadTextures( pScene, fileName ) ) {
 		std::cout << "\t\tWarning: Unable to load all associated materials.\n";
@@ -249,131 +222,113 @@ bool c_mesh::prepMeshes( const aiScene* pScene, uint& numVerts, uint& numIndices
 //-----------------------------------------------------------------------------
 bool c_mesh::loadMeshes( const aiScene* pScene, s_vertex* vertArray, uint* indexArray ) {
 	const aiMesh* pMesh( HGE_NULL );
-	uint vertIter( 0 );
-	uint indexIter( 0 );
-	uint sumVerts( 0 );
-	uint sumIndices( 0 );
-	
-	for ( uint i( 0 ); i < numMeshes; ++i ) {
-		pMesh = pScene->mMeshes[ i ];
-		std::cout << "\t\tMaterial " << i << " uses texture " << pMesh->mMaterialIndex << ".\n";
-		
-		// prep the data for each sub-mesh
-		entries[ i ].matIndex	= pMesh->mMaterialIndex;
-		entries[ i ].numIndices	= pMesh->mNumFaces * 3;
-		entries[ i ].baseVertex	= sumVerts;
-		entries[ i ].baseIndex	= sumIndices;
-		sumVerts				+= pMesh->mNumVertices;
-		sumIndices				+= entries[ i ].numIndices;
-		
-		//get all texture coordinates, normals, and vertex positions
-		for ( uint j( 0 ); j < pMesh->mNumVertices; ++j ) {
-			aiVector3D* pPos				( &pMesh->mVertices[ j ] );
-			aiVector3D* pNorm				( &pMesh->mNormals[ j ] );
-			vertArray[ vertIter ].setPos	( pPos->x, pPos->y, pPos->z );
-			vertArray[ vertIter ].setNorm	( pNorm->x, pNorm->y, pNorm->z );
+    uint vertIter( 0 );
+    uint indexIter( 0 );
+    uint sumVerts( 0 );
+    uint sumIndices( 0 );
+
+    for ( uint i( 0 ); i < numMeshes; ++i ) {
+        pMesh = pScene->mMeshes[ i ];
+        std::cout << "\t\tMaterial " << i << " uses texture " << pMesh->mMaterialIndex << ".\n";
+
+        // prep the data for each sub-mesh
+        entries[ i ].matIndex	= pMesh->mMaterialIndex;
+        entries[ i ].numIndices	= pMesh->mNumFaces * 3;
+        entries[ i ].baseVertex	= sumVerts;
+        entries[ i ].baseIndex	= sumIndices;
+        sumVerts				+= pMesh->mNumVertices;
+        sumIndices				+= entries[ i ].numIndices;
+
+        //get all texture coordinates, normals, and vertex positions
+        for ( uint j( 0 ); j < pMesh->mNumVertices; ++j ) {
+            const aiVector3D* pPos          = &pMesh->mVertices[ j ];
+            const aiVector3D* pNorm         = &pMesh->mNormals[ j ];
+            vertArray[ vertIter ].setPos    ( pPos->x, pPos->y, pPos->z );
+            vertArray[ vertIter ].setNorm   ( pNorm->x, pNorm->y, pNorm->z );
             
             if ( pMesh->HasTangentsAndBitangents() ) {
-                aiVector3D* pTangent( &pMesh->mTangents[ j ] );
+                const aiVector3D* pTangent = &pMesh->mTangents[ j ];
                 vertArray[ vertIter ].setTangent( pTangent->x, pTangent->y, pTangent->z );
             }
-            
-			if ( pMesh->HasTextureCoords( 0 ) ) {
-				vertArray[ vertIter ].uv[ 0 ] = pMesh->mTextureCoords[ 0 ][ j ].x;
-				vertArray[ vertIter ].uv[ 1 ] = pMesh->mTextureCoords[ 0 ][ j ].y;
-			}
-			++vertIter;
-		}
-		
-		// gather all indices from the meshEntry faces
-		for ( uint f( 0 ); f < pMesh->mNumFaces; ++f ) {
-			aiFace* face = &pMesh->mFaces[ f ];
-			indexArray[ indexIter++ ] = face->mIndices[ 0 ];
-			indexArray[ indexIter++ ] = face->mIndices[ 1 ];
-			indexArray[ indexIter++ ] = face->mIndices[ 2 ];
-		}
-        std::cout << "\n\t\tLoaded sub-mesh " << i << ".\n";
-	}
-	
-	return true;
+
+            if ( pMesh->HasTextureCoords( 0 ) ) {
+                vertArray[ vertIter ].uv[ 0 ] = pMesh->mTextureCoords[ 0 ][ j ].x;
+                vertArray[ vertIter ].uv[ 1 ] = pMesh->mTextureCoords[ 0 ][ j ].y;
+            }
+            ++vertIter;
+        }
+
+        // gather all indices from the meshEntry faces
+        for ( uint f( 0 ); f < pMesh->mNumFaces; ++f ) {
+            const aiFace* face          = &pMesh->mFaces[ f ];
+            indexArray[ indexIter++ ]   = face->mIndices[ 0 ];
+            indexArray[ indexIter++ ]   = face->mIndices[ 1 ];
+            indexArray[ indexIter++ ]   = face->mIndices[ 2 ];
+        }
+        std::cout << "\t\tLoaded sub-mesh " << i << ".\n";
+    }
+
+    return true;
 }
 
 //-----------------------------------------------------------------------------
 // Mesh - Texture Loading
 //-----------------------------------------------------------------------------
 bool c_mesh::loadTextures( const aiScene* pScene, cstr fileName ) {
-	std::string matDir;
-	std::string currDir = fileName;
-	std::string::size_type slash = currDir.find_last_of("/\\");
-	
-	// ensure the correct folder for the materials
-	if ( slash == std::string::npos ) {
-		matDir = ".";
-	}
-	else if ( slash == 0 ) {
-		matDir = "/";
-	}
-	else {
-		matDir = currDir.substr( 0, slash );
-	}
-	matDir.push_back('/');
-	
-	//begin loading materials
-	aiMaterial* pMaterial( HGE_NULL );
-	uint texIter( 0 );
-	std::cout << "\t\t# Textures: " << numTextures << "\n";
-	
-	//get a list of all the textures associated with each meshEntry
-	for ( uint i( 0 ); i < numTextures; ++i ) {
-		pMaterial = pScene->mMaterials[ i ];
-		if (
-			!loadTexType( pMaterial, aiTextureType_DIFFUSE, matDir, texIter )
-		||	!loadTexType( pMaterial, aiTextureType_SPECULAR, matDir, texIter )
-		||	!loadTexType( pMaterial, aiTextureType_AMBIENT, matDir, texIter )
-		||	!loadTexType( pMaterial, aiTextureType_EMISSIVE, matDir, texIter )
-		||	!loadTexType( pMaterial, aiTextureType_HEIGHT, matDir, texIter )
-		||	!loadTexType( pMaterial, aiTextureType_NORMALS, matDir, texIter )
-		||	!loadTexType( pMaterial, aiTextureType_SHININESS, matDir, texIter )
-		||	!loadTexType( pMaterial, aiTextureType_OPACITY, matDir, texIter )
-		||	!loadTexType( pMaterial, aiTextureType_DISPLACEMENT, matDir, texIter )
-		||	!loadTexType( pMaterial, aiTextureType_LIGHTMAP, matDir, texIter )
-		||	!loadTexType( pMaterial, aiTextureType_REFLECTION, matDir, texIter )
-		||	!loadTexType( pMaterial, aiTextureType_UNKNOWN, matDir, texIter )
-		) {
-			return false;
-		}
-	}
-	
-	return true;
+    std::string currDir = fileName;
+    std::string::size_type slash = currDir.find_last_of("/\\");
+
+    // ensure the correct folder for the materials
+    if ( slash == std::string::npos ) {
+        currDir = '.';
+    }
+    else if ( slash == 0 ) {
+        currDir = '/';
+    }
+    else {
+        currDir.erase( slash );
+    }
+
+    //begin loading materials
+    std::cout << "\t\t# Textures: " << numTextures << "\n";
+
+    //get a list of all the textures associated with each meshEntry
+    for ( uint i( 0 ); i < numTextures; ++i ) {
+
+        const aiMaterial* pMaterial = pScene->mMaterials[ i ];
+
+        if ( pMaterial->GetTextureCount( aiTextureType_DIFFUSE ) > 0 )
+            loadTexType( i, pMaterial, aiTextureType_DIFFUSE, currDir );
+
+    }
+
+    return true;
 }
 
 //-----------------------------------------------------------------------------
-// Mesh - Texture loading assistance function
+// Mesh - Loading Specific Texture Types
 //-----------------------------------------------------------------------------
-bool c_mesh::loadTexType(
-	aiMaterial* pMat,
-	int texType,
-	const std::string& directory,
-	uint& texIter
+void c_mesh::loadTexType(
+    int index,
+    const aiMaterial* pMaterial,
+    int textureType,
+    const std::string& directory
 ) {
-	aiString path;
-	std::string filePath;
-	
-	uint iter( 0 );
-	while ( pMat->GetTexture( (aiTextureType)texType, iter, &path ) == AI_SUCCESS ) {
-		filePath = directory + path.data;
-		std::cout << "\t\t" << texIter << ": " << filePath.c_str() << "...";
-        
-		if ( !textures[ texIter ].load( filePath.c_str() ) ) {
-			std::cout << "Failed to load " << filePath.c_str() << ".\n";
-			return false;
-		}
-        
-		std::cout << "Ok.\n";
-        ++iter;
-        ++texIter;
-	}
-	return true;
+    aiString path;
+    std::string fullPath;
+    if ( pMaterial->GetTexture( (aiTextureType)textureType, 0, &path ) == AI_SUCCESS ) {
+        if ( path.data[0] != '/' )
+            fullPath = directory + '/' + path.data;
+        else
+            fullPath = directory + path.data;
+        if ( !textures[ index ].load( fullPath.c_str() ) ) {
+            std::cerr << "Unable to load " << fullPath << '\n';
+        }
+        else {
+            std::cout << "Successfully loaded " << fullPath << '\n';
+            textures[ index ].setTexUnit( pipeline::HGE_TEXTURE_DEFAULT + (textureType-1));
+        }
+    }
 }
 
 //-----------------------------------------------------------------------------
@@ -452,7 +407,7 @@ void c_mesh::draw() const {
 		const uint matIndex = entries[ i ].matIndex;
 		
 		if ( textures )
-            textures[ matIndex ].makeActive( pipeline::HGE_TEXTURE_DIFFUSE );	
+            textures[ matIndex ].makeActive();
 		
 		glDrawElementsBaseVertex(
 			GL_TRIANGLES, entries[ i ].numIndices, GL_UNSIGNED_INT,

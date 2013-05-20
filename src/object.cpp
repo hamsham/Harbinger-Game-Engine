@@ -9,25 +9,9 @@
 #include "object.h"
 
 namespace hge {
-
-//-----------------------------------------------------------------------------
-//	Object - Basic Object Abstraction
-//-----------------------------------------------------------------------------
-c_object::~c_object() {}
-
 //-----------------------------------------------------------------------------
 //	Drawable Object - Abstraction
 //-----------------------------------------------------------------------------
-c_drawableObj::~c_drawableObj() {}
-
-void c_drawableObj::setRotation( const vec3& angles ) {
-	rot = fromEuler( angles );
-}
-
-void c_drawableObj::rotate( const vec3& angles ) {
-	rot *= fromEuler( angles );
-}
-
 void c_drawableObj::update() {
 	
 	modelMat

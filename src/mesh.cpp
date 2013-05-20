@@ -90,12 +90,12 @@ c_mesh::meshEntry& c_mesh::meshEntry::operator = ( const c_mesh::meshEntry& meCo
 void c_mesh::unload() {
 	if ( entries ) {
 		delete [] entries;
-		entries = HGE_NULL;
+		entries = nullptr;
 		numMeshes = 0;
 	}
 	if ( textures ) {
 		delete [] textures;
-		textures = HGE_NULL;
+		textures = nullptr;
 		numTextures = 0;
 	}
     
@@ -110,7 +110,7 @@ void c_mesh::unload() {
 // Mesh - Loading Check
 //-----------------------------------------------------------------------------
 bool c_mesh::isLoaded() const {
-	return ( entries != HGE_NULL && textures != HGE_NULL );
+	return ( entries != nullptr && textures != nullptr );
 }
 
 //-----------------------------------------------------------------------------
@@ -121,18 +121,32 @@ bool c_mesh::load( cstr fileName, int flags ) {
 	
 	unload();
 	Assimp::Importer importer;
-	const aiScene* pScene( HGE_NULL );
-	s_vertex* vertArray( HGE_NULL );
-	uint* indexArray( HGE_NULL );
-	uint numVerts( 0 );
-	uint numIndices( 0 );
-	
-	glGenVertexArrays( 1, &vao );
-	glBindVertexArray( vao );
+	const aiScene* pScene   = nullptr;
+	s_vertex* vertArray     = nullptr;
+	uint* indexArray        = nullptr;
+	uint numVerts           = 0;
+	uint numIndices         = 0;
 	
 	std::cout << "\tReading data from the file...\n";
-	pScene = importer.ReadFile( fileName, aiProcessPreset_TargetRealtime_MaxQuality );
-	if ( pScene == HGE_NULL ) {
+	//pScene = importer.ReadFile( fileName, aiProcessPreset_TargetRealtime_MaxQuality );
+	pScene = importer.ReadFile( fileName,   aiProcess_Triangulate           |
+                                            aiProcess_GenSmoothNormals      |
+                                            aiProcess_GenUVCoords           |
+                                            aiProcess_CalcTangentSpace      |
+                                            aiProcess_JoinIdenticalVertices |
+                                            aiProcess_SplitLargeMeshes      |
+                                            aiProcess_OptimizeMeshes        |
+                                            aiProcess_FindInstances         |
+                                            aiProcess_ValidateDataStructure |
+                                            aiProcess_RemoveRedundantMaterials |
+                                            aiProcess_ImproveCacheLocality  |
+                                            aiProcess_SortByPType           |
+                                            aiProcess_FindDegenerates       |
+                                            aiProcess_FindInvalidData       |
+                                            aiProcess_RemoveComponent       |
+                                            0
+    );
+	if ( pScene == nullptr ) {
 		std::cout << "\tFailed. " << importer.GetErrorString() << std::endl;
 		return false;
 	}
@@ -144,9 +158,9 @@ bool c_mesh::load( cstr fileName, int flags ) {
 		std::cout << "\tFailed. Aborting file import." << std::endl;
 		return false;
 	}
-	vertArray = new s_vertex[ numVerts ];
-	indexArray = new uint[ numIndices ];
-	entries = new meshEntry[ numMeshes ];
+	vertArray   = new s_vertex[ numVerts ];
+	indexArray  = new uint[ numIndices ];
+	entries     = new meshEntry[ numMeshes ];
 	std::cout << "\tDone\n";
 	
 	// convert Assimp's meshes to OpenGL-compatible arrays
@@ -167,7 +181,7 @@ bool c_mesh::load( cstr fileName, int flags ) {
 	if ( !loadTextures( pScene, fileName ) ) {
 		std::cout << "\t\tWarning: Unable to load all associated materials.\n";
 		delete [] textures;
-		textures = HGE_NULL;
+		textures = nullptr;
 		numTextures = 0;
 	}
 	std::cout << "\tDone.\n";
@@ -178,8 +192,6 @@ bool c_mesh::load( cstr fileName, int flags ) {
 	delete [] vertArray;
 	delete [] indexArray;
 	
-	glBindVertexArray( 0 );
-	
 	std::cout << "Successfully loaded " << fileName << std::endl;
 	return true;
 }
@@ -188,15 +200,14 @@ bool c_mesh::load( cstr fileName, int flags ) {
 // Mesh - Data preparation process
 //-----------------------------------------------------------------------------
 bool c_mesh::prepMeshes( const aiScene* pScene, uint& numVerts, uint& numIndices ) {
-	const aiMesh* pMesh( HGE_NULL );
-	numVerts = 0;
-	numIndices = 0;
-	numMeshes = pScene->mNumMeshes;
+	numVerts    = 0;
+	numIndices  = 0;
+	numMeshes   = pScene->mNumMeshes;
 	
-	for ( uint i( 0 ); i < numMeshes; ++i ) {
-		pMesh = pScene->mMeshes[ i ];
+	for ( uint i = 0; i < numMeshes; ++i ) {
+		const aiMesh* pMesh = pScene->mMeshes[ i ];
 		
-		for ( uint f( 0 ); f < pMesh->mNumFaces; ++f ) {
+		for ( uint f = 0; f < pMesh->mNumFaces; ++f ) {
 			if ( pMesh->mFaces[ f ].mNumIndices != 3 ) {
 				std::cout << "\tError: Mesh contains non-triangulated faces\n";
 				numVerts = 0;
@@ -206,7 +217,7 @@ bool c_mesh::prepMeshes( const aiScene* pScene, uint& numVerts, uint& numIndices
 			numIndices += pMesh->mFaces[ f ].mNumIndices;
 		}
 		
-		for ( uint j( 0 ); j < pMesh->mNumVertices; ++j ) {
+		for ( uint j = 0; j < pMesh->mNumVertices; ++j ) {
 			++numVerts;
 		}
 	}
@@ -221,13 +232,13 @@ bool c_mesh::prepMeshes( const aiScene* pScene, uint& numVerts, uint& numIndices
 // Mesh - Mesh data loading
 //-----------------------------------------------------------------------------
 bool c_mesh::loadMeshes( const aiScene* pScene, s_vertex* vertArray, uint* indexArray ) {
-	const aiMesh* pMesh( HGE_NULL );
-    uint vertIter( 0 );
-    uint indexIter( 0 );
-    uint sumVerts( 0 );
-    uint sumIndices( 0 );
+	const aiMesh* pMesh( nullptr );
+    uint vertIter   = 0;
+    uint indexIter  = 0;
+    uint sumVerts   = 0;
+    uint sumIndices = 0;
 
-    for ( uint i( 0 ); i < numMeshes; ++i ) {
+    for ( uint i = 0; i < numMeshes; ++i ) {
         pMesh = pScene->mMeshes[ i ];
         std::cout << "\t\tMaterial " << i << " uses texture " << pMesh->mMaterialIndex << ".\n";
 
@@ -240,7 +251,7 @@ bool c_mesh::loadMeshes( const aiScene* pScene, s_vertex* vertArray, uint* index
         sumIndices				+= entries[ i ].numIndices;
 
         //get all texture coordinates, normals, and vertex positions
-        for ( uint j( 0 ); j < pMesh->mNumVertices; ++j ) {
+        for ( uint j = 0; j < pMesh->mNumVertices; ++j ) {
             const aiVector3D* pPos          = &pMesh->mVertices[ j ];
             const aiVector3D* pNorm         = &pMesh->mNormals[ j ];
             vertArray[ vertIter ].setPos    ( pPos->x, pPos->y, pPos->z );
@@ -259,7 +270,7 @@ bool c_mesh::loadMeshes( const aiScene* pScene, s_vertex* vertArray, uint* index
         }
 
         // gather all indices from the meshEntry faces
-        for ( uint f( 0 ); f < pMesh->mNumFaces; ++f ) {
+        for ( uint f = 0; f < pMesh->mNumFaces; ++f ) {
             const aiFace* face          = &pMesh->mFaces[ f ];
             indexArray[ indexIter++ ]   = face->mIndices[ 0 ];
             indexArray[ indexIter++ ]   = face->mIndices[ 1 ];
@@ -293,7 +304,7 @@ bool c_mesh::loadTextures( const aiScene* pScene, cstr fileName ) {
     std::cout << "\t\t# Textures: " << numTextures << "\n";
 
     //get a list of all the textures associated with each meshEntry
-    for ( uint i( 0 ); i < numTextures; ++i ) {
+    for ( uint i = 0; i < numTextures; ++i ) {
 
         const aiMaterial* pMaterial = pScene->mMaterials[ i ];
 
@@ -339,6 +350,8 @@ void c_mesh::loadVao(
 	uint* indices, uint numIndices
 ) {
 	// create a buffer for the vertex positions & indices
+	glGenVertexArrays( 1, &vao );
+	glBindVertexArray( vao );
 	glGenBuffers( 2, buffers );
 	
 	glBindBuffer( GL_ARRAY_BUFFER, buffers[ 0 ] );
@@ -394,6 +407,8 @@ void c_mesh::loadVao(
 	glBindBuffer( GL_ELEMENT_ARRAY_BUFFER, buffers[ 1 ] );
 	glBufferData( GL_ELEMENT_ARRAY_BUFFER, sizeof( indices[0] ) * numIndices, indices, GL_STATIC_DRAW );
 	printGlError( "Error while sending mesh data to the GPU.");
+	
+	glBindVertexArray( 0 );
 }
 
 //-----------------------------------------------------------------------------
@@ -407,7 +422,7 @@ void c_mesh::draw() const {
 		const uint matIndex = entries[ i ].matIndex;
 		
 		if ( textures )
-            textures[ matIndex ].makeActive();
+            textures[ matIndex ].activate();
 		
 		glDrawElementsBaseVertex(
 			GL_TRIANGLES, entries[ i ].numIndices, GL_UNSIGNED_INT,

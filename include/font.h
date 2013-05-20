@@ -38,7 +38,7 @@ class HGE_API c_font : virtual public c_drawableObj, virtual public c_resource {
         GLuint vbo = 0;
 //        GLuint ibo = 0;
         int newLine = 0;
-        const char* text = HGE_NULL;
+        const char* text = nullptr;
         charTexture charList[ HGE_MAX_NUM_GLYPHS ];
         
         void createCharBitmap( FT_FaceRec_*, int index, s_vertex* );

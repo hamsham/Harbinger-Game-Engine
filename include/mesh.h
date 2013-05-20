@@ -61,8 +61,8 @@ class HGE_API c_mesh : virtual public c_resource, virtual public c_drawableObj {
 		uint					numTextures     = 0;
 		GLuint					vao             = 0u;
 		GLuint					buffers[ 2 ]    = { 0u, 0u }; // Vertices & Indices
-		meshEntry*				entries         = HGE_NULL;
-		c_bitmap*				textures        = HGE_NULL;
+		meshEntry*				entries         = nullptr;
+		c_bitmap*				textures        = nullptr;
 		
 		//load all data from Assimp using two passes
 		bool	prepMeshes		( const aiScene*, uint& numVerts, uint& numIndices );

@@ -144,7 +144,7 @@ bool c_bitmap::isLoaded() const {
 //-----------------------------------------------------------------------------
 bool c_bitmap::load( cstr fileName, int ) {
     
-	FIBITMAP* image( HGE_NULL );
+	FIBITMAP* image( nullptr );
 	FREE_IMAGE_FORMAT imageFormat( FIF_UNKNOWN );
 	int FreeImageFlags( 0 );
 	
@@ -209,7 +209,7 @@ void c_bitmap::unload() {
 //-----------------------------------------------------------------------------
 //	Bitmap - Enable a texture within OpenGL
 //-----------------------------------------------------------------------------
-void c_bitmap::makeActive() const {
+void c_bitmap::activate() const {
 	glActiveTexture( textureUnit );
 	glBindTexture( GL_TEXTURE_2D, oglTexture );
 }
@@ -242,7 +242,7 @@ c_cubeMap& c_cubeMap::operator =( c_cubeMap&& bmpCopy ) {
 //-----------------------------------------------------------------------------
 bool c_cubeMap::load( const char* texFile, int cubeIndex ) {
     
-	FIBITMAP* image( HGE_NULL );
+	FIBITMAP* image( nullptr );
 	FREE_IMAGE_FORMAT imageFormat( FIF_UNKNOWN );
 	int FreeImageFlags( 0 );
     

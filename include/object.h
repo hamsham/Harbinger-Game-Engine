@@ -28,7 +28,7 @@ class HGE_API c_object {
 			pos( obj.pos )
 		{}
 		
-		virtual ~c_object	() = 0;
+		virtual ~c_object	() {}
 		
 		const vec3&		getPos	() const				{ return pos; }
 		void			setPos	( const vec3& inPos )	{ pos = inPos; }
@@ -62,15 +62,15 @@ class HGE_API c_drawableObj : virtual public c_object {
 			modelMat( obj.modelMat )
 		{}
 		
-		virtual ~c_drawableObj() = 0;
+		virtual ~c_drawableObj() {}
 		
 		const vec3&		getScale	() const				{ return scale; }
 		const quat&		getRotation () const				{ return rot; }
 		const mat4&		getModelMatrix	() const			{ return modelMat; }
 		
 		void			setScale	( const vec3& s )		{ scale = s; }
-		void			setRotation	( const vec3& angles );
-		void			rotate		( const vec3& angles );
+		void			setRotation	( const vec3& angles )  { rot = fromEuler( angles ); }
+		void			rotate		( const vec3& angles )  { rot *= fromEuler( angles ); }
 		
 		virtual void	update		();
 		virtual void	tick		( float )				{ update(); }

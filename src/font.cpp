@@ -13,9 +13,6 @@
 #include "font.h"
 #include "pipeline.h"
 
-using hamLibs::math::mat4;
-using hamLibs::math::vec3;
-
 void printFontError( const char* msg, int error ) {
     std::cerr << msg;
     if ( error ) std::cerr << error;
@@ -90,7 +87,7 @@ void c_font::unload() {
     
     vao = vbo = 0;
     pos = scale = vec3( 0.f );
-    text = HGE_NULL;
+    text = nullptr;
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -280,7 +277,8 @@ void c_font::draw() const {
     glBindVertexArray   ( vao );
     glEnable            ( GL_BLEND );
     glBlendFunc         ( GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA );
-	glDisable           ( GL_DEPTH_TEST );
+	//glDisable           ( GL_DEPTH_TEST );
+    glDepthMask( GL_FALSE );
     
     while ( text[ iter ] != '\0' ) {
         currChar = (int)text[ iter++ ];
@@ -312,9 +310,9 @@ void c_font::draw() const {
                 xPos += (ct.advX - ct.bearX) * fontScaleX;
         }
     }
+    glDepthMask( GL_TRUE );
+	//glEnable        ( GL_DEPTH_TEST );
     glDisable       ( GL_BLEND );
-	glEnable        ( GL_DEPTH_TEST );
-    glPolygonOffset ( 0.f, 0.f );
     glBindTexture   ( GL_TEXTURE_2D, 0 );
 }
 

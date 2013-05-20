@@ -16,10 +16,6 @@
 /*
  * Macros
  */
-#ifndef HGE_NULL
-	#define HGE_NULL nullptr
-#endif
-
 // Returns the number of elements in a statically allocated array.
 // This will not work for dynamic arrays (will return 1)
 #ifndef ARRAY_SIZE_FROM_ELEMENTS

@@ -232,7 +232,7 @@ int display::getNumVideoModes() {
 const s_videoMode* display::getVideoMode( int i ) {
     return ( (i > 0) && (i <= vidModes.size()) )
         ? &vidModes[i]
-        : HGE_NULL;
+        : nullptr;
 }
 
 } // end hge namespace

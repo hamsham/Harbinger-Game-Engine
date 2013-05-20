@@ -34,7 +34,7 @@ bool c_shadowMap::init( unsigned w, unsigned h ) {
     glBindTexture( GL_TEXTURE_2D, shadow );
     glTexImage2D(
         GL_TEXTURE_2D, 0, GL_DEPTH_COMPONENT,
-        width, height, 0, GL_DEPTH_COMPONENT, GL_FLOAT, HGE_NULL
+        width, height, 0, GL_DEPTH_COMPONENT, GL_FLOAT, nullptr
     );
     glTexParameterf( GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST );
     glTexParameterf( GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST );

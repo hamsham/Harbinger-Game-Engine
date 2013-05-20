@@ -22,7 +22,7 @@ void printShaderError(GLuint programId, GLuint shaderId ) {
         programInfoLog = new GLchar[ infoLogLength + 1 ];
         programInfoLog [infoLogLength ] = 0;
 
-        glGetProgramInfoLog(programId, infoLogLength, HGE_NULL, programInfoLog);
+        glGetProgramInfoLog(programId, infoLogLength, nullptr, programInfoLog);
         std::cout << "Program error log:\t";
         std::cout << programInfoLog << "\n";
         delete [] programInfoLog;
@@ -34,7 +34,7 @@ void printShaderError(GLuint programId, GLuint shaderId ) {
         shaderInfoLog = new GLchar[ infoLogLength + 1 ];
         shaderInfoLog[ infoLogLength ] = 0;
 
-        glGetShaderInfoLog(shaderId, infoLogLength, HGE_NULL, shaderInfoLog);
+        glGetShaderInfoLog(shaderId, infoLogLength, nullptr, shaderInfoLog);
         std::cout << "Shader error log:\n";
         std::cout << "Program: " << programId << "\n";
         std::cout << "Shader: " << shaderId << "\n";
@@ -106,7 +106,7 @@ bool c_shader::load( cstr shaderFilePath, int shaderType ) {
     }
 
     int fileLength( 0 );
-    char* shaderData( HGE_NULL );
+    char* shaderData( nullptr );
     bool ret = false;
 
     fileLength = (int)c_resource::fileSize( shaderFilePath );

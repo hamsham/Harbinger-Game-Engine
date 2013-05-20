@@ -31,6 +31,12 @@ enum e_attributes : GLint {
     TANGENT_ATTRIB  = 3
 };
 
+enum e_matrixState : int {
+    HGE_MODEL_MAT   = 0,
+    HGE_VIEW_MAT    = 1,
+    HGE_PROJ_MAT    = 2
+};
+
 // These are based off the enumerations defined in Assimp's "material.h" header
 // Due to OpenGL limitations, no more than 32 enum types will be defined here
 enum e_texType : GLint {
@@ -68,12 +74,6 @@ enum e_texType : GLint {
     HGE_TEXTURE_AUX19           = GL_TEXTURE30, HGE_SAMPLER_AUX19           = 30,
     HGE_TEXTURE_AUX20           = GL_TEXTURE31, HGE_SAMPLER_AUX20           = 31,
     HGE_TEXTURE_UNKNOWN         = 0
-};
-
-enum e_matrixState : int {
-    HGE_MODEL_MAT   = 0,
-    HGE_VIEW_MAT    = 1,
-    HGE_PROJ_MAT    = 2
 };
 
 /******************************************************************************

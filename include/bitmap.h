@@ -47,7 +47,7 @@ class HGE_API c_bitmap : virtual public c_resource {
         uint    getHeight   () const { return bmpHeight; }
         uint    getTexID    () const { return oglTexture; }
 
-        void    makeActive  () const;
+        void    activate    () const;
         void    deActivate  () const;
         
         void    setTexUnit  ( GLint texUnit = pipeline::HGE_TEXTURE_DEFAULT ) { textureUnit = texUnit; }

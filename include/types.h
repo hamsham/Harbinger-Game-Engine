@@ -19,12 +19,7 @@ using namespace hamLibs::math;
  * Global Typedefs
  */
 typedef unsigned int	uint;
-typedef unsigned long	ulong;
-typedef unsigned char	uchar;
 typedef const char*		cstr;
-typedef unsigned long	hgeSize_t;
-typedef vec3_t< int >	vec3i;
-typedef vec2_t< int >	vec2i;
 
 /*
  * Forward Declarations

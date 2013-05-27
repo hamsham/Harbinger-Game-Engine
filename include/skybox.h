@@ -15,6 +15,28 @@
 #include "bitmap.h"
 #include "primitives.h"
 
+/*
+ * Skybox images should be loaded in the following order:
+ * Right, left, bottom, top, back, front.
+ * 
+ * Use the graph below as a guide when importing the textures:
+ *              --------
+ *             |        |
+ *             |  top   |
+ *             |        |
+ *              --------
+ *  --------    --------    --------    --------
+ * |        |  |        |  |        |  |        |
+ * |  left  |  |  front |  |  right |  |  back  |
+ * |        |  |        |  |        |  |        |
+ *  --------    --------    --------    --------
+ *              --------
+ *             |        |
+ *             | bottom |
+ *             |        |
+ *              --------
+ */
+
 namespace hge {
 
 class HGE_API c_skyBox : virtual public hge::c_drawableObj {

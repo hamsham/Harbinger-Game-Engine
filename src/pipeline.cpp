@@ -45,17 +45,6 @@ void pipeline::applyMatrix( e_matrixState s, const mat4& m ) {
     glBindBuffer( GL_UNIFORM_BUFFER, ubo );
     glBindBufferBase( GL_UNIFORM_BUFFER, HGE_PIPELINE_MATRIX_BINDING, ubo );
     
-//    glBufferSubData(
-//        GL_UNIFORM_BUFFER, sizeof( mat4 ) * s,
-//        sizeof( mat4 ), &transforms[s]
-//    );
-//    
-//    // Pass the MVP Matrix
-//    glBufferSubData(
-//        GL_UNIFORM_BUFFER, sizeof( mat4 ) * 3,
-//            sizeof( mat4 ), &transforms[3]
-//    );
-    
     glBufferData(
         GL_UNIFORM_BUFFER, sizeof( transforms ), transforms, GL_DYNAMIC_DRAW
     );
@@ -173,6 +162,17 @@ void pipeline::printErrorMsg( cstr msg, uint lineNum, cstr sourceFile ) {
 bool pipeline::init() {
     
     ASSERT_FATAL( display::isWindowOpen() );
+	
+	/*
+	 * Default OpenGL parameters
+	 */
+    glViewport( 0, 0, display::getWindowWidth(), display::getWindowHeight() );
+	glClearColor( 0.5f, 0.5f, 0.5f, 1.0f );
+	glEnable    ( GL_CULL_FACE );		// Occlusion Culling
+	glCullFace  ( GL_BACK );
+	glFrontFace ( GL_CCW );
+	glEnable    ( GL_DEPTH_TEST );		// Depth/Z-Buffer
+	glDepthFunc ( GL_LESS );
     
     if ( ubo != 0 ) {
         // Return if the pipeline is already initialized

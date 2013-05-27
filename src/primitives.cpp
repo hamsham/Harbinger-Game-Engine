@@ -249,12 +249,6 @@ void c_line::setVertPos( int index, const vec3& pos ) {
     glBufferData( GL_ARRAY_BUFFER, sizeof( points ), &points[0].v, GL_STREAM_DRAW );
 }
 
-void c_line::draw() const {
-    glBindVertexArray( vao );
-    glDrawArrays( GL_LINES, 0, 2 );
-    glBindVertexArray( 0 );
-}
-
 /******************************************************************************
  *      SPHERES
 ******************************************************************************/

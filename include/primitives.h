@@ -38,9 +38,9 @@ class HGE_API c_quad : virtual public c_drawableObj {
         static void terminate();
 
         void draw() const {
-        glBindVertexArray( vao );
-        glDrawArrays( GL_TRIANGLE_STRIP, 0, 4 );
-        glBindVertexArray( 0 );
+            glBindVertexArray( vao );
+            glDrawArrays( GL_TRIANGLE_STRIP, 0, 4 );
+            glBindVertexArray( 0 );
     }
 };
 
@@ -61,9 +61,9 @@ class HGE_API c_triangle : virtual public c_drawableObj {
         static void terminate();
 
         void draw() const {
-        glBindVertexArray( vao );
-        glDrawArrays( GL_TRIANGLE_STRIP, 0, 3 );
-        glBindVertexArray( 0 );
+            glBindVertexArray( vao );
+            glDrawArrays( GL_TRIANGLE_STRIP, 0, 3 );
+            glBindVertexArray( 0 );
     }
 };
 
@@ -84,9 +84,13 @@ class HGE_API c_line : virtual public c_drawableObj {
         static bool init();
         static void terminate();
         
-        void draw() const;
-        
         void setVertPos( int index, const vec3& pos );
+        
+        void draw() const {
+            glBindVertexArray( vao );
+            glDrawArrays( GL_LINES, 0, 2 );
+            glBindVertexArray( 0 );
+        }
 };
 
 
@@ -115,7 +119,7 @@ class HGE_API c_sphere : virtual public c_drawableObj {
         
         void draw() const {
             glBindVertexArray( vao );
-            glDrawElements( GL_TRIANGLE_STRIP, numIndices, GL_UNSIGNED_INT, nullptr );
+            glDrawElements( GL_TRIANGLE_STRIP, numIndices, GL_UNSIGNED_INT, 0 );
             glBindVertexArray( 0 );
         }
 };

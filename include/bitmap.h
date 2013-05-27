@@ -63,8 +63,8 @@ class HGE_API c_cubeMap : virtual public c_resource {
 
     public:
         c_cubeMap   () {}
-        c_cubeMap    ( const c_cubeMap& ) = delete;
-        c_cubeMap    ( c_cubeMap&& );
+        c_cubeMap   ( const c_cubeMap& ) = delete;
+        c_cubeMap   ( c_cubeMap&& );
         ~c_cubeMap  () { unload(); }
         c_cubeMap&  operator = ( const c_cubeMap& ) = delete;
         c_cubeMap&  operator = ( c_cubeMap&& );
@@ -72,6 +72,7 @@ class HGE_API c_cubeMap : virtual public c_resource {
         bool        load            ( const char* texFile, int cubeIndex );
         bool        isLoaded        () const { return textureObj != 0; }
         void        unload          ();
+        
         void        activate        () const;
         void        deActivate      () const;
         

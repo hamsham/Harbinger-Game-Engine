@@ -36,13 +36,14 @@ class   c_drawableObj;
 class   c_resource;
 class   c_bitmap;
 class   c_cubeMap;
+class   c_font;
 class   c_shader;
 
 // Visual-Related
 class   c_camera;
-class   c_font;
 class   c_mesh;
 class   c_skyBox;
+class   c_string;
 
 // Drawable Primitives
 class   c_line;

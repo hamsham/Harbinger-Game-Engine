@@ -429,6 +429,9 @@ void c_mesh::draw() const {
 			( GLvoid* )( sizeof( uint ) * entries[ i ].baseIndex ),
 			entries[ i ].baseVertex
 		);
+		
+		if ( textures )
+            textures[ matIndex ].deActivate();
 	}
 	glBindVertexArray( 0 );
 }

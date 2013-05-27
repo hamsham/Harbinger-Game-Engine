@@ -41,14 +41,17 @@ bool display::createWindow(
     if ( isWindowOpen() == true )
         return true;
     
-    /*/
+    /*
      * Create a new window using GLFW
-    /*/
+     */
 	glfwOpenWindowHint( GLFW_OPENGL_VERSION_MAJOR, 3 );
 	glfwOpenWindowHint( GLFW_OPENGL_VERSION_MINOR, 3 );
 	glfwOpenWindowHint( GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE );
 	glfwOpenWindowHint( GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE );
 	glfwOpenWindowHint( GLFW_WINDOW_NO_RESIZE, (resizeable ? GL_FALSE : GL_TRUE) );
+#ifdef DEBUG
+    glfwOpenWindowHint( GLFW_OPENGL_DEBUG_CONTEXT, GL_TRUE );
+#endif
     
 	if ( !glfwOpenWindow(
             w, h, 8, 8, 8, 8, 24, 24,
@@ -60,13 +63,15 @@ bool display::createWindow(
     
     glfwGetWindowSize( &windowWidth, &windowHeight );
     glfwSetWindowPos( 0, 0 );
+    glfwDisable( GLFW_STICKY_KEYS );
+    glfwEnable( GLFW_AUTO_POLL_EVENTS );
     
 	if ( useVsync == false )
         glfwSwapInterval( 0 );
     
-	/*/
+	/*
 	 * Initialize GLEW
-	/*/
+	 */
 	glewExperimental = GL_TRUE;
 	if ( glewInit() != GLEW_OK ) {
 		std::cerr << "Post-window creation error" << std::endl;
@@ -77,17 +82,6 @@ bool display::createWindow(
         << "Created a window. OpenGL 3.3 initialized.\n\t0x"
         << std::hex << glGetError()
         << std::dec << std::endl;
-	
-	/*/
-	 * Default OpenGL parameters
-	/*/
-    glViewport( 0, 0, windowWidth, windowHeight );
-	glClearColor( 0.5f, 0.5f, 0.5f, 1.0f );
-	glEnable    ( GL_CULL_FACE );		// Occlusion Culling
-	glCullFace  ( GL_BACK );
-	glFrontFace ( GL_CCW );
-	glEnable    ( GL_DEPTH_TEST );		// Depth/Z-Buffer
-	glDepthFunc ( GL_LESS );
     
     displayFullscreen = fullscreen;
     

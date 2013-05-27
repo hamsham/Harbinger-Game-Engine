@@ -20,6 +20,7 @@ void printFontError( const char* msg, int error ) {
 }
 
 namespace hge {
+
 ///////////////////////////////////////////////////////////////////////////////
 // FONT -- LOADING
 ///////////////////////////////////////////////////////////////////////////////
@@ -45,49 +46,30 @@ bool c_font::load( const char* filename, int fontsize ) {
     // Modify the font's size
     FT_Set_Pixel_Sizes( ftFace, fontsize, fontsize );
     
-    s_vertex* vertArray = new s_vertex[ HGE_MAX_NUM_GLYPHS * 4 ];
-    
-    for ( int i(0); i < HGE_MAX_NUM_GLYPHS; ++i ) {
-        createCharBitmap( ftFace, i, vertArray );
-    }
-    
-    int ret = sendVerticesToGPU( vertArray );
-    if ( !ret )
-        unload();
-    
-    scale = vec3( 1.f );
-    c_drawableObj::update();
+    loadGlyphs( ftFace );
     
     FT_Done_Face( ftFace );
     FT_Done_FreeType( ftLib );
-    delete [] vertArray;
     
-    return ret;
+    return true;
 }
 
 ///////////////////////////////////////////////////////////////////////////////
 // FONT -- CHECKING IF LOADED
 ///////////////////////////////////////////////////////////////////////////////
 bool c_font::isLoaded() const {
-    return vao != 0;
+    return textureId != 0;
 }
 
 ///////////////////////////////////////////////////////////////////////////////
 // FONT -- UNLOADING
 ///////////////////////////////////////////////////////////////////////////////
 void c_font::unload() {
-    for ( int i = 0; i < HGE_MAX_NUM_GLYPHS; ++i )
-        unloadCharTexture( charList[ i ] );
+    glDeleteTextures( 1, &textureId );
     
-    glDeleteBuffers( 1, &vbo );
-    glDeleteVertexArrays( 1, &vao );
+    textureId = 0;
     
-//    glDeleteBuffers( 1, &ibo );
-//    ibo = 0;
-    
-    vao = vbo = 0;
-    pos = scale = vec3( 0.f );
-    text = nullptr;
+    maxWidth = maxHeight = 0;
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -110,111 +92,150 @@ inline int getMax( int x, int y ) {
     return x>y ? x:y;
 }
 
-void c_font::createCharBitmap( FT_Face face, int index, s_vertex* vertArray ) {
+void c_font::loadGlyphs( FT_Face face ) {
+    int maxCharWidth = 0;
+    int maxCharHeight = 0;
+    GLubyte* dataArray[ MAX_NUM_GLYPHS ];
     
-    FT_Load_Glyph( face, FT_Get_Char_Index( face, index ), FT_LOAD_DEFAULT );
-    
-    FT_Render_Glyph( face->glyph, FT_RENDER_MODE_NORMAL );
-    
-    FT_Bitmap* ftBitmap = &face->glyph->bitmap;
-    s_vertex* currVert  = vertArray + (index * 4);
-    int& width          = charList[ index ].width;
-    int& height         = charList[ index ].height;
-    int& advX           = charList[ index ].advX;
-    int& advY           = charList[ index ].advY;
-    int& bearX          = charList[ index ].bearX;
-    width               = nextPow2( ftBitmap->width );
-    height              = nextPow2( ftBitmap->rows );
-    GLubyte* data       = new GLubyte[ width*height ];
-    
-    // copy bitmap data into a format suitable for opengl
-    for ( int h(0); h < height; ++h ) {
-        for ( int w(0); w < width; ++w ) {
-            data[h*width+w] = (h >= ftBitmap->rows || w >= ftBitmap->width)
-            ? 0
-            : ftBitmap->buffer[ (ftBitmap->rows-h-1) * ftBitmap->width+w ];
+    for ( int index = 0; index < MAX_NUM_GLYPHS; ++index ) {
+        FT_Load_Glyph( face, FT_Get_Char_Index( face, index ), FT_LOAD_DEFAULT );
+
+        FT_Render_Glyph( face->glyph, FT_RENDER_MODE_NORMAL );
+
+        FT_Bitmap* ftBitmap = &face->glyph->bitmap;
+        int& width          = metrics[ index ].width;
+        int& height         = metrics[ index ].height;
+        int& advX           = metrics[ index ].advX;
+        int& advY           = metrics[ index ].advY;
+        int& bearX          = metrics[ index ].bearX;
+        width               = nextPow2( ftBitmap->width );
+        height              = nextPow2( ftBitmap->rows );
+        
+        GLubyte* data       = dataArray[ index ] = new GLubyte[ width*height ];
+
+        // copy bitmap data into a format suitable for opengl
+        for ( int h(0); h < height; ++h ) {
+            for ( int w(0); w < width; ++w ) {
+                data[h*width+w] = (h >= ftBitmap->rows || w >= ftBitmap->width)
+                ? 0
+                : ftBitmap->buffer[ (ftBitmap->rows-h-1) * ftBitmap->width+w ];
+            }
         }
+        
+        maxWidth = getMax( maxCharWidth, width );
+        maxHeight = getMax( maxCharHeight, height );
+        
+        // calculate the glyph data
+        advX    = face->glyph->advance.x >> 6;
+        bearX   = face->glyph->metrics.horiBearingX >> 6;
+        advY    = (face->glyph->metrics.height - face->glyph->metrics.horiBearingY) >> 6;
+        advY    = -advY;
+        newLine = getMax(newLine, (int)face->glyph->metrics.height>>6);
     }
     
-    //generate a texture for the current character
-    sendTexturesToGPU( charList[ index ], data );
-    
-    // calculate the glyph data
-    advX    = face->glyph->advance.x >> 6;
-    bearX   = face->glyph->metrics.horiBearingX >> 6;
-    advY    = (face->glyph->metrics.height - face->glyph->metrics.horiBearingY) >> 6;
-    advY    = -advY;
-    newLine = getMax(newLine, (int)face->glyph->metrics.height>>6);
-        
-    currVert[ 0 ].pos = vec3( 0.f,          float(advY+height), 0.f );
-    currVert[ 1 ].pos = vec3( 0.f,          float(advY),        0.f );
-    currVert[ 2 ].pos = vec3( float(width), float(advY+height), 0.f );
-    currVert[ 3 ].pos = vec3( float(width), float(advY),        0.f );
-
-    currVert[ 0 ].uv = vec2( 0.f, 1.f );
-    currVert[ 1 ].uv = vec2( 0.f, 0.f );
-    currVert[ 2 ].uv = vec2( 1.f, 1.f );
-    currVert[ 3 ].uv = vec2( 1.f, 0.f );
-
-    currVert[0].norm =
-        currVert[1].norm =
-            currVert[2].norm =
-                currVert[3].norm = vec3( 0.f, 0.f, -1.f );
-
-    currVert[0].tangent =
-        currVert[1].tangent =
-            currVert[2].tangent =
-                currVert[3].tangent = vec3( 0.5f, 0.f, 0.5f );
-    
-    delete [] data;
+    //generate a texture atlas
+    createCharAtlas( dataArray );
 }
 
 ///////////////////////////////////////////////////////////////////////////////
 // FONT -- UPLOADING CHARACTER TEXTURES TO THE GPU
 ///////////////////////////////////////////////////////////////////////////////
-void c_font::sendTexturesToGPU( c_font::charTexture& ct, const void* data ) {
-    GLuint tex(0), sampler(0);
-    glGenTextures( 1, &tex );
-    glBindTexture( GL_TEXTURE_2D, tex );
+void c_font::createCharAtlas( GLubyte* bitmaps[ MAX_NUM_GLYPHS ] ) {
+    
+    const int texDimension = HL_ROUND( std::sqrt( (float)MAX_NUM_GLYPHS ) );
+    
+    glGenTextures( 1, &textureId );
+    glBindTexture( GL_TEXTURE_2D, textureId );
     
     glTexImage2D(
         GL_TEXTURE_2D, 0, GL_DEPTH_COMPONENT,
-        ct.width, ct.height, 0, GL_DEPTH_COMPONENT, GL_UNSIGNED_BYTE, data
+        (texDimension * maxWidth), (texDimension * maxHeight),
+        0, GL_DEPTH_COMPONENT, GL_UNSIGNED_BYTE, nullptr
     );
     
-    glGenSamplers( 1, &sampler );
-    glSamplerParameteri( sampler, GL_TEXTURE_MAG_FILTER, GL_LINEAR );
-    glSamplerParameteri( sampler, GL_TEXTURE_MIN_FILTER, GL_LINEAR );
-    glSamplerParameteri( sampler, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE );
-    glSamplerParameteri( sampler, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE );
+    int iter = 0;
+    for ( int i = 0; i < texDimension; ++i ) {
+        for ( int j = 0; j < texDimension; ++j ) {
+            glTexSubImage2D(
+                GL_TEXTURE_2D, 0, (i*maxWidth), (j*maxHeight),
+                metrics[ iter ].width, metrics[ iter ].height,
+                GL_RED, GL_UNSIGNED_BYTE, bitmaps[ iter ]
+            );
+            printGlError( "Error while updating a font atlas" );
+            
+            vec2 pos = vec2( i*maxWidth, j*maxHeight );
+            vec2 uv = vec2(
+                pos[0] + metrics[ iter ].width, pos[1] + metrics[ iter ].height
+            );
+            
+            metrics[ iter ].pos[0]  = (pos[0]) / (texDimension*maxWidth);
+            metrics[ iter ].pos[1]  = (pos[1]) / (texDimension*maxHeight);
+            metrics[ iter ].uv[0]   = (uv[0]) / (texDimension*maxWidth);
+            metrics[ iter ].uv[1]   = (uv[1]-1.f) / (texDimension*maxHeight);
+            
+            delete [] bitmaps[ iter ];
+            ++iter;
+        }
+    }
     
-    ct.textureId = tex;
-    ct.samplerId = sampler;
+	glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE );
+	glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE );
+	
+	// Create Mip Maps (if requested), then delete the FreeImage data,
+    glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR );
+    glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR );
+    glGenerateMipmap( GL_TEXTURE_2D );
+    printGlError( "Error while creating mipmaps for a font atlas" );
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-// FONT -- UPLOADING VERTEX DATA TO THE GPU
+//	FONT - TEXTURE ACTIVATION/BINDING
 ///////////////////////////////////////////////////////////////////////////////
-bool c_font::sendVerticesToGPU( const s_vertex* vertArray ) {
-	
-	glGenVertexArrays( 1, &vao );
-	glBindVertexArray( vao );
-	glGenBuffers( 1, &vbo );
-//	glGenBuffers( 1, &ibo );
+void c_font::activate() const {
+	glActiveTexture ( textureUnit );
+	glBindTexture   ( GL_TEXTURE_2D, textureId );
+}
+
+///////////////////////////////////////////////////////////////////////////////
+//	FONT - TEXTURE DEACTIVATION
+///////////////////////////////////////////////////////////////////////////////
+void c_font::deActivate() const {
+	glActiveTexture ( textureUnit );
+	glBindTexture   ( GL_TEXTURE_2D, 0 );
+}
+
+///////////////////////////////////////////////////////////////////////////////
+// TEST STRING CLASS
+///////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////
+// STRING - UNLOADING
+///////////////////////////////////////////////////////////////////////////////
+void c_string::clearString() {
+    glDeleteVertexArrays( 1, &vao );
+    glDeleteBuffers( 1, &vbo );
     
-    if ( !vao || !vbo ) {
-        std::cerr
-            << "An error occurred while loading font vertices"
-            << std::endl;
-        return false;
-    }
+    vao = vbo = 0;
+    numChars = 0;
+}
+
+///////////////////////////////////////////////////////////////////////////////
+// STRING - Buffer Data
+///////////////////////////////////////////////////////////////////////////////
+void c_string::createVertexBuffer( unsigned numVerts ) {
+    if ( !vao )
+        glGenVertexArrays( 1, &vao );
+    
+	glBindVertexArray( vao );
+    
+    if ( !vbo )
+        glGenBuffers( 1, &vbo );
 	
 	glBindBuffer( GL_ARRAY_BUFFER, vbo );
     glBufferData(
-        GL_ARRAY_BUFFER, sizeof( s_vertex ) * 4 * HGE_MAX_NUM_GLYPHS,
-        vertArray, GL_STATIC_DRAW
+        GL_ARRAY_BUFFER, sizeof( s_vertex ) * 4 * numVerts,
+        nullptr, GL_DYNAMIC_DRAW
     );
-	printGlError( "Error while sending primitive data to the GPU.");
+	printGlError( "Error while creating a string object's vertex buffer.");
     
 	glEnableVertexAttribArray( pipeline::VERTEX_ATTRIB );
 	glVertexAttribPointer(
@@ -243,77 +264,111 @@ bool c_font::sendVerticesToGPU( const s_vertex* vertArray ) {
 		ARRAY_SIZE_FROM_ELEMENTS( s_vertex::tangent.v ), GL_FLOAT, GL_FALSE,
         sizeof( s_vertex ), (GLvoid*)offsetof( s_vertex, tangent.v )
 	);
-    
-//    unsigned short indices[ 4 ] = { 0, 1, 2, 3 };
-//	glBindBuffer( GL_ELEMENT_ARRAY_BUFFER, ibo );
-//	glBufferData( GL_ELEMENT_ARRAY_BUFFER, sizeof( indices ), indices, GL_STATIC_DRAW );
-	
-	glBindVertexArray( 0 );
-    return true;
+	printGlError( "Error while resizing a string buffer on the GPU.");
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-// FONT -- UNLOADING CHAR TEXTURES
+// STRING - TEXT FORMATTING
 ///////////////////////////////////////////////////////////////////////////////
-void c_font::unloadCharTexture( c_font::charTexture& ct ) {
-    glDeleteTextures( 1, &ct.textureId );
-    glDeleteSamplers( 1, &ct.samplerId );
-    ct.width = ct.height = ct.samplerId = ct.textureId = 0;
-    ct.advX = ct.advY = ct.bearX = 0;
-}
-
-///////////////////////////////////////////////////////////////////////////////
-// FONT -- DRAWING
-///////////////////////////////////////////////////////////////////////////////
-void c_font::draw() const {
-    float xPos          = pos.v[0];
-    float yPos          = pos.v[1];
-    float fontScaleX    = scale.v[0];
-    float fontScaleY    = scale.v[1];
-    unsigned iter       = 0;
-    int currChar        = 0;
-    mat4&& rotMatrix    = quatToMat4( rot );
+void c_string::setString( const c_font& font, const char* str ) {
     
-    glBindVertexArray   ( vao );
-    glEnable            ( GL_BLEND );
-    glBlendFunc         ( GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA );
-	//glDisable           ( GL_DEPTH_TEST );
-    glDepthMask( GL_FALSE );
+    if ( !str ) {
+        clearString();
+        return;
+    }
     
-    while ( text[ iter ] != '\0' ) {
-        currChar = (int)text[ iter++ ];
-        const charTexture& ct = charList[ currChar ];
-        
-        switch( currChar ) {
-            case '\n':  case '\r':
-                xPos = pos.v[0];
-                yPos -= newLine*fontScaleY;
-                break;
-            case '\t':
-                xPos += ((charList[' '].advX - charList[' '].bearX) * SPACES_PER_TAB ) * fontScaleX;
-                break;
-            default:
-                glActiveTexture( GL_TEXTURE0 );
-                glBindTexture( GL_TEXTURE_2D, ct.textureId );
-                glBindSampler( 0, ct.samplerId );
-
-                hge::pipeline::applyMatrix(
-                    hge::pipeline::HGE_MODEL_MAT,
-                    translate( modelMat, vec3( xPos, yPos, 0.f ) )
-                    * rotMatrix
-                );
-
-                glDrawArrays( GL_TRIANGLE_STRIP, currChar*4, 4  );
-//                glDrawElementsBaseVertex(
-//                    GL_TRIANGLE_STRIP, 4, GL_UNSIGNED_SHORT, 0, currChar*4
-//                );
-                xPos += (ct.advX - ct.bearX) * fontScaleX;
+    float xPos = 0;
+    float yPos = 0;
+    s_vertex tempQuad[ 4 ];
+    numChars = 0;
+    
+    //count all the whitespace
+    for( int i = 0; str[ i ] != '\0'; ++i ) {
+        if (    str[ i ] != '\n'
+        &&      str[ i ] != '\r'
+        &&      str[ i ] != '\t'
+        &&      str[ i ] != ' '
+        ) {
+            ++numChars;
         }
     }
-    glDepthMask( GL_TRUE );
-	//glEnable        ( GL_DEPTH_TEST );
-    glDisable       ( GL_BLEND );
-    glBindTexture   ( GL_TEXTURE_2D, 0 );
+	
+    // Resize the text buffer
+    createVertexBuffer( numChars );
+    
+    tempQuad[0].norm =
+        tempQuad[1].norm =
+            tempQuad[2].norm =
+                tempQuad[3].norm = vec3( 0.f, 0.f, -1.f );
+
+    tempQuad[0].tangent =
+        tempQuad[1].tangent =
+            tempQuad[2].tangent =
+                tempQuad[3].tangent = vec3( 0.5f, 0.f, 0.5f );
+    
+    // Create and send the vertices to OpenGL
+    int charCount = 0;
+    for ( int i = 0; str[ i ] != '\0'; ++i ) {
+        const int currChar = (int)str[ i ];
+        const c_font::charMetrics& m = font.metrics[ currChar ];
+        
+        if ( currChar == '\n' ) {
+            yPos -= font.newLine;
+            xPos = 0;
+        }
+        else if ( currChar == '\r' ) {
+            xPos = 0;
+        }
+        else if ( currChar == ' ' ) {
+            xPos += (font.metrics[' '].advX - font.metrics[' '].bearX);
+        }
+        else if ( currChar == '\t' ) {
+            xPos += (font.metrics[' '].advX - font.metrics[' '].bearX)
+                * c_font::SPACES_PER_TAB;
+        }
+        else {
+            /*
+             * 0--------2
+             * |     /  |
+             * |   /    |
+             * | /      |
+             * 1--------3
+             */
+            tempQuad[ 0 ].setPos( xPos,           yPos+m.advY+m.height,   0.f );
+            tempQuad[ 1 ].setPos( xPos,           yPos+m.advY,            0.f );
+            tempQuad[ 2 ].setPos( xPos+m.width,   yPos+m.advY+m.height,   0.f );
+            tempQuad[ 3 ].setPos( xPos+m.width,   yPos+m.advY,            0.f );
+
+            tempQuad[ 0 ].setUVs( m.pos[0],       m.uv[1] );
+            tempQuad[ 1 ].setUVs( m.pos[0],       m.pos[1] );
+            tempQuad[ 2 ].setUVs( m.uv[0],        m.uv[1] );
+            tempQuad[ 3 ].setUVs( m.uv[0],        m.pos[1] );
+
+            xPos += m.advX - m.bearX;
+
+            glBufferSubData(
+                GL_ARRAY_BUFFER, sizeof( tempQuad ) * charCount++,
+                sizeof( tempQuad ), tempQuad
+            );
+            printGlError( "Error while updating string buffer data on the GPU.");
+        }
+    }
+	glBindVertexArray( 0 );
+}
+        
+void c_string::draw() const {
+    glEnable            ( GL_BLEND );
+    glBlendFunc         ( GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA );
+    glDepthMask         ( GL_FALSE );
+    
+    glBindVertexArray   ( vao );
+    for ( int i = 0; i < numChars; ++i )
+        glDrawArrays( GL_TRIANGLE_STRIP, i*4, 4 );
+    glBindVertexArray   ( 0 );
+
+    glDepthMask         ( GL_TRUE );
+    glDisable           ( GL_BLEND );
+    glBindTexture       ( GL_TEXTURE_2D, 0 );
 }
 
 } // End Harbinger namespace

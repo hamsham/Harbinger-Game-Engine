@@ -11,7 +11,16 @@
 #include FT_FREETYPE_H
 
 #include "font.h"
+
 #include "pipeline.h"
+
+using namespace hamLibs::math;
+
+struct font_vertex {
+	vec3 pos;
+	vec2 uv;
+	vec3 norm;
+};
 
 void printFontError( const char* msg, int error ) {
     std::cerr << msg;
@@ -232,7 +241,7 @@ void c_string::createVertexBuffer( unsigned numVerts ) {
 	
 	glBindBuffer( GL_ARRAY_BUFFER, vbo );
     glBufferData(
-        GL_ARRAY_BUFFER, sizeof( s_vertex ) * 4 * numVerts,
+        GL_ARRAY_BUFFER, sizeof( font_vertex ) * 4 * numVerts,
         nullptr, GL_DYNAMIC_DRAW
     );
 	printGlError( "Error while creating a string object's vertex buffer.");
@@ -240,30 +249,26 @@ void c_string::createVertexBuffer( unsigned numVerts ) {
 	glEnableVertexAttribArray( pipeline::VERTEX_ATTRIB );
 	glVertexAttribPointer(
 		pipeline::VERTEX_ATTRIB,
-		ARRAY_SIZE_FROM_ELEMENTS( s_vertex::pos.v ), GL_FLOAT, GL_FALSE,
-        sizeof( s_vertex ), (GLvoid*)offsetof( s_vertex, pos.v )
+		ARRAY_SIZE_FROM_ELEMENTS( font_vertex::pos.v ), GL_FLOAT, GL_FALSE,
+        sizeof( font_vertex ), (GLvoid*)offsetof( font_vertex, pos.v )
 	);
     
 	glEnableVertexAttribArray( pipeline::TEXTURE_ATTRIB );
 	glVertexAttribPointer(
 		pipeline::TEXTURE_ATTRIB,
-		ARRAY_SIZE_FROM_ELEMENTS( s_vertex::uv.v ), GL_FLOAT, GL_FALSE,
-        sizeof( s_vertex ), (GLvoid*)offsetof( s_vertex, uv.v )
+		ARRAY_SIZE_FROM_ELEMENTS( font_vertex::uv.v ), GL_FLOAT, GL_FALSE,
+        sizeof( font_vertex ), (GLvoid*)offsetof( font_vertex, uv.v )
 	);
     
 	glEnableVertexAttribArray( pipeline::NORMAL_ATTRIB );
 	glVertexAttribPointer(
 		pipeline::NORMAL_ATTRIB,
-		ARRAY_SIZE_FROM_ELEMENTS( s_vertex::norm.v ), GL_FLOAT, GL_FALSE,
-        sizeof( s_vertex ), (GLvoid*)offsetof( s_vertex, norm.v )
+		ARRAY_SIZE_FROM_ELEMENTS( font_vertex::norm.v ), GL_FLOAT, GL_FALSE,
+        sizeof( font_vertex ), (GLvoid*)offsetof( font_vertex, norm.v )
 	);
     
-	glEnableVertexAttribArray( pipeline::TANGENT_ATTRIB );
-	glVertexAttribPointer(
-		pipeline::TANGENT_ATTRIB,
-		ARRAY_SIZE_FROM_ELEMENTS( s_vertex::tangent.v ), GL_FLOAT, GL_FALSE,
-        sizeof( s_vertex ), (GLvoid*)offsetof( s_vertex, tangent.v )
-	);
+	glDisableVertexAttribArray( pipeline::TANGENT_ATTRIB );
+    
 	printGlError( "Error while resizing a string buffer on the GPU.");
 }
 
@@ -279,7 +284,7 @@ void c_string::setString( const c_font& font, const char* str ) {
     
     float xPos = 0;
     float yPos = 0;
-    s_vertex tempQuad[ 4 ];
+    font_vertex tempQuad[ 4 ];
     numChars = 0;
     
     //count all the whitespace
@@ -300,11 +305,6 @@ void c_string::setString( const c_font& font, const char* str ) {
         tempQuad[1].norm =
             tempQuad[2].norm =
                 tempQuad[3].norm = vec3( 0.f, 0.f, -1.f );
-
-    tempQuad[0].tangent =
-        tempQuad[1].tangent =
-            tempQuad[2].tangent =
-                tempQuad[3].tangent = vec3( 0.5f, 0.f, 0.5f );
     
     // Create and send the vertices to OpenGL
     int charCount = 0;
@@ -334,15 +334,15 @@ void c_string::setString( const c_font& font, const char* str ) {
              * | /      |
              * 1--------3
              */
-            tempQuad[ 0 ].setPos( xPos,           yPos+m.advY+m.height,   0.f );
-            tempQuad[ 1 ].setPos( xPos,           yPos+m.advY,            0.f );
-            tempQuad[ 2 ].setPos( xPos+m.width,   yPos+m.advY+m.height,   0.f );
-            tempQuad[ 3 ].setPos( xPos+m.width,   yPos+m.advY,            0.f );
+            tempQuad[ 0 ].pos = vec3( xPos,           yPos+m.advY+m.height,   0.f );
+            tempQuad[ 1 ].pos = vec3( xPos,           yPos+m.advY,            0.f );
+            tempQuad[ 2 ].pos = vec3( xPos+m.width,   yPos+m.advY+m.height,   0.f );
+            tempQuad[ 3 ].pos = vec3( xPos+m.width,   yPos+m.advY,            0.f );
 
-            tempQuad[ 0 ].setUVs( m.pos[0],       m.uv[1] );
-            tempQuad[ 1 ].setUVs( m.pos[0],       m.pos[1] );
-            tempQuad[ 2 ].setUVs( m.uv[0],        m.uv[1] );
-            tempQuad[ 3 ].setUVs( m.uv[0],        m.pos[1] );
+            tempQuad[ 0 ].uv = vec2( m.pos[0],       m.uv[1] );
+            tempQuad[ 1 ].uv = vec2( m.pos[0],       m.pos[1] );
+            tempQuad[ 2 ].uv = vec2( m.uv[0],        m.uv[1] );
+            tempQuad[ 3 ].uv = vec2( m.uv[0],        m.pos[1] );
 
             xPos += m.advX - m.bearX;
 
@@ -361,6 +361,7 @@ void c_string::draw() const {
     glBlendFunc         ( GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA );
     glDepthMask         ( GL_FALSE );
     
+    // Fix this -- Use indices for a single draw call
     glBindVertexArray   ( vao );
     for ( int i = 0; i < numChars; ++i )
         glDrawArrays( GL_TRIANGLE_STRIP, i*4, 4 );

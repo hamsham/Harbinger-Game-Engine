@@ -6,6 +6,7 @@
  */
 
 #include <iostream>
+#include <stdexcept>
 
 #include <ft2build.h>
 #include FT_FREETYPE_H
@@ -223,6 +224,8 @@ void c_string::clearString() {
     glDeleteVertexArrays( 1, &vao );
     glDeleteBuffers( 1, &vbo );
     
+    indices.clear();
+    
     vao = vbo = 0;
     numChars = 0;
 }
@@ -282,8 +285,8 @@ void c_string::setString( const c_font& font, const char* str ) {
         return;
     }
     
-    float xPos = 0;
-    float yPos = 0;
+    int xPos = 0;
+    int yPos = 0;
     font_vertex tempQuad[ 4 ];
     numChars = 0;
     
@@ -299,6 +302,14 @@ void c_string::setString( const c_font& font, const char* str ) {
     }
 	
     // Resize the text buffer
+    try {
+        indices.reserve( numChars * 2 );
+    }
+    catch( const std::length_error& err ) {
+        std::cerr << "ERROR: Unable to create the string of text: " << str << std::endl;
+        clearString();
+        return;
+    }
     createVertexBuffer( numChars );
     
     tempQuad[0].norm =
@@ -308,16 +319,17 @@ void c_string::setString( const c_font& font, const char* str ) {
     
     // Create and send the vertices to OpenGL
     int charCount = 0;
+    int indexIter = 0;
     for ( int i = 0; str[ i ] != '\0'; ++i ) {
         const int currChar = (int)str[ i ];
         const c_font::charMetrics& m = font.metrics[ currChar ];
         
         if ( currChar == '\n' ) {
             yPos -= font.newLine;
-            xPos = 0;
+            xPos = 0.f;
         }
         else if ( currChar == '\r' ) {
-            xPos = 0;
+            xPos = 0.f;
         }
         else if ( currChar == ' ' ) {
             xPos += (font.metrics[' '].advX - font.metrics[' '].bearX);
@@ -327,6 +339,11 @@ void c_string::setString( const c_font& font, const char* str ) {
                 * c_font::SPACES_PER_TAB;
         }
         else {
+            // populate the index array
+            indices[ indexIter ] = indexIter * 4;
+            indices[ indexIter + numChars ] = 4;
+            ++indexIter;
+            
             /*
              * 0--------2
              * |     /  |
@@ -355,21 +372,23 @@ void c_string::setString( const c_font& font, const char* str ) {
     }
 	glBindVertexArray( 0 );
 }
-        
+
 void c_string::draw() const {
     glEnable            ( GL_BLEND );
     glBlendFunc         ( GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA );
     glDepthMask         ( GL_FALSE );
-    
-    // Fix this -- Use indices for a single draw call
     glBindVertexArray   ( vao );
-    for ( int i = 0; i < numChars; ++i )
-        glDrawArrays( GL_TRIANGLE_STRIP, i*4, 4 );
-    glBindVertexArray   ( 0 );
 
+    glMultiDrawArrays(
+        GL_TRIANGLE_STRIP,
+        (const GLint*)indices.data(),
+        (const GLsizei*)(indices.data() + numChars),
+        numChars
+    );
+
+    glBindVertexArray   ( 0 );
     glDepthMask         ( GL_TRUE );
     glDisable           ( GL_BLEND );
-    glBindTexture       ( GL_TEXTURE_2D, 0 );
 }
 
 } // End Harbinger namespace

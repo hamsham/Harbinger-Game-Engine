@@ -8,6 +8,7 @@
 #ifndef __HGE_FONT_H__
 #define	__HGE_FONT_H__
 
+#include <vector>
 #include "mesh.h"
 #include "math/math.h"
 
@@ -41,7 +42,7 @@ class HGE_API c_font : virtual public c_resource {
     private:
         GLint textureUnit   = pipeline::HGE_TEXTURE_DEFAULT;
         unsigned    textureId   = 0;
-        unsigned    newLine     = 0;
+        int         newLine     = 0;
         int         maxWidth    = 0;
         int         maxHeight   = 0;
         charMetrics metrics[ MAX_NUM_GLYPHS ];
@@ -70,10 +71,15 @@ class HGE_API c_font : virtual public c_resource {
 // CHARACTER STRING CLASS
 ///////////////////////////////////////////////////////////////////////////////
 class HGE_API c_string : virtual public c_drawableObj {
+    typedef std::vector< int > intArr;
+    
     private:
         unsigned    vao         = 0;
         unsigned    vbo         = 0;
         int         numChars    = 0;
+        intArr      indices;
+        // "indices" contains the starting elements of each character
+        // plus the number of elements to draw (specified by an offset of "numChars")
         
         void        createVertexBuffer( unsigned numVerts );
         
@@ -84,7 +90,7 @@ class HGE_API c_string : virtual public c_drawableObj {
         void        setString   ( const c_font&, const char* );
         void        clearString ();
         
-        // make sure a font atlas has been activated before drawing
+        // USERS: ensure a font atlas has been activated before drawing
         void        draw        () const;
 };
 

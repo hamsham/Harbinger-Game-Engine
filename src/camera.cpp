@@ -70,7 +70,7 @@ c_camera::c_camera( const c_camera& c ) :
 {}
         
 void c_camera::makeOrtho() {
-    //projMatrix = hamLibs::ortho( -aspectW, aspectW, -aspectH, aspectH, zNear, zFar );
+    //projMatrix = ortho( -aspectW, aspectW, -aspectH, aspectH, zNear, zFar );
     projMatrix = ortho( -aspectW, aspectW, -aspectH, aspectH );
 }
 
@@ -145,8 +145,8 @@ void c_camera::rotateUnlockedY( const vec3& amount ) {
 void c_camera::rotateLockedY( const vec3& amount ) {
     orientation
         = fromAxisAngle( zAxis, -amount[2] )
-        * fromAxisAngle( vec3( 0.f, 1.f, 0.f), -amount[0] )
-        * fromAxisAngle( xAxis, -amount[1] )
+        * fromAxisAngle( vec3( 0.f, 1.f, 0.f), -amount[1] )
+        * fromAxisAngle( xAxis, -amount[0] )
         * orientation;
 }
 

@@ -96,6 +96,10 @@ class HGE_API c_line : virtual public c_drawableObj {
 
 /******************************************************************************
  * Sphere Primitive
+ * 
+ * NOTE:
+ *      Use c_drawableObj::scale as the sphere's radius
+ *      Spheres can also be rendered using a cubemap texture
 ******************************************************************************/
 class HGE_API c_sphere : virtual public c_drawableObj {
     private:

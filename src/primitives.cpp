@@ -87,28 +87,28 @@ bool c_quad::init() {
 	glEnableVertexAttribArray( pipeline::VERTEX_ATTRIB );
 	glVertexAttribPointer(
 		pipeline::VERTEX_ATTRIB,
-		ARRAY_SIZE_FROM_ELEMENTS( s_vertex::pos.v ), GL_FLOAT, GL_FALSE,
+		ARRAY_COUNT_FROM_SIZE( s_vertex::pos.v ), GL_FLOAT, GL_FALSE,
         sizeof( s_vertex ), (GLvoid*)offsetof( s_vertex, pos.v )
 	);
     
 	glEnableVertexAttribArray( pipeline::TEXTURE_ATTRIB );
 	glVertexAttribPointer(
 		pipeline::TEXTURE_ATTRIB,
-		ARRAY_SIZE_FROM_ELEMENTS( s_vertex::uv.v ), GL_FLOAT, GL_FALSE,
+		ARRAY_COUNT_FROM_SIZE( s_vertex::uv.v ), GL_FLOAT, GL_FALSE,
         sizeof( s_vertex ), (GLvoid*)offsetof( s_vertex, uv.v )
 	);
     
 	glEnableVertexAttribArray( pipeline::NORMAL_ATTRIB );
 	glVertexAttribPointer(
 		pipeline::NORMAL_ATTRIB,
-		ARRAY_SIZE_FROM_ELEMENTS( s_vertex::norm.v ), GL_FLOAT, GL_FALSE,
+		ARRAY_COUNT_FROM_SIZE( s_vertex::norm.v ), GL_FLOAT, GL_FALSE,
         sizeof( s_vertex ), (GLvoid*)offsetof( s_vertex, norm.v )
 	);
     
 	glEnableVertexAttribArray( pipeline::TANGENT_ATTRIB );
 	glVertexAttribPointer(
 		pipeline::TANGENT_ATTRIB,
-		ARRAY_SIZE_FROM_ELEMENTS( s_vertex::tangent.v ), GL_FLOAT, GL_FALSE,
+		ARRAY_COUNT_FROM_SIZE( s_vertex::tangent.v ), GL_FLOAT, GL_FALSE,
         sizeof( s_vertex ), (GLvoid*)offsetof( s_vertex, tangent.v )
 	);
 	
@@ -166,28 +166,28 @@ bool c_triangle::init() {
 	glEnableVertexAttribArray( pipeline::VERTEX_ATTRIB );
 	glVertexAttribPointer(
 		pipeline::VERTEX_ATTRIB,
-		ARRAY_SIZE_FROM_ELEMENTS( s_vertex::pos.v ), GL_FLOAT, GL_FALSE,
+		ARRAY_COUNT_FROM_SIZE( s_vertex::pos.v ), GL_FLOAT, GL_FALSE,
         sizeof( s_vertex ), (GLvoid*)offsetof( s_vertex, pos.v )
 	);
     
 	glEnableVertexAttribArray( pipeline::TEXTURE_ATTRIB );
 	glVertexAttribPointer(
 		pipeline::TEXTURE_ATTRIB,
-		ARRAY_SIZE_FROM_ELEMENTS( s_vertex::uv.v ), GL_FLOAT, GL_FALSE,
+		ARRAY_COUNT_FROM_SIZE( s_vertex::uv.v ), GL_FLOAT, GL_FALSE,
         sizeof( s_vertex ), (GLvoid*)offsetof( s_vertex, uv.v )
 	);
     
 	glEnableVertexAttribArray( pipeline::NORMAL_ATTRIB );
 	glVertexAttribPointer(
 		pipeline::NORMAL_ATTRIB,
-		ARRAY_SIZE_FROM_ELEMENTS( s_vertex::norm.v ), GL_FLOAT, GL_FALSE,
+		ARRAY_COUNT_FROM_SIZE( s_vertex::norm.v ), GL_FLOAT, GL_FALSE,
         sizeof( s_vertex ), (GLvoid*)offsetof( s_vertex, norm.v )
 	);
     
 	glEnableVertexAttribArray( pipeline::TANGENT_ATTRIB );
 	glVertexAttribPointer(
 		pipeline::TANGENT_ATTRIB,
-		ARRAY_SIZE_FROM_ELEMENTS( s_vertex::tangent.v ), GL_FLOAT, GL_FALSE,
+		ARRAY_COUNT_FROM_SIZE( s_vertex::tangent.v ), GL_FLOAT, GL_FALSE,
         sizeof( s_vertex ), (GLvoid*)offsetof( s_vertex, tangent.v )
 	);
 	
@@ -276,28 +276,28 @@ bool c_sphere::sendToOpenGL() {
 	glEnableVertexAttribArray( pipeline::VERTEX_ATTRIB );
 	glVertexAttribPointer(
 		pipeline::VERTEX_ATTRIB,
-		ARRAY_SIZE_FROM_ELEMENTS( s_vertex::pos.v ), GL_FLOAT, GL_FALSE,
+		ARRAY_COUNT_FROM_SIZE( s_vertex::pos.v ), GL_FLOAT, GL_FALSE,
         sizeof( s_vertex ), (GLvoid*)offsetof( s_vertex, pos.v )
 	);
     
 	glEnableVertexAttribArray( pipeline::TEXTURE_ATTRIB );
 	glVertexAttribPointer(
 		pipeline::TEXTURE_ATTRIB,
-		ARRAY_SIZE_FROM_ELEMENTS( s_vertex::uv.v ), GL_FLOAT, GL_FALSE,
+		ARRAY_COUNT_FROM_SIZE( s_vertex::uv.v ), GL_FLOAT, GL_FALSE,
         sizeof( s_vertex ), (GLvoid*)offsetof( s_vertex, uv.v )
 	);
     
 	glEnableVertexAttribArray( pipeline::NORMAL_ATTRIB );
 	glVertexAttribPointer(
 		pipeline::NORMAL_ATTRIB,
-		ARRAY_SIZE_FROM_ELEMENTS( s_vertex::norm.v ), GL_FLOAT, GL_FALSE,
+		ARRAY_COUNT_FROM_SIZE( s_vertex::norm.v ), GL_FLOAT, GL_FALSE,
         sizeof( s_vertex ), (GLvoid*)offsetof( s_vertex, norm.v )
 	);
     
 	glEnableVertexAttribArray( pipeline::TANGENT_ATTRIB );
 	glVertexAttribPointer(
 		pipeline::TANGENT_ATTRIB,
-		ARRAY_SIZE_FROM_ELEMENTS( s_vertex::tangent.v ), GL_FLOAT, GL_FALSE,
+		ARRAY_COUNT_FROM_SIZE( s_vertex::tangent.v ), GL_FLOAT, GL_FALSE,
         sizeof( s_vertex ), (GLvoid*)offsetof( s_vertex, tangent.v )
 	);
     

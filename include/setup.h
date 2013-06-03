@@ -18,8 +18,8 @@
  */
 // Returns the number of elements in a statically allocated array.
 // This will not work for dynamic arrays (will return 1)
-#ifndef ARRAY_SIZE_FROM_ELEMENTS
-	#define ARRAY_SIZE_FROM_ELEMENTS( a ) ( sizeof( a ) / sizeof( a[ 0 ] ) )
+#ifndef ARRAY_COUNT_FROM_SIZE
+	#define ARRAY_COUNT_FROM_SIZE( a ) ( sizeof( a ) / sizeof( a[ 0 ] ) )
 #endif
 
 #ifdef DEBUG

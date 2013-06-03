@@ -12,6 +12,7 @@
 #include "types.h"
 
 #include "bitmap.h"
+#include "billboard.h"
 #include "camera.h"
 #include "display.h"
 #include "font.h"
@@ -23,6 +24,7 @@
 #include "primitives.h"
 #include "resource.h"
 #include "shader.h"
+#include "stockShaders.h"
 #include "shadowMap.h"
 #include "skybox.h"
 #include "timeObject.h"

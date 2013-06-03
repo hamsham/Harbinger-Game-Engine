@@ -40,6 +40,7 @@ class   c_font;
 class   c_shader;
 
 // Visual-Related
+class   c_billboard;
 class   c_camera;
 class   c_mesh;
 class   c_skyBox;

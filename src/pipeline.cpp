@@ -11,6 +11,7 @@
 #include "camera.h"
 #include "display.h"
 #include "shader.h"
+#include "stockShaders.h"
 #include "primitives.h"
 
 using namespace hge;
@@ -24,7 +25,7 @@ namespace {
     GLuint currShader = 0;
     
     // Creating an array of four 4x4 Matrices. Model, View, Projection, and MVP
-    mat4 transforms[ 4 ] = { mat4( 1.f ) };
+    mat4 transforms[ 3 ] = { mat4( 1.f ) };
 }
 
 /******************************************************************************
@@ -32,13 +33,9 @@ namespace {
 ******************************************************************************/
 void pipeline::applyMatrix( e_matrixState s, const mat4& m ) {
     
-    transforms[ s ] = m;
-    
     // Update the current MVP matrix
-    transforms[ 3 ]
-        = transforms[ HGE_MODEL_MAT ]
-        * transforms[ HGE_VIEW_MAT ]
-        * transforms[ HGE_PROJ_MAT ];
+    transforms[ s ] = m;
+    transforms[ 2 ] = transforms[ HGE_MODEL_MAT ] * transforms[ HGE_VP_MAT ];
     
     // Upload the matrix data to the current shader
     glUniformBlockBinding( currShader, matrixIndexId, HGE_PIPELINE_MATRIX_BINDING );
@@ -52,15 +49,10 @@ void pipeline::applyMatrix( e_matrixState s, const mat4& m ) {
 
 void pipeline::applyMatrix( const c_drawableObj& obj, const c_camera& cam ) {
     
-    transforms[ HGE_MODEL_MAT ] = obj.getModelMatrix();
-    transforms[ HGE_VIEW_MAT ] = cam.getViewMatrix();
-    transforms[ HGE_PROJ_MAT ] = cam.getProjMatrix();
-    
     // Update the current MVP matrix
-    transforms[ 3 ]
-        = transforms[ HGE_MODEL_MAT ]
-        * transforms[ HGE_VIEW_MAT ]
-        * transforms[ HGE_PROJ_MAT ];
+    transforms[ HGE_MODEL_MAT ] = obj.getModelMatrix();
+    transforms[ HGE_VP_MAT ] = cam.getVPMatrix();
+    transforms[ 2 ] = transforms[ HGE_MODEL_MAT ] * transforms[ HGE_VP_MAT ];
     
     // Upload the matrix data to the current shader
     glUniformBlockBinding( currShader, matrixIndexId, HGE_PIPELINE_MATRIX_BINDING );
@@ -190,7 +182,7 @@ bool pipeline::init() {
     }
     
     // PRIMITIVE INITIALIZATION
-    if ( !initPrimitives() ) {
+    if ( !initPrimitives() || !stockShaders::init() ) {
         terminate();
         return false;
     }
@@ -210,4 +202,5 @@ void pipeline::terminate() {
     matrixIndexId = GL_INVALID_INDEX;
     
     terminatePrimitives();
+    stockShaders::terminate();
 }

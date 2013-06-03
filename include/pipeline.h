@@ -33,8 +33,7 @@ enum e_attributes : GLint {
 
 enum e_matrixState : int {
     HGE_MODEL_MAT   = 0,
-    HGE_VIEW_MAT    = 1,
-    HGE_PROJ_MAT    = 2
+    HGE_VP_MAT      = 1
 };
 
 // These are based off the enumerations defined in Assimp's "material.h" header

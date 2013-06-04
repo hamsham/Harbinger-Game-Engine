@@ -250,23 +250,24 @@ void c_string::createVertexBuffer( unsigned numVerts ) {
 	printGlError( "Error while creating a string object's vertex buffer.");
     
 	glEnableVertexAttribArray( pipeline::VERTEX_ATTRIB );
+	glEnableVertexAttribArray( pipeline::TEXTURE_ATTRIB );
+	glEnableVertexAttribArray( pipeline::NORMAL_ATTRIB );
+    
 	glVertexAttribPointer(
 		pipeline::VERTEX_ATTRIB,
-		ARRAY_SIZE_FROM_ELEMENTS( font_vertex::pos.v ), GL_FLOAT, GL_FALSE,
+		ARRAY_COUNT_FROM_SIZE( font_vertex::pos.v ), GL_FLOAT, GL_FALSE,
         sizeof( font_vertex ), (GLvoid*)offsetof( font_vertex, pos.v )
 	);
     
-	glEnableVertexAttribArray( pipeline::TEXTURE_ATTRIB );
 	glVertexAttribPointer(
 		pipeline::TEXTURE_ATTRIB,
-		ARRAY_SIZE_FROM_ELEMENTS( font_vertex::uv.v ), GL_FLOAT, GL_FALSE,
+		ARRAY_COUNT_FROM_SIZE( font_vertex::uv.v ), GL_FLOAT, GL_FALSE,
         sizeof( font_vertex ), (GLvoid*)offsetof( font_vertex, uv.v )
 	);
     
-	glEnableVertexAttribArray( pipeline::NORMAL_ATTRIB );
 	glVertexAttribPointer(
 		pipeline::NORMAL_ATTRIB,
-		ARRAY_SIZE_FROM_ELEMENTS( font_vertex::norm.v ), GL_FLOAT, GL_FALSE,
+		ARRAY_COUNT_FROM_SIZE( font_vertex::norm.v ), GL_FLOAT, GL_FALSE,
         sizeof( font_vertex ), (GLvoid*)offsetof( font_vertex, norm.v )
 	);
     
@@ -364,9 +365,10 @@ void c_string::setString( const c_font& font, const char* str ) {
             xPos += m.advX - m.bearX;
 
             glBufferSubData(
-                GL_ARRAY_BUFFER, sizeof( tempQuad ) * charCount++,
+                GL_ARRAY_BUFFER, sizeof( tempQuad ) * charCount,
                 sizeof( tempQuad ), tempQuad
             );
+            ++charCount;
             printGlError( "Error while updating string buffer data on the GPU.");
         }
     }

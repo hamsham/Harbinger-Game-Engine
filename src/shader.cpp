@@ -79,7 +79,7 @@ bool c_shader::compile() {
     GLint shaderStatus(0);
 
     // Link the shader files
-    for (uint i(0); i < shaderID.size(); ++i) {
+    for (unsigned i(0); i < shaderID.size(); ++i) {
         glAttachShader(progID, shaderID[ i ]);
         glLinkProgram(progID);
         glGetProgramiv(progID, GL_LINK_STATUS, &shaderStatus);
@@ -97,7 +97,7 @@ bool c_shader::compile() {
 //-----------------------------------------------------------------------------
 //	Shader - Generic Shader File Loading
 //-----------------------------------------------------------------------------
-bool c_shader::load( cstr shaderFilePath, int shaderType ) {
+bool c_shader::load( const char* shaderFilePath, int shaderType ) {
     //check to see if the fragment shader file exists
     if ( !c_resource::fileExists( shaderFilePath ) ) {
         std::cerr << "WARNING: Attempted to load a nonexistent shader file:\n";
@@ -122,7 +122,7 @@ bool c_shader::load( cstr shaderFilePath, int shaderType ) {
 //-----------------------------------------------------------------------------
 //	Shader - Shader From a Buffer
 //-----------------------------------------------------------------------------
-bool c_shader::loadBuffer( cstr buffer, int length, int shaderType ) {
+bool c_shader::loadBuffer( const char* buffer, int length, int shaderType ) {
     GLint shaderStatus(0);
     GLuint shader( 0 );
 
@@ -147,7 +147,7 @@ bool c_shader::loadBuffer( cstr buffer, int length, int shaderType ) {
 //	Shader - Shader Unloading
 //-----------------------------------------------------------------------------
 void c_shader::unload() {
-    for (uint i(0); i < shaderID.size(); ++i) {
+    for (unsigned i(0); i < shaderID.size(); ++i) {
         glDetachShader(progID, shaderID[ i ]);
         glDeleteShader(shaderID[ i ]);
     }

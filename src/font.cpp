@@ -13,15 +13,7 @@
 
 #include "font.h"
 
-#include "pipeline.h"
-
 using namespace hamLibs::math;
-
-struct font_vertex {
-	vec3 pos;
-	vec2 uv;
-	vec3 norm;
-};
 
 void printFontError( const char* msg, int error ) {
     std::cerr << msg;
@@ -121,6 +113,7 @@ void c_font::loadGlyphs( FT_Face face ) {
         width               = nextPow2( ftBitmap->width );
         height              = nextPow2( ftBitmap->rows );
         
+        // Allocate memory for a glyph. Memory is deleted in "createCharAtlas()"
         GLubyte* data       = dataArray[ index ] = new GLubyte[ width*height ];
 
         // copy bitmap data into a format suitable for opengl
@@ -178,8 +171,10 @@ void c_font::createCharAtlas( GLubyte* bitmaps[ MAX_NUM_GLYPHS ] ) {
                 pos[0] + metrics[ iter ].width, pos[1] + metrics[ iter ].height
             );
             
+            // Scale the Position coords so that they clamp within the atlas' size
             metrics[ iter ].pos[0]  = (pos[0]) / (texDimension*maxWidth);
             metrics[ iter ].pos[1]  = (pos[1]) / (texDimension*maxHeight);
+            // scale the UV components so they are merely offsets of the positions
             metrics[ iter ].uv[0]   = (uv[0]) / (texDimension*maxWidth);
             metrics[ iter ].uv[1]   = (uv[1]-1.f) / (texDimension*maxHeight);
             
@@ -244,7 +239,7 @@ void c_string::createVertexBuffer( unsigned numVerts ) {
 	
 	glBindBuffer( GL_ARRAY_BUFFER, vbo );
     glBufferData(
-        GL_ARRAY_BUFFER, sizeof( font_vertex ) * 4 * numVerts,
+        GL_ARRAY_BUFFER, sizeof( s_plainVertex ) * 4 * numVerts,
         nullptr, GL_DYNAMIC_DRAW
     );
 	printGlError( "Error while creating a string object's vertex buffer.");
@@ -255,20 +250,20 @@ void c_string::createVertexBuffer( unsigned numVerts ) {
     
 	glVertexAttribPointer(
 		pipeline::VERTEX_ATTRIB,
-		ARRAY_COUNT_FROM_SIZE( font_vertex::pos.v ), GL_FLOAT, GL_FALSE,
-        sizeof( font_vertex ), (GLvoid*)offsetof( font_vertex, pos.v )
+		ARRAY_COUNT_FROM_SIZE( s_plainVertex::pos.v ), GL_FLOAT, GL_FALSE,
+        sizeof( s_plainVertex ), (GLvoid*)offsetof( s_plainVertex, pos.v )
 	);
     
 	glVertexAttribPointer(
 		pipeline::TEXTURE_ATTRIB,
-		ARRAY_COUNT_FROM_SIZE( font_vertex::uv.v ), GL_FLOAT, GL_FALSE,
-        sizeof( font_vertex ), (GLvoid*)offsetof( font_vertex, uv.v )
+		ARRAY_COUNT_FROM_SIZE( s_plainVertex::uv.v ), GL_FLOAT, GL_FALSE,
+        sizeof( s_plainVertex ), (GLvoid*)offsetof( s_plainVertex, uv.v )
 	);
     
 	glVertexAttribPointer(
 		pipeline::NORMAL_ATTRIB,
-		ARRAY_COUNT_FROM_SIZE( font_vertex::norm.v ), GL_FLOAT, GL_FALSE,
-        sizeof( font_vertex ), (GLvoid*)offsetof( font_vertex, norm.v )
+		ARRAY_COUNT_FROM_SIZE( s_plainVertex::norm.v ), GL_FLOAT, GL_FALSE,
+        sizeof( s_plainVertex ), (GLvoid*)offsetof( s_plainVertex, norm.v )
 	);
     
 	glDisableVertexAttribArray( pipeline::TANGENT_ATTRIB );
@@ -288,7 +283,7 @@ void c_string::setString( const c_font& font, const char* str ) {
     
     int xPos = 0;
     int yPos = 0;
-    font_vertex tempQuad[ 4 ];
+    s_plainVertex tempQuad[ 4 ];
     numChars = 0;
     
     //count all the whitespace
@@ -323,7 +318,7 @@ void c_string::setString( const c_font& font, const char* str ) {
     int indexIter = 0;
     for ( int i = 0; str[ i ] != '\0'; ++i ) {
         const int currChar = (int)str[ i ];
-        const c_font::charMetrics& m = font.metrics[ currChar ];
+        const c_font::metric_t& m = font.metrics[ currChar ];
         
         if ( currChar == '\n' ) {
             yPos -= font.newLine;

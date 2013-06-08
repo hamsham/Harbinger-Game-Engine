@@ -9,8 +9,8 @@
 #define	__HGE_FONT_H__
 
 #include <vector>
-#include "mesh.h"
-#include "math/math.h"
+#include "resource.h"
+#include "pipeline.h"
 
 struct FT_FaceRec_;
 
@@ -28,7 +28,7 @@ class HGE_API c_font : virtual public c_resource {
         MAX_NUM_GLYPHS = 256
     };
     
-    struct charMetrics {
+    struct metric_t {
         int width   = 0;
         int height  = 0;
         int advX    = 0; // font advance
@@ -45,7 +45,7 @@ class HGE_API c_font : virtual public c_resource {
         int         newLine     = 0;
         int         maxWidth    = 0;
         int         maxHeight   = 0;
-        charMetrics metrics[ MAX_NUM_GLYPHS ];
+        metric_t    metrics[ MAX_NUM_GLYPHS ];
         
         void        loadGlyphs( FT_FaceRec_* );
         void        createCharAtlas( GLubyte* bitmaps[ MAX_NUM_GLYPHS ] );
@@ -54,6 +54,13 @@ class HGE_API c_font : virtual public c_resource {
         
         c_font  ()          {}
         ~c_font ()          { unload(); }
+        
+        c_font  ( const c_font& ) = delete;
+        c_font  ( c_font&& ) = default;
+        c_font& operator =  ( const c_font& ) = delete;
+        c_font& operator =  ( c_font&& ) = default;
+        bool    operator == ( const c_font& f ) { return textureId == f.textureId; }
+        bool    operator != ( const c_font& f ) { return textureId != f.textureId; }
         
         bool    load        ( const char* filename, int fontsize );
         bool    isLoaded    () const;
@@ -70,7 +77,7 @@ class HGE_API c_font : virtual public c_resource {
 ///////////////////////////////////////////////////////////////////////////////
 // CHARACTER STRING CLASS
 ///////////////////////////////////////////////////////////////////////////////
-class HGE_API c_string : virtual public c_drawableObj {
+class HGE_API c_string {
     typedef std::vector< int > intArr;
     
     private:
@@ -86,6 +93,14 @@ class HGE_API c_string : virtual public c_drawableObj {
     public:
         c_string()  {}
         ~c_string() { clearString(); }
+        
+        c_string    ( const c_string& ) = delete;
+        c_string    ( c_string&& ) = default;
+        c_string&   operator =  ( const c_string& ) = delete;
+        c_string&   operator =  ( c_string&& ) = default;
+        bool        operator == ( const c_string& s ) { return vao == s.vao; }
+        bool        operator != ( const c_string& s ) { return vao != s.vao; }
+        
         
         void        setString   ( const c_font&, const char* );
         void        clearString ();

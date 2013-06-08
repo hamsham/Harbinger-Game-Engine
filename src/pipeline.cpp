@@ -13,6 +13,7 @@
 #include "shader.h"
 #include "stockShaders.h"
 #include "primitives.h"
+#include "transformations.h"
 
 using namespace hge;
 
@@ -47,7 +48,7 @@ void pipeline::applyMatrix( e_matrixState s, const mat4& m ) {
     );
 }
 
-void pipeline::applyMatrix( const c_drawableObj& obj, const c_camera& cam ) {
+void pipeline::applyMatrix( const c_drawTransform& obj, const c_camera& cam ) {
     
     // Update the current MVP matrix
     transforms[ HGE_MODEL_MAT ] = obj.getModelMatrix();
@@ -112,7 +113,7 @@ void pipeline::applyShader( GLuint programId ) {
 /******************************************************************************
  * Error Messages
 ******************************************************************************/
-void pipeline::printErrorMsg( cstr msg, uint lineNum, cstr sourceFile ) {
+void pipeline::printErrorMsg( const char* msg, unsigned lineNum, const char* sourceFile ) {
 	GLenum errorCode( glGetError() );
 	if ( errorCode == GL_NO_ERROR )
 		return;

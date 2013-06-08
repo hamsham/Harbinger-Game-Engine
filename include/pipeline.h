@@ -84,13 +84,13 @@ HGE_API     void terminate();
 // The matrix stack will only hold (at most) a single user-applied matrix of
 // each type (model, view, and projection).
 HGE_API     void applyMatrix( e_matrixState s, const mat4& m = mat4( 1.f ) );
-HGE_API     void applyMatrix( const c_drawableObj&, const c_camera& );
+HGE_API     void applyMatrix( const c_drawTransform&, const c_camera& );
 HGE_API     void removeMatrix( e_matrixState s );
 
 HGE_API     void applyShader( GLuint programId );
 HGE_INLINE  void applyShader( const c_shader& s ) { applyShader( s.getProgramId() ); }
 
-HGE_API     void printErrorMsg( cstr msg, uint lineNum, cstr sourceFile );
+HGE_API     void printErrorMsg( const char* msg, unsigned lineNum, const char* sourceFile );
 
 HGE_INLINE  vec3 getWorldAxisX() { return vec3( 1.f, 0.f, 0.f ); }
 HGE_INLINE  vec3 getWorldAxisY() { return vec3( 0.f, 1.f, 0.f ); }

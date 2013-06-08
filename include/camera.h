@@ -9,7 +9,6 @@
 #define	__HGE_CAMERA_H__
 
 #include "types.h"
-#include "object.h"
 
 namespace hge {
 
@@ -26,7 +25,7 @@ namespace hge {
 //		Camera & View Control
 ///////////////////////////////////////////////////////////////////////////////
 
-class HGE_API c_camera : virtual public c_object {
+class HGE_API c_camera {
     
     public:
         enum e_viewMode : unsigned {
@@ -55,6 +54,7 @@ class HGE_API c_camera : virtual public c_object {
         
         float orbitDist = 1.f;
         
+        vec3 pos;
         vec3 target;
         vec3 xAxis;
         vec3 yAxis;
@@ -75,7 +75,11 @@ class HGE_API c_camera : virtual public c_object {
     public:
         c_camera    ();
         c_camera    ( const c_camera& );
+        c_camera    ( c_camera&& ) = default;
         ~c_camera   () {}
+        
+        c_camera&   operator =      ( const c_camera& );
+        c_camera&   operator =      ( c_camera&& )          = default;
         
         void        makeOrtho       ();
         void        makePerspective ();
@@ -90,6 +94,8 @@ class HGE_API c_camera : virtual public c_object {
         float       getOrbitDist    () const                { return orbitDist; }
         void        setOrbitDist    ( float d )             { orbitDist = std::fabs(d); }
         
+		const vec3& getPos          () const				{ return pos; }
+		void        setPos          ( const vec3& p )       { pos = p; }
         const vec3& getDir          () const                { return zAxis; }
         void        setDir          ( const vec3& d )       { look( d ); }
         const vec3& getTarget       () const                { return target; }
@@ -120,7 +126,6 @@ class HGE_API c_camera : virtual public c_object {
         void        unroll          ();
         
         void        update          ();
-        void        tick            ( float )               { update(); }
 };
 
 } // end hge namespace

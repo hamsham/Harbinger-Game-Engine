@@ -43,4 +43,18 @@ void c_skyBox::draw() const {
     glDepthFunc( GL_LESS );
 }
 
+void c_skyBox::draw( const c_cubeMap& c, const c_sphere& s ) {
+    glCullFace( GL_FRONT );
+    glDepthFunc( GL_LEQUAL );
+    
+    c.activate();
+    
+    s.draw();
+    
+    c.deActivate();
+    
+    glCullFace( GL_BACK );
+    glDepthFunc( GL_LESS );
+}
+
 } // End hge namespace

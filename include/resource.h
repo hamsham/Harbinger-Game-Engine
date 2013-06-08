@@ -13,17 +13,22 @@
 namespace hge {
 
 class HGE_API c_resource {
-	public:
-		c_resource		() {}
-		~c_resource		() {}
-		
-		virtual bool	isLoaded	() const = 0;
-		virtual bool	load		( cstr filename, int flags ) = 0;
-		virtual void	unload		() = 0;
+    public:
+        c_resource		() {}
+        c_resource      ( c_resource&& ) {}
+        c_resource      ( const c_resource& ) {}
+        ~c_resource		() {}
+        
+        c_resource&     operator =  ( c_resource&& ) = default;
+        c_resource&     operator =  ( const c_resource& ) = default;
 
-		static bool		fileExists	( cstr filename );
-		static uint		fileSize	( cstr filename );
-		static void		readFile	( cstr filename, char* buffer, uint length );
+        virtual bool	isLoaded	() const = 0;
+        virtual bool	load		( const char* filename, int flags ) = 0;
+        virtual void	unload		() = 0;
+
+        static bool		fileExists	( const char* filename );
+        static unsigned fileSize	( const char* filename );
+        static void		readFile	( const char* filename, char* buffer, unsigned length );
 };
 
 } // end hge namespace

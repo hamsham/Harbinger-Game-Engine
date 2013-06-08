@@ -8,7 +8,6 @@
 #ifndef __HGE_BILLBOARD_H__
 #define	__HGE_BILLBOARD_H__
 
-#include "object.h"
 #include "pipeline.h"
 
 namespace hge {
@@ -21,14 +20,15 @@ class HGE_API c_billboard {
 
     public:
         c_billboard ()              {}
-        ~c_billboard()              { clearInstances(); }
+        ~c_billboard()              { clearImages(); }
         
-        void        clearInstances  ();
+        void        clearImages     ();
         
-        bool        setNumInstances ( unsigned rows, unsigned cols );
-        unsigned    getNumInstances () const { return numBmps; }
+        // Image positions will be reset upon calling "setNumImages()"
+        bool        setNumImages    ( unsigned rows, unsigned cols );
+        unsigned    getNumImages    () const { return numBmps; }
         
-        void        setInstancePos  ( unsigned index, const vec3& pos );
+        void        setImagePos     ( unsigned index, const vec3& pos );
         
         // Ensure that a bitmap has been bound before drawing
         void        draw            () const;

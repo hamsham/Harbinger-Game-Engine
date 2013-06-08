@@ -19,7 +19,6 @@
 #include "input.h"
 #include "light.h"
 #include "mesh.h"
-#include "object.h"
 #include "pipeline.h"
 #include "primitives.h"
 #include "resource.h"
@@ -28,6 +27,7 @@
 #include "shadowMap.h"
 #include "skybox.h"
 #include "timeObject.h"
+#include "transformations.h"
 
 namespace hge {
 

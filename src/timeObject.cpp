@@ -129,11 +129,11 @@ c_timeObject::hr_prec c_timeObject::getStopTime() const {
 //-----------------
 // Time Flags
 //-----------------
-void c_timeObject::setFlags( unsigned int flags ) {
+void c_timeObject::setFlags( unsigned flags ) {
 	timeFlags = flags;
 }
 
-unsigned int c_timeObject::getFlags() const {
+unsigned c_timeObject::getFlags() const {
 	return timeFlags;
 }
 
@@ -290,13 +290,13 @@ c_stopwatch::c_stopwatch( const c_stopwatch& sw ) :
 //-----------------
 // Laps
 //-----------------
-c_timeObject::hr_prec c_stopwatch::getLapTime( unsigned int lapIndex ) const {
+c_timeObject::hr_prec c_stopwatch::getLapTime( unsigned lapIndex ) const {
 	if ( lapIndex > laps.size() )
 		return 0.0;
 	return laps[ lapIndex ];
 }
 
-unsigned int c_stopwatch::getNumLaps() const {
+unsigned c_stopwatch::getNumLaps() const {
 	return laps.size();
 }
 

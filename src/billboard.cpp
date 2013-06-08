@@ -11,7 +11,7 @@
 
 namespace hge {
 
-bool c_billboard::setNumInstances( unsigned r, unsigned c ) {
+bool c_billboard::setNumImages( unsigned r, unsigned c ) {
     
     if ( !vao ) {
         glGenVertexArrays( 1, &vao );
@@ -58,14 +58,14 @@ bool c_billboard::setNumInstances( unsigned r, unsigned c ) {
     return true;
 }
 
-void c_billboard::clearInstances() {
+void c_billboard::clearImages() {
     glDeleteVertexArrays( 1, &vao );
     glDeleteBuffers( 1, &vbo );
     
     vao = vbo = 0;
 }
 
-void c_billboard::setInstancePos( unsigned index, const vec3& pos ) {
+void c_billboard::setImagePos( unsigned index, const vec3& pos ) {
     if ( index > numBmps ) return;
     
     glBindVertexArray( vao );

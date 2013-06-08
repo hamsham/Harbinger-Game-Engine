@@ -19,7 +19,7 @@ namespace hge {
 class HGE_API c_bitmap : virtual public c_resource {
     private:
         GLint textureUnit   = pipeline::HGE_TEXTURE_DEFAULT;
-        uint oglTexture     = 0;
+        unsigned oglTexture = 0;
         int bmpWidth        = 0;
         int bmpHeight       = 0;
 
@@ -33,24 +33,29 @@ class HGE_API c_bitmap : virtual public c_resource {
         c_bitmap    () {}
         c_bitmap    ( const c_bitmap& ) = delete;
         c_bitmap    ( c_bitmap&& );
-        ~c_bitmap   () { unload(); }
-        c_bitmap&   operator = ( const c_bitmap& ) = delete;
-        c_bitmap&   operator = ( c_bitmap&& );
+        ~c_bitmap   ()          { unload(); }
+        
+        c_bitmap&   operator =  ( const c_bitmap& ) = delete;
+        c_bitmap&   operator =  ( c_bitmap&& );
+        bool        operator == ( const c_bitmap& s ) { return oglTexture == s.oglTexture; }
+        bool        operator != ( const c_bitmap& s ) { return oglTexture != s.oglTexture; }
 
         // memory-based operations
-        bool    isLoaded    () const;
-        bool    load        ( cstr filename, int unused = 0 );
-        void    unload      ();
+        bool    isLoaded        () const;
+        bool    load            ( const char* filename, int unused = 0 );
+        void    unload          ();
 
         // data operations
-        uint    getWidth    () const { return bmpWidth; }
-        uint    getHeight   () const { return bmpHeight; }
-        uint    getTexID    () const { return oglTexture; }
+        unsigned    getWidth    () const { return bmpWidth; }
+        unsigned    getHeight   () const { return bmpHeight; }
+        unsigned    getTexID    () const { return oglTexture; }
 
-        void    activate    () const;
-        void    deActivate  () const;
+        void        activate    () const;
+        void        deActivate  () const;
         
-        void    setTexUnit  ( GLint texUnit = pipeline::HGE_TEXTURE_DEFAULT ) { textureUnit = texUnit; }
+        void        setTexUnit  ( GLint texUnit = pipeline::HGE_TEXTURE_DEFAULT ) {
+                                    textureUnit = texUnit;
+                                }
 };
 
 /******************************************************************************
@@ -66,8 +71,11 @@ class HGE_API c_cubeMap : virtual public c_resource {
         c_cubeMap   ( const c_cubeMap& ) = delete;
         c_cubeMap   ( c_cubeMap&& );
         ~c_cubeMap  () { unload(); }
-        c_cubeMap&  operator = ( const c_cubeMap& ) = delete;
-        c_cubeMap&  operator = ( c_cubeMap&& );
+        
+        c_cubeMap&  operator =      ( const c_cubeMap& ) = delete;
+        c_cubeMap&  operator =      ( c_cubeMap&& );
+        bool        operator ==     ( const c_cubeMap& s ) { return textureObj == s.textureObj; }
+        bool        operator !=     ( const c_cubeMap& s ) { return textureObj != s.textureObj; }
         
         bool        load            ( const char* texFile, int cubeIndex );
         bool        isLoaded        () const { return textureObj != 0; }

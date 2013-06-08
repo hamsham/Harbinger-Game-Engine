@@ -14,7 +14,7 @@ namespace hge {
 ///////////////////////////////////////////////////////////////////////////////
 class HGE_API c_timeObject {
     public:
-        enum : unsigned int {
+        enum : unsigned {
             TIMEOBJ_STOP_AT_TIME_POINT    = 0x01,
             TIMEOBJ_PAUSED                = 0x02
         };
@@ -30,7 +30,7 @@ class HGE_API c_timeObject {
         static std::tm* getGlobalTimeInfo(); // NOT thread safe at the moment
 
     protected:
-        uint timeFlags;
+        unsigned timeFlags;
         hr_time_point currPoint;
         hr_prec currTime;
         hr_prec tickTime;
@@ -63,8 +63,8 @@ class HGE_API c_timeObject {
         void            setStopTime(hr_prec = 0.0);
         hr_prec         getStopTime() const;
 
-        void            setFlags(uint);
-        uint            getFlags() const;
+        void            setFlags(unsigned);
+        unsigned            getFlags() const;
         bool            isPaused() const;
         bool            isSetToStop() const;
 
@@ -134,8 +134,8 @@ class HGE_API c_stopwatch : virtual public c_timeObject {
 
         ~c_stopwatch() {}
 
-        hr_prec getLapTime(uint lapIndex) const;
-        uint    getNumLaps() const;
+        hr_prec getLapTime(unsigned lapIndex) const;
+        unsigned    getNumLaps() const;
         void    clearLaps();
 
         void    lap();

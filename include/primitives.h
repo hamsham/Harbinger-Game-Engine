@@ -8,8 +8,7 @@
 #ifndef __HGE_PRIMITIVES_H__
 #define	__HGE_PRIMITIVES_H__
 
-#include "mesh.h"
-#include "object.h"
+#include "types.h"
 #include "pipeline.h"
 
 namespace hge {
@@ -24,11 +23,10 @@ HGE_API void terminatePrimitives();
 /******************************************************************************
  * Quad Primitives
 ******************************************************************************/
-class HGE_API c_quad : virtual public c_drawableObj {
+class HGE_API c_quad {
     private:
         static GLuint   vao;
         static GLuint   vbo;
-        static s_vertex verts[ 4 ];
 
     public:
         c_quad  () {}
@@ -36,6 +34,13 @@ class HGE_API c_quad : virtual public c_drawableObj {
 
         static bool init();
         static void terminate();
+        
+        c_quad  ( const c_quad& ) = delete;
+        c_quad  ( c_quad&& ) = default;
+        c_quad& operator =  ( const c_quad& ) = delete;
+        c_quad& operator =  ( c_quad&& ) = default;
+        bool    operator == ( const c_quad& s ) { return vao == s.vao; }
+        bool    operator != ( const c_quad& s ) { return vao != s.vao; }
 
         void draw() const {
             glBindVertexArray( vao );
@@ -47,11 +52,10 @@ class HGE_API c_quad : virtual public c_drawableObj {
 /******************************************************************************
  * Triangle Primitives
 ******************************************************************************/
-class HGE_API c_triangle : virtual public c_drawableObj {
+class HGE_API c_triangle {
     private:
         static GLuint   vao;
         static GLuint   vbo;
-        static s_vertex verts[ 3 ];
 
     public:
         c_triangle  () {}
@@ -59,6 +63,13 @@ class HGE_API c_triangle : virtual public c_drawableObj {
 
         static bool init();
         static void terminate();
+        
+        c_triangle  ( const c_triangle& ) = delete;
+        c_triangle  ( c_triangle&& ) = default;
+        c_triangle& operator =  ( const c_triangle& ) = delete;
+        c_triangle& operator =  ( c_triangle&& ) = default;
+        bool        operator == ( const c_triangle& t ) { return vao == t.vao; }
+        bool        operator != ( const c_triangle& t ) { return vao != t.vao; }
 
         void draw() const {
             glBindVertexArray( vao );
@@ -70,7 +81,7 @@ class HGE_API c_triangle : virtual public c_drawableObj {
 /******************************************************************************
  * Line Primitive
 ******************************************************************************/
-class HGE_API c_line : virtual public c_drawableObj {
+class HGE_API c_line {
     private:
         static GLuint vao;
         static GLuint vbo;
@@ -84,7 +95,14 @@ class HGE_API c_line : virtual public c_drawableObj {
         static bool init();
         static void terminate();
         
-        void setVertPos( int index, const vec3& pos );
+        c_line  ( const c_line& ) = delete;
+        c_line  ( c_line&& ) = default;
+        c_line& operator =  ( const c_line& ) = delete;
+        c_line& operator =  ( c_line&& ) = default;
+        bool    operator == ( const c_line& l ) { return vao == l.vao; }
+        bool    operator != ( const c_line& l ) { return vao != l.vao; }
+        
+        void setVertPos( int index, const vec3& inPos );
         
         void draw() const {
             glBindVertexArray( vao );
@@ -98,15 +116,15 @@ class HGE_API c_line : virtual public c_drawableObj {
  * Sphere Primitive
  * 
  * NOTE:
- *      Use c_drawableObj::scale as the sphere's radius
+ *      Use c_drawable::scale as the sphere's radius
  *      Spheres can also be rendered using a cubemap texture
 ******************************************************************************/
-class HGE_API c_sphere : virtual public c_drawableObj {
+class HGE_API c_sphere {
     private:
         GLuint vao = 0;
         GLuint vbo[ 2 ] = { 0, 0 };
         
-        s_vertex* vertices = nullptr;
+        s_bumpVertex* vertices = nullptr;
         unsigned numVerts = 0;
         
         GLuint* indices = nullptr;
@@ -116,7 +134,14 @@ class HGE_API c_sphere : virtual public c_drawableObj {
         
     public:
         c_sphere() {}
-        ~c_sphere();
+        ~c_sphere() { destroySphere(); }
+        
+        c_sphere    ( const c_sphere& ) = delete;
+        c_sphere    ( c_sphere&& ) = default;
+        c_sphere&   operator =  ( const c_sphere& ) = delete;
+        c_sphere&   operator =  ( c_sphere&& ) = default;
+        bool        operator == ( const c_sphere& s ) { return vao == s.vao; }
+        bool        operator != ( const c_sphere& s ) { return vao != s.vao; }
         
         bool createSphere( int rings, int sectors );
         void destroySphere();

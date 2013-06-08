@@ -29,8 +29,8 @@ class HGE_API c_shader : virtual public c_resource {
         ~c_shader       ();
 
         bool            isLoaded        () const { return (progID) ? true : false; }
-        bool            load            ( cstr shaderFilePath, int shaderType );
-        bool            loadBuffer      ( cstr shaderBuffer, int length, int shaderType );
+        bool            load            ( const char* shaderFilePath, int shaderType );
+        bool            loadBuffer      ( const char* shaderBuffer, int length, int shaderType );
         bool            compile         ();
         void            unload          ();
         GLuint          getProgramId    () const { return progID; }

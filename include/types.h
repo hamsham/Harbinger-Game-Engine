@@ -16,21 +16,27 @@ namespace hge {
 using namespace hamLibs::math;
 
 /*
- * Global Typedefs
- */
-typedef unsigned int	uint;
-typedef const char*		cstr;
-
-/*
  * Forward Declarations
  */
 // Miscellaneous Structures
 struct  s_videoMode;
-struct  s_vertex;
+
+//simple vertex structure
+struct s_plainVertex {
+	vec3 pos;
+	vec2 uv;
+	vec3 norm;
+};
+
+// bumped vertex
+struct s_bumpVertex : s_plainVertex {
+	vec3 tangent;
+};
 
 // Abstract Base Classes
+class   c_component;
 class   c_object;
-class   c_drawableObj;
+class   c_drawTransform;
 
 // File-based resources
 class   c_resource;

@@ -13,7 +13,7 @@
 //-----------------------------------------------------------------------------
 //	Private Functions
 //-----------------------------------------------------------------------------
-void printImageLoadError( FREE_IMAGE_FORMAT fif, const char *msg );
+void printImageLoadError( FREE_IMAGE_FORMAT fif, const char* msg );
 
 FREE_IMAGE_FORMAT deduceImageFormat( const char* inFile );
 
@@ -26,7 +26,7 @@ void send3DToOpenGL( unsigned index, const void* buffer, int w, int h );
 //-----------------------------------------------------------------------------
 //	Printing an error using FreeImage
 //-----------------------------------------------------------------------------
-void printImageLoadError( FREE_IMAGE_FORMAT fif, const char *msg ) {
+void printImageLoadError( FREE_IMAGE_FORMAT fif, const char* msg ) {
 	std::cerr
 		<< "An error occurred when attempting to load an image:"
 		<< "\n\tFormat: " << FreeImage_GetFormatFromFIF( fif )
@@ -142,7 +142,7 @@ bool c_bitmap::isLoaded() const {
 //-----------------------------------------------------------------------------
 //	Bitmap - Loading an image file
 //-----------------------------------------------------------------------------
-bool c_bitmap::load( cstr fileName, int ) {
+bool c_bitmap::load( const char* fileName, int ) {
     
 	FIBITMAP* image( nullptr );
 	FREE_IMAGE_FORMAT imageFormat( FIF_UNKNOWN );

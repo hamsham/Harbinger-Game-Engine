@@ -9,7 +9,7 @@ namespace hge {
 //-----------------------------------------------------------------------------
 //	Error Messaging
 //-----------------------------------------------------------------------------
-void printFileError( cstr fileName ) {
+void printFileError( const char* fileName ) {
 	std::cerr << "Error opening the file:" << endl;
 	std::cerr << "\t" << fileName << endl;
 	std::cerr << "Please check that the file name was input correctly." << endl;
@@ -21,7 +21,7 @@ void printFileError( cstr fileName ) {
 /*
  * Check if a file exists
  */
-bool c_resource::fileExists(cstr fileName) {
+bool c_resource::fileExists(const char* fileName) {
 	ifstream fin(fileName);
 	
 	if (!fin.good())
@@ -34,8 +34,8 @@ bool c_resource::fileExists(cstr fileName) {
 /*
  * Get the size (in bytes) of the file
  */
-uint c_resource::fileSize(cstr fileName) {
-	uint size(0);
+unsigned c_resource::fileSize(const char* fileName) {
+	unsigned size(0);
 	ifstream fin(fileName);
 	if (!fin.good()) {
 		printFileError(fileName);
@@ -51,7 +51,7 @@ uint c_resource::fileSize(cstr fileName) {
 /*
  * Read the file data into a buffer
  */
-void c_resource::readFile(cstr filename, char* buffer, uint length) {
+void c_resource::readFile(const char* filename, char* buffer, unsigned length) {
 	ifstream fin(filename, ios_base::in | ios_base::binary);
 	if (!fin.good()) {
 		printFileError(filename);

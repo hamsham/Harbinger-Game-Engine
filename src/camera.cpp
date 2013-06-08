@@ -25,8 +25,10 @@ const mat4 c_camera::DEFAULT_PERSPECTIVE(
 	)
 );
 
+/******************************************************************************
+ * CAMERA -- Construction & Operators
+******************************************************************************/
 c_camera::c_camera() :
-    c_object(),
     rotateFunction{ &c_camera::rotateLockedY, &c_camera::rotateOrbitLockedY },
     updateFunction{ &c_camera::updateNormal, &c_camera::updateOrbit },
     viewMode( VIEW_NORMAL ),
@@ -36,6 +38,7 @@ c_camera::c_camera() :
     zNear( DEFAULT_Z_NEAR ),
     zFar( DEFAULT_Z_FAR ),
     orbitDist( 1.f ),
+    pos( 0.f ),
     target( 0.f ),
     xAxis( pipeline::getWorldAxisX() ),
     yAxis( pipeline::getWorldAxisY() ),
@@ -46,10 +49,9 @@ c_camera::c_camera() :
     projMatrix(
         infinitePerspective( DEFAULT_FOV, DEFAULT_ASPECT_WIDTH/DEFAULT_ASPECT_HEIGHT, DEFAULT_Z_NEAR )
     )
-    {}
+{}
 
 c_camera::c_camera( const c_camera& c ) :
-    c_object( c ),
     rotateFunction{ &c_camera::rotateLockedY, &c_camera::rotateOrbitLockedY },
     updateFunction{ &c_camera::updateNormal, &c_camera::updateOrbit },
     viewMode( c.viewMode ),
@@ -59,6 +61,7 @@ c_camera::c_camera( const c_camera& c ) :
     zNear( c.zNear ),
     zFar( c.zFar ),
     orbitDist( c.orbitDist ),
+    pos( c.pos ),
     target( c.target ),
     xAxis( c.xAxis ),
     yAxis( c.yAxis ),
@@ -68,7 +71,33 @@ c_camera::c_camera( const c_camera& c ) :
     viewMatrix( c.viewMatrix ),
     projMatrix( c.projMatrix )
 {}
-        
+
+c_camera& c_camera::operator = ( const c_camera& c ) {
+    rotateFunction[ 0 ] = &c_camera::rotateLockedY;
+    rotateFunction[ 1 ] = &c_camera::rotateOrbitLockedY;
+    updateFunction[ 0 ] = &c_camera::updateNormal;
+    updateFunction[ 1 ] = &c_camera::updateOrbit;
+    viewMode = c.viewMode;
+    fov = c.fov;
+    aspectW = c.aspectW;
+    aspectH = c.aspectH;
+    zNear = c.zNear;
+    zFar = c.zFar;
+    orbitDist = c.orbitDist;
+    pos = c.pos;
+    target = c.target;
+    xAxis = c.xAxis;
+    yAxis = c.yAxis;
+    zAxis = c.zAxis;
+    angles = c.angles;
+    orientation = c.orientation;
+    viewMatrix = c.viewMatrix;
+    projMatrix = c.projMatrix;
+}
+
+/******************************************************************************
+ * CAMERA -- Functions
+******************************************************************************/
 void c_camera::makeOrtho() {
     //projMatrix = ortho( -aspectW, aspectW, -aspectH, aspectH, zNear, zFar );
     projMatrix = ortho( -aspectW, aspectW, -aspectH, aspectH );

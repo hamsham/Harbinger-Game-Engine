@@ -39,7 +39,7 @@
 
 namespace hge {
 
-class HGE_API c_skyBox : virtual public hge::c_drawableObj {
+class HGE_API c_skyBox {
     private:
         hge::c_cubeMap  cubeMap;
         hge::c_sphere   spherePrim;
@@ -48,11 +48,20 @@ class HGE_API c_skyBox : virtual public hge::c_drawableObj {
         c_skyBox    () {}
         ~c_skyBox   () {}
         
+        c_skyBox    ( const c_skyBox& ) = delete;
+        c_skyBox    ( c_skyBox&& ) = default;
+        c_skyBox&   operator =  ( const c_skyBox& ) = delete;
+        c_skyBox&   operator =  ( c_skyBox&& ) = default;
+        bool        operator == ( const c_skyBox& s ) { return (cubeMap == s.cubeMap) && (spherePrim == s.spherePrim); }
+        bool        operator != ( const c_skyBox& s ) { return (cubeMap != s.cubeMap) || (spherePrim != s.spherePrim); }
+        
         bool load   ( const char* skyFiles[ 6 ] );
         void unload ();
         
         void draw   () const;
+        static void draw ( const c_cubeMap&, const c_sphere& );
 };
+
 
 } // End hge namespace
 

@@ -15,6 +15,8 @@
 //-----------------------------------------------------------------------------
 void printImageLoadError( FREE_IMAGE_FORMAT fif, const char* msg );
 
+bool loadImageFile( const char*, FIBITMAP**, int* w, int* h );
+
 FREE_IMAGE_FORMAT deduceImageFormat( const char* inFile );
 
 int setBitmapFlags( FREE_IMAGE_FORMAT inFormat );
@@ -32,6 +34,61 @@ void printImageLoadError( FREE_IMAGE_FORMAT fif, const char* msg ) {
 		<< "\n\tFormat: " << FreeImage_GetFormatFromFIF( fif )
 		<< "\n\tOutput: " << msg
 		<< std::endl;
+}
+
+//-----------------------------------------------------------------------------
+//	Generic image loading function
+//-----------------------------------------------------------------------------
+bool loadImageFile( const char* filename, FIBITMAP** img, int* w, int* h ) {
+    
+	FREE_IMAGE_FORMAT imageFormat( FIF_UNKNOWN );
+    
+	int FreeImageFlags = 0;
+    FIBITMAP* image = nullptr;
+	
+    if ( !filename ) {
+        *w = *h = 0;
+        return false;
+    }
+	FreeImage_SetOutputMessage( printImageLoadError );
+	
+	imageFormat = deduceImageFormat( filename );
+	if ( imageFormat == FIF_UNKNOWN
+	|| FreeImage_FIFSupportsReading( imageFormat ) == false ) {
+		return false;
+	}
+	
+	// Load the file
+	FreeImageFlags = setBitmapFlags( imageFormat );
+	image = FreeImage_Load( imageFormat, filename, FreeImageFlags );
+	
+	if ( !image ) {
+        std::cerr
+            << "ERROR: Could not load the image " << filename << std::endl;
+        *w = *h = 0;
+		return false;
+	}
+	
+	// Convert the image to RGBA. Unload if it cannot be converted
+	if ( FreeImage_GetColorType( image ) != FIC_RGBALPHA ) {
+		FIBITMAP* temp = image;
+		image = FreeImage_ConvertTo32Bits( temp );
+		FreeImage_Unload( temp );
+		if ( !image ) {
+            std::cerr
+                << "ERROR: Could not convert " << filename
+                << " to RGBA format" << std::endl;
+            *w = *h = 0;
+			return false;
+		}
+	}
+	
+	// All checks gave finished properly. Load the rest of the image
+	*w      = FreeImage_GetWidth( image );
+	*h      = FreeImage_GetHeight( image );
+    *img    = image;
+    
+    return true;
 }
 
 //-----------------------------------------------------------------------------
@@ -144,47 +201,22 @@ bool bitmap::isLoaded() const {
 //-----------------------------------------------------------------------------
 bool bitmap::load( const char* fileName, int ) {
     
-	FIBITMAP* image( nullptr );
-	FREE_IMAGE_FORMAT imageFormat( FIF_UNKNOWN );
-	int FreeImageFlags( 0 );
-	
-    if ( !fileName )
+    if ( oglTexture )
+        unload();
+    
+	FIBITMAP* image = nullptr;
+    
+    if ( !loadImageFile( fileName, &image, &bmpWidth, &bmpHeight ) )
         return false;
-	FreeImage_SetOutputMessage( printImageLoadError );
-	
-	imageFormat = deduceImageFormat( fileName );
-	if ( imageFormat == FIF_UNKNOWN
-	|| FreeImage_FIFSupportsReading( imageFormat ) == false ) {
-		return false;
-	}
-	
-	// Load the file
-	FreeImageFlags = setBitmapFlags( imageFormat );
-	image = FreeImage_Load( imageFormat, fileName, FreeImageFlags );
-	
-	if ( !image ) {
-		return false;
-	}
-	
-	// Convert the image to RGBA. Unload if it cannot be converted
-	if ( FreeImage_GetColorType( image ) != FIC_RGBALPHA ) {
-		FIBITMAP* temp = image;
-		image = FreeImage_ConvertTo32Bits( temp );
-		FreeImage_Unload( temp );
-		if ( !image ) {
-			return false;
-		}
-	}
     
 	glGenTextures( 1, &oglTexture );
+    
     if ( !oglTexture ) {
-        unload();
+        std::cerr << "ERROR: OpenGL could not create a texture buffer" << std::endl;
+        FreeImage_Unload( image );
+        bmpWidth = bmpHeight = 0;
         return false;
     }
-	
-	// All checks gave finished properly. Load the rest of the image
-	bmpWidth    = FreeImage_GetWidth( image );
-	bmpHeight   = FreeImage_GetHeight( image );
     
 	glBindTexture( GL_TEXTURE_2D, oglTexture );
     send2DToOpenGL( FreeImage_GetBits( image ), bmpWidth, bmpHeight );
@@ -240,64 +272,31 @@ cubemap& cubemap::operator =( cubemap&& bmpCopy ) {
 //-----------------------------------------------------------------------------
 //	Main Cubemap loading function
 //-----------------------------------------------------------------------------
-bool cubemap::load( const char* texFile, int cubeIndex ) {
+bool cubemap::load( const char* fileName, int cubeIndex ) {
     
-	FIBITMAP* image( nullptr );
-	FREE_IMAGE_FORMAT imageFormat( FIF_UNKNOWN );
-	int FreeImageFlags( 0 );
+    int texWidth = 0;
+    int texHeight = 0;
+	FIBITMAP* image = nullptr;
     
-	FreeImage_SetOutputMessage( printImageLoadError );
-    
-    imageFormat = deduceImageFormat( texFile );
-
-    if (    imageFormat == FIF_UNKNOWN
-    ||      FreeImage_FIFSupportsReading( imageFormat ) == false
-    ) {
-        std::cerr
-            << "ERROR: Unable to determine to file format of "
-            << "the cubemap texture " << texFile
-            << std::endl;
-        unload();
+    if ( !loadImageFile( fileName, &image, &texWidth, &texHeight ) )
         return false;
-    }
-
-    // Load the file
-    FreeImageFlags = setBitmapFlags( imageFormat );
-    image = FreeImage_Load( imageFormat, texFile, FreeImageFlags );
-
-    if ( !image ) {
-        std::cerr
-            << "ERROR: Unable to load the cubemap texture "
-            << texFile
-            << std::endl;
-        unload();
-        return false;
-    }
-
-    // Convert the image to RGBA. Unload if it cannot be converted
-    if ( FreeImage_GetColorType( image ) != FIC_RGBALPHA ) {
-        FIBITMAP* temp = image;
-        image = FreeImage_ConvertTo32Bits( temp );
-        FreeImage_Unload( temp );
-        if ( !image ) {
+    
+    if ( !textureObj ) {
+        glGenTextures( 1, &textureObj );
+        
+        if ( !textureObj ) {
             std::cerr
-                << "ERROR: Unable to convert the cubemap texture "
-                << texFile << " to RGBA format."
+                << "ERROR: OpenGL could not create a texture buffer"
                 << std::endl;
+            FreeImage_Unload( image );
             unload();
             return false;
         }
     }
     
-    if ( !textureObj )
-        glGenTextures( 1, &textureObj );
-    
     // All checks gave finished properly. Load the rest of the image
     glBindTexture( GL_TEXTURE_CUBE_MAP, textureObj );
-    send3DToOpenGL( cubeIndex, FreeImage_GetBits( image ),
-        FreeImage_GetWidth( image ), FreeImage_GetHeight( image )
-    );
-    glBindTexture( GL_TEXTURE_3D, 0 );
+    send3DToOpenGL( cubeIndex, FreeImage_GetBits( image ), texWidth, texHeight );
     glBindTexture( GL_TEXTURE_CUBE_MAP, 0 );
 
     FreeImage_Unload( image );

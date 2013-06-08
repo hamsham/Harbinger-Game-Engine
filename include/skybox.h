@@ -52,8 +52,6 @@ class HGE_API skybox {
         skybox      ( skybox&& ) = default;
         skybox&     operator =  ( const skybox& ) = delete;
         skybox&     operator =  ( skybox&& ) = default;
-        bool        operator == ( const skybox& s ) { return (skyTex == s.skyTex) && (spherePrim == s.spherePrim); }
-        bool        operator != ( const skybox& s ) { return (skyTex != s.skyTex) || (spherePrim != s.spherePrim); }
         
         bool load   ( const char* skyFiles[ 6 ] );
         void unload ();

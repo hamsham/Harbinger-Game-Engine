@@ -183,8 +183,7 @@ const char skyVS[] = R"***(
 
     void main() {
         texCoords = posVerts;
-        vec4 skyPos = mvpMatrix * vec4(posVerts, 1.0);
-        gl_Position = skyPos.xyww;
+        gl_Position = mvpMatrix * vec4(posVerts, 1.0);
     }
 )***";
 

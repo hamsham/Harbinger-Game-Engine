@@ -10,6 +10,7 @@
 #include "camera.h"
 #include "light.h"
 #include "pipeline.h"
+#include "shader.h"
 #include "stockShaders.h"
 
 namespace pipeline = hge::pipeline;
@@ -305,7 +306,7 @@ const char billboardFS[] = R"***(
  * Shader Manager Private Variables
  ******************************************************************************/
 //Point Light Shader
-hge::c_shader   pointLightShader;
+hge::shader     pointLightShader;
 GLint           ambColorId      = 0;
 GLint           ambIntId        = 0;
 GLint           pointColorId    = 0;
@@ -319,17 +320,17 @@ GLint           lightMatrixId   = 0;
 GLint           textureId       = 0;
 //GLint           normalId = 0;
 // Shadow Shader
-hge::c_shader   shadowShader;
+hge::shader     shadowShader;
 GLint           shadowMapId     = 0;
 // Skybox Shader
-hge::c_shader   skyShader;
+hge::shader     skyShader;
 GLint           skyTexId        = 0;
 // Font Shader Setup
-hge::c_shader   fontShader;
+hge::shader     fontShader;
 GLint           fontColId       = 0;
 GLint           fontSampler     = 0;
 // Billboard Setup
-hge::c_shader   bbShader;
+hge::shader     bbShader;
 GLint           camPosId        = 0;
 GLint           bbTexSampler    = 0;
 
@@ -585,7 +586,7 @@ void stockShaders::applyBillboardShader() {
     pipeline::applyShader( bbShader );
 }
 
-void stockShaders::setBillboardCam( const c_camera& c ) {
+void stockShaders::setBillboardCam( const camera& c ) {
     glUniform3fv( camPosId, 1, c.getPos().v );
 }
 
@@ -600,7 +601,7 @@ void stockShaders::applyPointLightShader() {
     pipeline::applyShader( pointLightShader );
 }
 
-void stockShaders::setPointLight( const s_light& a, const s_pointLight& p ) {
+void stockShaders::setPointLight( const ambientLight& a, const pointLight& p ) {
     glUniform1f(    ambIntId,       a.intensity );
     glUniform1f(    pointIntId,     p.intensity );
     glUniform1f(    pointLinearId,  p.linear );

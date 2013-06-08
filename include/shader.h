@@ -17,24 +17,24 @@ namespace hge {
 ///////////////////////////////////////////////////////////////////////////////
 //		OpenGL Shader Class
 ///////////////////////////////////////////////////////////////////////////////
-class HGE_API c_shader : virtual public c_resource {
+class HGE_API shader : virtual public resource {
     private:
-        std::vector< GLuint > shaderID;
-        GLuint progID;
+        std::vector< GLuint > shaderIds;
+        GLuint programId = 0;
 
     public:
         enum : GLint { INVALID_UNIFORM = -1 };
         
-        c_shader        ();
-        ~c_shader       ();
+        shader      ()              {}
+        ~shader     ()              { unload(); }
 
-        bool            isLoaded        () const { return (progID) ? true : false; }
-        bool            load            ( const char* shaderFilePath, int shaderType );
-        bool            loadBuffer      ( const char* shaderBuffer, int length, int shaderType );
-        bool            compile         ();
-        void            unload          ();
-        GLuint          getProgramId    () const { return progID; }
-        GLint           getVariableId   ( const char* v ) { return glGetUniformLocation( progID, v ); }
+        bool        isLoaded        () const { return (programId) ? true : false; }
+        bool        load            ( const char* shaderFilePath, int shaderType );
+        bool        loadBuffer      ( const char* shaderBuffer, int length, int shaderType );
+        bool        compile         ();
+        void        unload          ();
+        GLuint      getProgramId    () const { return programId; }
+        GLint       getVariableId   ( const char* v ) { return glGetUniformLocation( programId, v ); }
 };
 
 } // end hge namespace

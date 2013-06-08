@@ -13,7 +13,7 @@ namespace hge {
 /******************************************************************************
  * Shadow Map Initialization
 ******************************************************************************/
-bool c_shadowMap::init( unsigned w, unsigned h ) {
+bool shadowMap::init( unsigned w, unsigned h ) {
     if ( fbo || shadow )
         terminate();
     
@@ -63,7 +63,7 @@ bool c_shadowMap::init( unsigned w, unsigned h ) {
 /******************************************************************************
  * Shadow Map Termination
 ******************************************************************************/
-void c_shadowMap::terminate() {
+void shadowMap::terminate() {
     glDeleteFramebuffers( 1, &fbo );
     glDeleteTextures( 1, &shadow );
     shadow = fbo = width = height = 0;
@@ -72,7 +72,7 @@ void c_shadowMap::terminate() {
 /******************************************************************************
  * Bind for reading
 ******************************************************************************/
-void c_shadowMap::bindForReading( int texUnit ) {
+void shadowMap::bindForReading( int texUnit ) {
     glActiveTexture( texUnit );
     glBindTexture( GL_TEXTURE_2D, shadow );
 }
@@ -80,7 +80,7 @@ void c_shadowMap::bindForReading( int texUnit ) {
 /******************************************************************************
  * Bind for writing
 ******************************************************************************/
-void c_shadowMap::bindForWriting() {
+void shadowMap::bindForWriting() {
     glBindFramebuffer( GL_DRAW_FRAMEBUFFER, fbo );
 }
 

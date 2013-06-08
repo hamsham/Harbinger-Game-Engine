@@ -12,15 +12,15 @@
 
 namespace hge {
 
-class HGE_API c_resource {
+class HGE_API resource {
     public:
-        c_resource		() {}
-        c_resource      ( c_resource&& ) {}
-        c_resource      ( const c_resource& ) {}
-        ~c_resource		() {}
+        resource		() {}
+        resource        ( resource&& ) {}
+        resource        ( const resource& ) {}
+        ~resource		() {}
         
-        c_resource&     operator =  ( c_resource&& ) = default;
-        c_resource&     operator =  ( const c_resource& ) = default;
+        resource&       operator =  ( resource&& ) = default;
+        resource&       operator =  ( const resource& ) = default;
 
         virtual bool	isLoaded	() const = 0;
         virtual bool	load		( const char* filename, int flags ) = 0;

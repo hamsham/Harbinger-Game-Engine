@@ -3,6 +3,7 @@
 #include "types.h"
 #include "pipeline.h"
 #include "shader.h"
+
 using namespace std;
 
 namespace {
@@ -51,43 +52,35 @@ void printShaderError(GLuint programId, GLuint shaderId ) {
 //		OpenGL Shader Class
 ///////////////////////////////////////////////////////////////////////////////
 namespace hge {
-//-----------------------------------------------------------------------------
-//	Shader - Shader Structure
-//-----------------------------------------------------------------------------
-c_shader::c_shader() :
-    progID(0)
-{}
-
-c_shader::~c_shader() {
-    unload();
-}
 
 //-----------------------------------------------------------------------------
 //	Shader - Compilation
 //-----------------------------------------------------------------------------
-bool c_shader::compile() {
-    if (shaderID.empty()) {
+bool shader::compile() {
+    if (shaderIds.empty()) {
         std::cerr << "WARNING: Attempted to compile a shader program without input" << std::endl;
         return false;
     }
 
-    if (progID) {
-        glDeleteProgram(progID);
-        progID = 0;
+    if (programId) {
+        glDeleteProgram(programId);
+        programId = 0;
     }
-    progID = glCreateProgram();
+    programId = glCreateProgram();
     GLint shaderStatus(0);
 
     // Link the shader files
-    for (unsigned i(0); i < shaderID.size(); ++i) {
-        glAttachShader(progID, shaderID[ i ]);
-        glLinkProgram(progID);
-        glGetProgramiv(progID, GL_LINK_STATUS, &shaderStatus);
-        if (shaderStatus != GL_TRUE) {
-            std::cerr << "\nWARNING: A GLSL Shader Error has occurred\n";
-            printShaderError(progID, shaderID[ i ]);
-            return false;
-        }
+    for (unsigned i(0); i < shaderIds.size(); ++i) {
+        glAttachShader(programId, shaderIds[ i ]);
+    }
+    
+    glLinkProgram(programId);
+    glGetProgramiv(programId, GL_LINK_STATUS, &shaderStatus);
+    if (shaderStatus != GL_TRUE) {
+        std::cerr << "\nWARNING: A GLSL Shader Error has occurred\n";
+        for ( int i = 0; i < shaderIds.size(); ++i )
+            printShaderError(programId, shaderIds[ i ]);
+        return false;
     }
 
     printGlError("Error compiling shader");
@@ -97,9 +90,9 @@ bool c_shader::compile() {
 //-----------------------------------------------------------------------------
 //	Shader - Generic Shader File Loading
 //-----------------------------------------------------------------------------
-bool c_shader::load( const char* shaderFilePath, int shaderType ) {
+bool shader::load( const char* shaderFilePath, int shaderType ) {
     //check to see if the fragment shader file exists
-    if ( !c_resource::fileExists( shaderFilePath ) ) {
+    if ( !resource::fileExists( shaderFilePath ) ) {
         std::cerr << "WARNING: Attempted to load a nonexistent shader file:\n";
         std::cerr << "\t" << shaderFilePath << std::endl;
         return false;
@@ -109,9 +102,9 @@ bool c_shader::load( const char* shaderFilePath, int shaderType ) {
     char* shaderData( nullptr );
     bool ret = false;
 
-    fileLength = (int)c_resource::fileSize( shaderFilePath );
+    fileLength = (int)resource::fileSize( shaderFilePath );
     shaderData = new char[ fileLength ];
-    c_resource::readFile( shaderFilePath, shaderData, fileLength );
+    resource::readFile( shaderFilePath, shaderData, fileLength );
     
     ret = loadBuffer( shaderData, fileLength, shaderType );
     delete [] shaderData;
@@ -122,22 +115,22 @@ bool c_shader::load( const char* shaderFilePath, int shaderType ) {
 //-----------------------------------------------------------------------------
 //	Shader - Shader From a Buffer
 //-----------------------------------------------------------------------------
-bool c_shader::loadBuffer( const char* buffer, int length, int shaderType ) {
+bool shader::loadBuffer( const char* buffer, int length, int shaderType ) {
     GLint shaderStatus(0);
-    GLuint shader( 0 );
+    GLuint shaderId( 0 );
 
-    shader = glCreateShader( shaderType ); // Fragment shader or Vertex Shader
-    glShaderSource( shader, 1, (const GLchar**)&buffer, (const GLint*)&length );
+    shaderId = glCreateShader( shaderType ); // Fragment shader or Vertex Shader
+    glShaderSource( shaderId, 1, (const GLchar**)&buffer, (const GLint*)&length );
 
-    glCompileShader( shader );
-    glGetShaderiv( shader, GL_COMPILE_STATUS, &shaderStatus );
+    glCompileShader( shaderId );
+    glGetShaderiv( shaderId, GL_COMPILE_STATUS, &shaderStatus );
 
     if ( shaderStatus != GL_TRUE ) {
-        printShaderError( 0, shader );
+        printShaderError( 0, shaderId );
         return false;
     }
     
-    shaderID.push_back( shader );
+    shaderIds.push_back( shaderId );
 
     printGlError("General shader loading error");
     return true;
@@ -146,16 +139,16 @@ bool c_shader::loadBuffer( const char* buffer, int length, int shaderType ) {
 //-----------------------------------------------------------------------------
 //	Shader - Shader Unloading
 //-----------------------------------------------------------------------------
-void c_shader::unload() {
-    for (unsigned i(0); i < shaderID.size(); ++i) {
-        glDetachShader(progID, shaderID[ i ]);
-        glDeleteShader(shaderID[ i ]);
+void shader::unload() {
+    for (unsigned i(0); i < shaderIds.size(); ++i) {
+        glDetachShader(programId, shaderIds[ i ]);
+        glDeleteShader(shaderIds[ i ]);
     }
-    shaderID.clear();
+    shaderIds.clear();
 
-    if (progID) {
-        glDeleteProgram(progID);
-        progID = 0;
+    if (programId) {
+        glDeleteProgram(programId);
+        programId = 0;
     }
 }
 

@@ -38,7 +38,8 @@ HGE_API void getMouseWheelPos       ( int* );
 /*/
  * These key codes have been copied and pasted directly from the GLFW Header.
  * I have done this to provide an HGE-only interface. This way, it is no longer
- * required to keep switching back and forth between Harbinger and GLFW.
+ * required to keep switching back and forth between Harbinger and GLFW. Nor
+ * is it required to link GLFW when including harbinger in an external project.
  * Most of the input calls have a direct 1:1 correlation with GLFW
 /*/
 

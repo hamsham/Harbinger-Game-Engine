@@ -12,15 +12,15 @@
 
 namespace hge {
 
-class HGE_API c_billboard {
+class HGE_API billboard {
     private:
         GLuint      vao     = 0;
         GLuint      vbo     = 0;
         unsigned    numBmps = 10;
 
     public:
-        c_billboard ()              {}
-        ~c_billboard()              { clearImages(); }
+        billboard   ()              {}
+        ~billboard  ()              { clearImages(); }
         
         void        clearImages     ();
         

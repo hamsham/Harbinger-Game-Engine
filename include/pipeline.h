@@ -11,7 +11,6 @@
 #include <GL/glew.h>
 #include <GL/glfw.h>
 #include "types.h"
-#include "shader.h"
 
 #ifndef HGE_PIPELINE_MATRIX_BINDING
     #define HGE_PIPELINE_MATRIX_BINDING 1
@@ -84,11 +83,11 @@ HGE_API     void terminate();
 // The matrix stack will only hold (at most) a single user-applied matrix of
 // each type (model, view, and projection).
 HGE_API     void applyMatrix( e_matrixState s, const mat4& m = mat4( 1.f ) );
-HGE_API     void applyMatrix( const c_drawTransform&, const c_camera& );
+HGE_API     void applyMatrix( const drawTransform&, const camera& );
 HGE_API     void removeMatrix( e_matrixState s );
 
 HGE_API     void applyShader( GLuint programId );
-HGE_INLINE  void applyShader( const c_shader& s ) { applyShader( s.getProgramId() ); }
+HGE_API     void applyShader( const shader& );
 
 HGE_API     void printErrorMsg( const char* msg, unsigned lineNum, const char* sourceFile );
 

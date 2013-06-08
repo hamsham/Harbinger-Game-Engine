@@ -15,64 +15,64 @@ namespace hge {
 ///////////////////////////////////////////////////////////////////////////////
 //		Ambient Lighting
 ///////////////////////////////////////////////////////////////////////////////
-struct HGE_API s_light {
-	vec4	color;
-	float	intensity;
+struct HGE_API ambientLight {
+	vec4    color;
+	float   intensity;
 
-	s_light			();
-	s_light			( const s_light& );
-	~s_light		() {}
+	ambientLight    ();
+	ambientLight    ( const ambientLight& );
+	~ambientLight   () {}
 };
 
 ///////////////////////////////////////////////////////////////////////////////
 //		Diffuse Lighting
 ///////////////////////////////////////////////////////////////////////////////
-struct HGE_API s_diffuseLight : s_light {
-	vec3	dir;
+struct HGE_API diffuseLight : ambientLight {
+    vec3    dir;
 
-	s_diffuseLight		();
-	s_diffuseLight		( const s_diffuseLight& );
-	~s_diffuseLight		() {};
+    diffuseLight    ();
+    diffuseLight    ( const diffuseLight& );
+    ~diffuseLight   () {};
 };
 
 ///////////////////////////////////////////////////////////////////////////////
 //		Specular Lighting
 ///////////////////////////////////////////////////////////////////////////////
-struct HGE_API s_specularLight : s_light {
-	float	shininess;
-
-	s_specularLight		();
-	s_specularLight		( const s_specularLight& );
-	~s_specularLight	() {}
+struct HGE_API specularLight : ambientLight {
+    float   shininess;
+    
+    specularLight     ();
+    specularLight     ( const specularLight& );
+    ~specularLight    () {}
 };
 
 ///////////////////////////////////////////////////////////////////////////////
 //		Point Lighting
 ///////////////////////////////////////////////////////////////////////////////
-struct HGE_API s_pointLight : s_light {
-	vec3	pos;
-	float	constant;
-	float	linear;
-	float	exponential;
+struct HGE_API pointLight : ambientLight {
+    vec3    pos;
+    float   constant;
+    float   linear;
+    float   exponential;
 
-	s_pointLight		();
-	s_pointLight		( const s_pointLight& );
-	~s_pointLight		() {}
+    pointLight    ();
+    pointLight    ( const pointLight& );
+    ~pointLight   () {}
 };
 
 ///////////////////////////////////////////////////////////////////////////////
 //		Spot Lighting
 ///////////////////////////////////////////////////////////////////////////////
-struct HGE_API s_spotLight : s_light {
-	static const float MIN_CONE_ANGLE;
-	vec3	pos;
-	vec3	dir;
-	float	coneAngle;
-	float	attenuation;
+struct HGE_API spotLight : ambientLight {
+    static const float MIN_CONE_ANGLE;
+    vec3    pos;
+    vec3    dir;
+    float   coneAngle;
+    float   attenuation;
 
-	s_spotLight			();
-	s_spotLight			( const s_spotLight& );
-	~s_spotLight		() {}
+    spotLight     ();
+    spotLight     ( const spotLight& );
+    ~spotLight    () {}
 };
 
 } // end hge namespace

@@ -15,12 +15,6 @@ namespace hge {
 ///////////////////////////////////////////////////////////////////////////////
 //		Video Modes
 ///////////////////////////////////////////////////////////////////////////////
-struct s_videoMode {
-    int width;
-    int height;
-    int bpp;
-};
-
 ///////////////////////////////////////////////////////////////////////////////
 //		Window/Display Object
 ///////////////////////////////////////////////////////////////////////////////
@@ -30,6 +24,12 @@ namespace display {
     const int DEFAULT_WINDOW_WIDTH  = 640;
     const int DEFAULT_WINDOW_HEIGHT = 480;
 	
+    struct videoMode {
+        int width;
+        int height;
+        int bpp;
+    };
+
     //Functions
 	HGE_API bool	init            ();
     HGE_API void    terminate       ();
@@ -58,7 +58,7 @@ namespace display {
     HGE_API void    setWindowTitle  ( const char* );
     
     HGE_API int     getNumVideoModes();
-    HGE_API const s_videoMode* getVideoMode( int );
+    HGE_API const videoMode* getVideoMode( int );
 }
 
 } // end hge namespace

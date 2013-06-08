@@ -12,22 +12,25 @@
 
 namespace hge {
 
-class HGE_API c_shadowMap {
+class HGE_API shadowMap {
     private:
-        unsigned width = 0;
+        unsigned width  = 0;
         unsigned height = 0;
-        unsigned fbo = 0;
+        unsigned fbo    = 0;
         unsigned shadow = 0;
         
     public:
-        c_shadowMap() {}
-        ~c_shadowMap() { terminate(); }
         
-        bool init( unsigned w = 256, unsigned h = 256 );
-        void terminate();
+        enum : unsigned { DEFAULT_SHADOW_SIZE = 256 };
         
-        void bindForWriting();
-        void bindForReading( int texUnit = hge::pipeline::HGE_TEXTURE_SHADOWMAP );
+        shadowMap()             {}
+        ~shadowMap()            { terminate(); }
+        
+        bool    init            ( unsigned w = DEFAULT_SHADOW_SIZE, unsigned h = DEFAULT_SHADOW_SIZE );
+        void    terminate       ();
+        
+        void    bindForWriting  ();
+        void    bindForReading  ( int texUnit = hge::pipeline::HGE_TEXTURE_SHADOWMAP );
 };
 
 } // end hge namespace

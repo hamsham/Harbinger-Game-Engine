@@ -9,13 +9,13 @@
 
 namespace hge {
 
-bool c_skyBox::load( const char* skyFiles[ 6 ] ) {
-    if (    !cubeMap.load( skyFiles[ 0 ], 0 )
-    ||      !cubeMap.load( skyFiles[ 1 ], 1 )
-    ||      !cubeMap.load( skyFiles[ 2 ], 2 )
-    ||      !cubeMap.load( skyFiles[ 3 ], 3 )
-    ||      !cubeMap.load( skyFiles[ 4 ], 4 )
-    ||      !cubeMap.load( skyFiles[ 5 ], 5 )
+bool skybox::load( const char* skyFiles[ 6 ] ) {
+    if (    !skyTex.load( skyFiles[ 0 ], 0 )
+    ||      !skyTex.load( skyFiles[ 1 ], 1 )
+    ||      !skyTex.load( skyFiles[ 2 ], 2 )
+    ||      !skyTex.load( skyFiles[ 3 ], 3 )
+    ||      !skyTex.load( skyFiles[ 4 ], 4 )
+    ||      !skyTex.load( skyFiles[ 5 ], 5 )
     ||      !spherePrim.createSphere( 10, 10 )
     ) {
         unload();
@@ -24,26 +24,26 @@ bool c_skyBox::load( const char* skyFiles[ 6 ] ) {
     return true;
 }
 
-void c_skyBox::unload() {
-    cubeMap.unload();
+void skybox::unload() {
+    skyTex.unload();
     spherePrim.destroySphere();
 }
 
-void c_skyBox::draw() const {
+void skybox::draw() const {
     glCullFace( GL_FRONT );
     glDepthFunc( GL_LEQUAL );
     
-    cubeMap.activate();
+    skyTex.activate();
     
     spherePrim.draw();
     
-    cubeMap.deActivate();
+    skyTex.deActivate();
     
     glCullFace( GL_BACK );
     glDepthFunc( GL_LESS );
 }
 
-void c_skyBox::draw( const c_cubeMap& c, const c_sphere& s ) {
+void skybox::draw( const cubemap& c, const sphere& s ) {
     glCullFace( GL_FRONT );
     glDepthFunc( GL_LEQUAL );
     

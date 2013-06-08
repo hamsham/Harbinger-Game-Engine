@@ -18,58 +18,55 @@ using namespace hamLibs::math;
 /*
  * Forward Declarations
  */
-// Miscellaneous Structures
-struct  s_videoMode;
+// Namespaced structures
+namespace display {
+    struct  videoMode;
+}
 
 //simple vertex structure
-struct s_plainVertex {
+struct plainVertex {
 	vec3 pos;
 	vec2 uv;
 	vec3 norm;
 };
 
 // bumped vertex
-struct s_bumpVertex : s_plainVertex {
+struct bumpVertex : plainVertex {
 	vec3 tangent;
 };
 
-// Abstract Base Classes
-class   c_component;
-class   c_object;
-class   c_drawTransform;
-
 // File-based resources
-class   c_resource;
-class   c_bitmap;
-class   c_cubeMap;
-class   c_font;
-class   c_shader;
+class   resource;
+class   bitmap;
+class   cubemap;
+class   font;
+class   shader;
 
 // Visual-Related
-class   c_billboard;
-class   c_camera;
-class   c_mesh;
-class   c_skyBox;
-class   c_string;
+class   billboard;
+class   camera;
+class   drawTransform;
+class   mesh;
+class   skybox;
+class   string3d;
 
 // Drawable Primitives
-class   c_line;
-class   c_quad;
-class   c_sphere;
-class   c_triangle;
+class   line;
+class   quad;
+class   sphere;
+class   triangle;
 
 // Lighting types
-struct  s_light;
-struct  s_diffuseLight;
-struct  s_specularLight;
-struct  s_pointLight;
-struct  s_spotLight;
+struct  ambientLight;
+struct  diffuseLight;
+struct  specularLight;
+struct  pointLight;
+struct  spotLight;
 
 // Time Types
-class   c_timeObject;	// time base class
-class   c_clock;		// general time (counts upwards)
-class   c_timer;		// count down
-class   c_stopwatch;	// count upward, with lapping
+class   clock;	// time base class
+class   timer;		// count down
+class   stopwatch;	// count upward, with lapping
 
 } // end hge namespace
 #endif	/* __HGE_TYPES_H__ */

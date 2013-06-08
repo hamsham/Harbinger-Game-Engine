@@ -16,21 +16,21 @@ namespace hge {
 ///////////////////////////////////////////////////////////////////////////////
 //	Mesh Structure
 ///////////////////////////////////////////////////////////////////////////////
-c_mesh::meshEntry::meshEntry() :
+mesh::meshEntry::meshEntry() :
 	matIndex	( 0 ),
 	baseVertex	( 0 ),
 	baseIndex	( 0 ),
 	numIndices	( 0 )
 {}
 
-c_mesh::meshEntry::meshEntry( const c_mesh::meshEntry& meCopy) :
+mesh::meshEntry::meshEntry( const mesh::meshEntry& meCopy) :
 	matIndex	( meCopy.matIndex ),
 	baseVertex	( meCopy.baseVertex ),
 	baseIndex	( meCopy.baseIndex ),
 	numIndices	( meCopy.numIndices )
 {}
 
-c_mesh::meshEntry& c_mesh::meshEntry::operator = ( const c_mesh::meshEntry& meCopy ) {
+mesh::meshEntry& mesh::meshEntry::operator = ( const mesh::meshEntry& meCopy ) {
 	matIndex	= meCopy.matIndex;
 	baseVertex	= meCopy.baseVertex;
 	baseIndex	= meCopy.baseIndex;
@@ -44,8 +44,8 @@ c_mesh::meshEntry& c_mesh::meshEntry::operator = ( const c_mesh::meshEntry& meCo
 //-----------------------------------------------------------------------------
 // Mesh - Move Operators
 //-----------------------------------------------------------------------------
-c_mesh::c_mesh( c_mesh&& m ) :
-    c_resource( m ),
+mesh::mesh( mesh&& m ) :
+    resource( m ),
     numMeshes( m.numMeshes ),
     numTextures( m.numTextures ),
     vao( m.vao ),
@@ -57,7 +57,7 @@ c_mesh::c_mesh( c_mesh&& m ) :
     m.textures = nullptr;
 }
 
-c_mesh& c_mesh::operator = ( c_mesh&& m ) {
+mesh& mesh::operator = ( mesh&& m ) {
     numMeshes       = m.numMeshes;
     numTextures     = m.numTextures;
     vao             = m.vao;
@@ -73,7 +73,7 @@ c_mesh& c_mesh::operator = ( c_mesh&& m ) {
 //-----------------------------------------------------------------------------
 // Mesh - Unloading
 //-----------------------------------------------------------------------------
-void c_mesh::unload() {
+void mesh::unload() {
 	if ( entries ) {
 		delete [] entries;
 		entries = nullptr;
@@ -95,20 +95,20 @@ void c_mesh::unload() {
 //-----------------------------------------------------------------------------
 // Mesh - Loading Check
 //-----------------------------------------------------------------------------
-bool c_mesh::isLoaded() const {
+bool mesh::isLoaded() const {
 	return ( entries != nullptr && textures != nullptr );
 }
 
 //-----------------------------------------------------------------------------
 // Mesh - Loading
 //-----------------------------------------------------------------------------
-bool c_mesh::load( const char* fileName, int flags ) {
+bool mesh::load( const char* fileName, int flags ) {
 	std::cout << "Loading 3d mesh data:" << "\n\tFile:\t" << fileName << "\n";
 	
 	unload();
 	Assimp::Importer importer;
 	const aiScene* pScene   = nullptr;
-	s_bumpVertex* vertArray     = nullptr;
+	bumpVertex* vertArray     = nullptr;
 	unsigned* indexArray        = nullptr;
 	unsigned numVerts           = 0;
 	unsigned numIndices         = 0;
@@ -144,7 +144,7 @@ bool c_mesh::load( const char* fileName, int flags ) {
 		std::cout << "\tFailed. Aborting file import." << std::endl;
 		return false;
 	}
-	vertArray   = new s_bumpVertex[ numVerts ];
+	vertArray   = new bumpVertex[ numVerts ];
 	indexArray  = new unsigned[ numIndices ];
 	entries     = new meshEntry[ numMeshes ];
 	std::cout << "\tDone\n";
@@ -163,7 +163,7 @@ bool c_mesh::load( const char* fileName, int flags ) {
 	// load all material data from the file
 	std::cout << "\tLoading texture & material data...\n";
     numTextures = pScene->mNumMaterials;
-	textures = new c_bitmap [ numTextures ];
+	textures = new bitmap [ numTextures ];
 	if ( !loadTextures( pScene, fileName ) ) {
 		std::cout << "\t\tWarning: Unable to load all associated materials.\n";
 		delete [] textures;
@@ -185,7 +185,7 @@ bool c_mesh::load( const char* fileName, int flags ) {
 //-----------------------------------------------------------------------------
 // Mesh - Data preparation process
 //-----------------------------------------------------------------------------
-bool c_mesh::prepMeshes( const aiScene* pScene, unsigned& numVerts, unsigned& numIndices ) {
+bool mesh::prepMeshes( const aiScene* pScene, unsigned& numVerts, unsigned& numIndices ) {
 	numVerts    = 0;
 	numIndices  = 0;
 	numMeshes   = pScene->mNumMeshes;
@@ -217,7 +217,7 @@ bool c_mesh::prepMeshes( const aiScene* pScene, unsigned& numVerts, unsigned& nu
 //-----------------------------------------------------------------------------
 // Mesh - Mesh data loading
 //-----------------------------------------------------------------------------
-bool c_mesh::loadMeshes( const aiScene* pScene, s_bumpVertex* vertArray, unsigned* indexArray ) {
+bool mesh::loadMeshes( const aiScene* pScene, bumpVertex* vertArray, unsigned* indexArray ) {
 	const aiMesh* pMesh( nullptr );
     unsigned vertIter   = 0;
     unsigned indexIter  = 0;
@@ -271,7 +271,7 @@ bool c_mesh::loadMeshes( const aiScene* pScene, s_bumpVertex* vertArray, unsigne
 //-----------------------------------------------------------------------------
 // Mesh - Texture Loading
 //-----------------------------------------------------------------------------
-bool c_mesh::loadTextures( const aiScene* pScene, const char* fileName ) {
+bool mesh::loadTextures( const aiScene* pScene, const char* fileName ) {
     std::string currDir = fileName;
     std::string::size_type slash = currDir.find_last_of("/\\");
 
@@ -305,7 +305,7 @@ bool c_mesh::loadTextures( const aiScene* pScene, const char* fileName ) {
 //-----------------------------------------------------------------------------
 // Mesh - Loading Specific Texture Types
 //-----------------------------------------------------------------------------
-void c_mesh::loadTexType(
+void mesh::loadTexType(
     int index,
     const aiMaterial* pMaterial,
     int textureType,
@@ -331,8 +331,8 @@ void c_mesh::loadTexType(
 //-----------------------------------------------------------------------------
 // Mesh - Send data to the GPU
 //-----------------------------------------------------------------------------
-void c_mesh::loadVao(
-	s_bumpVertex* vertices, unsigned numVertices,
+void mesh::loadVao(
+	bumpVertex* vertices, unsigned numVertices,
 	unsigned* indices, unsigned numIndices
 ) {
 	// create a buffer for the vertex positions & indices
@@ -341,51 +341,51 @@ void c_mesh::loadVao(
 	glGenBuffers( 2, buffers );
 	
 	glBindBuffer( GL_ARRAY_BUFFER, buffers[ 0 ] );
-	glBufferData( GL_ARRAY_BUFFER, sizeof( s_bumpVertex ) * numVertices, vertices, GL_STATIC_DRAW );
+	glBufferData( GL_ARRAY_BUFFER, sizeof( bumpVertex ) * numVertices, vertices, GL_STATIC_DRAW );
 	printGlError( "Error while sending mesh data to the GPU.");
 	
 	//send the vertices to opengl
 	glEnableVertexAttribArray( pipeline::VERTEX_ATTRIB );
 	glVertexAttribPointer(
 		pipeline::VERTEX_ATTRIB,
-		ARRAY_COUNT_FROM_SIZE( s_bumpVertex::pos.v ),
+		ARRAY_COUNT_FROM_SIZE( bumpVertex::pos.v ),
 		GL_FLOAT,
 		GL_FALSE, 
-		sizeof( s_bumpVertex ),
-		(GLvoid*)offsetof( s_bumpVertex, pos.v )
+		sizeof( bumpVertex ),
+		(GLvoid*)offsetof( bumpVertex, pos.v )
 	);
 	
 	//send the UVs to opengl
 	glEnableVertexAttribArray( pipeline::TEXTURE_ATTRIB );
 	glVertexAttribPointer(
 		pipeline::TEXTURE_ATTRIB,
-		ARRAY_COUNT_FROM_SIZE( s_bumpVertex::uv.v ),
+		ARRAY_COUNT_FROM_SIZE( bumpVertex::uv.v ),
 		GL_FLOAT,
 		GL_FALSE,
-		sizeof( s_bumpVertex ),
-		(GLvoid*)offsetof( s_bumpVertex, uv.v )
+		sizeof( bumpVertex ),
+		(GLvoid*)offsetof( bumpVertex, uv.v )
 	);
 	
 	//send the normals to opengl
 	glEnableVertexAttribArray( pipeline::NORMAL_ATTRIB );
 	glVertexAttribPointer(
 		pipeline::NORMAL_ATTRIB,
-		ARRAY_COUNT_FROM_SIZE( s_bumpVertex::norm.v ),
+		ARRAY_COUNT_FROM_SIZE( bumpVertex::norm.v ),
 		GL_FLOAT,
 		GL_FALSE,
-		sizeof( s_bumpVertex ),
-		(GLvoid*)offsetof( s_bumpVertex, norm.v )
+		sizeof( bumpVertex ),
+		(GLvoid*)offsetof( bumpVertex, norm.v )
 	);
 	
 	//send the tangents to opengl
 	glEnableVertexAttribArray( pipeline::TANGENT_ATTRIB );
 	glVertexAttribPointer(
 		pipeline::TANGENT_ATTRIB,
-		ARRAY_COUNT_FROM_SIZE( s_bumpVertex::tangent.v ),
+		ARRAY_COUNT_FROM_SIZE( bumpVertex::tangent.v ),
 		GL_FLOAT,
 		GL_FALSE,
-		sizeof( s_bumpVertex ),
-		(GLvoid*)offsetof( s_bumpVertex, tangent.v )
+		sizeof( bumpVertex ),
+		(GLvoid*)offsetof( bumpVertex, tangent.v )
 	);
 	printGlError( "Error while sending mesh data to the GPU.");
 	
@@ -400,7 +400,7 @@ void c_mesh::loadVao(
 //-----------------------------------------------------------------------------
 // Scene Drawing
 //-----------------------------------------------------------------------------
-void c_mesh::draw() const {
+void mesh::draw() const {
 	glBindVertexArray( vao );
 	
 	for ( unsigned i( 0 ); i < numMeshes; ++i ) {

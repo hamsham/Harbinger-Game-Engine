@@ -15,7 +15,7 @@ namespace hge {
 //-----------------------------------------------------------------------------
 //	Draw Transformations
 //-----------------------------------------------------------------------------
-class HGE_API c_drawTransform {
+class HGE_API drawTransform {
     
 	protected:
 		vec3    pos;
@@ -24,11 +24,11 @@ class HGE_API c_drawTransform {
 		mat4    modelMat;
 		
 	public:
-		c_drawTransform     ();
-		c_drawTransform     ( const c_drawTransform& obj );
-		~c_drawTransform    () {}
+		drawTransform     ();
+		drawTransform     ( const drawTransform& obj );
+		~drawTransform    () {}
         
-        c_drawTransform&    operator =      ( const c_drawTransform& );
+        drawTransform&    operator =      ( const drawTransform& );
 		
 		const vec3&         getPos          () const				{ return pos; }
 		const vec3&         getScale        () const				{ return scaling; }

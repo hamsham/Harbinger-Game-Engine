@@ -48,12 +48,5 @@
 	#define HGE_INLINE HL_INLINE
 #endif
 
-/*
- * Compile-Time hashing
- */
-#ifndef HGE_HASH
-    #define HGE_HASH( x ) hamLibs::utils::constHash( HL_STRINGIFY( x ) )
-#endif
-
 #endif	/* __HGE_SETUP_H__ */
 

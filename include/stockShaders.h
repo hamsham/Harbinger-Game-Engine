@@ -12,14 +12,15 @@
 
 namespace hge {
 namespace stockShaders {
+    
     HGE_API bool    init                ();
     HGE_API void    terminate           ();
     
     HGE_API void    applyBillboardShader();
-    HGE_API void    setBillboardCam     ( const c_camera& );
+    HGE_API void    setBillboardCam     ( const camera& );
 
     HGE_API void    applyPointLightShader();
-    HGE_API void    setPointLight       ( const s_light&, const s_pointLight& );
+    HGE_API void    setPointLight       ( const ambientLight&, const pointLight& );
     HGE_API void    setPointLightMvp    ( const mat4& );
     
     HGE_API void    applyShadowShader   ();

@@ -12,52 +12,52 @@ namespace hge {
 //-----------------------------------------------------------------------------
 //	Draw Transformations
 //-----------------------------------------------------------------------------
-c_drawTransform::c_drawTransform() :
+drawTransform::drawTransform() :
     pos( 0.f ),
     scaling( 1.f ),
     rot( 0.f, 0.f, 0.f, 1.f ),
     modelMat( 1.f )
 {}
 
-c_drawTransform::c_drawTransform( const c_drawTransform& obj ) :
+drawTransform::drawTransform( const drawTransform& obj ) :
     pos( obj.pos ),
     scaling( obj.scaling ),
     rot( obj.rot ),
     modelMat( obj.modelMat )
 {}
 
-c_drawTransform& c_drawTransform::operator = ( const c_drawTransform& i ) {
+drawTransform& drawTransform::operator = ( const drawTransform& i ) {
     pos = i.pos;
     scaling = i.scaling;
     rot = i.rot;
     modelMat = i.modelMat;
 }
 
-void c_drawTransform::setPos( const vec3& p ) {
+void drawTransform::setPos( const vec3& p ) {
     pos = p;
 }
 
-void c_drawTransform::setScale( const vec3& s ) {
+void drawTransform::setScale( const vec3& s ) {
     scaling = s;
 }
 
-void c_drawTransform::setRotation( const vec3& angles ) {
+void drawTransform::setRotation( const vec3& angles ) {
     rot = fromEuler( angles );
 }
 
-void c_drawTransform::move( const vec3& p ) {
+void drawTransform::move( const vec3& p ) {
     pos += p;
 }
 
-void c_drawTransform::scale( const vec3& s ) {
+void drawTransform::scale( const vec3& s ) {
     scaling += s;
 }
 
-void c_drawTransform::rotate( const vec3& angles ) {
+void drawTransform::rotate( const vec3& angles ) {
     rot *= fromEuler( angles );
 }
 
-void c_drawTransform::update() {
+void drawTransform::update() {
 	modelMat
         = quatToMat4( rot )
         * mat4(

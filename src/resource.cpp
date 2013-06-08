@@ -21,7 +21,7 @@ void printFileError( const char* fileName ) {
 /*
  * Check if a file exists
  */
-bool c_resource::fileExists(const char* fileName) {
+bool resource::fileExists(const char* fileName) {
 	ifstream fin(fileName);
 	
 	if (!fin.good())
@@ -34,7 +34,7 @@ bool c_resource::fileExists(const char* fileName) {
 /*
  * Get the size (in bytes) of the file
  */
-unsigned c_resource::fileSize(const char* fileName) {
+unsigned resource::fileSize(const char* fileName) {
 	unsigned size(0);
 	ifstream fin(fileName);
 	if (!fin.good()) {
@@ -51,7 +51,7 @@ unsigned c_resource::fileSize(const char* fileName) {
 /*
  * Read the file data into a buffer
  */
-void c_resource::readFile(const char* filename, char* buffer, unsigned length) {
+void resource::readFile(const char* filename, char* buffer, unsigned length) {
 	ifstream fin(filename, ios_base::in | ios_base::binary);
 	if (!fin.good()) {
 		printFileError(filename);

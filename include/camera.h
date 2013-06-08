@@ -25,7 +25,7 @@ namespace hge {
 //		Camera & View Control
 ///////////////////////////////////////////////////////////////////////////////
 
-class HGE_API c_camera {
+class HGE_API camera {
     
     public:
         enum e_viewMode : unsigned {
@@ -42,8 +42,8 @@ class HGE_API c_camera {
     
     private:
 		//function pointer arrays for movement and rotations
-		void ( c_camera::*rotateFunction[ 2 ] )( const vec3& );
-		void ( c_camera::*updateFunction[ 2 ] )();
+		void ( camera::*rotateFunction[ 2 ] )( const vec3& );
+		void ( camera::*updateFunction[ 2 ] )();
         
         e_viewMode viewMode = VIEW_NORMAL;
         float fov       = 45.f;
@@ -73,22 +73,22 @@ class HGE_API c_camera {
         void        updateOrbit();
         
     public:
-        c_camera    ();
-        c_camera    ( const c_camera& );
-        c_camera    ( c_camera&& ) = default;
-        ~c_camera   () {}
+        camera      ();
+        camera      ( const camera& );
+        camera      ( camera&& ) = default;
+        ~camera     () {}
         
-        c_camera&   operator =      ( const c_camera& );
-        c_camera&   operator =      ( c_camera&& )          = default;
+        camera&     operator =      ( const camera& );
+        camera&     operator =      ( camera&& )            = default;
         
         void        makeOrtho       ();
         void        makePerspective ();
         void        setProjectionParams(
-                                float inFov                 = DEFAULT_FOV,
-                                float aspectWidth           = DEFAULT_ASPECT_WIDTH,
-                                float aspectHeight          = DEFAULT_ASPECT_HEIGHT,
-                                float near                  = DEFAULT_Z_NEAR,
-                                float far                   = DEFAULT_Z_FAR
+                                    float inFov             = DEFAULT_FOV,
+                                    float aspectWidth       = DEFAULT_ASPECT_WIDTH,
+                                    float aspectHeight      = DEFAULT_ASPECT_HEIGHT,
+                                    float near              = DEFAULT_Z_NEAR,
+                                    float far               = DEFAULT_Z_FAR
                     );
         
         float       getOrbitDist    () const                { return orbitDist; }

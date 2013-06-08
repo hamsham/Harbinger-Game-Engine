@@ -11,8 +11,8 @@
 #include "setup.h"
 #include "types.h"
 
-#include "bitmap.h"
 #include "billboard.h"
+#include "bitmap.h"
 #include "camera.h"
 #include "display.h"
 #include "font.h"
@@ -23,9 +23,9 @@
 #include "primitives.h"
 #include "resource.h"
 #include "shader.h"
-#include "stockShaders.h"
 #include "shadowMap.h"
 #include "skybox.h"
+#include "stockShaders.h"
 #include "timeObject.h"
 #include "transformations.h"
 

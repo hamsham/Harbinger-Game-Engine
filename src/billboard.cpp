@@ -11,7 +11,7 @@
 
 namespace hge {
 
-bool c_billboard::setNumImages( unsigned r, unsigned c ) {
+bool billboard::setNumImages( unsigned r, unsigned c ) {
     
     if ( !vao ) {
         glGenVertexArrays( 1, &vao );
@@ -58,14 +58,14 @@ bool c_billboard::setNumImages( unsigned r, unsigned c ) {
     return true;
 }
 
-void c_billboard::clearImages() {
+void billboard::clearImages() {
     glDeleteVertexArrays( 1, &vao );
     glDeleteBuffers( 1, &vbo );
     
     vao = vbo = 0;
 }
 
-void c_billboard::setImagePos( unsigned index, const vec3& pos ) {
+void billboard::setImagePos( unsigned index, const vec3& pos ) {
     if ( index > numBmps ) return;
     
     glBindVertexArray( vao );
@@ -80,7 +80,7 @@ void c_billboard::setImagePos( unsigned index, const vec3& pos ) {
     glBindVertexArray( 0 );
 }
 
-void c_billboard::draw() const {
+void billboard::draw() const {
     glBindVertexArray( vao );
     glDrawArrays( GL_POINTS, 0, numBmps );
     glBindVertexArray( 0 );

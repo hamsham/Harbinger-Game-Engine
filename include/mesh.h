@@ -23,7 +23,7 @@ namespace hge {
 ///////////////////////////////////////////////////////////////////////////////
 //	Mesh Scene & Structure
 ///////////////////////////////////////////////////////////////////////////////
-class HGE_API c_mesh : virtual public c_resource {
+class HGE_API mesh : virtual public resource {
     private:
         // Mesh Structure
         struct meshEntry {
@@ -45,25 +45,25 @@ class HGE_API c_mesh : virtual public c_resource {
         GLuint                  vao             = 0u;
         GLuint                  buffers[ 2 ]    = { 0u, 0u }; // Vertices & Indices
         meshEntry*              entries         = nullptr;
-        c_bitmap*               textures        = nullptr;
+        bitmap*                 textures        = nullptr;
 
         //load all data from Assimp using two passes
         bool	prepMeshes      ( const aiScene*, unsigned& numVerts, unsigned& numIndices );
-        bool	loadMeshes      ( const aiScene*, s_bumpVertex* vertArray, unsigned* indexArray );
+        bool	loadMeshes      ( const aiScene*, bumpVertex* vertArray, unsigned* indexArray );
         bool	loadTextures    ( const aiScene*, const char* fileName );
         void	loadTexType     ( int index, const aiMaterial*, int textureType, const std::string& directory );
-        void	loadVao         ( s_bumpVertex* vertices, unsigned numVertices, unsigned* indices, unsigned numIndices );
+        void	loadVao         ( bumpVertex* vertices, unsigned numVertices, unsigned* indices, unsigned numIndices );
 
     public:
-        c_mesh	() {}
-        c_mesh  ( c_mesh&& );
-        c_mesh  ( const c_mesh& ) = delete;
-        ~c_mesh	() { unload(); }
+        mesh	() {}
+        mesh    ( mesh&& );
+        mesh    ( const mesh& ) = delete;
+        ~mesh	() { unload(); }
         
-        c_mesh& operator =      ( c_mesh&& );
-        c_mesh& operator =      ( const c_mesh& ) = delete;
-        bool    operator ==     ( const c_mesh& m ) { return vao == m.vao; }
-        bool    operator !=     ( const c_mesh& m ) { return vao != m.vao; }
+        mesh&   operator =      ( mesh&& );
+        mesh&   operator =      ( const mesh& ) = delete;
+        bool    operator ==     ( const mesh& m ) { return vao == m.vao; }
+        bool    operator !=     ( const mesh& m ) { return vao != m.vao; }
 
         //data loading and unloading
         bool	isLoaded		() const;

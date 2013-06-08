@@ -14,7 +14,7 @@ namespace hge {
  *      PRIMITIVE SETUP
 ******************************************************************************/
 bool initPrimitives() {
-    if ( !c_quad::init() || !c_triangle::init() || !c_line::init() ) {
+    if ( !quad::init() || !triangle::init() || !line::init() ) {
         terminatePrimitives();
         return false;
     }
@@ -22,31 +22,31 @@ bool initPrimitives() {
 }
 
 void terminatePrimitives() {
-    c_quad::terminate();
-    c_triangle::terminate();
-    c_line::terminate();
+    quad::terminate();
+    triangle::terminate();
+    line::terminate();
 }
 
 /******************************************************************************
  *      STATIC MEMBER CONSTRUCTION
 ******************************************************************************/
-GLuint c_quad::vao( 0 );
-GLuint c_quad::vbo( 0 );
+GLuint quad::vao( 0 );
+GLuint quad::vbo( 0 );
 
-GLuint c_triangle::vao( 0 );
-GLuint c_triangle::vbo( 0 );
+GLuint triangle::vao( 0 );
+GLuint triangle::vbo( 0 );
 
-GLuint c_line::vao( 0 );
-GLuint c_line::vbo( 0 );
+GLuint line::vao( 0 );
+GLuint line::vbo( 0 );
 
 /******************************************************************************
  *      QUADS
 ******************************************************************************/
-bool c_quad::init() {
+bool quad::init() {
 	if ( vao )
         return true;
     
-    s_bumpVertex verts[ 4 ];
+    bumpVertex verts[ 4 ];
     
     verts[0].pos = vec3( -1.f, 1.f, 0.f );
     verts[1].pos = vec3( 1.f, 1.f, 0.f );
@@ -87,29 +87,29 @@ bool c_quad::init() {
 	glEnableVertexAttribArray( pipeline::VERTEX_ATTRIB );
 	glVertexAttribPointer(
 		pipeline::VERTEX_ATTRIB,
-		ARRAY_COUNT_FROM_SIZE( s_bumpVertex::pos.v ), GL_FLOAT, GL_FALSE,
-        sizeof( s_bumpVertex ), (GLvoid*)offsetof( s_bumpVertex, pos.v )
+		ARRAY_COUNT_FROM_SIZE( bumpVertex::pos.v ), GL_FLOAT, GL_FALSE,
+        sizeof( bumpVertex ), (GLvoid*)offsetof( bumpVertex, pos.v )
 	);
     
 	glEnableVertexAttribArray( pipeline::TEXTURE_ATTRIB );
 	glVertexAttribPointer(
 		pipeline::TEXTURE_ATTRIB,
-		ARRAY_COUNT_FROM_SIZE( s_bumpVertex::uv.v ), GL_FLOAT, GL_FALSE,
-        sizeof( s_bumpVertex ), (GLvoid*)offsetof( s_bumpVertex, uv.v )
+		ARRAY_COUNT_FROM_SIZE( bumpVertex::uv.v ), GL_FLOAT, GL_FALSE,
+        sizeof( bumpVertex ), (GLvoid*)offsetof( bumpVertex, uv.v )
 	);
     
 	glEnableVertexAttribArray( pipeline::NORMAL_ATTRIB );
 	glVertexAttribPointer(
 		pipeline::NORMAL_ATTRIB,
-		ARRAY_COUNT_FROM_SIZE( s_bumpVertex::norm.v ), GL_FLOAT, GL_FALSE,
-        sizeof( s_bumpVertex ), (GLvoid*)offsetof( s_bumpVertex, norm.v )
+		ARRAY_COUNT_FROM_SIZE( bumpVertex::norm.v ), GL_FLOAT, GL_FALSE,
+        sizeof( bumpVertex ), (GLvoid*)offsetof( bumpVertex, norm.v )
 	);
     
 	glEnableVertexAttribArray( pipeline::TANGENT_ATTRIB );
 	glVertexAttribPointer(
 		pipeline::TANGENT_ATTRIB,
-		ARRAY_COUNT_FROM_SIZE( s_bumpVertex::tangent.v ), GL_FLOAT, GL_FALSE,
-        sizeof( s_bumpVertex ), (GLvoid*)offsetof( s_bumpVertex, tangent.v )
+		ARRAY_COUNT_FROM_SIZE( bumpVertex::tangent.v ), GL_FLOAT, GL_FALSE,
+        sizeof( bumpVertex ), (GLvoid*)offsetof( bumpVertex, tangent.v )
 	);
 	
 	glBindVertexArray( 0 );
@@ -117,7 +117,7 @@ bool c_quad::init() {
 	return true;
 }
 
-void c_quad::terminate() {
+void quad::terminate() {
     glDeleteVertexArrays( 1, &vao );
     glDeleteBuffers( 1, &vbo );
 
@@ -127,11 +127,11 @@ void c_quad::terminate() {
 /******************************************************************************
  *      TRIANGLES
 ******************************************************************************/
-bool c_triangle::init() {
+bool triangle::init() {
 	if ( vao )
         return true;
     
-    s_bumpVertex verts[ 3 ];
+    bumpVertex verts[ 3 ];
     
     verts[0].pos = vec3( -1.f, -1.f, 0.f );
     verts[1].pos = vec3( 0.f, 1.f, 0.f );
@@ -168,29 +168,29 @@ bool c_triangle::init() {
 	glEnableVertexAttribArray( pipeline::VERTEX_ATTRIB );
 	glVertexAttribPointer(
 		pipeline::VERTEX_ATTRIB,
-		ARRAY_COUNT_FROM_SIZE( s_bumpVertex::pos.v ), GL_FLOAT, GL_FALSE,
-        sizeof( s_bumpVertex ), (GLvoid*)offsetof( s_bumpVertex, pos.v )
+		ARRAY_COUNT_FROM_SIZE( bumpVertex::pos.v ), GL_FLOAT, GL_FALSE,
+        sizeof( bumpVertex ), (GLvoid*)offsetof( bumpVertex, pos.v )
 	);
     
 	glEnableVertexAttribArray( pipeline::TEXTURE_ATTRIB );
 	glVertexAttribPointer(
 		pipeline::TEXTURE_ATTRIB,
-		ARRAY_COUNT_FROM_SIZE( s_bumpVertex::uv.v ), GL_FLOAT, GL_FALSE,
-        sizeof( s_bumpVertex ), (GLvoid*)offsetof( s_bumpVertex, uv.v )
+		ARRAY_COUNT_FROM_SIZE( bumpVertex::uv.v ), GL_FLOAT, GL_FALSE,
+        sizeof( bumpVertex ), (GLvoid*)offsetof( bumpVertex, uv.v )
 	);
     
 	glEnableVertexAttribArray( pipeline::NORMAL_ATTRIB );
 	glVertexAttribPointer(
 		pipeline::NORMAL_ATTRIB,
-		ARRAY_COUNT_FROM_SIZE( s_bumpVertex::norm.v ), GL_FLOAT, GL_FALSE,
-        sizeof( s_bumpVertex ), (GLvoid*)offsetof( s_bumpVertex, norm.v )
+		ARRAY_COUNT_FROM_SIZE( bumpVertex::norm.v ), GL_FLOAT, GL_FALSE,
+        sizeof( bumpVertex ), (GLvoid*)offsetof( bumpVertex, norm.v )
 	);
     
 	glEnableVertexAttribArray( pipeline::TANGENT_ATTRIB );
 	glVertexAttribPointer(
 		pipeline::TANGENT_ATTRIB,
-		ARRAY_COUNT_FROM_SIZE( s_bumpVertex::tangent.v ), GL_FLOAT, GL_FALSE,
-        sizeof( s_bumpVertex ), (GLvoid*)offsetof( s_bumpVertex, tangent.v )
+		ARRAY_COUNT_FROM_SIZE( bumpVertex::tangent.v ), GL_FLOAT, GL_FALSE,
+        sizeof( bumpVertex ), (GLvoid*)offsetof( bumpVertex, tangent.v )
 	);
 	
 	glBindVertexArray( 0 );
@@ -198,7 +198,7 @@ bool c_triangle::init() {
 	return true;
 }
 
-void c_triangle::terminate() {
+void triangle::terminate() {
     glDeleteVertexArrays( 1, &vao );
     glDeleteBuffers( 1, &vbo );
 
@@ -208,7 +208,7 @@ void c_triangle::terminate() {
 /******************************************************************************
  *      LINES
 ******************************************************************************/
-bool c_line::init() {
+bool line::init() {
     if ( vao )
         return true;
     
@@ -224,8 +224,8 @@ bool c_line::init() {
     glBindBuffer( GL_ARRAY_BUFFER, vbo );
     
     glBufferData(
-        GL_ARRAY_BUFFER, sizeof( c_line().points ),
-        &c_line().points[0].v, GL_STREAM_DRAW
+        GL_ARRAY_BUFFER, sizeof( line().points ),
+        &line().points[0].v, GL_STREAM_DRAW
     );
     printGlError( "Initializing a line primitive" );
     glVertexAttribPointer( pipeline::VERTEX_ATTRIB, 3, GL_FLOAT, GL_FALSE, 0, 0 );
@@ -235,14 +235,14 @@ bool c_line::init() {
     return true;
 }
 
-void c_line::terminate() {
+void line::terminate() {
     glDeleteVertexArrays( 1, &vao );
     glDeleteBuffers( 1, &vbo );
     
     vao = vbo = 0;
 }
 
-void c_line::setVertPos( int index, const vec3& inPos ) {
+void line::setVertPos( int index, const vec3& inPos ) {
     HL_ASSERT( (index > 0) && (index < 2) );
     points[ index ] = inPos;
     
@@ -254,7 +254,7 @@ void c_line::setVertPos( int index, const vec3& inPos ) {
 /******************************************************************************
  *      SPHERES
 ******************************************************************************/
-bool c_sphere::sendToOpenGL() {
+bool sphere::sendToOpenGL() {
 	glGenVertexArrays( 1, &vao );
 	glBindVertexArray( vao );
 	glGenBuffers( 2, vbo );
@@ -268,35 +268,35 @@ bool c_sphere::sendToOpenGL() {
     }
 	
 	glBindBuffer( GL_ARRAY_BUFFER, vbo[0] );
-    glBufferData( GL_ARRAY_BUFFER, numVerts * sizeof( s_bumpVertex ), vertices, GL_STATIC_DRAW );
+    glBufferData( GL_ARRAY_BUFFER, numVerts * sizeof( bumpVertex ), vertices, GL_STATIC_DRAW );
 	printGlError( "Error while sending sphere primitive data to the GPU.");
     
 	glEnableVertexAttribArray( pipeline::VERTEX_ATTRIB );
 	glVertexAttribPointer(
 		pipeline::VERTEX_ATTRIB,
-		ARRAY_COUNT_FROM_SIZE( s_bumpVertex::pos.v ), GL_FLOAT, GL_FALSE,
-        sizeof( s_bumpVertex ), (GLvoid*)offsetof( s_bumpVertex, pos.v )
+		ARRAY_COUNT_FROM_SIZE( bumpVertex::pos.v ), GL_FLOAT, GL_FALSE,
+        sizeof( bumpVertex ), (GLvoid*)offsetof( bumpVertex, pos.v )
 	);
     
 	glEnableVertexAttribArray( pipeline::TEXTURE_ATTRIB );
 	glVertexAttribPointer(
 		pipeline::TEXTURE_ATTRIB,
-		ARRAY_COUNT_FROM_SIZE( s_bumpVertex::uv.v ), GL_FLOAT, GL_FALSE,
-        sizeof( s_bumpVertex ), (GLvoid*)offsetof( s_bumpVertex, uv.v )
+		ARRAY_COUNT_FROM_SIZE( bumpVertex::uv.v ), GL_FLOAT, GL_FALSE,
+        sizeof( bumpVertex ), (GLvoid*)offsetof( bumpVertex, uv.v )
 	);
     
 	glEnableVertexAttribArray( pipeline::NORMAL_ATTRIB );
 	glVertexAttribPointer(
 		pipeline::NORMAL_ATTRIB,
-		ARRAY_COUNT_FROM_SIZE( s_bumpVertex::norm.v ), GL_FLOAT, GL_FALSE,
-        sizeof( s_bumpVertex ), (GLvoid*)offsetof( s_bumpVertex, norm.v )
+		ARRAY_COUNT_FROM_SIZE( bumpVertex::norm.v ), GL_FLOAT, GL_FALSE,
+        sizeof( bumpVertex ), (GLvoid*)offsetof( bumpVertex, norm.v )
 	);
     
 	glEnableVertexAttribArray( pipeline::TANGENT_ATTRIB );
 	glVertexAttribPointer(
 		pipeline::TANGENT_ATTRIB,
-		ARRAY_COUNT_FROM_SIZE( s_bumpVertex::tangent.v ), GL_FLOAT, GL_FALSE,
-        sizeof( s_bumpVertex ), (GLvoid*)offsetof( s_bumpVertex, tangent.v )
+		ARRAY_COUNT_FROM_SIZE( bumpVertex::tangent.v ), GL_FLOAT, GL_FALSE,
+        sizeof( bumpVertex ), (GLvoid*)offsetof( bumpVertex, tangent.v )
 	);
     
     glBindBuffer( GL_ELEMENT_ARRAY_BUFFER, vbo[1] );
@@ -307,7 +307,7 @@ bool c_sphere::sendToOpenGL() {
 	return true;
 }
 
-bool c_sphere::createSphere( int rings, int sectors ) {
+bool sphere::createSphere( int rings, int sectors ) {
     float const R = 1.f / (float)(rings-1);
     float const S = 1.f / (float)(sectors-1);
     
@@ -316,7 +316,7 @@ bool c_sphere::createSphere( int rings, int sectors ) {
     numVerts = rings * sectors;
     numIndices = rings * sectors * 4;
     
-    vertices = new( std::nothrow ) s_bumpVertex[ rings * sectors ];
+    vertices = new( std::nothrow ) bumpVertex[ rings * sectors ];
     if ( !vertices )
         return false;
         
@@ -360,7 +360,7 @@ bool c_sphere::createSphere( int rings, int sectors ) {
     return sendToOpenGL();
 }
 
-void c_sphere::destroySphere() {
+void sphere::destroySphere() {
     glDeleteVertexArrays( 1, &vao );
     glDeleteBuffers( 2, vbo );
 

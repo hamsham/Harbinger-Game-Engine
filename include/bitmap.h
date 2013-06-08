@@ -16,7 +16,7 @@ namespace hge {
 /******************************************************************************
  *      2D Bitmaps
 ******************************************************************************/
-class HGE_API c_bitmap : virtual public c_resource {
+class HGE_API bitmap : virtual public resource {
     private:
         GLint textureUnit   = pipeline::HGE_TEXTURE_DEFAULT;
         unsigned oglTexture = 0;
@@ -30,20 +30,20 @@ class HGE_API c_bitmap : virtual public c_resource {
         };
 
         // con/destruction
-        c_bitmap    () {}
-        c_bitmap    ( const c_bitmap& ) = delete;
-        c_bitmap    ( c_bitmap&& );
-        ~c_bitmap   ()          { unload(); }
+        bitmap      () {}
+        bitmap      ( const bitmap& ) = delete;
+        bitmap      ( bitmap&& );
+        ~bitmap     ()          { unload(); }
         
-        c_bitmap&   operator =  ( const c_bitmap& ) = delete;
-        c_bitmap&   operator =  ( c_bitmap&& );
-        bool        operator == ( const c_bitmap& s ) { return oglTexture == s.oglTexture; }
-        bool        operator != ( const c_bitmap& s ) { return oglTexture != s.oglTexture; }
+        bitmap&     operator =  ( const bitmap& ) = delete;
+        bitmap&     operator =  ( bitmap&& );
+        bool        operator == ( const bitmap& s ) { return oglTexture == s.oglTexture; }
+        bool        operator != ( const bitmap& s ) { return oglTexture != s.oglTexture; }
 
         // memory-based operations
-        bool    isLoaded        () const;
-        bool    load            ( const char* filename, int unused = 0 );
-        void    unload          ();
+        bool        isLoaded    () const;
+        bool        load        ( const char* filename, int unused = 0 );
+        void        unload      ();
 
         // data operations
         unsigned    getWidth    () const { return bmpWidth; }
@@ -61,21 +61,21 @@ class HGE_API c_bitmap : virtual public c_resource {
 /******************************************************************************
  *      3D Textures (Cube Maps)
 ******************************************************************************/
-class HGE_API c_cubeMap : virtual public c_resource {
+class HGE_API cubemap : virtual public resource {
     private:
         GLint       textureUnit     = pipeline::HGE_TEXTURE_DEFAULT;
         GLuint      textureObj      = 0;
 
     public:
-        c_cubeMap   () {}
-        c_cubeMap   ( const c_cubeMap& ) = delete;
-        c_cubeMap   ( c_cubeMap&& );
-        ~c_cubeMap  () { unload(); }
+        cubemap     () {}
+        cubemap     ( const cubemap& ) = delete;
+        cubemap     ( cubemap&& );
+        ~cubemap    () { unload(); }
         
-        c_cubeMap&  operator =      ( const c_cubeMap& ) = delete;
-        c_cubeMap&  operator =      ( c_cubeMap&& );
-        bool        operator ==     ( const c_cubeMap& s ) { return textureObj == s.textureObj; }
-        bool        operator !=     ( const c_cubeMap& s ) { return textureObj != s.textureObj; }
+        cubemap&    operator =      ( const cubemap& ) = delete;
+        cubemap&    operator =      ( cubemap&& );
+        bool        operator ==     ( const cubemap& s ) { return textureObj == s.textureObj; }
+        bool        operator !=     ( const cubemap& s ) { return textureObj != s.textureObj; }
         
         bool        load            ( const char* texFile, int cubeIndex );
         bool        isLoaded        () const { return textureObj != 0; }

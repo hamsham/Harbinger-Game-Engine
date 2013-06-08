@@ -23,65 +23,65 @@ HGE_API void terminatePrimitives();
 /******************************************************************************
  * Quad Primitives
 ******************************************************************************/
-class HGE_API c_quad {
+class HGE_API quad {
     private:
         static GLuint   vao;
         static GLuint   vbo;
 
     public:
-        c_quad  () {}
-        ~c_quad () {}
+        quad    () {}
+        ~quad   () {}
 
         static bool init();
         static void terminate();
         
-        c_quad  ( const c_quad& ) = delete;
-        c_quad  ( c_quad&& ) = default;
-        c_quad& operator =  ( const c_quad& ) = delete;
-        c_quad& operator =  ( c_quad&& ) = default;
-        bool    operator == ( const c_quad& s ) { return vao == s.vao; }
-        bool    operator != ( const c_quad& s ) { return vao != s.vao; }
+        quad    ( const quad& ) = delete;
+        quad    ( quad&& ) = default;
+        quad&   operator =  ( const quad& ) = delete;
+        quad&   operator =  ( quad&& ) = default;
+        bool    operator == ( const quad& s ) { return vao == s.vao; }
+        bool    operator != ( const quad& s ) { return vao != s.vao; }
 
         void draw() const {
             glBindVertexArray( vao );
             glDrawArrays( GL_TRIANGLE_STRIP, 0, 4 );
             glBindVertexArray( 0 );
-    }
+        }
 };
 
 /******************************************************************************
  * Triangle Primitives
 ******************************************************************************/
-class HGE_API c_triangle {
+class HGE_API triangle {
     private:
         static GLuint   vao;
         static GLuint   vbo;
 
     public:
-        c_triangle  () {}
-        ~c_triangle () {}
+        triangle    () {}
+        ~triangle   () {}
 
         static bool init();
         static void terminate();
         
-        c_triangle  ( const c_triangle& ) = delete;
-        c_triangle  ( c_triangle&& ) = default;
-        c_triangle& operator =  ( const c_triangle& ) = delete;
-        c_triangle& operator =  ( c_triangle&& ) = default;
-        bool        operator == ( const c_triangle& t ) { return vao == t.vao; }
-        bool        operator != ( const c_triangle& t ) { return vao != t.vao; }
+        triangle    ( const triangle& ) = delete;
+        triangle    ( triangle&& ) = default;
+        triangle&   operator =  ( const triangle& ) = delete;
+        triangle&   operator =  ( triangle&& ) = default;
+        bool        operator == ( const triangle& t ) { return vao == t.vao; }
+        bool        operator != ( const triangle& t ) { return vao != t.vao; }
 
         void draw() const {
             glBindVertexArray( vao );
             glDrawArrays( GL_TRIANGLE_STRIP, 0, 3 );
             glBindVertexArray( 0 );
-    }
+        }
 };
 
 /******************************************************************************
  * Line Primitive
 ******************************************************************************/
-class HGE_API c_line {
+class HGE_API line {
     private:
         static GLuint vao;
         static GLuint vbo;
@@ -89,18 +89,18 @@ class HGE_API c_line {
         vec3 points[ 2 ] = { {0.f}, {1.f} };
         
     public:
-        c_line() {}
-        ~c_line() {}
+        line    () {}
+        ~line   () {}
         
         static bool init();
         static void terminate();
         
-        c_line  ( const c_line& ) = delete;
-        c_line  ( c_line&& ) = default;
-        c_line& operator =  ( const c_line& ) = delete;
-        c_line& operator =  ( c_line&& ) = default;
-        bool    operator == ( const c_line& l ) { return vao == l.vao; }
-        bool    operator != ( const c_line& l ) { return vao != l.vao; }
+        line    ( const line& ) = delete;
+        line    ( line&& ) = default;
+        line&   operator =  ( const line& ) = delete;
+        line&   operator =  ( line&& ) = default;
+        bool    operator == ( const line& l ) { return vao == l.vao; }
+        bool    operator != ( const line& l ) { return vao != l.vao; }
         
         void setVertPos( int index, const vec3& inPos );
         
@@ -119,12 +119,12 @@ class HGE_API c_line {
  *      Use c_drawable::scale as the sphere's radius
  *      Spheres can also be rendered using a cubemap texture
 ******************************************************************************/
-class HGE_API c_sphere {
+class HGE_API sphere {
     private:
         GLuint vao = 0;
         GLuint vbo[ 2 ] = { 0, 0 };
         
-        s_bumpVertex* vertices = nullptr;
+        bumpVertex* vertices = nullptr;
         unsigned numVerts = 0;
         
         GLuint* indices = nullptr;
@@ -133,18 +133,18 @@ class HGE_API c_sphere {
         bool sendToOpenGL();
         
     public:
-        c_sphere() {}
-        ~c_sphere() { destroySphere(); }
+        sphere      () {}
+        ~sphere     () { destroySphere(); }
         
-        c_sphere    ( const c_sphere& ) = delete;
-        c_sphere    ( c_sphere&& ) = default;
-        c_sphere&   operator =  ( const c_sphere& ) = delete;
-        c_sphere&   operator =  ( c_sphere&& ) = default;
-        bool        operator == ( const c_sphere& s ) { return vao == s.vao; }
-        bool        operator != ( const c_sphere& s ) { return vao != s.vao; }
+        sphere      ( const sphere& ) = delete;
+        sphere      ( sphere&& ) = default;
+        sphere&     operator =  ( const sphere& ) = delete;
+        sphere&     operator =  ( sphere&& ) = default;
+        bool        operator == ( const sphere& s ) { return vao == s.vao; }
+        bool        operator != ( const sphere& s ) { return vao != s.vao; }
         
-        bool createSphere( int rings, int sectors );
-        void destroySphere();
+        bool createSphere       ( int rings, int sectors );
+        void destroySphere      ();
         
         void draw() const {
             glBindVertexArray( vao );

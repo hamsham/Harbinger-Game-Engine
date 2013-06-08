@@ -48,7 +48,7 @@ void pipeline::applyMatrix( e_matrixState s, const mat4& m ) {
     );
 }
 
-void pipeline::applyMatrix( const c_drawTransform& obj, const c_camera& cam ) {
+void pipeline::applyMatrix( const drawTransform& obj, const camera& cam ) {
     
     // Update the current MVP matrix
     transforms[ HGE_MODEL_MAT ] = obj.getModelMatrix();
@@ -108,6 +108,10 @@ void pipeline::applyShader( GLuint programId ) {
     glUniformBlockBinding( currShader, matrixIndexId, HGE_PIPELINE_MATRIX_BINDING );
     printGlError( "Sending Matrix Uniform Binding" );
     glBindBuffer( GL_UNIFORM_BUFFER, 0 );
+}
+
+void pipeline::applyShader( const shader& s ) {
+    applyShader( s.getProgramId() );
 }
 
 /******************************************************************************

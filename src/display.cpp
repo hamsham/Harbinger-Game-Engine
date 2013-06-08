@@ -23,7 +23,7 @@ namespace {
     int     deskHeight          = 0;
     
     const int MAX_VIDEO_MODES   = 100;
-    std::vector< hge::s_videoMode > vidModes;
+    std::vector< hge::display::videoMode > vidModes;
     
 }// end anonymous namespace
 
@@ -131,7 +131,7 @@ bool display::init() {
     vidModes.resize( numModes );
     
     for ( int i = 0; i < numModes; ++i ) {
-        s_videoMode* pMode = &vidModes[ i ];
+        videoMode* pMode = &vidModes[ i ];
         
         pMode->bpp
             = modeList[ i ].BlueBits
@@ -223,7 +223,7 @@ int display::getNumVideoModes() {
     return vidModes.size();
 }
 
-const s_videoMode* display::getVideoMode( int i ) {
+const display::videoMode* display::getVideoMode( int i ) {
     return ( (i > 0) && (i <= vidModes.size()) )
         ? &vidModes[i]
         : nullptr;

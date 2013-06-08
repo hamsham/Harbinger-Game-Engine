@@ -19,9 +19,9 @@ namespace hge {
 ///////////////////////////////////////////////////////////////////////////////
 // FONT TEXTURE ATLAS
 ///////////////////////////////////////////////////////////////////////////////
-class HGE_API c_font : virtual public c_resource {
+class HGE_API font : virtual public resource {
     
-    friend class c_string;
+    friend class string3d;
     
     enum : int {
         SPACES_PER_TAB = 5,
@@ -52,15 +52,16 @@ class HGE_API c_font : virtual public c_resource {
         
     public:
         
-        c_font  ()          {}
-        ~c_font ()          { unload(); }
+        font  ()            {}
+        ~font ()            { unload(); }
         
-        c_font  ( const c_font& ) = delete;
-        c_font  ( c_font&& ) = default;
-        c_font& operator =  ( const c_font& ) = delete;
-        c_font& operator =  ( c_font&& ) = default;
-        bool    operator == ( const c_font& f ) { return textureId == f.textureId; }
-        bool    operator != ( const c_font& f ) { return textureId != f.textureId; }
+        font    ( const font& ) = delete;
+        font    ( font&& ) = default;
+        
+        font&   operator =  ( const font& ) = delete;
+        font&   operator =  ( font&& ) = default;
+        bool    operator == ( const font& f ) { return textureId == f.textureId; }
+        bool    operator != ( const font& f ) { return textureId != f.textureId; }
         
         bool    load        ( const char* filename, int fontsize );
         bool    isLoaded    () const;
@@ -77,7 +78,7 @@ class HGE_API c_font : virtual public c_resource {
 ///////////////////////////////////////////////////////////////////////////////
 // CHARACTER STRING CLASS
 ///////////////////////////////////////////////////////////////////////////////
-class HGE_API c_string {
+class HGE_API string3d {
     typedef std::vector< int > intArr;
     
     private:
@@ -91,18 +92,18 @@ class HGE_API c_string {
         void        createVertexBuffer( unsigned numVerts );
         
     public:
-        c_string()  {}
-        ~c_string() { clearString(); }
+        string3d()  {}
+        ~string3d() { clearString(); }
         
-        c_string    ( const c_string& ) = delete;
-        c_string    ( c_string&& ) = default;
-        c_string&   operator =  ( const c_string& ) = delete;
-        c_string&   operator =  ( c_string&& ) = default;
-        bool        operator == ( const c_string& s ) { return vao == s.vao; }
-        bool        operator != ( const c_string& s ) { return vao != s.vao; }
+        string3d    ( const string3d& ) = delete;
+        string3d    ( string3d&& ) = default;
+        string3d&   operator =  ( const string3d& ) = delete;
+        string3d&   operator =  ( string3d&& ) = default;
+        bool        operator == ( const string3d& s ) { return vao == s.vao; }
+        bool        operator != ( const string3d& s ) { return vao != s.vao; }
         
         
-        void        setString   ( const c_font&, const char* );
+        void        setString   ( const font&, const char* );
         void        clearString ();
         
         // USERS: ensure a font atlas has been activated before drawing

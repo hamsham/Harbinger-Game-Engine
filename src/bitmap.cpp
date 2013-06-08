@@ -109,8 +109,8 @@ namespace hge {
 /******************************************************************************
  *      2D Bitmaps
 ******************************************************************************/
-c_bitmap::c_bitmap( c_bitmap&& orig ) :
-	c_resource(),
+bitmap::bitmap( bitmap&& orig ) :
+	resource(),
 	oglTexture( orig.oglTexture ),
 	bmpWidth( orig.bmpWidth ),
 	bmpHeight( orig.bmpHeight )
@@ -120,7 +120,7 @@ c_bitmap::c_bitmap( c_bitmap&& orig ) :
 	orig.bmpHeight = 0;
 }
 
-c_bitmap& c_bitmap::operator =( c_bitmap&& bmpCopy ) {
+bitmap& bitmap::operator =( bitmap&& bmpCopy ) {
 	oglTexture = bmpCopy.oglTexture;
 	bmpWidth = bmpCopy.bmpWidth;
 	bmpHeight = bmpCopy.bmpHeight;
@@ -135,14 +135,14 @@ c_bitmap& c_bitmap::operator =( c_bitmap&& bmpCopy ) {
 //-----------------------------------------------------------------------------
 //	Bitmap - Check if an image is loaded within OpenGL
 //-----------------------------------------------------------------------------
-bool c_bitmap::isLoaded() const {
+bool bitmap::isLoaded() const {
 	return ( oglTexture != 0 );
 }
 
 //-----------------------------------------------------------------------------
 //	Bitmap - Loading an image file
 //-----------------------------------------------------------------------------
-bool c_bitmap::load( const char* fileName, int ) {
+bool bitmap::load( const char* fileName, int ) {
     
 	FIBITMAP* image( nullptr );
 	FREE_IMAGE_FORMAT imageFormat( FIF_UNKNOWN );
@@ -198,7 +198,7 @@ bool c_bitmap::load( const char* fileName, int ) {
 //-----------------------------------------------------------------------------
 //	Bitmap - Unloading
 //-----------------------------------------------------------------------------
-void c_bitmap::unload() {
+void bitmap::unload() {
 	glDeleteTextures( 1, &oglTexture );
 	oglTexture = 0; // insurance
 	bmpWidth = 0;
@@ -209,7 +209,7 @@ void c_bitmap::unload() {
 //-----------------------------------------------------------------------------
 //	Bitmap - Enable a texture within OpenGL
 //-----------------------------------------------------------------------------
-void c_bitmap::activate() const {
+void bitmap::activate() const {
 	glActiveTexture( textureUnit );
 	glBindTexture( GL_TEXTURE_2D, oglTexture );
 }
@@ -217,7 +217,7 @@ void c_bitmap::activate() const {
 //-----------------------------------------------------------------------------
 //	Bitmap - Disable an OpenGL texture
 //-----------------------------------------------------------------------------
-void c_bitmap::deActivate() const {
+void bitmap::deActivate() const {
 	glActiveTexture( textureUnit );
 	glBindTexture( GL_TEXTURE_2D, 0 );
 }
@@ -225,13 +225,13 @@ void c_bitmap::deActivate() const {
 /******************************************************************************
  * 3D (CUBEMAP) TEXTURES
 ******************************************************************************/
-c_cubeMap::c_cubeMap( c_cubeMap&& orig ) :
+cubemap::cubemap( cubemap&& orig ) :
     textureObj( orig.textureObj )
 {
     orig.textureObj = 0;
 }
 
-c_cubeMap& c_cubeMap::operator =( c_cubeMap&& bmpCopy ) {
+cubemap& cubemap::operator =( cubemap&& bmpCopy ) {
     textureObj = bmpCopy.textureObj;
     bmpCopy.textureObj = 0;
 	return *this;
@@ -240,7 +240,7 @@ c_cubeMap& c_cubeMap::operator =( c_cubeMap&& bmpCopy ) {
 //-----------------------------------------------------------------------------
 //	Main Cubemap loading function
 //-----------------------------------------------------------------------------
-bool c_cubeMap::load( const char* texFile, int cubeIndex ) {
+bool cubemap::load( const char* texFile, int cubeIndex ) {
     
 	FIBITMAP* image( nullptr );
 	FREE_IMAGE_FORMAT imageFormat( FIF_UNKNOWN );
@@ -308,7 +308,7 @@ bool c_cubeMap::load( const char* texFile, int cubeIndex ) {
 //-----------------------------------------------------------------------------
 //	Cubemap unloading
 //-----------------------------------------------------------------------------
-void c_cubeMap::unload() {
+void cubemap::unload() {
     glDeleteTextures( 1, &textureObj );
     textureObj = 0;
     textureUnit = pipeline::HGE_TEXTURE_DEFAULT;
@@ -317,12 +317,12 @@ void c_cubeMap::unload() {
 //-----------------------------------------------------------------------------
 //	Cubemap Binding
 //-----------------------------------------------------------------------------
-void c_cubeMap::activate() const {
+void cubemap::activate() const {
     glActiveTexture( textureUnit );
     glBindTexture( GL_TEXTURE_CUBE_MAP, textureObj );
 }
 
-void c_cubeMap::deActivate() const {
+void cubemap::deActivate() const {
 	glActiveTexture( textureUnit );
 	glBindTexture( GL_TEXTURE_CUBE_MAP, 0 );
 }

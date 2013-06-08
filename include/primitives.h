@@ -25,22 +25,23 @@ HGE_API void terminatePrimitives();
 ******************************************************************************/
 class HGE_API quad {
     private:
+        friend HGE_API bool initPrimitives();
+        friend HGE_API void terminatePrimitives();
+
+        static bool init();
+        static void terminate();
+        
         static GLuint   vao;
         static GLuint   vbo;
 
     public:
         quad    () {}
         ~quad   () {}
-
-        static bool init();
-        static void terminate();
         
         quad    ( const quad& ) = delete;
         quad    ( quad&& ) = default;
         quad&   operator =  ( const quad& ) = delete;
         quad&   operator =  ( quad&& ) = default;
-        bool    operator == ( const quad& s ) { return vao == s.vao; }
-        bool    operator != ( const quad& s ) { return vao != s.vao; }
 
         void draw() const {
             glBindVertexArray( vao );
@@ -54,22 +55,23 @@ class HGE_API quad {
 ******************************************************************************/
 class HGE_API triangle {
     private:
+        friend HGE_API bool initPrimitives();
+        friend HGE_API void terminatePrimitives();
+
+        static bool init();
+        static void terminate();
+        
         static GLuint   vao;
         static GLuint   vbo;
 
     public:
         triangle    () {}
         ~triangle   () {}
-
-        static bool init();
-        static void terminate();
         
         triangle    ( const triangle& ) = delete;
         triangle    ( triangle&& ) = default;
         triangle&   operator =  ( const triangle& ) = delete;
         triangle&   operator =  ( triangle&& ) = default;
-        bool        operator == ( const triangle& t ) { return vao == t.vao; }
-        bool        operator != ( const triangle& t ) { return vao != t.vao; }
 
         void draw() const {
             glBindVertexArray( vao );
@@ -83,24 +85,25 @@ class HGE_API triangle {
 ******************************************************************************/
 class HGE_API line {
     private:
-        static GLuint vao;
-        static GLuint vbo;
+        friend HGE_API bool initPrimitives();
+        friend HGE_API void terminatePrimitives();
+
+        static bool init();
+        static void terminate();
         
+        static GLuint   vao;
+        static GLuint   vbo;
+
         vec3 points[ 2 ] = { {0.f}, {1.f} };
         
     public:
         line    () {}
         ~line   () {}
         
-        static bool init();
-        static void terminate();
-        
         line    ( const line& ) = delete;
         line    ( line&& ) = default;
         line&   operator =  ( const line& ) = delete;
         line&   operator =  ( line&& ) = default;
-        bool    operator == ( const line& l ) { return vao == l.vao; }
-        bool    operator != ( const line& l ) { return vao != l.vao; }
         
         void setVertPos( int index, const vec3& inPos );
         
@@ -111,6 +114,38 @@ class HGE_API line {
         }
 };
 
+/******************************************************************************
+ * Cube Primitive
+ * 
+ * NOTE:
+ *      Cubes can also be rendered using a cubemap texture
+******************************************************************************/
+class HGE_API cube {
+    private:
+        friend HGE_API bool initPrimitives();
+        friend HGE_API void terminatePrimitives();
+
+        static bool init();
+        static void terminate();
+        
+        static GLuint   vao;
+        static GLuint   vbo;
+
+    public:
+        cube    () {}
+        ~cube   () {}
+        
+        cube    ( const cube& ) = delete;
+        cube    ( cube&& ) = default;
+        cube&   operator =  ( const cube& ) = delete;
+        cube&   operator =  ( cube&& ) = default;
+        
+        void draw() const {
+            glBindVertexArray( vao );
+            glDrawArrays( GL_TRIANGLE_STRIP, 0, 26 );
+            glBindVertexArray( 0 );
+        }
+};
 
 /******************************************************************************
  * Sphere Primitive
@@ -140,8 +175,6 @@ class HGE_API sphere {
         sphere      ( sphere&& ) = default;
         sphere&     operator =  ( const sphere& ) = delete;
         sphere&     operator =  ( sphere&& ) = default;
-        bool        operator == ( const sphere& s ) { return vao == s.vao; }
-        bool        operator != ( const sphere& s ) { return vao != s.vao; }
         
         bool createSphere       ( int rings, int sectors );
         void destroySphere      ();

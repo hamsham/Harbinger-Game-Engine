@@ -14,7 +14,11 @@ namespace hge {
  *      PRIMITIVE SETUP
 ******************************************************************************/
 bool initPrimitives() {
-    if ( !quad::init() || !triangle::init() || !line::init() ) {
+    if (    !quad::init()
+    ||      !triangle::init()
+    ||      !line::init()
+    ||      !cube::init()
+    ) {
         terminatePrimitives();
         return false;
     }
@@ -25,6 +29,7 @@ void terminatePrimitives() {
     quad::terminate();
     triangle::terminate();
     line::terminate();
+    cube::terminate();
 }
 
 /******************************************************************************
@@ -38,6 +43,9 @@ GLuint triangle::vbo( 0 );
 
 GLuint line::vao( 0 );
 GLuint line::vbo( 0 );
+
+GLuint cube::vao( 0 );
+GLuint cube::vbo( 0 );
 
 /******************************************************************************
  *      QUADS
@@ -249,6 +257,112 @@ void line::setVertPos( int index, const vec3& inPos ) {
     glBindVertexArray( vao );
     glBindBuffer( GL_ARRAY_BUFFER, vbo );
     glBufferData( GL_ARRAY_BUFFER, sizeof( points ), &points[0].v, GL_STREAM_DRAW );
+}
+
+/******************************************************************************
+ *      CUBES
+******************************************************************************/
+bool cube::init() {
+    
+    if ( vao )
+        return true;
+    
+    glGenVertexArrays( 1, &vao );
+    if ( !vao ) {
+        std::cerr << "ERROR: Unable to create a cube VAO." << std::endl;
+        return false;
+    }
+    
+    glBindVertexArray( vao );
+    glGenBuffers( 1, &vbo );
+    
+    if ( !vbo ) {
+        std::cerr << "ERROR: Unable to create a cube VBO." << std::endl;
+        glDeleteVertexArrays( 1, &vao );
+        return false;
+    }
+    
+    glBindBuffer( GL_ARRAY_BUFFER, vbo );
+    
+    const GLfloat verts[] = {
+        // Front face
+        -0.5f,-0.5f,0.5f, 0.5f,-0.5f,0.5f, -0.5f,0.5f,0.5f, 0.5f,0.5f,0.5f,
+        // Right face
+        0.5f,0.5f,0.5f, 0.5f,-0.5f,0.5f, 0.5f,0.5f,-0.5f, 0.5f,-0.5f,-0.5f,
+        // Back face
+        0.5f,-0.5f,-0.5f, -0.5f,-0.5f,-0.5f, 0.5f,0.5f,-0.5f, -0.5f,0.5f,-0.5f,
+        // Left face
+        -0.5f,0.5f,-0.5f, -0.5f,-0.5f,-0.5f, -0.5f,0.5f,0.5f, -0.5f,-0.5f,0.5f,
+        // Bottom face
+        -0.5f,-0.5f,0.5f, -0.5f,-0.5f,-0.5f, 0.5f,-0.5f,0.5f, 0.5f,-0.5f,-0.5f,
+        // move to top
+        0.5f,-0.5f,-0.5f, -0.5f,0.5f,0.5f,
+        // Top Face
+        -0.5f,0.5f,0.5f, 0.5f,0.5f,0.5f, -0.5f,0.5f,-0.5f, 0.5f,0.5f,-0.5f
+    };
+    
+    const GLfloat uvs[] = {
+        // Front face
+        0.f,0.f, 1.f,0.f, 0.f,1.f, 1.f,1.f,
+        // Right face
+        0.f,1.f, 0.f,0.f, 1.f,1.f, 1.f,0.f,
+        // Back face
+        0.f,0.f, 1.f,0.f, 0.f,1.f, 1.f,1.f,
+        // Left face
+        0.f,1.f, 0.f,0.f, 1.f,1.f, 1.f,0.f,
+        // Bottom face
+        0.f,1.f, 0.f,0.f, 1.f,1.f, 1.f,0.f,
+        1.f,0.f, 0.f,0.f,
+        // Top face
+        0.f,0.f, 1.f,0.f, 0.f,1.f, 1.f,1.f
+	};
+
+	const GLfloat norms[] = {
+		0.0f, 0.0f, -1.0f,
+		0.0f, 0.0f, 1.0f,
+		1.0f, 0.0f, 0.0f,
+		-1.0f, 0.0f, 0.0f,
+		0.0f, -1.0f, 0.0f,
+		0.0f, 1.0f, 0.0f
+	};
+    
+    glBufferData(
+        GL_ARRAY_BUFFER, sizeof( verts ) + sizeof( uvs ) + sizeof( norms ),
+        nullptr, GL_STATIC_DRAW
+    );
+    
+    glBufferSubData( GL_ARRAY_BUFFER, 0, sizeof( verts ), verts );
+    glBufferSubData( GL_ARRAY_BUFFER, sizeof( verts ), sizeof( uvs ), uvs );
+    glBufferSubData( GL_ARRAY_BUFFER, sizeof( verts ) + sizeof( uvs ), sizeof( norms ), norms );
+    
+    glEnableVertexAttribArray( hge::pipeline::VERTEX_ATTRIB );
+    glVertexAttribPointer(
+        hge::pipeline::VERTEX_ATTRIB, 3, GL_FLOAT, GL_FALSE, 0, 0
+    );
+    
+    glEnableVertexAttribArray( hge::pipeline::TEXTURE_ATTRIB );
+    glVertexAttribPointer(
+        hge::pipeline::TEXTURE_ATTRIB, 2, GL_FLOAT, GL_FALSE,
+        0, (GLvoid*)sizeof( verts )
+    );
+    
+    glEnableVertexAttribArray( hge::pipeline::NORMAL_ATTRIB );
+    glVertexAttribPointer(
+        hge::pipeline::NORMAL_ATTRIB, 3, GL_FLOAT, GL_FALSE,
+        0, (GLvoid*)(sizeof( verts ) + sizeof( uvs ))
+    );
+    
+    glBindVertexArray( 0 );
+    printGlError( "Creating a cube object" );
+    
+    return true;
+}
+
+void cube::terminate() {
+    glDeleteVertexArrays( 1, &vao );
+    glDeleteBuffers( 1, &vbo );
+    
+    vao = vbo = 0;
 }
 
 /******************************************************************************

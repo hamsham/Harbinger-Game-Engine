@@ -10,6 +10,7 @@
 #include <assimp/Importer.hpp>
 #include <assimp/postprocess.h>
 #include "mesh.h"
+#include "geometry.h"
 
 namespace hge {
 
@@ -242,25 +243,38 @@ bool mesh::loadMeshes( const aiScene* pScene, bumpVertex* vertArray, unsigned* i
             const aiVector3D* pNorm         = &pMesh->mNormals[ j ];
             vertArray[ vertIter ].pos       = vec3( pPos->x, pPos->y, pPos->z );
             vertArray[ vertIter ].norm      = vec3( pNorm->x, pNorm->y, pNorm->z );
-            
-            if ( pMesh->HasTangentsAndBitangents() ) {
-                const aiVector3D* pTangent = &pMesh->mTangents[ j ];
-                vertArray[ vertIter ].tangent = vec3( pTangent->x, pTangent->y, pTangent->z );
-            }
 
             if ( pMesh->HasTextureCoords( 0 ) ) {
                 vertArray[ vertIter ].uv[ 0 ] = pMesh->mTextureCoords[ 0 ][ j ].x;
                 vertArray[ vertIter ].uv[ 1 ] = pMesh->mTextureCoords[ 0 ][ j ].y;
             }
+            
+            // Calculate our own tangents if Assimp was unable to
+            if ( pMesh->HasTangentsAndBitangents() ) {
+                const aiVector3D* pTng      = &pMesh->mTangents[ j ];
+                const aiVector3D* pBtng     = &pMesh->mBitangents[ j ];
+                vertArray[ vertIter ].tng   = vec3( pTng->x, pTng->y, pTng->z );
+                vertArray[ vertIter ].btng  = vec3( pBtng->x, pBtng->y, pBtng->z );
+            }
+            else {
+                if ( vertIter && (vertIter % 3 == 0) )
+                calcTangents(
+                    vertArray[ vertIter - 2 ],
+                    vertArray[ vertIter - 1 ],
+                    vertArray[ vertIter - 0 ]
+                );
+            }
+            
             ++vertIter;
         }
 
         // gather all indices from the meshEntry faces
         for ( unsigned f = 0; f < pMesh->mNumFaces; ++f ) {
             const aiFace* face          = &pMesh->mFaces[ f ];
-            indexArray[ indexIter++ ]   = face->mIndices[ 0 ];
-            indexArray[ indexIter++ ]   = face->mIndices[ 1 ];
-            indexArray[ indexIter++ ]   = face->mIndices[ 2 ];
+            indexArray[ indexIter+0 ]   = face->mIndices[ 0 ];
+            indexArray[ indexIter+1 ]   = face->mIndices[ 1 ];
+            indexArray[ indexIter+2 ]   = face->mIndices[ 2 ];
+            indexIter += 3;
         }
         std::cout << "\t\tLoaded sub-mesh " << i << ".\n";
     }
@@ -381,11 +395,11 @@ void mesh::loadVao(
 	glEnableVertexAttribArray( pipeline::TANGENT_ATTRIB );
 	glVertexAttribPointer(
 		pipeline::TANGENT_ATTRIB,
-		ARRAY_COUNT_FROM_SIZE( bumpVertex::tangent.v ),
+		ARRAY_COUNT_FROM_SIZE( bumpVertex::tng.v ),
 		GL_FLOAT,
 		GL_FALSE,
 		sizeof( bumpVertex ),
-		(GLvoid*)offsetof( bumpVertex, tangent.v )
+		(GLvoid*)offsetof( bumpVertex, tng.v )
 	);
 	printGlError( "Error while sending mesh data to the GPU.");
 	

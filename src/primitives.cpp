@@ -7,6 +7,7 @@
 
 #include <iostream>
 #include "primitives.h"
+#include "geometry.h"
 
 namespace hge {
 
@@ -56,10 +57,10 @@ bool quad::init() {
     
     bumpVertex verts[ 4 ];
     
-    verts[0].pos = vec3( -1.f, 1.f, 0.f );
-    verts[1].pos = vec3( 1.f, 1.f, 0.f );
-    verts[2].pos = vec3( -1.f, -1.f, 0.f );
-    verts[3].pos = vec3( 1.f, -1.f, 0.f );
+    verts[0].pos = vec3( -0.5f, 0.5f, 0.f );
+    verts[1].pos = vec3( 0.5f, 0.5f, 0.f );
+    verts[2].pos = vec3( -0.5f, -0.5f, 0.f );
+    verts[3].pos = vec3( 0.5f, -0.5f, 0.f );
     
     verts[0].uv = vec2( 0.f, 1.f );
     verts[1].uv = vec2( 1.f, 1.f );
@@ -71,10 +72,8 @@ bool quad::init() {
     verts[2].norm = vec3( 0.f, 0.f, -1.f );
     verts[3].norm = vec3( 0.f, 0.f, -1.f );
     
-    verts[0].tangent = vec3( 0.5f, 0.f, 0.5f );
-    verts[1].tangent = vec3( 0.5f, 0.f, 0.5f );
-    verts[2].tangent = vec3( 0.5f, 0.f, 0.5f );
-    verts[3].tangent = vec3( 0.5f, 0.f, 0.5f );
+    calcTangents( verts[0], verts[1], verts[2] );
+    calcTangents( verts[1], verts[2], verts[3] );
 	
 	glGenVertexArrays( 1, &vao );
 	glBindVertexArray( vao );
@@ -116,8 +115,8 @@ bool quad::init() {
 	glEnableVertexAttribArray( pipeline::TANGENT_ATTRIB );
 	glVertexAttribPointer(
 		pipeline::TANGENT_ATTRIB,
-		ARRAY_COUNT_FROM_SIZE( bumpVertex::tangent.v ), GL_FLOAT, GL_FALSE,
-        sizeof( bumpVertex ), (GLvoid*)offsetof( bumpVertex, tangent.v )
+		ARRAY_COUNT_FROM_SIZE( bumpVertex::tng.v ), GL_FLOAT, GL_FALSE,
+        sizeof( bumpVertex ), (GLvoid*)offsetof( bumpVertex, tng.v )
 	);
 	
 	glBindVertexArray( 0 );
@@ -141,9 +140,9 @@ bool triangle::init() {
     
     bumpVertex verts[ 3 ];
     
-    verts[0].pos = vec3( -1.f, -1.f, 0.f );
-    verts[1].pos = vec3( 0.f, 1.f, 0.f );
-    verts[2].pos = vec3( 1.f, -1.f, 0.f );
+    verts[0].pos = vec3( -0.5f, -0.5f, 0.f );
+    verts[1].pos = vec3( 0.f, 0.5f, 0.f );
+    verts[2].pos = vec3( 0.5f, -0.5f, 0.f );
     
     verts[0].uv = vec2( 0.f, 0.f );
     verts[1].uv = vec2( 0.5f, 1.f );
@@ -153,9 +152,7 @@ bool triangle::init() {
     verts[1].norm = vec3( 0.f, 0.f, -1.f );
     verts[2].norm = vec3( 0.f, 0.f, -1.f );
     
-    verts[0].tangent = vec3( 0.5f, 0.f, 0.5f );
-    verts[1].tangent = vec3( 0.5f, 0.f, 0.5f );
-    verts[2].tangent = vec3( 0.5f, 0.f, 0.5f );
+    calcTangents( verts[0], verts[1], verts[2] );
 	
 	glGenVertexArrays( 1, &vao );
 	glBindVertexArray( vao );
@@ -197,8 +194,8 @@ bool triangle::init() {
 	glEnableVertexAttribArray( pipeline::TANGENT_ATTRIB );
 	glVertexAttribPointer(
 		pipeline::TANGENT_ATTRIB,
-		ARRAY_COUNT_FROM_SIZE( bumpVertex::tangent.v ), GL_FLOAT, GL_FALSE,
-        sizeof( bumpVertex ), (GLvoid*)offsetof( bumpVertex, tangent.v )
+		ARRAY_COUNT_FROM_SIZE( bumpVertex::tng.v ), GL_FLOAT, GL_FALSE,
+        sizeof( bumpVertex ), (GLvoid*)offsetof( bumpVertex, tng.v )
 	);
 	
 	glBindVertexArray( 0 );
@@ -409,8 +406,8 @@ bool sphere::sendToOpenGL() {
 	glEnableVertexAttribArray( pipeline::TANGENT_ATTRIB );
 	glVertexAttribPointer(
 		pipeline::TANGENT_ATTRIB,
-		ARRAY_COUNT_FROM_SIZE( bumpVertex::tangent.v ), GL_FLOAT, GL_FALSE,
-        sizeof( bumpVertex ), (GLvoid*)offsetof( bumpVertex, tangent.v )
+		ARRAY_COUNT_FROM_SIZE( bumpVertex::tng.v ), GL_FLOAT, GL_FALSE,
+        sizeof( bumpVertex ), (GLvoid*)offsetof( bumpVertex, tng.v )
 	);
     
     glBindBuffer( GL_ELEMENT_ARRAY_BUFFER, vbo[1] );

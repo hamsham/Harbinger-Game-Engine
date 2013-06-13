@@ -23,9 +23,9 @@
 #endif
 
 #ifdef DEBUG
-    #define HGE_ASSERT( x ) ASSERT_WARN( x )
+    #define HGE_ASSERT( x ) HL_WARN( x )
 #else
-    #define HGE_ASSERT( X ) ASSERT_FATAL( x )
+    #define HGE_ASSERT( x ) HL_ASSERT( x )
 #endif
 
 /*

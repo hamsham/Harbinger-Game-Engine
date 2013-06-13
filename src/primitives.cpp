@@ -200,7 +200,7 @@ void line::terminate() {
 }
 
 void line::setVertPos( int index, const vec3& inPos ) {
-    HL_ASSERT( (index > 0) && (index < 2) );
+    HGE_ASSERT( (index >= 0) && (index < 2) );
     points[ index ] = inPos;
     
     glBindVertexArray( vao );

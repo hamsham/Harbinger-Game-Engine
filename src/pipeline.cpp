@@ -215,7 +215,7 @@ void pipeline::printErrorMsg( const char* msg, unsigned lineNum, const char* sou
 ******************************************************************************/
 bool pipeline::init() {
     
-    ASSERT_FATAL( display::isWindowOpen() );
+    HL_ASSERT( display::isWindowOpen() );
 	
 	/*
 	 * Default OpenGL parameters

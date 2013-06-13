@@ -317,47 +317,19 @@ void cube::terminate() {
 /******************************************************************************
  *      SPHERES
 ******************************************************************************/
-bool sphere::sendToOpenGL() {
-	glGenVertexArrays( 1, &vao );
-	glBindVertexArray( vao );
-	glGenBuffers( 2, vbo );
-    
-    if ( !vao || !vbo[0] || !vbo[1] ) {
-        std::cerr
-            << "An error occurred while initializing the sphere primitives"
-            << std::endl;
-        destroySphere();
-        return false;
-    }
-	
-	glBindBuffer( GL_ARRAY_BUFFER, vbo[0] );
-    glBufferData( GL_ARRAY_BUFFER, numVerts * sizeof( bumpVertex ), vertices, GL_STATIC_DRAW );
-	printGlError( "Error while sending sphere primitive data to the GPU.");
-    
-    pipeline::enableBumpVertexAttribs();
-    
-    glBindBuffer( GL_ELEMENT_ARRAY_BUFFER, vbo[1] );
-    glBufferData( GL_ELEMENT_ARRAY_BUFFER, numIndices * sizeof( GLuint ), indices, GL_STATIC_DRAW );
-	
-	glBindVertexArray( 0 );
-    
-	return true;
-}
-
 bool sphere::createSphere( int rings, int sectors ) {
     float const R = 1.f / (float)(rings-1);
     float const S = 1.f / (float)(sectors-1);
     
     destroySphere();
     
-    numVerts = rings * sectors;
-    numIndices = rings * sectors * 4;
+    unsigned numVerts = rings * sectors;
     
-    vertices = new( std::nothrow ) bumpVertex[ rings * sectors ];
+    bumpVertex* vertices = new( std::nothrow ) bumpVertex[ rings * sectors ];
     if ( !vertices )
         return false;
         
-    indices = new( std::nothrow ) GLuint[ rings * sectors * 4 ];
+    GLuint* indices = new( std::nothrow ) GLuint[ rings * sectors * 4 ];
     if ( !indices ) {
         delete [] vertices;
         vertices = nullptr;
@@ -393,8 +365,35 @@ bool sphere::createSphere( int rings, int sectors ) {
         }
     }
     
+	glGenVertexArrays( 1, &vao );
+	glBindVertexArray( vao );
+	glGenBuffers( 2, vbo );
     
-    return sendToOpenGL();
+    if ( !vao || !vbo[0] || !vbo[1] ) {
+        std::cerr
+            << "An error occurred while initializing the sphere primitives"
+            << std::endl;
+        destroySphere();
+        return false;
+    }
+    
+    numIndices = numVerts * 4;
+	
+	glBindBuffer( GL_ARRAY_BUFFER, vbo[0] );
+    glBufferData( GL_ARRAY_BUFFER, numVerts * sizeof( bumpVertex ), vertices, GL_STATIC_DRAW );
+	printGlError( "Error while sending sphere primitive data to the GPU.");
+    
+    pipeline::enableBumpVertexAttribs();
+    
+    glBindBuffer( GL_ELEMENT_ARRAY_BUFFER, vbo[1] );
+    glBufferData( GL_ELEMENT_ARRAY_BUFFER, numIndices * sizeof( GLuint ), indices, GL_STATIC_DRAW );
+	
+	glBindVertexArray( 0 );
+    
+    delete [] vertices;
+    delete [] indices;
+    
+	return true;
 }
 
 void sphere::destroySphere() {
@@ -402,12 +401,7 @@ void sphere::destroySphere() {
     glDeleteBuffers( 2, vbo );
 
     vao = vbo[0] = vbo[1] = 0;
-    
-    if ( vertices ) delete [] vertices;
-    if ( indices )  delete [] indices;
-    vertices = nullptr;
-    indices = nullptr;
-    numVerts = numIndices = 0;
+    numIndices = 0;
 }
 
 } // end hge namespace

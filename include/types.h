@@ -23,17 +23,9 @@ namespace display {
     struct  videoMode;
 }
 
-//simple vertex structure
-struct plainVertex {
-	vec3 pos;
-	vec2 uv;
-	vec3 norm;
-};
-
-// bumped vertex
-struct bumpVertex : plainVertex {
-	vec3 tangent;
-};
+//vertex structures
+struct plainVertex; // position, uv, normal
+struct bumpVertex; // plainVertex + tangent & bitangent
 
 // File-based resources
 class   resource;

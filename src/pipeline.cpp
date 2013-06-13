@@ -30,6 +30,63 @@ namespace {
 }
 
 /******************************************************************************
+ * Enabling Vertex Attributes
+******************************************************************************/
+void pipeline::enablePlainVertexAttribs() {
+	glEnableVertexAttribArray( VERTEX_ATTRIB );
+	glEnableVertexAttribArray( TEXTURE_ATTRIB );
+	glEnableVertexAttribArray( NORMAL_ATTRIB );
+    
+	glVertexAttribPointer(
+		VERTEX_ATTRIB, ARRAY_COUNT_FROM_SIZE( plainVertex::pos.v ), GL_FLOAT,
+        GL_FALSE, sizeof( plainVertex ), (GLvoid*)offsetof( plainVertex, pos.v )
+	);
+    
+	glVertexAttribPointer(
+		TEXTURE_ATTRIB, ARRAY_COUNT_FROM_SIZE( plainVertex::uv.v ), GL_FLOAT,
+        GL_FALSE, sizeof( plainVertex ), (GLvoid*)offsetof( plainVertex, uv.v )
+	);
+    
+	glVertexAttribPointer(
+		NORMAL_ATTRIB, ARRAY_COUNT_FROM_SIZE( plainVertex::norm.v ), GL_FLOAT,
+        GL_FALSE, sizeof( plainVertex ), (GLvoid*)offsetof( plainVertex, norm.v )
+	);
+    
+	glDisableVertexAttribArray( TANGENT_ATTRIB );
+    
+	printGlError( "Error while enabling plain vertex attributes.");
+}
+
+void pipeline::enableBumpVertexAttribs() {
+	glEnableVertexAttribArray( VERTEX_ATTRIB );
+	glEnableVertexAttribArray( TEXTURE_ATTRIB );
+	glEnableVertexAttribArray( NORMAL_ATTRIB );
+    glEnableVertexAttribArray( TANGENT_ATTRIB );
+    
+	glVertexAttribPointer(
+		VERTEX_ATTRIB, ARRAY_COUNT_FROM_SIZE( bumpVertex::pos.v ), GL_FLOAT,
+        GL_FALSE, sizeof( bumpVertex ), (GLvoid*)offsetof( bumpVertex, pos.v )
+	);
+    
+	glVertexAttribPointer(
+		TEXTURE_ATTRIB, ARRAY_COUNT_FROM_SIZE( bumpVertex::uv.v ), GL_FLOAT,
+        GL_FALSE, sizeof( bumpVertex ), (GLvoid*)offsetof( bumpVertex, uv.v )
+	);
+    
+	glVertexAttribPointer(
+		NORMAL_ATTRIB, ARRAY_COUNT_FROM_SIZE( bumpVertex::norm.v ), GL_FLOAT,
+        GL_FALSE, sizeof( bumpVertex ), (GLvoid*)offsetof( bumpVertex, norm.v )
+	);
+    
+	glVertexAttribPointer(
+		TANGENT_ATTRIB, ARRAY_COUNT_FROM_SIZE( bumpVertex::tng.v ), GL_FLOAT,
+        GL_FALSE, sizeof( bumpVertex ), (GLvoid*)offsetof( bumpVertex, tng.v )
+	);
+    
+	printGlError( "Error while enabling bumped vertex attributes.");
+}
+
+/******************************************************************************
  * Pushing to the matrix stack
 ******************************************************************************/
 void pipeline::applyMatrix( e_matrixState s, const mat4& m ) {

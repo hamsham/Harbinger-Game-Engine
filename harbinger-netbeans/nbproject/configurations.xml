@@ -17,6 +17,7 @@
       <itemPath>../include/camera.h</itemPath>
       <itemPath>../include/display.h</itemPath>
       <itemPath>../include/font.h</itemPath>
+      <itemPath>../include/geometry.h</itemPath>
       <itemPath>../include/harbinger.h</itemPath>
       <itemPath>../include/input.h</itemPath>
       <itemPath>../include/light.h</itemPath>
@@ -39,9 +40,9 @@
       <itemPath>../src/camera.cpp</itemPath>
       <itemPath>../src/display.cpp</itemPath>
       <itemPath>../src/font.cpp</itemPath>
+      <itemPath>../src/geometry.cpp</itemPath>
       <itemPath>../src/harbinger.cpp</itemPath>
       <itemPath>../src/input.cpp</itemPath>
-      <itemPath>../src/light.cpp</itemPath>
       <itemPath>../src/mesh.cpp</itemPath>
       <itemPath>../src/pipeline.cpp</itemPath>
       <itemPath>../src/primitives.cpp</itemPath>
@@ -86,6 +87,7 @@
           <incDir>
             <pElem>../include</pElem>
             <pElem>../../hamlibs/include</pElem>
+            <pElem>../../../../../../mingw4.8.1/mingw32/i686-w64-mingw32/include/freetype2</pElem>
           </incDir>
           <commandLine>-W -Wall -Werror -Wextra -pedantic -mmmx -msse -msse2 -msse3 -mfpmath=sse -s -shared</commandLine>
           <preprocessorList>
@@ -98,11 +100,11 @@
           <output>../bin/WIN32/harbinger-debug.dll</output>
           <linkerLibItems>
             <linkerLibLibItem>glew32</linkerLibLibItem>
-            <linkerLibLibItem>glfw</linkerLibLibItem>
+            <linkerLibLibItem>glfw3dll</linkerLibLibItem>
             <linkerLibLibItem>opengl32</linkerLibLibItem>
             <linkerLibLibItem>FreeImage</linkerLibLibItem>
             <linkerLibLibItem>assimp.dll</linkerLibLibItem>
-            <linkerLibLibItem>freetype-2.4.8-static-md-debug</linkerLibLibItem>
+            <linkerLibLibItem>freetype.dll</linkerLibLibItem>
             <linkerLibProjectItem>
               <makeArtifact PL="../../hamlibs/HamLibs_NetBeans"
                             CT="3"
@@ -152,6 +154,8 @@
       </item>
       <item path="../include/font.h" ex="false" tool="3" flavor2="0">
       </item>
+      <item path="../include/geometry.h" ex="false" tool="3" flavor2="0">
+      </item>
       <item path="../include/harbinger.h" ex="false" tool="3" flavor2="0">
       </item>
       <item path="../include/input.h" ex="false" tool="3" flavor2="0">
@@ -192,11 +196,11 @@
       </item>
       <item path="../src/font.cpp" ex="false" tool="1" flavor2="0">
       </item>
+      <item path="../src/geometry.cpp" ex="false" tool="1" flavor2="0">
+      </item>
       <item path="../src/harbinger.cpp" ex="false" tool="1" flavor2="0">
       </item>
       <item path="../src/input.cpp" ex="false" tool="1" flavor2="0">
-      </item>
-      <item path="../src/light.cpp" ex="false" tool="1" flavor2="0">
       </item>
       <item path="../src/mesh.cpp" ex="false" tool="1" flavor2="0">
       </item>
@@ -240,6 +244,7 @@
           <incDir>
             <pElem>../include</pElem>
             <pElem>../../hamlibs/include</pElem>
+            <pElem>../../../../../../mingw4.8.1/mingw32/i686-w64-mingw32/include/freetype2</pElem>
           </incDir>
           <commandLine>-W -Wall -Werror -Wextra -pedantic -mmmx -msse -msse2 -msse3 -mfpmath=sse -O3 -s -shared</commandLine>
           <preprocessorList>
@@ -258,11 +263,11 @@
           <stripSymbols>true</stripSymbols>
           <linkerLibItems>
             <linkerLibLibItem>glew32</linkerLibLibItem>
-            <linkerLibLibItem>glfw</linkerLibLibItem>
+            <linkerLibLibItem>glfw3dll</linkerLibLibItem>
             <linkerLibLibItem>opengl32</linkerLibLibItem>
             <linkerLibLibItem>FreeImage</linkerLibLibItem>
             <linkerLibLibItem>assimp.dll</linkerLibLibItem>
-            <linkerLibLibItem>freetype-2.4.8-static-md</linkerLibLibItem>
+            <linkerLibLibItem>freetype.dll</linkerLibLibItem>
             <linkerLibProjectItem>
               <makeArtifact PL="../../hamlibs/HamLibs_NetBeans"
                             CT="3"
@@ -312,6 +317,8 @@
       </item>
       <item path="../include/font.h" ex="false" tool="3" flavor2="0">
       </item>
+      <item path="../include/geometry.h" ex="false" tool="3" flavor2="0">
+      </item>
       <item path="../include/harbinger.h" ex="false" tool="3" flavor2="0">
       </item>
       <item path="../include/input.h" ex="false" tool="3" flavor2="0">
@@ -352,11 +359,11 @@
       </item>
       <item path="../src/font.cpp" ex="false" tool="1" flavor2="0">
       </item>
+      <item path="../src/geometry.cpp" ex="false" tool="1" flavor2="0">
+      </item>
       <item path="../src/harbinger.cpp" ex="false" tool="1" flavor2="0">
       </item>
       <item path="../src/input.cpp" ex="false" tool="1" flavor2="0">
-      </item>
-      <item path="../src/light.cpp" ex="false" tool="1" flavor2="0">
       </item>
       <item path="../src/mesh.cpp" ex="false" tool="1" flavor2="0">
       </item>
@@ -458,6 +465,8 @@
       </item>
       <item path="../include/font.h" ex="false" tool="3" flavor2="0">
       </item>
+      <item path="../include/geometry.h" ex="false" tool="3" flavor2="0">
+      </item>
       <item path="../include/harbinger.h" ex="false" tool="3" flavor2="0">
       </item>
       <item path="../include/input.h" ex="false" tool="3" flavor2="0">
@@ -498,11 +507,11 @@
       </item>
       <item path="../src/font.cpp" ex="false" tool="1" flavor2="0">
       </item>
+      <item path="../src/geometry.cpp" ex="false" tool="1" flavor2="0">
+      </item>
       <item path="../src/harbinger.cpp" ex="false" tool="1" flavor2="0">
       </item>
       <item path="../src/input.cpp" ex="false" tool="1" flavor2="0">
-      </item>
-      <item path="../src/light.cpp" ex="false" tool="1" flavor2="0">
       </item>
       <item path="../src/mesh.cpp" ex="false" tool="1" flavor2="0">
       </item>
@@ -613,6 +622,8 @@
       </item>
       <item path="../include/font.h" ex="false" tool="3" flavor2="0">
       </item>
+      <item path="../include/geometry.h" ex="false" tool="3" flavor2="0">
+      </item>
       <item path="../include/harbinger.h" ex="false" tool="3" flavor2="0">
       </item>
       <item path="../include/input.h" ex="false" tool="3" flavor2="0">
@@ -653,11 +664,11 @@
       </item>
       <item path="../src/font.cpp" ex="false" tool="1" flavor2="0">
       </item>
+      <item path="../src/geometry.cpp" ex="false" tool="1" flavor2="0">
+      </item>
       <item path="../src/harbinger.cpp" ex="false" tool="1" flavor2="0">
       </item>
       <item path="../src/input.cpp" ex="false" tool="1" flavor2="0">
-      </item>
-      <item path="../src/light.cpp" ex="false" tool="1" flavor2="0">
       </item>
       <item path="../src/mesh.cpp" ex="false" tool="1" flavor2="0">
       </item>

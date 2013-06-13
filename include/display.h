@@ -10,6 +10,8 @@
 
 #include "types.h"
 
+struct GLFWwindow;
+
 namespace hge {
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -19,6 +21,9 @@ namespace hge {
 //		Window/Display Object
 ///////////////////////////////////////////////////////////////////////////////
 namespace display {
+    
+    typedef GLFWwindow hgeWindow;
+    HGE_API hgeWindow* getCurrentWindow();
     
     // Variables
     const int DEFAULT_WINDOW_WIDTH  = 640;
@@ -50,15 +55,11 @@ namespace display {
 	HGE_API int		getWindowHeight ();
     HGE_API int     getDesktopWidth ();
     HGE_API int     getDesktopHeight();
-    HGE_API void    setResizeCallback( void (*callback)(int w, int h) );
     
     HGE_API void    raiseWindow     ();
     HGE_API void    lowerWindow     ();
     
     HGE_API void    setWindowTitle  ( const char* );
-    
-    HGE_API int     getNumVideoModes();
-    HGE_API const videoMode* getVideoMode( int );
 }
 
 } // end hge namespace

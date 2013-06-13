@@ -12,6 +12,7 @@
 #include FT_FREETYPE_H
 
 #include "font.h"
+#include "geometry.h"
 
 using namespace hamLibs::math;
 
@@ -244,31 +245,7 @@ void string3d::createVertexBuffer( unsigned numVerts ) {
     );
 	printGlError( "Error while creating a string object's vertex buffer.");
     
-	glEnableVertexAttribArray( pipeline::VERTEX_ATTRIB );
-	glEnableVertexAttribArray( pipeline::TEXTURE_ATTRIB );
-	glEnableVertexAttribArray( pipeline::NORMAL_ATTRIB );
-    
-	glVertexAttribPointer(
-		pipeline::VERTEX_ATTRIB,
-		ARRAY_COUNT_FROM_SIZE( plainVertex::pos.v ), GL_FLOAT, GL_FALSE,
-        sizeof( plainVertex ), (GLvoid*)offsetof( plainVertex, pos.v )
-	);
-    
-	glVertexAttribPointer(
-		pipeline::TEXTURE_ATTRIB,
-		ARRAY_COUNT_FROM_SIZE( plainVertex::uv.v ), GL_FLOAT, GL_FALSE,
-        sizeof( plainVertex ), (GLvoid*)offsetof( plainVertex, uv.v )
-	);
-    
-	glVertexAttribPointer(
-		pipeline::NORMAL_ATTRIB,
-		ARRAY_COUNT_FROM_SIZE( plainVertex::norm.v ), GL_FLOAT, GL_FALSE,
-        sizeof( plainVertex ), (GLvoid*)offsetof( plainVertex, norm.v )
-	);
-    
-	glDisableVertexAttribArray( pipeline::TANGENT_ATTRIB );
-    
-	printGlError( "Error while resizing a string buffer on the GPU.");
+    pipeline::enablePlainVertexAttribs();
 }
 
 ///////////////////////////////////////////////////////////////////////////////

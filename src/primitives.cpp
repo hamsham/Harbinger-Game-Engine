@@ -91,33 +91,7 @@ bool quad::init() {
     glBufferData( GL_ARRAY_BUFFER, sizeof( verts ), verts, GL_STATIC_DRAW );
 	printGlError( "Error while sending primitive data to the GPU.");
     
-	glEnableVertexAttribArray( pipeline::VERTEX_ATTRIB );
-	glVertexAttribPointer(
-		pipeline::VERTEX_ATTRIB,
-		ARRAY_COUNT_FROM_SIZE( bumpVertex::pos.v ), GL_FLOAT, GL_FALSE,
-        sizeof( bumpVertex ), (GLvoid*)offsetof( bumpVertex, pos.v )
-	);
-    
-	glEnableVertexAttribArray( pipeline::TEXTURE_ATTRIB );
-	glVertexAttribPointer(
-		pipeline::TEXTURE_ATTRIB,
-		ARRAY_COUNT_FROM_SIZE( bumpVertex::uv.v ), GL_FLOAT, GL_FALSE,
-        sizeof( bumpVertex ), (GLvoid*)offsetof( bumpVertex, uv.v )
-	);
-    
-	glEnableVertexAttribArray( pipeline::NORMAL_ATTRIB );
-	glVertexAttribPointer(
-		pipeline::NORMAL_ATTRIB,
-		ARRAY_COUNT_FROM_SIZE( bumpVertex::norm.v ), GL_FLOAT, GL_FALSE,
-        sizeof( bumpVertex ), (GLvoid*)offsetof( bumpVertex, norm.v )
-	);
-    
-	glEnableVertexAttribArray( pipeline::TANGENT_ATTRIB );
-	glVertexAttribPointer(
-		pipeline::TANGENT_ATTRIB,
-		ARRAY_COUNT_FROM_SIZE( bumpVertex::tng.v ), GL_FLOAT, GL_FALSE,
-        sizeof( bumpVertex ), (GLvoid*)offsetof( bumpVertex, tng.v )
-	);
+    pipeline::enableBumpVertexAttribs();
 	
 	glBindVertexArray( 0 );
     
@@ -170,33 +144,7 @@ bool triangle::init() {
     glBufferData( GL_ARRAY_BUFFER, sizeof( verts ), verts, GL_STATIC_DRAW );
 	printGlError( "Error while sending primitive data to the GPU.");
     
-	glEnableVertexAttribArray( pipeline::VERTEX_ATTRIB );
-	glVertexAttribPointer(
-		pipeline::VERTEX_ATTRIB,
-		ARRAY_COUNT_FROM_SIZE( bumpVertex::pos.v ), GL_FLOAT, GL_FALSE,
-        sizeof( bumpVertex ), (GLvoid*)offsetof( bumpVertex, pos.v )
-	);
-    
-	glEnableVertexAttribArray( pipeline::TEXTURE_ATTRIB );
-	glVertexAttribPointer(
-		pipeline::TEXTURE_ATTRIB,
-		ARRAY_COUNT_FROM_SIZE( bumpVertex::uv.v ), GL_FLOAT, GL_FALSE,
-        sizeof( bumpVertex ), (GLvoid*)offsetof( bumpVertex, uv.v )
-	);
-    
-	glEnableVertexAttribArray( pipeline::NORMAL_ATTRIB );
-	glVertexAttribPointer(
-		pipeline::NORMAL_ATTRIB,
-		ARRAY_COUNT_FROM_SIZE( bumpVertex::norm.v ), GL_FLOAT, GL_FALSE,
-        sizeof( bumpVertex ), (GLvoid*)offsetof( bumpVertex, norm.v )
-	);
-    
-	glEnableVertexAttribArray( pipeline::TANGENT_ATTRIB );
-	glVertexAttribPointer(
-		pipeline::TANGENT_ATTRIB,
-		ARRAY_COUNT_FROM_SIZE( bumpVertex::tng.v ), GL_FLOAT, GL_FALSE,
-        sizeof( bumpVertex ), (GLvoid*)offsetof( bumpVertex, tng.v )
-	);
+    pipeline::enableBumpVertexAttribs();
 	
 	glBindVertexArray( 0 );
     
@@ -235,6 +183,10 @@ bool line::init() {
     printGlError( "Initializing a line primitive" );
     glVertexAttribPointer( pipeline::VERTEX_ATTRIB, 3, GL_FLOAT, GL_FALSE, 0, 0 );
     glEnableVertexAttribArray( pipeline::VERTEX_ATTRIB );
+    
+    glDisableVertexAttribArray( pipeline::TEXTURE_ATTRIB );
+    glDisableVertexAttribArray( pipeline::NORMAL_ATTRIB );
+    glDisableVertexAttribArray( pipeline::TANGENT_ATTRIB );
     
     glBindVertexArray( 0 );
     return true;
@@ -382,33 +334,7 @@ bool sphere::sendToOpenGL() {
     glBufferData( GL_ARRAY_BUFFER, numVerts * sizeof( bumpVertex ), vertices, GL_STATIC_DRAW );
 	printGlError( "Error while sending sphere primitive data to the GPU.");
     
-	glEnableVertexAttribArray( pipeline::VERTEX_ATTRIB );
-	glVertexAttribPointer(
-		pipeline::VERTEX_ATTRIB,
-		ARRAY_COUNT_FROM_SIZE( bumpVertex::pos.v ), GL_FLOAT, GL_FALSE,
-        sizeof( bumpVertex ), (GLvoid*)offsetof( bumpVertex, pos.v )
-	);
-    
-	glEnableVertexAttribArray( pipeline::TEXTURE_ATTRIB );
-	glVertexAttribPointer(
-		pipeline::TEXTURE_ATTRIB,
-		ARRAY_COUNT_FROM_SIZE( bumpVertex::uv.v ), GL_FLOAT, GL_FALSE,
-        sizeof( bumpVertex ), (GLvoid*)offsetof( bumpVertex, uv.v )
-	);
-    
-	glEnableVertexAttribArray( pipeline::NORMAL_ATTRIB );
-	glVertexAttribPointer(
-		pipeline::NORMAL_ATTRIB,
-		ARRAY_COUNT_FROM_SIZE( bumpVertex::norm.v ), GL_FLOAT, GL_FALSE,
-        sizeof( bumpVertex ), (GLvoid*)offsetof( bumpVertex, norm.v )
-	);
-    
-	glEnableVertexAttribArray( pipeline::TANGENT_ATTRIB );
-	glVertexAttribPointer(
-		pipeline::TANGENT_ATTRIB,
-		ARRAY_COUNT_FROM_SIZE( bumpVertex::tng.v ), GL_FLOAT, GL_FALSE,
-        sizeof( bumpVertex ), (GLvoid*)offsetof( bumpVertex, tng.v )
-	);
+    pipeline::enableBumpVertexAttribs();
     
     glBindBuffer( GL_ELEMENT_ARRAY_BUFFER, vbo[1] );
     glBufferData( GL_ELEMENT_ARRAY_BUFFER, numIndices * sizeof( GLuint ), indices, GL_STATIC_DRAW );

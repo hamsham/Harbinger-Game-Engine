@@ -9,8 +9,8 @@
 #define	__HGE_GL_PIPELINE_H__
 
 #include <GL/glew.h>
-#include <GL/glfw.h>
 #include "types.h"
+#include "geometry.h"
 
 #ifndef HGE_PIPELINE_MATRIX_BINDING
     #define HGE_PIPELINE_MATRIX_BINDING 1
@@ -79,6 +79,9 @@ enum e_texType : GLint {
 ******************************************************************************/
 HGE_API     bool init();
 HGE_API     void terminate();
+
+HGE_API     void enablePlainVertexAttribs();
+HGE_API     void enableBumpVertexAttribs();
 
 // The matrix stack will only hold (at most) a single user-applied matrix of
 // each type (model, view, and projection).

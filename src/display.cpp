@@ -8,6 +8,7 @@
 #include <iostream>
 #include <vector>
 #include "pipeline.h"
+#include <GL/glfw3.h>
 #include "display.h"
 
 //-----------------------------------------------------------------------------
@@ -23,12 +24,16 @@ namespace {
     int     deskHeight          = 0;
     
     const int MAX_VIDEO_MODES   = 100;
-    std::vector< hge::display::videoMode > vidModes;
     
 }// end anonymous namespace
+GLFWwindow* mainWindow          = nullptr; // needed by the input system
 
 namespace hge {
-	
+
+display::hgeWindow* display::getCurrentWindow() {
+    return mainWindow;
+}
+
 //-----------------------------------------------------------------------------
 //	Window Creation
 //-----------------------------------------------------------------------------
@@ -44,30 +49,26 @@ bool display::createWindow(
     /*
      * Create a new window using GLFW
      */
-	glfwOpenWindowHint( GLFW_OPENGL_VERSION_MAJOR, 3 );
-	glfwOpenWindowHint( GLFW_OPENGL_VERSION_MINOR, 3 );
-	glfwOpenWindowHint( GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE );
-	glfwOpenWindowHint( GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE );
-	glfwOpenWindowHint( GLFW_WINDOW_NO_RESIZE, (resizeable ? GL_FALSE : GL_TRUE) );
+	glfwWindowHint( GLFW_CONTEXT_VERSION_MAJOR, 3 );
+	glfwWindowHint( GLFW_CONTEXT_VERSION_MINOR, 3 );
+	glfwWindowHint( GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE );
+	glfwWindowHint( GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE );
+	glfwWindowHint( GLFW_RESIZABLE, (resizeable ? GL_TRUE : GL_FALSE) );
 #ifdef DEBUG
-    glfwOpenWindowHint( GLFW_OPENGL_DEBUG_CONTEXT, GL_TRUE );
+    glfwWindowHint( GLFW_OPENGL_DEBUG_CONTEXT, GL_TRUE );
 #endif
     
-	if ( !glfwOpenWindow(
-            w, h, 8, 8, 8, 8, 24, 24,
-            fullscreen ? GLFW_FULLSCREEN : GLFW_WINDOW
-    ) ) {
+    mainWindow = glfwCreateWindow( w, h, "Harbinger Game Engine", nullptr, nullptr );
+	if ( !mainWindow ) {
 		std::cerr << "Failed to create an OpenGL context." << std::endl;
         return false;
 	}
+    glfwMakeContextCurrent( mainWindow );
     
-    glfwGetWindowSize( &windowWidth, &windowHeight );
-    glfwSetWindowPos( 0, 0 );
-    glfwDisable( GLFW_STICKY_KEYS );
-    glfwEnable( GLFW_AUTO_POLL_EVENTS );
+    glfwGetWindowSize( mainWindow, &windowWidth, &windowHeight );
+    glfwSetInputMode( mainWindow, GLFW_STICKY_KEYS, GL_TRUE );
     
-	if ( useVsync == false )
-        glfwSwapInterval( 0 );
+    glfwSwapInterval( useVsync );
     
 	/*
 	 * Initialize GLEW
@@ -96,7 +97,9 @@ void display::closeWindow() {
     // Close all OpenGL-dependant functions
     pipeline::terminate();
     
-    glfwCloseWindow();
+    glfwDestroyWindow( mainWindow );
+    
+    mainWindow = false;
     displayFullscreen = false;
 }
 
@@ -104,7 +107,7 @@ void display::closeWindow() {
 //	Window Open-ness check
 //-----------------------------------------------------------------------------
 bool display::isWindowOpen() {
-    return glfwGetWindowParam(GLFW_OPENED) == GL_TRUE;
+    return mainWindow != nullptr;
 }
 
 //-----------------------------------------------------------------------------
@@ -114,73 +117,51 @@ bool display::init() {
     if ( displayInitialized )
         return true;
     
+    std::cout << "Initializing display subsystems...";
     displayInitialized = glfwInit();
 	if ( displayInitialized == false ) {
 		std::cerr << "Display failed to initialize." << std::endl;
 		return false;
     }
     
-    GLFWvidmode deskMode;
-    glfwGetDesktopMode( &deskMode );
-    deskWidth = deskMode.Width;
-    deskHeight = deskMode.Height;
+    const GLFWvidmode* deskMode = glfwGetVideoMode( glfwGetPrimaryMonitor() );
+    deskWidth = deskMode->width;
+    deskHeight = deskMode->height;
     
-    std::cout << "Acquiring display modes...";
-    GLFWvidmode modeList[ MAX_VIDEO_MODES ];
-    int numModes = glfwGetVideoModes( modeList, MAX_VIDEO_MODES );
-    vidModes.resize( numModes );
-    
-    for ( int i = 0; i < numModes; ++i ) {
-        videoMode* pMode = &vidModes[ i ];
-        
-        pMode->bpp
-            = modeList[ i ].BlueBits
-            + modeList[ i ].GreenBits
-            + modeList[ i ].RedBits;
-        
-        pMode->width = modeList[i].Width;
-        pMode->height = modeList[i].Height;
-    }
-    std::cout << "Done. Acquired " << numModes << " video modes." << std::endl;
+    std::cout << "Done." << std::endl;
     
     return displayInitialized;
 }
 
 void display::terminate() {
-    if ( isWindowOpen() )
+    if ( isWindowOpen() ) {
+        pipeline::terminate();
         display::closeWindow();
+    }
     glfwTerminate();
-    vidModes.clear();
     displayInitialized = false;
     deskWidth = deskHeight = 0;
 }
 
 void display::flip() {
-    glfwSwapBuffers();
+    glfwSwapBuffers( mainWindow );
+    glfwPollEvents();
 }
 
 //-----------------------------------------------------------------------------
 //	Display Object - Screen Size Manipulation
 //-----------------------------------------------------------------------------
 void display::resizeWindow( int w, int h ) {
-    // Get the display size that matches an acquired display mode
-    for ( int i = 0; i < vidModes.size(); ++i ) {
-        if ( w == vidModes[i].width && h == vidModes[i].height ) {
-            glfwSetWindowSize( w, h );
-            glViewport( 0, 0, w, h );
-            break;
-        }
-    }
-    glfwGetWindowSize( &windowWidth, &windowHeight );
+    glfwGetWindowSize( mainWindow, &windowWidth, &windowHeight );
 }
 
 int display::getWindowWidth() {
-    glfwGetWindowSize( &windowWidth, &windowHeight );
+    glfwGetWindowSize( mainWindow, &windowWidth, &windowHeight );
 	return windowWidth;
 }
 
 int display::getWindowHeight() {
-    glfwGetWindowSize( &windowWidth, &windowHeight );
+    glfwGetWindowSize( mainWindow, &windowWidth, &windowHeight );
 	return windowHeight;
 }
 
@@ -192,20 +173,16 @@ int display::getDesktopHeight() {
 	return deskHeight;
 }
 
-void display::setResizeCallback( void(*callback)( int w, int h ) ) {
-    glfwSetWindowSizeCallback( callback );
-}
-
 //-----------------------------------------------------------------------------
 //	Window View Manipulation
 //-----------------------------------------------------------------------------
 void display::raiseWindow() {
-    glfwRestoreWindow();
+    glfwRestoreWindow( mainWindow );
     
 }
 
 void display::lowerWindow() {
-    glfwIconifyWindow();
+    glfwIconifyWindow( mainWindow );
     
 }
 
@@ -213,20 +190,7 @@ void display::lowerWindow() {
 //	Window View Manipulation
 //-----------------------------------------------------------------------------
 void display::setWindowTitle( const char* str ) {
-    glfwSetWindowTitle( str );
-}
-
-//-----------------------------------------------------------------------------
-//	Desktop Video Modes
-//-----------------------------------------------------------------------------
-int display::getNumVideoModes() {
-    return vidModes.size();
-}
-
-const display::videoMode* display::getVideoMode( int i ) {
-    return ( (i > 0) && (i <= vidModes.size()) )
-        ? &vidModes[i]
-        : nullptr;
+    glfwSetWindowTitle(  mainWindow , str );
 }
 
 } // end hge namespace

@@ -56,10 +56,8 @@ class HGE_API font : virtual public resource {
         ~font ()            { unload(); }
         
         font    ( const font& ) = delete;
-        font    ( font&& ) = default;
         
         font&   operator =  ( const font& ) = delete;
-        font&   operator =  ( font&& ) = default;
         bool    operator == ( const font& f ) { return textureId == f.textureId; }
         bool    operator != ( const font& f ) { return textureId != f.textureId; }
         

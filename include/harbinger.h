@@ -16,6 +16,7 @@
 #include "camera.h"
 #include "display.h"
 #include "font.h"
+#include "geometry.h"
 #include "input.h"
 #include "light.h"
 #include "mesh.h"

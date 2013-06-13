@@ -83,10 +83,11 @@ const char pointVS[] = R"***(
     void main() {
         texCoords   = texVerts;
         worldPos    = vec3(modelMatrix * vec4(posVerts, 1.0)).xyz;
-        nrmCoords   = normalize(modelMatrix * vec4(nrmVerts, 0.0)).xyz;
-        tngCoords   = normalize(modelMatrix * vec4(tngVerts, 0.0)).xyz;
         lightPos    = lightMVP * vec4( posVerts, 1.0 );
         gl_Position = mvpMatrix * vec4(posVerts, 1.0);
+
+        nrmCoords   = normalize(modelMatrix * vec4(nrmVerts, 0.0)).xyz;
+        tngCoords   = normalize(modelMatrix * vec4(tngVerts, 0.0)).xyz;
     }
 )***";
 
@@ -100,10 +101,11 @@ const char pointFS[] = R"***(
 
     struct s_pointLight {
         float   constant;
-        float   linear;
         float   exponential;
+        float   intensity;
+        float   linear;
         vec3    position;
-        s_ambientLight ambient;
+        vec4    color;
     };
 
     uniform sampler2D       texSampler;
@@ -143,24 +145,25 @@ const char pointFS[] = R"***(
             + ( p.linear * distance )
             + ( p.exponential * distance*distance );
 
-        return p.ambient.color * p.ambient.intensity * diffuse / attenuation;
+        return p.color * p.intensity * diffuse / attenuation;
     }
 
     vec3 calcBumpedNormal() {
         vec3 tangent    = normalize( tngCoords - dot(tngCoords, nrmCoords) * nrmCoords );
-        vec3 bitTangent = cross( tangent, nrmCoords );
+        vec3 bitangent = cross( tangent, nrmCoords );
         vec3 bumpNormal = 2.0 * texture( normalMap, texCoords ).rgb - 1.0;
-        mat3 tbn        = mat3( tangent, bitTangent, nrmCoords );
+        mat3 tbn        = mat3( tangent, bitangent, nrmCoords );
 
         return normalize( tbn * bumpNormal );
     }
 
     void main() {
         fragCol
-            = texture2D( texSampler, texCoords )
-            * (
-                calcAmbientLight( ambientLight )
-                + ( calcPointLight( pointLight, nrmCoords ) * calcShadowAmount( lightPos ) )
+            = texture2D( texSampler, texCoords ) * (
+                calcAmbientLight( ambientLight ) + (
+                    calcPointLight( pointLight, calcBumpedNormal() ) *
+                    calcShadowAmount( lightPos )
+                )
             );
     }
 )***";
@@ -317,7 +320,7 @@ GLint           pointPosId      = 0;
 GLint           shadowId        = 0;
 GLint           lightMatrixId   = 0;
 GLint           textureId       = 0;
-//GLint           normalId = 0;
+GLint           normalId        = 0;
 // Shadow Shader
 hge::shader     shadowShader;
 GLint           shadowMapId     = 0;
@@ -354,8 +357,8 @@ bool initPointLightShader() {
     pipeline::applyShader( pointLightShader );
     ambColorId      = pointLightShader.getVariableId( "ambientLight.color" );
     ambIntId        = pointLightShader.getVariableId( "ambientLight.intensity" );
-    pointColorId    = pointLightShader.getVariableId( "pointLight.ambient.color" );
-    pointIntId      = pointLightShader.getVariableId( "pointLight.ambient.intensity" );
+    pointColorId    = pointLightShader.getVariableId( "pointLight.color" );
+    pointIntId      = pointLightShader.getVariableId( "pointLight.intensity" );
     pointConstId    = pointLightShader.getVariableId( "pointLight.constant" );
     pointLinearId   = pointLightShader.getVariableId( "pointLight.linear" );
     pointExpId      = pointLightShader.getVariableId( "pointLight.exponential" );
@@ -363,7 +366,7 @@ bool initPointLightShader() {
     shadowId        = pointLightShader.getVariableId( "shadowMap" );
     lightMatrixId   = pointLightShader.getVariableId( "lightMVP" );
     textureId       = pointLightShader.getVariableId( "texSampler" );
-   // normalId        = pointLightShader.getVariableId( "normalMap" );
+    normalId        = pointLightShader.getVariableId( "normalMap" );
     printGlError("Point light shader setup error");
     
     if (
@@ -378,7 +381,7 @@ bool initPointLightShader() {
     ||  shadowId        == pipeline::INVALID_UNIFORM
     ||  lightMatrixId   == pipeline::INVALID_UNIFORM
     ||  textureId       == pipeline::INVALID_UNIFORM
-    //||  normalId        == pipeline::INVALID_UNIFORM
+    ||  normalId        == pipeline::INVALID_UNIFORM
     ||  camPosId        == pipeline::INVALID_UNIFORM
     ) {
         printGlError("Error accessing a point light uniform variable");
@@ -387,8 +390,8 @@ bool initPointLightShader() {
     
     glUniform1i( textureId, pipeline::HGE_SAMPLER_DIFFUSE );
     printGlError( "Texture Sampler error" );
-    //glUniform1i( normalId, pipeline::HGE_SAMPLER_NORMAL );
-    //printGlError( "Normal Sampler error" );
+    glUniform1i( normalId, pipeline::HGE_SAMPLER_NORMAL );
+    printGlError( "Normal Sampler error" );
     glUniform1i( shadowId, pipeline::HGE_SAMPLER_SHADOWMAP );
     printGlError( "Shadowmap Sampler error" );
     
@@ -566,7 +569,7 @@ void stockShaders::terminate() {
     shadowId        = 0;
     lightMatrixId   = 0;
     textureId       = 0;
-    //normalId        = 0;
+    normalId        = 0;
     
     shadowMapId     = 0;
     

@@ -6,6 +6,7 @@
  */
 
 #include <iostream>
+#include <cstring>
 #include <assimp/scene.h>
 #include <assimp/Importer.hpp>
 #include <assimp/postprocess.h>
@@ -252,9 +253,7 @@ bool mesh::loadMeshes( const aiScene* pScene, bumpVertex* vertArray, unsigned* i
             // Calculate our own tangents if Assimp was unable to
             if ( pMesh->HasTangentsAndBitangents() ) {
                 const aiVector3D* pTng      = &pMesh->mTangents[ j ];
-                const aiVector3D* pBtng     = &pMesh->mBitangents[ j ];
                 vertArray[ vertIter ].tng   = vec3( pTng->x, pTng->y, pTng->z );
-                vertArray[ vertIter ].btng  = vec3( pBtng->x, pBtng->y, pBtng->z );
             }
             else {
                 if ( vertIter && (vertIter % 3 == 0) )
@@ -357,51 +356,8 @@ void mesh::loadVao(
 	glBindBuffer( GL_ARRAY_BUFFER, buffers[ 0 ] );
 	glBufferData( GL_ARRAY_BUFFER, sizeof( bumpVertex ) * numVertices, vertices, GL_STATIC_DRAW );
 	printGlError( "Error while sending mesh data to the GPU.");
-	
-	//send the vertices to opengl
-	glEnableVertexAttribArray( pipeline::VERTEX_ATTRIB );
-	glVertexAttribPointer(
-		pipeline::VERTEX_ATTRIB,
-		ARRAY_COUNT_FROM_SIZE( bumpVertex::pos.v ),
-		GL_FLOAT,
-		GL_FALSE, 
-		sizeof( bumpVertex ),
-		(GLvoid*)offsetof( bumpVertex, pos.v )
-	);
-	
-	//send the UVs to opengl
-	glEnableVertexAttribArray( pipeline::TEXTURE_ATTRIB );
-	glVertexAttribPointer(
-		pipeline::TEXTURE_ATTRIB,
-		ARRAY_COUNT_FROM_SIZE( bumpVertex::uv.v ),
-		GL_FLOAT,
-		GL_FALSE,
-		sizeof( bumpVertex ),
-		(GLvoid*)offsetof( bumpVertex, uv.v )
-	);
-	
-	//send the normals to opengl
-	glEnableVertexAttribArray( pipeline::NORMAL_ATTRIB );
-	glVertexAttribPointer(
-		pipeline::NORMAL_ATTRIB,
-		ARRAY_COUNT_FROM_SIZE( bumpVertex::norm.v ),
-		GL_FLOAT,
-		GL_FALSE,
-		sizeof( bumpVertex ),
-		(GLvoid*)offsetof( bumpVertex, norm.v )
-	);
-	
-	//send the tangents to opengl
-	glEnableVertexAttribArray( pipeline::TANGENT_ATTRIB );
-	glVertexAttribPointer(
-		pipeline::TANGENT_ATTRIB,
-		ARRAY_COUNT_FROM_SIZE( bumpVertex::tng.v ),
-		GL_FLOAT,
-		GL_FALSE,
-		sizeof( bumpVertex ),
-		(GLvoid*)offsetof( bumpVertex, tng.v )
-	);
-	printGlError( "Error while sending mesh data to the GPU.");
+    
+    pipeline::enableBumpVertexAttribs();
 	
 	// create an index buffer to the current set of data
 	glBindBuffer( GL_ELEMENT_ARRAY_BUFFER, buffers[ 1 ] );

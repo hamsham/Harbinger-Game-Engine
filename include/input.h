@@ -28,8 +28,8 @@ namespace input {
 /*/
     
 enum action_t : int {
-    HGE_BUTTON_PRESSED      = 0,
-    HGE_BUTTON_RELEASED     = 1,
+    HGE_BUTTON_RELEASED     = 0,
+    HGE_BUTTON_PRESSED      = 1,
     HGE_BUTTON_REPEATED     = 2
 };
 
@@ -216,8 +216,8 @@ HGE_API void setMousePosCallback    ( hgeWindow*, void (*func)( hgeWindow*, doub
 HGE_API void setMouseWheelCallback  ( hgeWindow*, void (*func)( hgeWindow*, double x, double y ) );
 
 // Button Pressing
-HGE_API bool isKeyPressed           ( int keycode );
-HGE_API bool isMouseButtonPressed   ( int button );
+HGE_API action_t getKeyButtonState  ( int keycode );
+HGE_API action_t getMouseButtonState( int button );
 
 // Mouse Positioning
 HGE_API void setMousePos            ( double x, double y );

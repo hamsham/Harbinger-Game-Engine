@@ -32,12 +32,12 @@ void input::setMouseWheelCallback( hgeWindow* w, void(*func)(hgeWindow*,double, 
 ///////////////////////////////////////////////////////////////////////////////
 //      BUTTON PRESSES
 ///////////////////////////////////////////////////////////////////////////////
-bool input::isKeyPressed( int keycode ) {
-    return glfwGetKey( display::getCurrentWindow(), keycode ) == GLFW_PRESS;
+input::action_t input::getKeyButtonState( int keycode ) {
+    return (action_t)glfwGetKey( display::getCurrentWindow(), keycode );
 }
 
-bool input::isMouseButtonPressed( int button ) {
-    return glfwGetMouseButton( display::getCurrentWindow(), button ) == GLFW_PRESS;
+input::action_t input::getMouseButtonState( int button ) {
+    return (action_t)glfwGetMouseButton( display::getCurrentWindow(), button );
 }
 
 ///////////////////////////////////////////////////////////////////////////////

@@ -158,14 +158,7 @@ class HGE_API sphere {
     private:
         GLuint vao = 0;
         GLuint vbo[ 2 ] = { 0, 0 };
-        
-        bumpVertex* vertices = nullptr;
-        unsigned numVerts = 0;
-        
-        GLuint* indices = nullptr;
         unsigned numIndices = 0;
-        
-        bool sendToOpenGL();
         
     public:
         sphere      () {}

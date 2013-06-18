@@ -2,7 +2,9 @@
 <configurationDescriptor version="89">
   <logicalFolder name="root" displayName="root" projectFiles="true" kind="ROOT">
     <logicalFolder name="bin" displayName="bin" projectFiles="true">
-      <logicalFolder name="Linux" displayName="Linux" projectFiles="true">
+      <logicalFolder name="LINUX" displayName="LINUX" projectFiles="true">
+        <itemPath>../bin/LINUX/libharbinger-debug.so</itemPath>
+        <itemPath>../bin/LINUX/libharbinger.so</itemPath>
       </logicalFolder>
       <logicalFolder name="WIN32" displayName="WIN32" projectFiles="true">
         <itemPath>../bin/WIN32/harbinger-debug.dll</itemPath>
@@ -133,6 +135,10 @@
           </makeArtifact>
         </requiredProjects>
       </compileType>
+      <item path="../bin/LINUX/libharbinger-debug.so" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="../bin/LINUX/libharbinger.so" ex="false" tool="3" flavor2="0">
+      </item>
       <item path="../bin/WIN32/harbinger-debug.dll" ex="false" tool="3" flavor2="0">
       </item>
       <item path="../bin/WIN32/harbinger.dll" ex="false" tool="3" flavor2="0">
@@ -246,7 +252,7 @@
             <pElem>../../hamlibs/include</pElem>
             <pElem>../../../../../../mingw4.8.1/mingw32/i686-w64-mingw32/include/freetype2</pElem>
           </incDir>
-          <commandLine>-Wall -Werror -Wextra -pedantic -mmmx -msse -msse2 -msse3 -mfpmath=sse -O3 -s -shared</commandLine>
+          <commandLine>-Wall -Werror -Wextra -pedantic -mmmx -msse -msse2 -msse3 -mfpmath=sse -O3 -s -shared -fPIC</commandLine>
           <preprocessorList>
             <Elem>HGE_BUILD_DYNAMIC</Elem>
           </preprocessorList>
@@ -296,6 +302,10 @@
           </makeArtifact>
         </requiredProjects>
       </compileType>
+      <item path="../bin/LINUX/libharbinger-debug.so" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="../bin/LINUX/libharbinger.so" ex="false" tool="3" flavor2="0">
+      </item>
       <item path="../bin/WIN32/harbinger-debug.dll" ex="false" tool="3" flavor2="0">
       </item>
       <item path="../bin/WIN32/harbinger.dll" ex="false" tool="3" flavor2="0">
@@ -445,6 +455,10 @@
           </makeArtifact>
         </requiredProjects>
       </compileType>
+      <item path="../bin/LINUX/libharbinger-debug.so" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="../bin/LINUX/libharbinger.so" ex="false" tool="3" flavor2="0">
+      </item>
       <item path="../bin/WIN32/harbinger-debug.dll" ex="false" tool="3" flavor2="0">
       </item>
       <item path="../bin/WIN32/harbinger.dll" ex="false" tool="3" flavor2="0">
@@ -602,6 +616,10 @@
           </makeArtifact>
         </requiredProjects>
       </compileType>
+      <item path="../bin/LINUX/libharbinger-debug.so" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="../bin/LINUX/libharbinger.so" ex="false" tool="3" flavor2="0">
+      </item>
       <item path="../bin/WIN32/harbinger-debug.dll" ex="false" tool="3" flavor2="0">
       </item>
       <item path="../bin/WIN32/harbinger.dll" ex="false" tool="3" flavor2="0">

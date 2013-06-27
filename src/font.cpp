@@ -258,8 +258,8 @@ void string3d::setString( const font& f, const char* str ) {
         return;
     }
     
-    int xPos = 0;
-    int yPos = 0;
+    float xPos = 0.f;
+    float yPos = 0.f;
     plainVertex tempQuad[ 4 ];
     numChars = 0;
     

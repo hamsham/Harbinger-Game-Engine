@@ -45,8 +45,9 @@ void skybox::draw() const {
 
 void skybox::draw( const cubemap& c, const sphere& s ) {
     glCullFace( GL_FRONT );
-    glDepthRange( 1, 1 );
-    glDepthFunc( GL_LEQUAL );
+//    glDepthRange( 1, 1 );
+//    glDepthFunc( GL_LEQUAL );
+    glDepthMask( GL_FALSE );
     
     c.activate();
     
@@ -55,8 +56,9 @@ void skybox::draw( const cubemap& c, const sphere& s ) {
     c.deActivate();
     
     glCullFace( GL_BACK );
-    glDepthRange( 0, 1 );
-    glDepthFunc( GL_LESS );
+//    glDepthRange( 0, 1 );
+//    glDepthFunc( GL_LESS );
+    glDepthMask( GL_TRUE );
 }
 
 } // End hge namespace

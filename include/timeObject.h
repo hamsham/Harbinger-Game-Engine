@@ -21,7 +21,11 @@ class HGE_API clock {
 
         typedef double                                              hr_prec;
         typedef std::chrono::high_resolution_clock                  hr_clock;
-        typedef std::ratio< 1, 1000 >                               hr_ratio; // seconds
+#ifdef HL_OS_WINDOWS
+        typedef std::ratio< 1, 1 >                                  hr_ratio; // seconds
+#else
+        typedef std::ratio< 1, 1000 >                               hr_ratio; // milliseconds
+#endif
         typedef std::chrono::duration < hr_prec, hr_ratio >         hr_duration;
         typedef std::chrono::time_point < hr_clock, hr_duration >   hr_time_point;
 

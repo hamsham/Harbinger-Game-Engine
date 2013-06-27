@@ -431,27 +431,27 @@
             <linkerLibProjectItem>
               <makeArtifact PL="../../hamlibs/HamLibs_NetBeans"
                             CT="3"
-                            CN="Debug__Linux_"
+                            CN="Debug_Linux"
                             AC="true"
                             BL="false"
                             WD="../../hamlibs/HamLibs_NetBeans"
-                            BC="${MAKE}  -f Makefile CONF=Debug__Linux_"
-                            CC="${MAKE}  -f Makefile CONF=Debug__Linux_ clean"
-                            OP="../bin/Linux/libhamlibs-debug.a">
+                            BC="${MAKE}  -f Makefile CONF=Debug_Linux"
+                            CC="${MAKE}  -f Makefile CONF=Debug_Linux clean"
+                            OP="../bin/LINUX/libhamlibs-debug.a">
               </makeArtifact>
             </linkerLibProjectItem>
           </linkerLibItems>
         </linkerTool>
         <requiredProjects>
-          <makeArtifact PL="/media/hammy/BE567C99567C545D/Users/hammy/C++/projects/hamlibs/HamLibs_NetBeans"
+          <makeArtifact PL="../../hamlibs/HamLibs_NetBeans"
                         CT="3"
-                        CN="Debug__Linux_"
+                        CN="Debug_Linux"
                         AC="true"
                         BL="false"
-                        WD="/media/hammy/BE567C99567C545D/Users/hammy/C++/projects/hamlibs/HamLibs_NetBeans"
-                        BC="${MAKE}  -f Makefile CONF=Debug__Linux_"
-                        CC="${MAKE}  -f Makefile CONF=Debug__Linux_ clean"
-                        OP="../bin/Linux/libhamlibs-debug.a">
+                        WD="../../hamlibs/HamLibs_NetBeans"
+                        BC="${MAKE}  -f Makefile CONF=Debug_Linux"
+                        CC="${MAKE}  -f Makefile CONF=Debug_Linux clean"
+                        OP="../bin/LINUX/libhamlibs-debug.a">
           </makeArtifact>
         </requiredProjects>
       </compileType>
@@ -590,15 +590,15 @@
             <linkerLibLibItem>assimp</linkerLibLibItem>
             <linkerLibLibItem>freetype</linkerLibLibItem>
             <linkerLibProjectItem>
-              <makeArtifact PL="/home/hammy/C++/projects/hamlibs/HamLibs_NetBeans"
+              <makeArtifact PL="../../hamlibs/HamLibs_NetBeans"
                             CT="3"
-                            CN="Release__Linux_"
+                            CN="Release_Linux"
                             AC="false"
                             BL="false"
-                            WD="/home/hammy/C++/projects/hamlibs/HamLibs_NetBeans"
-                            BC="${MAKE}  -f Makefile CONF=Release__Linux_"
-                            CC="${MAKE}  -f Makefile CONF=Release__Linux_ clean"
-                            OP="../bin/Linux/libhamlibs.a">
+                            WD="../../hamlibs/HamLibs_NetBeans"
+                            BC="${MAKE}  -f Makefile CONF=Release_Linux"
+                            CC="${MAKE}  -f Makefile CONF=Release_Linux clean"
+                            OP="../bin/LINUX/libhamlibs.a">
               </makeArtifact>
             </linkerLibProjectItem>
           </linkerLibItems>
@@ -606,13 +606,13 @@
         <requiredProjects>
           <makeArtifact PL="../../hamlibs/HamLibs_NetBeans"
                         CT="3"
-                        CN="Release__Linux_"
+                        CN="Release_Linux"
                         AC="false"
                         BL="false"
                         WD="../../hamlibs/HamLibs_NetBeans"
-                        BC="${MAKE}  -f Makefile CONF=Release__Linux_"
-                        CC="${MAKE}  -f Makefile CONF=Release__Linux_ clean"
-                        OP="../bin/Linux/libhamlibs.a">
+                        BC="${MAKE}  -f Makefile CONF=Release_Linux"
+                        CC="${MAKE}  -f Makefile CONF=Release_Linux clean"
+                        OP="../bin/LINUX/libhamlibs.a">
           </makeArtifact>
         </requiredProjects>
       </compileType>

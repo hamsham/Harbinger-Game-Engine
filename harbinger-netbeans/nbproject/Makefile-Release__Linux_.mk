@@ -69,13 +69,13 @@ FFLAGS=
 ASFLAGS=
 
 # Link Libraries and Options
-LDLIBSOPTIONS=-lGLEW -lglfw -lGL -lfreeimage -lassimp -lfreetype /home/hammy/C++/projects/hamlibs/HamLibs_NetBeans/../bin/Linux/libhamlibs.a
+LDLIBSOPTIONS=-lGLEW -lglfw -lGL -lfreeimage -lassimp -lfreetype ../../hamlibs/HamLibs_NetBeans/../bin/LINUX/libhamlibs.a
 
 # Build Targets
 .build-conf: ${BUILD_SUBPROJECTS}
 	"${MAKE}"  -f nbproject/Makefile-${CND_CONF}.mk ../bin/LINUX/libharbinger.so
 
-../bin/LINUX/libharbinger.so: /home/hammy/C++/projects/hamlibs/HamLibs_NetBeans/../bin/Linux/libhamlibs.a
+../bin/LINUX/libharbinger.so: ../../hamlibs/HamLibs_NetBeans/../bin/LINUX/libhamlibs.a
 
 ../bin/LINUX/libharbinger.so: ${OBJECTFILES}
 	${MKDIR} -p ../bin/LINUX

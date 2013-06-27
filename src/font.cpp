@@ -292,7 +292,6 @@ void string3d::setString( const font& f, const char* str ) {
     
     // Create and send the vertices to OpenGL
     int charCount = 0;
-    int indexIter = 0;
     for ( int i = 0; str[ i ] != '\0'; ++i ) {
         const int currChar = (int)str[ i ];
         const font::metric_t& m = f.metrics[ currChar ];
@@ -313,9 +312,8 @@ void string3d::setString( const font& f, const char* str ) {
         }
         else {
             // populate the index array
-            indices[ indexIter ] = indexIter * 4;
-            indices[ indexIter + numChars ] = 4;
-            ++indexIter;
+            indices[ charCount ] = charCount * 4;
+            indices[ charCount + numChars ] = 4;
             
             /*
              * 0--------2
@@ -349,7 +347,7 @@ void string3d::setString( const font& f, const char* str ) {
 
 void string3d::draw() const {
     glEnable            ( GL_BLEND );
-    glBlendFunc         ( GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA );
+    glBlendFunc         ( GL_SRC_ALPHA, GL_ONE );
     glDepthMask         ( GL_FALSE );
     glBindVertexArray   ( vao );
 

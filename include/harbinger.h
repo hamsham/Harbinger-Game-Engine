@@ -27,7 +27,6 @@
 #include "shadowMap.h"
 #include "skybox.h"
 #include "stockShaders.h"
-#include "timeObject.h"
 #include "transformations.h"
 
 namespace hge {

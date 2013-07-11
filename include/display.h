@@ -22,12 +22,14 @@ namespace hge {
 ///////////////////////////////////////////////////////////////////////////////
 namespace display {
     
-    typedef GLFWwindow hgeWindow;
-    HGE_API hgeWindow* getCurrentWindow();
+    typedef GLFWwindow context;
+    HGE_API context* getCurrentWindow();
     
     // Variables
-    const int DEFAULT_WINDOW_WIDTH  = 640;
-    const int DEFAULT_WINDOW_HEIGHT = 480;
+    enum : int {
+        DEFAULT_WINDOW_WIDTH  = 640,
+        DEFAULT_WINDOW_HEIGHT = 480
+    };
 	
     struct videoMode {
         int width;

@@ -24,9 +24,8 @@ void calcTangents( bumpVertex& v0, bumpVertex& v1, bumpVertex& v2 ) {
     v0.tng = v1.tng = v2.tng =
         vec3( (deltaPos1 * deltaUv2[1]) - (deltaPos2 * deltaUv1[1]) ) * r;
     
-    // Use of Bitangents has been postponed
-//    v0.btng = v1.btng = v2.btng =
-//        vec3( (deltaPos2 * deltaUv1[0]) - (deltaPos1 * deltaUv2[0]) ) * r;
+    v0.btng = v1.btng = v2.btng =
+        vec3( (deltaPos2 * deltaUv1[0]) - (deltaPos1 * deltaUv2[0]) ) * r;
 }
 
 } // end hge namespace

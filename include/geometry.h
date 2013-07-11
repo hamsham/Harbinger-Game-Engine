@@ -22,7 +22,7 @@ struct plainVertex {
 // bumped vertex
 struct bumpVertex : plainVertex {
 	vec3 tng;
-    //vec3 btng;
+    vec3 btng;
 };
 
 HGE_API void calcTangents( bumpVertex& v0, bumpVertex& v1, bumpVertex& v2 );

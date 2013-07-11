@@ -6,6 +6,8 @@
  */
 
 #include <iostream>
+#include <cstddef> /* used for offsetof */
+
 #include "math/math.h"
 #include "pipeline.h"
 #include "camera.h"
@@ -27,6 +29,18 @@ namespace {
     
     // Creating an array of four 4x4 Matrices. Model, View, Projection, and MVP
     mat4 transforms[ 3 ] = { mat4( 1.f ) };
+    
+
+    inline void updateMatricesImpl() {
+        // Upload the matrix data to the current shader
+        glUniformBlockBinding( currShader, matrixIndexId, HGE_PIPELINE_MATRIX_BINDING );
+        glBindBuffer( GL_UNIFORM_BUFFER, ubo );
+        glBindBufferBase( GL_UNIFORM_BUFFER, HGE_PIPELINE_MATRIX_BINDING, ubo );
+
+        glBufferData(
+            GL_UNIFORM_BUFFER, sizeof( transforms ), transforms, GL_DYNAMIC_DRAW
+        );
+    }
 }
 
 /******************************************************************************
@@ -53,6 +67,7 @@ void pipeline::enablePlainVertexAttribs() {
 	);
     
 	glDisableVertexAttribArray( TANGENT_ATTRIB );
+	glDisableVertexAttribArray( BITANGENT_ATTRIB );
     
 	printGlError( "Error while enabling plain vertex attributes.");
 }
@@ -62,6 +77,7 @@ void pipeline::enableBumpVertexAttribs() {
 	glEnableVertexAttribArray( TEXTURE_ATTRIB );
 	glEnableVertexAttribArray( NORMAL_ATTRIB );
     glEnableVertexAttribArray( TANGENT_ATTRIB );
+    glEnableVertexAttribArray( BITANGENT_ATTRIB );
     
 	glVertexAttribPointer(
 		VERTEX_ATTRIB, ARRAY_COUNT_FROM_SIZE( bumpVertex::pos.v ), GL_FLOAT,
@@ -83,6 +99,11 @@ void pipeline::enableBumpVertexAttribs() {
         GL_FALSE, sizeof( bumpVertex ), (GLvoid*)offsetof( bumpVertex, tng.v )
 	);
     
+	glVertexAttribPointer(
+		BITANGENT_ATTRIB, ARRAY_COUNT_FROM_SIZE( bumpVertex::btng.v ), GL_FLOAT,
+        GL_FALSE, sizeof( bumpVertex ), (GLvoid*)offsetof( bumpVertex, btng.v )
+	);
+    
 	printGlError( "Error while enabling bumped vertex attributes.");
 }
 
@@ -95,14 +116,7 @@ void pipeline::applyMatrix( e_matrixState s, const mat4& m ) {
     transforms[ s ] = m;
     transforms[ 2 ] = transforms[ HGE_MODEL_MAT ] * transforms[ HGE_VP_MAT ];
     
-    // Upload the matrix data to the current shader
-    glUniformBlockBinding( currShader, matrixIndexId, HGE_PIPELINE_MATRIX_BINDING );
-    glBindBuffer( GL_UNIFORM_BUFFER, ubo );
-    glBindBufferBase( GL_UNIFORM_BUFFER, HGE_PIPELINE_MATRIX_BINDING, ubo );
-    
-    glBufferData(
-        GL_UNIFORM_BUFFER, sizeof( transforms ), transforms, GL_DYNAMIC_DRAW
-    );
+    updateMatricesImpl();
 }
 
 void pipeline::applyMatrix( const drawTransform& obj, const camera& cam ) {
@@ -112,14 +126,7 @@ void pipeline::applyMatrix( const drawTransform& obj, const camera& cam ) {
     transforms[ HGE_VP_MAT ] = cam.getVPMatrix();
     transforms[ 2 ] = transforms[ HGE_MODEL_MAT ] * transforms[ HGE_VP_MAT ];
     
-    // Upload the matrix data to the current shader
-    glUniformBlockBinding( currShader, matrixIndexId, HGE_PIPELINE_MATRIX_BINDING );
-    glBindBuffer( GL_UNIFORM_BUFFER, ubo );
-    glBindBufferBase( GL_UNIFORM_BUFFER, HGE_PIPELINE_MATRIX_BINDING, ubo );
-    
-    glBufferData(
-        GL_UNIFORM_BUFFER, sizeof( transforms ), transforms, GL_DYNAMIC_DRAW
-    );
+    updateMatricesImpl();
 }
 
 /******************************************************************************
@@ -165,10 +172,6 @@ void pipeline::applyShader( GLuint programId ) {
     glUniformBlockBinding( currShader, matrixIndexId, HGE_PIPELINE_MATRIX_BINDING );
     printGlError( "Sending Matrix Uniform Binding" );
     glBindBuffer( GL_UNIFORM_BUFFER, 0 );
-}
-
-void pipeline::applyShader( const shader& s ) {
-    applyShader( s.getProgramId() );
 }
 
 /******************************************************************************

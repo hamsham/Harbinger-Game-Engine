@@ -253,10 +253,12 @@ bool mesh::loadMeshes( const aiScene* pScene, bumpVertex* vertArray, unsigned* i
             // Calculate our own tangents if Assimp was unable to
             if ( pMesh->HasTangentsAndBitangents() ) {
                 const aiVector3D* pTng      = &pMesh->mTangents[ j ];
+                const aiVector3D* pBtng     = &pMesh->mBitangents[ j ];
                 vertArray[ vertIter ].tng   = vec3( pTng->x, pTng->y, pTng->z );
+                vertArray[ vertIter ].btng  = vec3( pBtng->x, pBtng->y, pBtng->z );
             }
             else {
-                if ( vertIter && (vertIter % 3 == 0) )
+                if ( vertIter >= 2 )
                 calcTangents(
                     vertArray[ vertIter - 2 ],
                     vertArray[ vertIter - 1 ],

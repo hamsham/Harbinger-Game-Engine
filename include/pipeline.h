@@ -11,6 +11,7 @@
 #include <GL/glew.h>
 #include "types.h"
 #include "geometry.h"
+#include "shader.h"
 
 #ifndef HGE_PIPELINE_MATRIX_BINDING
     #define HGE_PIPELINE_MATRIX_BINDING 1
@@ -23,11 +24,12 @@ namespace hge {
 namespace pipeline {
 
 enum e_attributes : GLint {
-    INVALID_UNIFORM = -1,
-    VERTEX_ATTRIB   = 0,
-    TEXTURE_ATTRIB  = 1,
-    NORMAL_ATTRIB   = 2,
-    TANGENT_ATTRIB  = 3
+    INVALID_UNIFORM     = -1,
+    VERTEX_ATTRIB       = 0,
+    TEXTURE_ATTRIB      = 1,
+    NORMAL_ATTRIB       = 2,
+    TANGENT_ATTRIB      = 3,
+    BITANGENT_ATTRIB    = 4
 };
 
 enum e_matrixState : int {
@@ -90,7 +92,7 @@ HGE_API     void applyMatrix( const drawTransform&, const camera& );
 HGE_API     void removeMatrix( e_matrixState s );
 
 HGE_API     void applyShader( GLuint programId );
-HGE_API     void applyShader( const shader& );
+inline      void applyShader( const shader& s ) { applyShader( s.getProgramId() ); }
 
 HGE_API     void printErrorMsg( const char* msg, unsigned lineNum, const char* sourceFile );
 

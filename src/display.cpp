@@ -30,7 +30,7 @@ GLFWwindow* mainWindow          = nullptr; // needed by the input system
 
 namespace hge {
 
-display::hgeWindow* display::getCurrentWindow() {
+display::context* display::getCurrentWindow() {
     return mainWindow;
 }
 

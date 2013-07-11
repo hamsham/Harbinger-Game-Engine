@@ -51,7 +51,6 @@ OBJECTFILES= \
 	${OBJECTDIR}/_ext/1360937237/shadowMap.o \
 	${OBJECTDIR}/_ext/1360937237/skybox.o \
 	${OBJECTDIR}/_ext/1360937237/stockShaders.o \
-	${OBJECTDIR}/_ext/1360937237/timeObject.o \
 	${OBJECTDIR}/_ext/1360937237/transformations.o
 
 
@@ -160,11 +159,6 @@ ${OBJECTDIR}/_ext/1360937237/stockShaders.o: nbproject/Makefile-${CND_CONF}.mk .
 	${MKDIR} -p ${OBJECTDIR}/_ext/1360937237
 	${RM} $@.d
 	$(COMPILE.cc) -w -DDEBUG -I../include -I../../hamlibs/include -I/usr/include/freetype2 -std=c++11 -Wall -Werror -Wextra -pedantic -mmmx -msse -msse2 -msse3 -mfpmath=sse -O2 -g -fPIC  -MMD -MP -MF $@.d -o ${OBJECTDIR}/_ext/1360937237/stockShaders.o ../src/stockShaders.cpp
-
-${OBJECTDIR}/_ext/1360937237/timeObject.o: nbproject/Makefile-${CND_CONF}.mk ../src/timeObject.cpp 
-	${MKDIR} -p ${OBJECTDIR}/_ext/1360937237
-	${RM} $@.d
-	$(COMPILE.cc) -w -DDEBUG -I../include -I../../hamlibs/include -I/usr/include/freetype2 -std=c++11 -Wall -Werror -Wextra -pedantic -mmmx -msse -msse2 -msse3 -mfpmath=sse -O2 -g -fPIC  -MMD -MP -MF $@.d -o ${OBJECTDIR}/_ext/1360937237/timeObject.o ../src/timeObject.cpp
 
 ${OBJECTDIR}/_ext/1360937237/transformations.o: nbproject/Makefile-${CND_CONF}.mk ../src/transformations.cpp 
 	${MKDIR} -p ${OBJECTDIR}/_ext/1360937237

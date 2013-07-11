@@ -71,12 +71,14 @@ const char pointVS[] = R"***(
     layout ( location = 1 ) in vec2 texVerts;
     layout ( location = 2 ) in vec3 nrmVerts;
     layout ( location = 3 ) in vec3 tngVerts;
+    layout ( location = 4 ) in vec3 btngVerts;
 
     uniform mat4 lightMVP;
 
     out vec2 texCoords;
     out vec3 nrmCoords;
     out vec3 tngCoords;
+    out vec3 btngCoords;
     out vec3 worldPos;
     out vec4 lightPos;
 
@@ -88,6 +90,7 @@ const char pointVS[] = R"***(
 
         nrmCoords   = normalize(modelMatrix * vec4(nrmVerts, 0.0)).xyz;
         tngCoords   = normalize(modelMatrix * vec4(tngVerts, 0.0)).xyz;
+        btngCoords  = normalize(modelMatrix * vec4(btngVerts, 0.0)).xyz;
     }
 )***";
 
@@ -117,6 +120,7 @@ const char pointFS[] = R"***(
     in vec2 texCoords;
     in vec3 nrmCoords;
     in vec3 tngCoords;
+    in vec3 btngCoords;
     in vec3 worldPos;
     in vec4 lightPos;
 
@@ -130,8 +134,8 @@ const char pointFS[] = R"***(
         vec3 projectionCoords   = (lightPosition.xyz / lightPosition.w) * 0.5;
         vec3 uvCoords           = projectionCoords + 0.5;
 
-        return texture( shadowMap, uvCoords.xy ).z > uvCoords.z
-            ? 1.0 : 0.0;
+        return texture( shadowMap, uvCoords.xy ).x < uvCoords.z+0.00001
+            ? 0.0 : 1.0;
     }
 
     vec4 calcPointLight( in s_pointLight p, in vec3 normals ) {
@@ -149,10 +153,13 @@ const char pointFS[] = R"***(
     }
 
     vec3 calcBumpedNormal() {
-        vec3 tangent    = normalize( tngCoords - dot(tngCoords, nrmCoords) * nrmCoords );
-        vec3 bitangent = cross( tangent, nrmCoords );
+//        vec3 tangent    = normalize( tngCoords - dot(tngCoords, nrmCoords) * nrmCoords );
+//        vec3 bitangent = cross( tangent, nrmCoords );
+//        vec3 bumpNormal = 2.0 * texture( normalMap, texCoords ).rgb - 1.0;
+//        mat3 tbn        = mat3( tangent, bitangent, nrmCoords );
+        
         vec3 bumpNormal = 2.0 * texture( normalMap, texCoords ).rgb - 1.0;
-        mat3 tbn        = mat3( tangent, bitangent, nrmCoords );
+        mat3 tbn        = mat3( tngCoords, btngCoords, nrmCoords );
 
         return normalize( tbn * bumpNormal );
     }
@@ -186,7 +193,7 @@ const char skyVS[] = R"***(
 
     void main() {
         texCoords = posVerts;
-        gl_Position = mvpMatrix * vec4(posVerts, 1.0);
+        gl_Position = mvpMatrix * vec4(-posVerts, 1.0);
     }
 )***";
 

@@ -30,35 +30,29 @@ void skybox::unload() {
 }
 
 void skybox::draw() const {
-    glCullFace( GL_FRONT );
-    glDepthFunc( GL_LEQUAL );
+//    glCullFace( GL_FRONT );
+//    glDepthFunc( GL_LEQUAL );
     
     skyTex.activate();
-    
     spherePrim.draw();
-    
     skyTex.deActivate();
     
-    glCullFace( GL_BACK );
-    glDepthFunc( GL_LESS );
+//    glCullFace( GL_BACK );
+//    glDepthFunc( GL_LESS );
 }
 
 void skybox::draw( const cubemap& c, const sphere& s ) {
-    glCullFace( GL_FRONT );
 //    glDepthRange( 1, 1 );
 //    glDepthFunc( GL_LEQUAL );
-    glDepthMask( GL_FALSE );
+//    glDepthMask( GL_FALSE );
     
     c.activate();
-    
     s.draw();
-    
     c.deActivate();
     
-    glCullFace( GL_BACK );
 //    glDepthRange( 0, 1 );
 //    glDepthFunc( GL_LESS );
-    glDepthMask( GL_TRUE );
+//    glDepthMask( GL_TRUE );
 }
 
 } // End hge namespace

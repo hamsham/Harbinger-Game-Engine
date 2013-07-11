@@ -11,40 +11,55 @@
 #include <GLFW/glfw3.h>
 #include "display.h"
 
-//-----------------------------------------------------------------------------
-//	Display Object - Private Variables & functions
-//-----------------------------------------------------------------------------
-namespace {
-    
-    bool    displayInitialized  = false;
-    bool    displayFullscreen   = false;
-    int     windowWidth         = hge::display::DEFAULT_WINDOW_WIDTH;
-    int     windowHeight        = hge::display::DEFAULT_WINDOW_HEIGHT;
-    int     deskWidth           = 0;
-    int     deskHeight          = 0;
-    
-    const int MAX_VIDEO_MODES   = 100;
-    
-}// end anonymous namespace
-GLFWwindow* mainWindow          = nullptr; // needed by the input system
-
 namespace hge {
 
-display::context* display::getCurrentWindow() {
-    return mainWindow;
+//-----------------------------------------------------------------------------
+//	Display Object - Static Methods and Members
+//-----------------------------------------------------------------------------
+bool window::displayInitialized = false;
+vec2i window::deskResolution = vec2i( 0, 0 );
+
+const vec2i& window::getDesktopSize() {
+    const GLFWvidmode* pVidMode = glfwGetVideoMode( glfwGetPrimaryMonitor() );
+    deskResolution[0] = pVidMode->width;
+    deskResolution[1] = pVidMode->height;
+	return deskResolution;
+}
+
+//-----------------------------------------------------------------------------
+//	Move Operators
+//-----------------------------------------------------------------------------
+window::window( window&& w ) :
+    displayFullscreen( w.displayFullscreen ),
+    pContext( w.pContext ),
+    resolution( w.resolution )
+{
+    w.displayFullscreen = false;
+    w.pContext = nullptr;
+    w.resolution = vec2i( DEFAULT_WINDOW_WIDTH, DEFAULT_WINDOW_HEIGHT );
+}
+
+window& window::operator = ( window&& w ) {
+    displayFullscreen   = w.displayFullscreen;
+    w.displayFullscreen = false;
+    
+    pContext            = w.pContext;
+    w.pContext          = nullptr;
+    
+    resolution          = w.resolution;
+    w.resolution        = vec2i( DEFAULT_WINDOW_WIDTH, DEFAULT_WINDOW_HEIGHT );
 }
 
 //-----------------------------------------------------------------------------
 //	Window Creation
 //-----------------------------------------------------------------------------
-bool display::createWindow(
+window::window(
     int w, int h,
     bool resizeable,
     bool fullscreen,
     bool useVsync
 ) {
-    if ( isWindowOpen() == true )
-        return true;
+    GLFWmonitor* fsMonitor = fullscreen ? glfwGetPrimaryMonitor() : nullptr;
     
     /*
      * Create a new window using GLFW
@@ -58,62 +73,41 @@ bool display::createWindow(
     glfwWindowHint( GLFW_OPENGL_DEBUG_CONTEXT, GL_TRUE );
 #endif
     
-    mainWindow = glfwCreateWindow( w, h, "Harbinger Game Engine", nullptr, nullptr );
-	if ( !mainWindow ) {
-		std::cerr << "Failed to create an OpenGL context." << std::endl;
-        return false;
-	}
-    glfwMakeContextCurrent( mainWindow );
+    pContext = glfwCreateWindow( w, h, "Harbinger Game Engine", fsMonitor, nullptr );
+    HGE_ASSERT( pContext != nullptr );
     
-    glfwGetWindowSize( mainWindow, &windowWidth, &windowHeight );
-    glfwSetInputMode( mainWindow, GLFW_STICKY_KEYS, GL_TRUE );
+    glfwMakeContextCurrent( pContext );
+    
+    glfwGetWindowSize( pContext, &resolution[0], &resolution[1] );
+    glfwSetInputMode( pContext, GLFW_STICKY_KEYS, GL_TRUE );
     
     glfwSwapInterval( useVsync );
     
-	/*
-	 * Initialize GLEW
-	 */
-	glewExperimental = GL_TRUE;
-	if ( glewInit() != GLEW_OK ) {
-		std::cerr << "Post-window creation error" << std::endl;
-        closeWindow();
-		return false;
-	}
-	std::cout
-        << "Created a window. OpenGL 3.3 initialized.\n\t0x"
-        << std::hex << glGetError()
-        << std::dec << std::endl;
-    
     displayFullscreen = fullscreen;
     
-    // Initialize all successive operations which required the window to be open
-    return pipeline::init();
+    HGE_ASSERT( pipeline::init( resolution ) );
 }
 
 //-----------------------------------------------------------------------------
 //	Window Termination
 //-----------------------------------------------------------------------------
-void display::closeWindow() {
-    // Close all OpenGL-dependant functions
+window::~window() {
     pipeline::terminate();
-    
-    glfwDestroyWindow( mainWindow );
-    
-    mainWindow = false;
-    displayFullscreen = false;
+    glfwDestroyWindow( pContext );
+    pContext = nullptr;
 }
 
 //-----------------------------------------------------------------------------
 //	Window Open-ness check
 //-----------------------------------------------------------------------------
-bool display::isWindowOpen() {
-    return mainWindow != nullptr;
+bool window::isOpen() {
+    return pContext != nullptr;
 }
 
 //-----------------------------------------------------------------------------
 //	Display Initialization & Termination
 //-----------------------------------------------------------------------------
-bool display::init() {
+bool window::init() {
     if ( displayInitialized )
         return true;
     
@@ -125,72 +119,58 @@ bool display::init() {
     }
     
     const GLFWvidmode* deskMode = glfwGetVideoMode( glfwGetPrimaryMonitor() );
-    deskWidth = deskMode->width;
-    deskHeight = deskMode->height;
+    deskResolution[0] = deskMode->width;
+    deskResolution[1] = deskMode->height;
     
     std::cout << "Done." << std::endl;
     
     return displayInitialized;
 }
 
-void display::terminate() {
-    if ( isWindowOpen() ) {
-        pipeline::terminate();
-        display::closeWindow();
-    }
+void window::terminate() {
+    pipeline::terminate();
     glfwTerminate();
     displayInitialized = false;
-    deskWidth = deskHeight = 0;
+    deskResolution = vec2i( 0 );
 }
 
-void display::flip() {
-    glfwSwapBuffers( mainWindow );
+void window::flip() {
+    glfwSwapBuffers( pContext );
     glfwPollEvents();
 }
 
 //-----------------------------------------------------------------------------
 //	Display Object - Screen Size Manipulation
 //-----------------------------------------------------------------------------
-void display::resizeWindow( int w, int h ) {
-    glfwGetWindowSize( mainWindow, &windowWidth, &windowHeight );
+void window::resize( const vec2i& newSize ) {
+    // Let GLFW handle resolutions. Acquire the new size when it's finished.
+    glfwSetWindowSize( pContext, newSize[0], newSize[1] );
+    glfwGetWindowSize( pContext, &resolution[0], &resolution[1] );
 }
 
-int display::getWindowWidth() {
-    glfwGetWindowSize( mainWindow, &windowWidth, &windowHeight );
-	return windowWidth;
-}
-
-int display::getWindowHeight() {
-    glfwGetWindowSize( mainWindow, &windowWidth, &windowHeight );
-	return windowHeight;
-}
-
-int display::getDesktopWidth() {
-	return deskWidth;
-}
-
-int display::getDesktopHeight() {
-	return deskHeight;
+const vec2i& window::getResolution() {
+    glfwGetWindowSize( pContext, &resolution[0], &resolution[1] );
+	return resolution;
 }
 
 //-----------------------------------------------------------------------------
 //	Window View Manipulation
 //-----------------------------------------------------------------------------
-void display::raiseWindow() {
-    glfwRestoreWindow( mainWindow );
+void window::raise() {
+    glfwRestoreWindow( pContext );
     
 }
 
-void display::lowerWindow() {
-    glfwIconifyWindow( mainWindow );
+void window::minimize() {
+    glfwIconifyWindow( pContext );
     
 }
 
 //-----------------------------------------------------------------------------
 //	Window View Manipulation
 //-----------------------------------------------------------------------------
-void display::setWindowTitle( const char* str ) {
-    glfwSetWindowTitle(  mainWindow , str );
+void window::setTitle( const char* str ) {
+    glfwSetWindowTitle(  pContext , str );
 }
 
 } // end hge namespace

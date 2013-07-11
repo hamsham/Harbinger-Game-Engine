@@ -4,10 +4,10 @@
 
 bool hge::init() {
     FreeImage_Initialise(true);
-    return display::init();
+    return window::init();
 }
 
 void hge::terminate() {
     FreeImage_DeInitialise();
-    display::terminate();
+    window::terminate();
 }

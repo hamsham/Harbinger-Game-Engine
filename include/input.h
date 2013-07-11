@@ -26,19 +26,19 @@ enum mouse_t    : int;
 enum joy_t      : int;
 
 // Button Callbacks
-HGE_API void setKeyCallback         ( display::context*, void (*func)( display::context*, key_t, int, action_t,mod_t ) );
-HGE_API void setTextCallback        ( display::context*, void (*func)( display::context*, int utf8_char ) );
-HGE_API void setMouseCallback       ( display::context*, void (*func)( display::context*, mouse_t, action_t, mod_t ) );
-HGE_API void setMousePosCallback    ( display::context*, void (*func)( display::context*, double x, double y ) );
-HGE_API void setMouseWheelCallback  ( display::context*, void (*func)( display::context*, double x, double y ) );
+HGE_API void setKeyCallback         ( window::context*, void (*func)( window::context*, key_t, int, action_t,mod_t ) );
+HGE_API void setTextCallback        ( window::context*, void (*func)( window::context*, int utf8_char ) );
+HGE_API void setMouseCallback       ( window::context*, void (*func)( window::context*, mouse_t, action_t, mod_t ) );
+HGE_API void setMousePosCallback    ( window::context*, void (*func)( window::context*, double x, double y ) );
+HGE_API void setMouseWheelCallback  ( window::context*, void (*func)( window::context*, double x, double y ) );
 
 // Button Pressing
-HGE_API action_t getKeyButtonState  ( display::context*, key_t );
-HGE_API action_t getMouseButtonState( display::context*, mouse_t );
+HGE_API action_t getKeyButtonState  ( window::context*, key_t );
+HGE_API action_t getMouseButtonState( window::context*, mouse_t );
 
 // Mouse Positioning
-HGE_API void setMousePos            ( display::context*, const vec2d& );
-HGE_API vec2d getMousePos           ( display::context* );
+HGE_API void setMousePos            ( window::context*, const vec2d& );
+HGE_API vec2d getMousePos           ( window::context* );
 
 /*/
  * These key codes have been copied and pasted directly from the GLFW Header.

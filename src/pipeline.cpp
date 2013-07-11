@@ -216,14 +216,22 @@ void pipeline::printErrorMsg( const char* msg, unsigned lineNum, const char* sou
 /******************************************************************************
  * Pipeline Initialization
 ******************************************************************************/
-bool pipeline::init() {
+bool pipeline::init( const vec2i& res ) {
+	/*
+	 * Initialize GLEW
+	 */
+	glewExperimental = GL_TRUE; // Ensure core extensions are loaded
+    HGE_ASSERT( glewInit() == GLEW_OK );
     
-    HL_ASSERT( display::isWindowOpen() );
+	std::cout
+        << "Created a window. OpenGL 3.3 initialized.\n\t0x"
+        << std::hex << glGetError()
+        << std::dec << std::endl;
 	
 	/*
 	 * Default OpenGL parameters
 	 */
-    glViewport( 0, 0, display::getWindowWidth(), display::getWindowHeight() );
+    glViewport( 0, 0, res[0], res[1] );
 	glClearColor( 0.5f, 0.5f, 0.5f, 1.0f );
 	glEnable    ( GL_CULL_FACE );		// Occlusion Culling
 	glCullFace  ( GL_BACK );

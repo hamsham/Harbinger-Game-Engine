@@ -18,14 +18,12 @@ using namespace hamLibs::math;
 /*
  * Forward Declarations
  */
-// Namespaced structures
-namespace display {
-    struct  videoMode;
-}
+// Display Objects/Contexts
+class   window;
 
 //vertex structures
-struct plainVertex; // position, uv, normal
-struct bumpVertex; // plainVertex + tangent & bitangent
+struct  plainVertex; // position, uv, normal
+struct  bumpVertex; // plainVertex + tangent & bitangent
 
 // File-based resources
 class   resource;

@@ -8,6 +8,7 @@
 #ifndef __HGE_DISPLAY_H__
 #define	__HGE_DISPLAY_H__
 
+#include <vector>
 #include "types.h"
 
 struct GLFWwindow;
@@ -20,49 +21,69 @@ namespace hge {
 ///////////////////////////////////////////////////////////////////////////////
 //		Window/Display Object
 ///////////////////////////////////////////////////////////////////////////////
-namespace display {
-    
-    typedef GLFWwindow context;
-    HGE_API context* getCurrentWindow();
-    
-    // Variables
-    enum : int {
-        DEFAULT_WINDOW_WIDTH  = 640,
-        DEFAULT_WINDOW_HEIGHT = 480
-    };
-	
-    struct videoMode {
-        int width;
-        int height;
-        int bpp;
-    };
+class HGE_API window {
+    public:
+        typedef GLFWwindow context;
 
-    //Functions
-	HGE_API bool	init            ();
-    HGE_API void    terminate       ();
-    HGE_API void    flip            ();
-    
-    HGE_API bool    createWindow    (   
-                                        int width       = DEFAULT_WINDOW_WIDTH,
-                                        int height      = DEFAULT_WINDOW_HEIGHT,
-                                        bool resizeable = true,
-                                        bool fullscreen = false,
-                                        bool useVsync   = false
-                                    );
-    HGE_API void    closeWindow     ();
-    HGE_API bool    isWindowOpen    ();
-    
-    HGE_API void    resizeWindow    ( int w, int h );
-	HGE_API int		getWindowWidth	();
-	HGE_API int		getWindowHeight ();
-    HGE_API int     getDesktopWidth ();
-    HGE_API int     getDesktopHeight();
-    
-    HGE_API void    raiseWindow     ();
-    HGE_API void    lowerWindow     ();
-    
-    HGE_API void    setWindowTitle  ( const char* );
-}
+        // Variables
+        enum : int {
+            DEFAULT_WINDOW_WIDTH  = 640,
+            DEFAULT_WINDOW_HEIGHT = 480
+        };
+        
+        // Another GLFW structure
+        struct videoMode {
+            int width       = 0;
+            int height      = 0;
+            int redBits     = 0;
+            int blueBits    = 0;
+            int greenBits   = 0;
+        };
+        
+    private:
+        bool    displayFullscreen   = false;
+        context* pContext           = nullptr; // needed by input systems
+        vec2i   resolution          = vec2i( DEFAULT_WINDOW_WIDTH, DEFAULT_WINDOW_HEIGHT );
+        
+        static bool  displayInitialized;
+        static vec2i deskResolution;
+        
+    public:
+        // RAII
+        window(                     int width       = DEFAULT_WINDOW_WIDTH,
+                                    int height      = DEFAULT_WINDOW_HEIGHT,
+                                    bool resizeable = true,
+                                    bool fullscreen = false,
+                                    bool useVsync   = false
+                                );
+        ~window                 ();
+        
+        window  () = delete;
+        window  ( const window& ) = delete;
+        window  ( window&& );
+        
+        window& operator =      ( const window& ) = delete;
+        window& operator =      ( window&& );
+        
+        context* getContext     () { return pContext; }
+        
+        //Functions
+        static  bool            init();
+        static  void            terminate();
+        static  const vec2i&    getDesktopSize();
+        
+        void    flip            ();
+        bool    isOpen          ();
+
+        void    resize          ( const vec2i& );
+        
+        const vec2i& getResolution();
+
+        void    raise           ();
+        void    minimize        ();
+
+        void    setTitle        ( const char* );
+};
 
 } // end hge namespace
 

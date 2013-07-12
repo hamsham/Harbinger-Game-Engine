@@ -18,8 +18,10 @@ using namespace hamLibs::math;
 /*
  * Forward Declarations
  */
-// Display Objects/Contexts
+// RAII Resources
 class   window;
+class   inputHandler;
+class   stockShaders;
 
 //vertex structures
 struct  plainVertex; // position, uv, normal

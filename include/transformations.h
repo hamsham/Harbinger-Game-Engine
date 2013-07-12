@@ -24,26 +24,26 @@ class HGE_API drawTransform {
 		mat4    modelMat;
 		
 	public:
-		drawTransform     ();
-		drawTransform     ( const drawTransform& obj );
-		~drawTransform    () {}
+		drawTransform   ();
+		drawTransform   ( const drawTransform& obj );
+		~drawTransform  () {}
         
-        drawTransform&    operator =      ( const drawTransform& );
+        drawTransform&  operator =      ( const drawTransform& );
 		
-		const vec3&         getPos          () const				{ return pos; }
-		const vec3&         getScale        () const				{ return scaling; }
-		const quat&         getRotation     () const				{ return rot; }
-		const mat4&         getModelMatrix	() const                { return modelMat; }
+		const vec3&     getPos          () const				{ return pos; }
+		const vec3&     getScale        () const				{ return scaling; }
+		const quat&     getOrientation  () const				{ return rot; }
+		const mat4&     getModelMatrix	() const                { return modelMat; }
 		
-		void                setPos          ( const vec3& p );
-		void                setScale        ( const vec3& s );
-		void                setRotation     ( const vec3& angles );
+		void            setPos          ( const vec3& p );
+		void            setScale        ( const vec3& s );
+		void            setOrientation  ( const quat& o );
         
-        void                move            ( const vec3& p );
-        void                scale           ( const vec3& s );
-		void                rotate          ( const vec3& angles );
+        void            move            ( const vec3& p );
+        void            scale           ( const vec3& s );
+		void            rotate          ( const vec3& angles );
 		
-		void                update          ();
+		void            update          ();
 };
 
 } // hge namespace

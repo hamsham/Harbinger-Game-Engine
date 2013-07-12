@@ -41,8 +41,8 @@ void drawTransform::setScale( const vec3& s ) {
     scaling = s;
 }
 
-void drawTransform::setRotation( const vec3& angles ) {
-    rot = fromEuler( angles );
+void drawTransform::setOrientation( const quat& o ) {
+    rot = o;
 }
 
 void drawTransform::move( const vec3& p ) {

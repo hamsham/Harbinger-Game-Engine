@@ -10,20 +10,89 @@
 #include "pipeline.h"
 #include <GLFW/glfw3.h>
 #include "display.h"
+#include "primitives.h"
 
 namespace hge {
 
 //-----------------------------------------------------------------------------
 //	Display Object - Static Methods and Members
 //-----------------------------------------------------------------------------
-bool window::displayInitialized = false;
-vec2i window::deskResolution = vec2i( 0, 0 );
+window::displayList_t window::displayList;
+std::vector< window::modeList_t > window::modeList;
 
-const vec2i& window::getDesktopSize() {
+window::display* window::getMainMonitor() {
+    return glfwGetPrimaryMonitor();
+}
+
+void window::setActiveContext( context* c ) {
+    glfwMakeContextCurrent( c );
+}
+
+vec2i window::getDesktopSize() {
     const GLFWvidmode* pVidMode = glfwGetVideoMode( glfwGetPrimaryMonitor() );
-    deskResolution[0] = pVidMode->width;
-    deskResolution[1] = pVidMode->height;
-	return deskResolution;
+    return vec2i( pVidMode->width, pVidMode->height );
+}
+
+void window::monitorCallback( hge::window::display* d, int action ) {
+    if ( action == GLFW_CONNECTED ) {
+        displayList.push_back( d );
+        return;
+    }
+    
+    for ( unsigned i = 0; i < displayList.size(); ++i ) {
+        if ( displayList[ i ] == d && action == GLFW_DISCONNECTED ) {
+            displayList.erase( displayList.begin() + i );
+            break;
+        }
+    }
+}
+
+//-----------------------------------------------------------------------------
+//	Display Initialization & Termination
+//-----------------------------------------------------------------------------
+bool window::init() {
+    // initialize GLFW
+    std::cout << "Initializing display subsystems...";
+	if ( !glfwInit() ) {
+		std::cerr << "Display failed to initialize." << std::endl;
+		return false;
+    }
+    
+    // populate the list of monitors
+    int numDisplays = 0;
+    GLFWmonitor** displays = glfwGetMonitors( &numDisplays );
+    displayList.resize( numDisplays, nullptr );
+    modeList.resize( numDisplays );
+    
+    for ( int i = 0; i < numDisplays; ++i )
+        displayList[ i ] = displays[ i ];
+    
+    // populate the list of display modes
+    for ( int i = 0; i < displayList.size(); ++i ) {
+        int numDisplayModes = 0;
+        const GLFWvidmode* modeArray = glfwGetVideoModes( displayList[ i ], &numDisplayModes );
+        
+        modeList[ i ].resize( numDisplayModes );
+        
+        // Copy GLFW's video mode array into harbinger
+        for ( int j = 0; j < numDisplayModes; ++j ) {
+            modeList[ i ][ j ].width        = modeArray[ j ].width;
+            modeList[ i ][ j ].height       = modeArray[ j ].height;
+            modeList[ i ][ j ].redBits      = modeArray[ j ].redBits;
+            modeList[ i ][ j ].blueBits     = modeArray[ j ].blueBits;
+            modeList[ i ][ j ].greenBits    = modeArray[ j ].greenBits;
+        }
+    }
+    
+    std::cout << "Done." << std::endl;
+    return displayList.size() > 0;
+}
+
+void window::terminate() {
+    glfwTerminate();
+    
+    displayList.clear();
+    modeList.clear();
 }
 
 //-----------------------------------------------------------------------------
@@ -56,11 +125,9 @@ window& window::operator = ( window&& w ) {
 window::window(
     int w, int h,
     bool resizeable,
-    bool fullscreen,
+    display* fullscreen,
     bool useVsync
 ) {
-    GLFWmonitor* fsMonitor = fullscreen ? glfwGetPrimaryMonitor() : nullptr;
-    
     /*
      * Create a new window using GLFW
      */
@@ -73,26 +140,47 @@ window::window(
     glfwWindowHint( GLFW_OPENGL_DEBUG_CONTEXT, GL_TRUE );
 #endif
     
-    pContext = glfwCreateWindow( w, h, "Harbinger Game Engine", fsMonitor, nullptr );
+    pContext = glfwCreateWindow( w, h, "Harbinger Game Engine", fullscreen, nullptr );
     HGE_ASSERT( pContext != nullptr );
     
-    glfwMakeContextCurrent( pContext );
+    glfwMakeContextCurrent  ( pContext );
+    glfwGetWindowSize       ( pContext, &resolution[0], &resolution[1] );
+    glfwSetInputMode        ( pContext, GLFW_STICKY_KEYS, GL_TRUE );
+    glfwSwapInterval        ( useVsync );
     
-    glfwGetWindowSize( pContext, &resolution[0], &resolution[1] );
-    glfwSetInputMode( pContext, GLFW_STICKY_KEYS, GL_TRUE );
+    displayFullscreen = fullscreen != nullptr;
     
-    glfwSwapInterval( useVsync );
+	/*
+	 * Initialize GLEW
+	 */
+	glewExperimental = GL_TRUE; // Ensure core extensions are loaded
+    HGE_ASSERT( glewInit() == GLEW_OK );
     
-    displayFullscreen = fullscreen;
+	std::cout
+        << "Created a window. OpenGL 3.3 initialized.\n\t0x"
+        << std::hex << glGetError()
+        << std::dec << std::endl;
+	
+	/*
+	 * Default OpenGL parameters
+	 */
+    glViewport  ( 0, 0, resolution[0], resolution[1] );
+	glClearColor( 0.5f, 0.5f, 0.5f, 1.0f );
+	glEnable    ( GL_CULL_FACE );		// Occlusion Culling
+	glCullFace  ( GL_BACK );
+	glFrontFace ( GL_CCW );
+	glEnable    ( GL_DEPTH_TEST );		// Depth/Z-Buffer
+	glDepthFunc ( GL_LESS );
     
-    HGE_ASSERT( pipeline::init( resolution ) );
+    // PRIMITIVE INITIALIZATION
+    HGE_ASSERT( initPrimitives() );
 }
 
 //-----------------------------------------------------------------------------
 //	Window Termination
 //-----------------------------------------------------------------------------
 window::~window() {
-    pipeline::terminate();
+    terminatePrimitives();
     glfwDestroyWindow( pContext );
     pContext = nullptr;
 }
@@ -105,52 +193,35 @@ bool window::isOpen() {
 }
 
 //-----------------------------------------------------------------------------
-//	Display Initialization & Termination
+//	Display Object - Flip the window's backbuffer
 //-----------------------------------------------------------------------------
-bool window::init() {
-    if ( displayInitialized )
-        return true;
-    
-    std::cout << "Initializing display subsystems...";
-    displayInitialized = glfwInit();
-	if ( displayInitialized == false ) {
-		std::cerr << "Display failed to initialize." << std::endl;
-		return false;
-    }
-    
-    const GLFWvidmode* deskMode = glfwGetVideoMode( glfwGetPrimaryMonitor() );
-    deskResolution[0] = deskMode->width;
-    deskResolution[1] = deskMode->height;
-    
-    std::cout << "Done." << std::endl;
-    
-    return displayInitialized;
-}
-
-void window::terminate() {
-    pipeline::terminate();
-    glfwTerminate();
-    displayInitialized = false;
-    deskResolution = vec2i( 0 );
-}
-
 void window::flip() {
-    glfwSwapBuffers( pContext );
-    glfwPollEvents();
+    glfwSwapBuffers         ( pContext );
+    glfwPollEvents          ();
 }
 
 //-----------------------------------------------------------------------------
 //	Display Object - Screen Size Manipulation
 //-----------------------------------------------------------------------------
-void window::resize( const vec2i& newSize ) {
+const vec2i& window::getResolution() {
+    glfwGetWindowSize( pContext, &resolution[0], &resolution[1] );
+	return resolution;
+}
+
+void window::setResolution( const vec2i& newSize ) {
     // Let GLFW handle resolutions. Acquire the new size when it's finished.
     glfwSetWindowSize( pContext, newSize[0], newSize[1] );
     glfwGetWindowSize( pContext, &resolution[0], &resolution[1] );
 }
 
-const vec2i& window::getResolution() {
-    glfwGetWindowSize( pContext, &resolution[0], &resolution[1] );
-	return resolution;
+vec2i window::getPosition() {
+    vec2i pos;
+    glfwGetWindowPos( pContext, &pos[0], &pos[1] );
+    return pos;
+}
+
+void window::setPosition( const vec2i& p ) {
+    glfwSetWindowPos( pContext, p[0], p[1] );
 }
 
 //-----------------------------------------------------------------------------
@@ -163,7 +234,10 @@ void window::raise() {
 
 void window::minimize() {
     glfwIconifyWindow( pContext );
-    
+}
+
+void window::showForeground() {
+    glfwShowWindow( pContext );
 }
 
 //-----------------------------------------------------------------------------
@@ -171,6 +245,44 @@ void window::minimize() {
 //-----------------------------------------------------------------------------
 void window::setTitle( const char* str ) {
     glfwSetWindowTitle(  pContext , str );
+}
+
+//-----------------------------------------------------------------------------
+//	Window Destruction handling
+//-----------------------------------------------------------------------------
+void window::notifyClose( bool c ) {
+    glfwSetWindowShouldClose( pContext, (int)c );
+}
+
+bool window::wantsToClose() const {
+    glfwWindowShouldClose( pContext ) == 0;
+}
+
+//-----------------------------------------------------------------------------
+//	Window Callbacks
+//-----------------------------------------------------------------------------
+void window::setCloseCallback( void (*func)( context* ) ) {
+    glfwSetWindowCloseCallback( pContext, func );
+}
+
+void window::setPositionCallback( void (*func)( context*, int, int ) ) {
+    glfwSetWindowPosCallback( pContext, func );
+}
+
+void window::setResizeCallback( void (*func)( context*, int, int ) ) {
+    glfwSetWindowSizeCallback( pContext, func );
+}
+
+void window::setRefreshCallback( void (*func)( context* ) ) {
+    glfwSetWindowRefreshCallback( pContext, func );
+}
+
+void window::setFocusCallback( void (*func)( context*, int ) ) {
+    glfwSetWindowFocusCallback( pContext, func );
+}
+
+void window::setIconifyCallback( void (*func)( context*, int ) ) {
+    glfwSetWindowIconifyCallback( pContext, func );
 }
 
 } // end hge namespace

@@ -11,21 +11,19 @@
 #include <vector>
 #include "types.h"
 
+struct GLFWmonitor;
 struct GLFWwindow;
 
 namespace hge {
 
 ///////////////////////////////////////////////////////////////////////////////
-//		Video Modes
-///////////////////////////////////////////////////////////////////////////////
-///////////////////////////////////////////////////////////////////////////////
 //		Window/Display Object
 ///////////////////////////////////////////////////////////////////////////////
 class HGE_API window {
     public:
-        typedef GLFWwindow context;
-
-        // Variables
+        /*
+         * Public enumerations and typedefs
+         */
         enum : int {
             DEFAULT_WINDOW_WIDTH  = 640,
             DEFAULT_WINDOW_HEIGHT = 480
@@ -40,49 +38,85 @@ class HGE_API window {
             int greenBits   = 0;
         };
         
+        typedef GLFWwindow context;
+        typedef GLFWmonitor display;
+        typedef std::vector< videoMode > modeList_t;
+        typedef std::vector< display* > displayList_t;
+        
     private:
+        /*
+         * Private Members
+         */
         bool    displayFullscreen   = false;
         context* pContext           = nullptr; // needed by input systems
         vec2i   resolution          = vec2i( DEFAULT_WINDOW_WIDTH, DEFAULT_WINDOW_HEIGHT );
         
-        static bool  displayInitialized;
-        static vec2i deskResolution;
+        /*
+         * Private Static Members
+         */
+        static displayList_t displayList;
+        static std::vector< modeList_t > modeList;
+        
+        /*
+         * Private Static Methods
+         */
+        static void monitorCallback( display*, int );
         
     public:
-        // RAII
-        window(                     int width       = DEFAULT_WINDOW_WIDTH,
-                                    int height      = DEFAULT_WINDOW_HEIGHT,
-                                    bool resizeable = true,
-                                    bool fullscreen = false,
-                                    bool useVsync   = false
-                                );
-        ~window                 ();
+        /*
+         * Public Static Methods
+         */
+        static  bool    init();
+        static  void    terminate();
+        static  void    setActiveContext( context* );
+        static  vec2i   getDesktopSize();
+        static display* getMainMonitor();
         
-        window  () = delete;
-        window  ( const window& ) = delete;
-        window  ( window&& );
+        static const displayList_t& getMonitorList() { return displayList; }
+        static const modeList_t& getDisplayModes( int monitorIndex = 0 ) { return modeList[ monitorIndex ]; }
         
-        window& operator =      ( const window& ) = delete;
-        window& operator =      ( window&& );
+        /*
+         * RAII Constructor
+         */
+        window(
+            int width           = DEFAULT_WINDOW_WIDTH,
+            int height          = DEFAULT_WINDOW_HEIGHT,
+            bool resizeable     = true,
+            display* fullscreen = nullptr,
+            bool useVsync       = false
+        );
+        ~window     ();
+        window      () = delete;
+        window      ( const window& ) = delete;
+        window      ( window&& );
+        window&     operator =      ( const window& ) = delete;
+        window&     operator =      ( window&& );
         
-        context* getContext     () { return pContext; }
+        /*
+         * Public Methods
+         */
+        context*    getContext      () { return pContext; }
+        void        raise           ();
+        void        minimize        ();
+        void        showForeground  ();
+        void        setTitle        ( const char* );
+        void        flip            ();
+        bool        isOpen          ();
         
-        //Functions
-        static  bool            init();
-        static  void            terminate();
-        static  const vec2i&    getDesktopSize();
+        const vec2i& getResolution  ();
+        void        setResolution   ( const vec2i& );
+        vec2i       getPosition     ();
+        void        setPosition     ( const vec2i& );
         
-        void    flip            ();
-        bool    isOpen          ();
-
-        void    resize          ( const vec2i& );
+        void        notifyClose     ( bool );
+        bool        wantsToClose    () const;
         
-        const vec2i& getResolution();
-
-        void    raise           ();
-        void    minimize        ();
-
-        void    setTitle        ( const char* );
+        void        setCloseCallback    ( void (*)( context* ) );
+        void        setPositionCallback ( void (*)( context*, int, int ) );
+        void        setResizeCallback   ( void (*)( context*, int, int ) ); // for when the window is obscured
+        void        setRefreshCallback  ( void (*)( context* ) );
+        void        setFocusCallback    ( void (*)( context*, int f ) ); // f = GL_TRUE if focused
+        void        setIconifyCallback  ( void (*)( context*, int i ) ); // i = GL_TRUE if iconified
 };
 
 } // end hge namespace

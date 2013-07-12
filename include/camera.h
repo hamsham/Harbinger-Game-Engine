@@ -107,6 +107,8 @@ class HGE_API camera {
         const mat4& getProjMatrix   () const                { return projMatrix; }
         mat4        getVPMatrix     () const                { return viewMatrix * projMatrix; }
         
+        const quat& getOrientation  () const                { return orientation; }
+        
         void        setAspect       ( float w, float h )    { aspectW = w; aspectH = h; }
         float       getAspect       () const                { return aspectW / aspectH; }
         void        setZNear        ( float inZNear )       { zNear = inZNear; }

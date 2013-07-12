@@ -43,7 +43,7 @@ void skybox::draw() const {
 
 void skybox::draw( const cubemap& c, const sphere& s ) {
 //    glDepthRange( 1, 1 );
-//    glDepthFunc( GL_LEQUAL );
+    glDepthFunc( GL_LEQUAL );
 //    glDepthMask( GL_FALSE );
     
     c.activate();
@@ -51,7 +51,7 @@ void skybox::draw( const cubemap& c, const sphere& s ) {
     c.deActivate();
     
 //    glDepthRange( 0, 1 );
-//    glDepthFunc( GL_LESS );
+    glDepthFunc( GL_LESS );
 //    glDepthMask( GL_TRUE );
 }
 

@@ -1,7 +1,5 @@
 
 #include <iostream>
-#include "types.h"
-#include "pipeline.h"
 #include "shader.h"
 
 using namespace std;
@@ -150,6 +148,13 @@ void shader::unload() {
         glDeleteProgram(programId);
         programId = 0;
     }
+}
+
+//-----------------------------------------------------------------------------
+//	Shader - Variable Acquisition
+//-----------------------------------------------------------------------------
+GLint shader::getVariableId( const char* v ) {
+    return glGetUniformLocation( programId, v );
 }
 
 } // End hge namespace

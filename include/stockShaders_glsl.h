@@ -190,7 +190,7 @@ const char skyVS[] = R"***(
 
     void main() {
         texCoords = posVerts;
-        gl_Position = mvpMatrix * vec4(-posVerts, 1.0);
+        gl_Position = vec4(mvpMatrix * vec4(-posVerts, 1.0)).xyww;
     }
 )***";
 

@@ -9,6 +9,7 @@
 #define __HGE_SHADER_H__
 
 #include <vector>
+#include "types.h"
 #include "pipeline.h"
 #include "resource.h"
 
@@ -17,7 +18,7 @@ namespace hge {
 ///////////////////////////////////////////////////////////////////////////////
 //		OpenGL Shader Class
 ///////////////////////////////////////////////////////////////////////////////
-class HGE_API shader : virtual public resource {
+class HGE_API shader : public resource {
     private:
         std::vector< GLuint > shaderIds;
         GLuint programId = 0;
@@ -34,7 +35,7 @@ class HGE_API shader : virtual public resource {
         bool        compile         ();
         void        unload          ();
         GLuint      getProgramId    () const { return programId; }
-        GLint       getVariableId   ( const char* v ) { return glGetUniformLocation( programId, v ); }
+        GLint       getVariableId   ( const char* );
 };
 
 } // end hge namespace

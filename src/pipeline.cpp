@@ -10,11 +10,6 @@
 
 #include "math/math.h"
 #include "pipeline.h"
-#include "camera.h"
-#include "display.h"
-#include "shader.h"
-#include "stockShaders.h"
-#include "primitives.h"
 
 using namespace hge;
 
@@ -121,45 +116,3 @@ void pipeline::printErrorMsg( const char* msg, unsigned lineNum, const char* sou
 	std::cerr << std::endl;
 }
 
-/******************************************************************************
- * Pipeline Initialization
-******************************************************************************/
-bool pipeline::init( const vec2i& res ) {
-	/*
-	 * Initialize GLEW
-	 */
-	glewExperimental = GL_TRUE; // Ensure core extensions are loaded
-    HGE_ASSERT( glewInit() == GLEW_OK );
-    
-	std::cout
-        << "Created a window. OpenGL 3.3 initialized.\n\t0x"
-        << std::hex << glGetError()
-        << std::dec << std::endl;
-	
-	/*
-	 * Default OpenGL parameters
-	 */
-    glViewport( 0, 0, res[0], res[1] );
-	glClearColor( 0.5f, 0.5f, 0.5f, 1.0f );
-	glEnable    ( GL_CULL_FACE );		// Occlusion Culling
-	glCullFace  ( GL_BACK );
-	glFrontFace ( GL_CCW );
-	glEnable    ( GL_DEPTH_TEST );		// Depth/Z-Buffer
-	glDepthFunc ( GL_LESS );
-    
-    // PRIMITIVE INITIALIZATION
-    if ( !initPrimitives() || !stockShaders::init() ) {
-        terminate();
-        return false;
-    }
-    
-    return true;
-}
-
-/******************************************************************************
- * Pipeline Termination
-******************************************************************************/
-void pipeline::terminate() {
-    terminatePrimitives();
-    stockShaders::terminate();
-}

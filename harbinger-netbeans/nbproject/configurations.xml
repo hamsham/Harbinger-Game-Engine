@@ -32,6 +32,7 @@
       <itemPath>../include/shadowMap.h</itemPath>
       <itemPath>../include/skybox.h</itemPath>
       <itemPath>../include/stockShaders.h</itemPath>
+      <itemPath>../include/stockShaders_glsl.h</itemPath>
       <itemPath>../include/transformations.h</itemPath>
       <itemPath>../include/types.h</itemPath>
     </logicalFolder>
@@ -183,6 +184,8 @@
       <item path="../include/skybox.h" ex="false" tool="3" flavor2="0">
       </item>
       <item path="../include/stockShaders.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="../include/stockShaders_glsl.h" ex="false" tool="3" flavor2="0">
       </item>
       <item path="../include/transformations.h" ex="false" tool="3" flavor2="0">
       </item>
@@ -347,6 +350,8 @@
       </item>
       <item path="../include/stockShaders.h" ex="false" tool="3" flavor2="0">
       </item>
+      <item path="../include/stockShaders_glsl.h" ex="false" tool="3" flavor2="0">
+      </item>
       <item path="../include/transformations.h" ex="false" tool="3" flavor2="0">
       </item>
       <item path="../include/types.h" ex="false" tool="3" flavor2="0">
@@ -495,6 +500,8 @@
       <item path="../include/skybox.h" ex="false" tool="3" flavor2="0">
       </item>
       <item path="../include/stockShaders.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="../include/stockShaders_glsl.h" ex="false" tool="3" flavor2="0">
       </item>
       <item path="../include/transformations.h" ex="false" tool="3" flavor2="0">
       </item>
@@ -652,6 +659,8 @@
       <item path="../include/skybox.h" ex="false" tool="3" flavor2="0">
       </item>
       <item path="../include/stockShaders.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="../include/stockShaders_glsl.h" ex="false" tool="3" flavor2="0">
       </item>
       <item path="../include/transformations.h" ex="false" tool="3" flavor2="0">
       </item>

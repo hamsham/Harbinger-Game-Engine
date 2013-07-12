@@ -73,9 +73,6 @@ enum e_texType : GLint {
 /******************************************************************************
  * OpenGL Display Pipeline Functions
 ******************************************************************************/
-HGE_API     bool init( const vec2i& resolution );
-HGE_API     void terminate();
-
 HGE_API     void enablePlainVertexAttribs();
 HGE_API     void enableBumpVertexAttribs();
 

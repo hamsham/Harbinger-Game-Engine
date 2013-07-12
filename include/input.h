@@ -51,8 +51,9 @@ class HGE_API inputHandler {
         action_t getMouseButtonState( mouse_t );
 
         // Mouse Positioning
-        void setMousePos            ( const vec2d& );
-        vec2d getMousePos           ();
+        void    setMousePos         ( const vec2d& );
+        vec2d   getMousePos         ();
+        void    showCursor          ( bool );
 
         /*/
          * These key codes have been copied and pasted directly from the GLFW Header.

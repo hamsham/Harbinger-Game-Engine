@@ -69,3 +69,10 @@ vec2d inputHandler::getMousePos() {
     glfwGetCursorPos( pContext, &pos.index.x, &pos.index.y );
     return pos;
 }
+
+void inputHandler::showCursor( bool cursor ) {
+    if ( cursor )
+        glfwSetInputMode( pContext, GLFW_CURSOR, GLFW_CURSOR_NORMAL );
+    else
+        glfwSetInputMode(pContext, GLFW_CURSOR, GLFW_CURSOR_HIDDEN );
+}

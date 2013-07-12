@@ -96,7 +96,7 @@ camera& camera::operator = ( const camera& c ) {
 }
 
 /******************************************************************************
- * CAMERA -- Functions
+ * Setting the projection type
 ******************************************************************************/
 void camera::makeOrtho() {
     //projMatrix = ortho( -aspectW, aspectW, -aspectH, aspectH, zNear, zFar );
@@ -119,6 +119,9 @@ void camera::setProjectionParams(
     zFar = far;
 }
 
+/******************************************************************************
+ * Y-Axis Locking
+******************************************************************************/
 void camera::lockYAxis( bool isLocked ) {
     rotateFunction[ VIEW_NORMAL ] = ( isLocked )
         ? &camera::rotateLockedY
@@ -130,6 +133,9 @@ void camera::lockYAxis( bool isLocked ) {
     
 }
 
+/******************************************************************************
+ * Looking at targets
+******************************************************************************/
 void camera::look( const vec3& eye, const vec3& point, const vec3& up ) {
     pos = eye;
     target = point;
@@ -157,6 +163,9 @@ void camera::look( const vec3& point ) {
     look( pos, point, yAxis );
 }
 
+/******************************************************************************
+ * Basic Movement and Rotation
+******************************************************************************/
 void camera::move( const vec3& amount ) {
     pos -= xAxis * amount[0];
     pos -= yAxis * amount[1];
@@ -167,6 +176,9 @@ void camera::rotate( const vec3& amount ) {
     ( this->*rotateFunction[ viewMode ] )( amount );
 }
 
+/******************************************************************************
+ * First-person rotations
+******************************************************************************/
 void camera::rotateUnlockedY( const vec3& amount ) {
     orientation *= fromEuler( -amount );
 }
@@ -179,6 +191,9 @@ void camera::rotateLockedY( const vec3& amount ) {
         * orientation;
 }
 
+/******************************************************************************
+ * Orbital/Arcball rotations
+******************************************************************************/
 void camera::rotateOrbitUnlockedY( const vec3& amount ) {
     pos -= xAxis * amount[0];
     pos -= yAxis * amount[1];
@@ -190,11 +205,17 @@ void camera::rotateOrbitLockedY( const vec3& amount ) {
     look( pos, target, vec3( 0.f, 1.f, 0.f ) );
 }
 
+/******************************************************************************
+ * Unrolling the camera
+******************************************************************************/
 void camera::unroll() {
 	if ( viewMode == VIEW_ORBIT )   look( pos, target, vec3( 0.f, 1.f, 0.f ) );
 	else                            look( pos, pos - zAxis, vec3( 0.f, 1.f, 0.f ) );
 }
 
+/******************************************************************************
+ * Camera update functions (both fps and orbital)
+******************************************************************************/
 void camera::updateNormal() {
     viewMatrix = quatToMat4( orientation );
     
@@ -208,6 +229,9 @@ void camera::updateOrbit() {
     look( target );
 }
 
+/******************************************************************************
+ * Update Implementation
+******************************************************************************/
 void camera::update() {
     ( this->*updateFunction[ viewMode ] )();
     viewMatrix[3][0] = -dot( xAxis, pos );

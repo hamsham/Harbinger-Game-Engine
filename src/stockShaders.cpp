@@ -12,8 +12,10 @@
 #include "pipeline.h"
 #include "shader.h"
 #include "stockShaders.h"
+#include "transformations.h"
 
 namespace pipeline = hge::pipeline;
+using hamLibs::math::mat4;
 
 namespace {
 /******************************************************************************
@@ -343,9 +345,30 @@ hge::shader     bbShader;
 GLint           camPosId        = 0;
 GLint           bbTexSampler    = 0;
 
+// Commonly shared Uniform buffer object
+GLuint ubo = 0;
+GLuint matrixIndexId = GL_INVALID_INDEX;
+GLuint currShader = 0;
+
+// Creating an array of four 4x4 Matrices. Model, View, Projection, and MVP
+mat4 transforms[ 3 ] = { mat4( 1.f ) };
+
+
+inline void updateMatricesImpl() {
+    // Upload the matrix data to the current shader
+    glUniformBlockBinding( currShader, matrixIndexId, HGE_PIPELINE_MATRIX_BINDING );
+    glBindBuffer( GL_UNIFORM_BUFFER, ubo );
+    glBindBufferBase( GL_UNIFORM_BUFFER, HGE_PIPELINE_MATRIX_BINDING, ubo );
+
+    glBufferData(
+        GL_UNIFORM_BUFFER, sizeof( transforms ), transforms, GL_DYNAMIC_DRAW
+    );
+}
+
 /******************************************************************************
  * Shader Manager Private Functions
  ******************************************************************************/
+
 bool initPointLightShader();
 bool initShadowShader();
 bool initSkyShader();
@@ -361,7 +384,8 @@ bool initPointLightShader() {
         << pointLightShader.getProgramId()
         << std::endl;
     
-    pipeline::applyShader( pointLightShader );
+    hge::stockShaders::applyShader( pointLightShader.getProgramId() );
+    
     ambColorId      = pointLightShader.getVariableId( "ambientLight.color" );
     ambIntId        = pointLightShader.getVariableId( "ambientLight.intensity" );
     pointColorId    = pointLightShader.getVariableId( "pointLight.color" );
@@ -414,7 +438,8 @@ bool initShadowShader() {
         << shadowShader.getProgramId()
         << std::endl;
     
-    pipeline::applyShader( shadowShader );
+    hge::stockShaders::applyShader( shadowShader.getProgramId() );
+    
     shadowMapId = shadowShader.getVariableId( "shadowMap" );
     printGlError("Shader setup error");
     
@@ -438,7 +463,8 @@ bool initSkyShader() {
         << skyShader.getProgramId()
         << std::endl;
     
-    pipeline::applyShader( skyShader );
+    hge::stockShaders::applyShader( skyShader.getProgramId() );
+    
     skyTexId = skyShader.getVariableId( "cubeTex" );
     printGlError("Skybox shader setup error");
     
@@ -462,7 +488,8 @@ bool initFontShader() {
         << fontShader.getProgramId()
         << std::endl;
     
-    pipeline::applyShader( fontShader );
+    hge::stockShaders::applyShader( fontShader.getProgramId() );
+    
     fontColId   = fontShader.getVariableId( "color" );
     fontSampler = fontShader.getVariableId( "texSampler" );
     printGlError("Font shader setup error");
@@ -489,7 +516,8 @@ bool initBillboardShader() {
         << bbShader.getProgramId()
         << std::endl;
     
-    pipeline::applyShader( bbShader );
+    hge::stockShaders::applyShader( bbShader.getProgramId() );
+    
     camPosId        = bbShader.getVariableId( "camPos" );
     bbTexSampler    = bbShader.getVariableId( "texSampler" );
     printGlError("Shader setup error");
@@ -514,6 +542,21 @@ bool initBillboardShader() {
 } // end anonymous namespace
 namespace hge {
 bool stockShaders::init() {
+    if ( ubo != 0 ) {
+        // Return if the pipeline is already initialized
+        return true;
+    }
+
+    glGenBuffers( 1, &ubo );
+    printGlError( "Creating pipeline uniform block" );
+
+    if ( ubo == 0 ) {
+        std::cerr
+            << "An error occurred while initializing the graphics pipeline."
+            << std::endl;
+        return false;
+    }
+    
     if (
             !shadowShader.loadBuffer( plainVS, sizeof( plainVS ), GL_VERTEX_SHADER )
     ||      !shadowShader.loadBuffer( shadowFS, sizeof( shadowFS ), GL_FRAGMENT_SHADER )
@@ -559,6 +602,13 @@ bool stockShaders::init() {
  * Shader Manager Termination
  ******************************************************************************/
 void stockShaders::terminate() {
+    if ( ubo == 0 )
+        return;
+    
+    glDeleteBuffers( 1, &ubo );
+    ubo = currShader = 0;
+    matrixIndexId = GL_INVALID_INDEX;
+    
     pointLightShader.unload();
     shadowShader.unload();
     fontShader.unload();
@@ -589,10 +639,75 @@ void stockShaders::terminate() {
 }
 
 /******************************************************************************
+ * Shader Management
+******************************************************************************/
+void stockShaders::applyShader( GLuint shaderId ) {
+    currShader = shaderId;
+    
+    if ( !currShader )
+        return;
+    
+    glUseProgram( currShader );
+    printGlError( "Applying a shader to the pipeline" );
+    
+    glBindBuffer( GL_UNIFORM_BUFFER, ubo );
+    glBindBufferBase( GL_UNIFORM_BUFFER, HGE_PIPELINE_MATRIX_BINDING, ubo );
+    glBufferData( GL_UNIFORM_BUFFER, sizeof( transforms ), transforms, GL_DYNAMIC_DRAW );
+    
+    matrixIndexId = glGetUniformBlockIndex( currShader, "matrixBlock" );
+    printGlError( "Accessing the Matrix Uniform Block" );
+    
+#ifdef DEBUG
+    if ( matrixIndexId == GL_INVALID_INDEX ) {
+        std::cerr
+            << "ERROR: Incompatible shader detected. "
+            << "Please ensure that the current shader has a uniform block "
+            << "titled \"matrixBlock\" which contains the mat4 identifiers "
+            << "\"modelMatrix\", \"viewMatrix\", "
+            << "\"projMatrix\", and \"mvpMatrix\"."
+            << std::endl;
+        
+        return;
+    }
+#endif
+    
+    glUniformBlockBinding( currShader, matrixIndexId, HGE_PIPELINE_MATRIX_BINDING );
+    printGlError( "Sending Matrix Uniform Binding" );
+    glBindBuffer( GL_UNIFORM_BUFFER, 0 );
+}
+
+/******************************************************************************
+ * Pushing to the matrix stack
+******************************************************************************/
+void stockShaders::applyMatrix( e_matrixState s, const mat4& m ) {
+    // Update the current MVP matrix
+    transforms[ s ] = m;
+    transforms[ 2 ] = transforms[ HGE_MODEL_MAT ] * transforms[ HGE_VP_MAT ];
+    
+    updateMatricesImpl();
+}
+
+void stockShaders::applyMatrix( const drawTransform& obj, const camera& cam ) {
+    // Update the current MVP matrix
+    transforms[ HGE_MODEL_MAT ] = obj.getModelMatrix();
+    transforms[ HGE_VP_MAT ] = cam.getVPMatrix();
+    transforms[ 2 ] = transforms[ HGE_MODEL_MAT ] * transforms[ HGE_VP_MAT ];
+    
+    updateMatricesImpl();
+}
+
+/******************************************************************************
+ * Popping off a matrix from the stack
+******************************************************************************/
+void stockShaders::removeMatrix( e_matrixState s ) {
+    transforms[ s ] = mat4( 1.f );
+}
+
+/******************************************************************************
  * Billboards
  ******************************************************************************/
 void stockShaders::applyBillboardShader() {
-    pipeline::applyShader( bbShader );
+    stockShaders::applyShader( bbShader.getProgramId() );
 }
 
 void stockShaders::setBillboardCam( const camera& c ) {
@@ -607,7 +722,7 @@ void stockShaders::setPointLightMvp( const mat4& mvp ) {
 }
 
 void stockShaders::applyPointLightShader() {
-    pipeline::applyShader( pointLightShader );
+    stockShaders::applyShader( pointLightShader.getProgramId() );
 }
 
 void stockShaders::setPointLight( const ambientLight& a, const pointLight& p ) {
@@ -622,11 +737,11 @@ void stockShaders::setPointLight( const ambientLight& a, const pointLight& p ) {
 }
 
 void stockShaders::applyShadowShader() {
-    pipeline::applyShader( shadowShader );
+    stockShaders::applyShader( shadowShader.getProgramId() );
 }
 
 void stockShaders::applyFontShader() {
-    pipeline::applyShader( fontShader );
+    stockShaders::applyShader( fontShader.getProgramId() );
 }
 
 void stockShaders::setFontColor( const vec4& v ) {
@@ -634,7 +749,7 @@ void stockShaders::setFontColor( const vec4& v ) {
 }
 
 void stockShaders::applySkyShader() {
-    pipeline::applyShader( skyShader );
+    stockShaders::applyShader( skyShader.getProgramId() );
 }
 
 } // end harbinger namespace

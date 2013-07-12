@@ -11,7 +11,6 @@
 #include <GL/glew.h>
 #include "types.h"
 #include "geometry.h"
-#include "shader.h"
 
 #ifndef HGE_PIPELINE_MATRIX_BINDING
     #define HGE_PIPELINE_MATRIX_BINDING 1
@@ -30,11 +29,6 @@ enum e_attributes : GLint {
     NORMAL_ATTRIB       = 2,
     TANGENT_ATTRIB      = 3,
     BITANGENT_ATTRIB    = 4
-};
-
-enum e_matrixState : int {
-    HGE_MODEL_MAT   = 0,
-    HGE_VP_MAT      = 1
 };
 
 // These are based off the enumerations defined in Assimp's "material.h" header
@@ -85,20 +79,11 @@ HGE_API     void terminate();
 HGE_API     void enablePlainVertexAttribs();
 HGE_API     void enableBumpVertexAttribs();
 
-// The matrix stack will only hold (at most) a single user-applied matrix of
-// each type (model, view, and projection).
-HGE_API     void applyMatrix( e_matrixState s, const mat4& m = mat4( 1.f ) );
-HGE_API     void applyMatrix( const drawTransform&, const camera& );
-HGE_API     void removeMatrix( e_matrixState s );
-
-HGE_API     void applyShader( GLuint programId );
-inline      void applyShader( const shader& s ) { applyShader( s.getProgramId() ); }
-
 HGE_API     void printErrorMsg( const char* msg, unsigned lineNum, const char* sourceFile );
 
-HGE_INLINE  vec3 getWorldAxisX() { return vec3( 1.f, 0.f, 0.f ); }
-HGE_INLINE  vec3 getWorldAxisY() { return vec3( 0.f, 1.f, 0.f ); }
-HGE_INLINE  vec3 getWorldAxisZ() { return vec3( 0.f, 0.f, 1.f ); }
+constexpr   vec3 getWorldAxisX() { return vec3( 1.f, 0.f, 0.f ); }
+constexpr   vec3 getWorldAxisY() { return vec3( 0.f, 1.f, 0.f ); }
+constexpr   vec3 getWorldAxisZ() { return vec3( 0.f, 0.f, 1.f ); }
 
 } // end pipeline namespace
 } // end hge namespace

@@ -57,6 +57,13 @@ void drawTransform::rotate( const vec3& angles ) {
     rot *= fromEuler( angles );
 }
 
+void drawTransform::look( const vec3& target, const vec3& up ) {
+    rot = matToQuat( lookAt( vec3( 0.f ), pos - target, up ) );
+    rot[0] *= -1;
+    rot[1] *= -1;
+    rot[2] *= -1;
+}
+
 void drawTransform::update() {
 	modelMat
         = quatToMat4( rot )

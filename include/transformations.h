@@ -37,10 +37,12 @@ class HGE_API drawTransform {
 		
 		void            setPos          ( const vec3& p );
 		void            setScale        ( const vec3& s );
+		void            setScaleUniform ( float s )             { this->setScale( vec3( s ) ); }
 		void            setOrientation  ( const quat& o );
         
         void            move            ( const vec3& p );
         void            scale           ( const vec3& s );
+        void            scaleUniform    ( float s )             { this->scale( vec3( s ) ); }
 		void            rotate          ( const vec3& angles );
         
         // The position should be set before using the look function

@@ -36,6 +36,7 @@ class HGE_API window {
             int redBits     = 0;
             int blueBits    = 0;
             int greenBits   = 0;
+            int refreshRate = 0;
         };
         
         typedef GLFWwindow context;
@@ -113,8 +114,8 @@ class HGE_API window {
         
         void        setCloseCallback    ( void (*)( context* ) );
         void        setPositionCallback ( void (*)( context*, int, int ) );
-        void        setResizeCallback   ( void (*)( context*, int, int ) ); // for when the window is obscured
-        void        setRefreshCallback  ( void (*)( context* ) );
+        void        setResizeCallback   ( void (*)( context*, int, int ) );
+        void        setRefreshCallback  ( void (*)( context* ) ); // for when the window is obscured
         void        setFocusCallback    ( void (*)( context*, int f ) ); // f = GL_TRUE if focused
         void        setIconifyCallback  ( void (*)( context*, int i ) ); // i = GL_TRUE if iconified
 };

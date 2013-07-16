@@ -81,6 +81,7 @@ bool window::init() {
             modeList[ i ][ j ].redBits      = modeArray[ j ].redBits;
             modeList[ i ][ j ].blueBits     = modeArray[ j ].blueBits;
             modeList[ i ][ j ].greenBits    = modeArray[ j ].greenBits;
+            modeList[ i ][ j ].refreshRate  = modeArray[ j ].refreshRate;
         }
     }
     
@@ -165,12 +166,12 @@ window::window(
 	 * Default OpenGL parameters
 	 */
     glViewport  ( 0, 0, resolution[0], resolution[1] );
-	glClearColor( 0.5f, 0.5f, 0.5f, 1.0f );
+	glClearColor( 0.f, 0.f, 0.f, 1.0f );
 	glEnable    ( GL_CULL_FACE );		// Occlusion Culling
 	glCullFace  ( GL_BACK );
 	glFrontFace ( GL_CCW );
 	glEnable    ( GL_DEPTH_TEST );		// Depth/Z-Buffer
-	glDepthFunc ( GL_LESS );
+	glDepthFunc ( GL_LEQUAL );
     
     // PRIMITIVE INITIALIZATION
     HGE_ASSERT( initPrimitives() );
@@ -182,6 +183,7 @@ window::window(
 window::~window() {
     terminatePrimitives();
     glfwDestroyWindow( pContext );
+    glfwDefaultWindowHints();
     pContext = nullptr;
 }
 

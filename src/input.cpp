@@ -26,23 +26,23 @@ inputHandler& inputHandler::operator = ( inputHandler&& i ) {
 ///////////////////////////////////////////////////////////////////////////////
 //      INPUT CALLBACKS
 ///////////////////////////////////////////////////////////////////////////////
-void inputHandler::setKeyCallback( void(*func)( window::context*, key_t,int, action_t, mod_t ) ) {
+void inputHandler::setKeyCallback( keyboardCallback_t func ) {
     glfwSetKeyCallback( pContext, (GLFWkeyfun)func );
 }
 
-void inputHandler::setTextCallback( void(*func)( window::context*,int ) ) {
+void inputHandler::setTextCallback( textCallback_t func ) {
     glfwSetCharCallback( pContext, (GLFWcharfun)func );
 }
 
-void inputHandler::setMouseCallback( void(*func)( window::context*, mouse_t, action_t, mod_t ) ) {
+void inputHandler::setMouseCallback( mouseCallback_t func ) {
     glfwSetMouseButtonCallback( pContext, (GLFWmousebuttonfun)func );
 }
 
-void inputHandler::setMousePosCallback( void(*func)( window::context*,double,double ) ) {
+void inputHandler::setMousePosCallback( mousePosCallback_t func ) {
     glfwSetCursorPosCallback( pContext, (GLFWcursorposfun)func );
 }
 
-void inputHandler::setMouseWheelCallback( void(*func)( window::context*,double,double ) ) {
+void inputHandler::setMouseWheelCallback( mouseWheelCallback_t func ) {
     glfwSetScrollCallback( pContext, (GLFWscrollfun)func );
 }
 

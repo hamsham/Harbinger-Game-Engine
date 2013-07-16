@@ -28,6 +28,12 @@ class HGE_API inputHandler {
         enum mod_t      : int;
         enum mouse_t    : int;
         enum joy_t      : int;
+        
+        typedef void (*keyboardCallback_t)  ( window::context*, key_t, int, action_t, mod_t );
+        typedef void (*textCallback_t)      ( window::context*, int utf8_char );
+        typedef void (*mouseCallback_t)     ( window::context*, mouse_t, action_t, mod_t );
+        typedef void (*mousePosCallback_t)  ( window::context*, double x, double y );
+        typedef void (*mouseWheelCallback_t)( window::context*, double x, double y );
 
         inputHandler    ( window& );
         inputHandler    () = delete;
@@ -40,11 +46,11 @@ class HGE_API inputHandler {
         inputHandler&   operator =  ( const inputHandler& ) = delete;
 
         // Button Callbacks
-        void setKeyCallback         ( void (*func)( window::context*, key_t, int, action_t,mod_t ) );
-        void setTextCallback        ( void (*func)( window::context*, int utf8_char ) );
-        void setMouseCallback       ( void (*func)( window::context*, mouse_t, action_t, mod_t ) );
-        void setMousePosCallback    ( void (*func)( window::context*, double x, double y ) );
-        void setMouseWheelCallback  ( void (*func)( window::context*, double x, double y ) );
+        void setKeyCallback         ( keyboardCallback_t );
+        void setTextCallback        ( textCallback_t );
+        void setMouseCallback       ( mouseCallback_t );
+        void setMousePosCallback    ( mousePosCallback_t );
+        void setMouseWheelCallback  ( mouseWheelCallback_t );
 
         // Button Pressing
         action_t getKeyButtonState  ( key_t );

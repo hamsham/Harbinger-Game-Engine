@@ -17,7 +17,7 @@
 
 /*
  * Skybox images should be loaded in the following order:
- * Right, left, bottom, top, back, front.
+ * Right, left, bottom, top, front, back.
  * 
  * Use the graph below as a guide when importing the textures:
  *              --------
@@ -56,9 +56,8 @@ class HGE_API skybox {
         bool load   ( const char* skyFiles[ 6 ] );
         void unload ();
         
-        void draw   () const;
-        
-        static void draw ( const cubemap&, const sphere& );
+        static void draw    ( const cubemap&, const sphere& );
+        inline void draw    () const { draw( skyTex, spherePrim ); }
 };
 
 

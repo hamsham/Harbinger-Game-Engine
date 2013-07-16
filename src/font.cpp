@@ -322,16 +322,16 @@ void string3d::setString( const font& f, const char* str ) {
              * | /      |
              * 1--------3
              */
-            tempQuad[ 0 ].pos = vec3( xPos,           yPos+m.advY+m.height,   0.f );
-            tempQuad[ 1 ].pos = vec3( xPos,           yPos+m.advY,            0.f );
-            tempQuad[ 2 ].pos = vec3( xPos+m.width,   yPos+m.advY+m.height,   0.f );
-            tempQuad[ 3 ].pos = vec3( xPos+m.width,   yPos+m.advY,            0.f );
-
-            tempQuad[ 0 ].uv = vec2( m.pos[0],       m.uv[1] );
-            tempQuad[ 1 ].uv = vec2( m.pos[0],       m.pos[1] );
-            tempQuad[ 2 ].uv = vec2( m.uv[0],        m.uv[1] );
-            tempQuad[ 3 ].uv = vec2( m.uv[0],        m.pos[1] );
-
+            tempQuad[ 0 ].pos = vec3( xPos,         yPos+m.advY+m.height,   0.f );
+            tempQuad[ 1 ].pos = vec3( xPos,         yPos+m.advY,            0.f );
+            tempQuad[ 2 ].pos = vec3( xPos+m.width, yPos+m.advY+m.height,   0.f );
+            tempQuad[ 3 ].pos = vec3( xPos+m.width, yPos+m.advY,            0.f );
+            
+            tempQuad[ 0 ].uv = vec2( m.pos[0],      m.uv[1] );
+            tempQuad[ 1 ].uv = vec2( m.pos[0],      m.pos[1] );
+            tempQuad[ 2 ].uv = vec2( m.uv[0],       m.uv[1] );
+            tempQuad[ 3 ].uv = vec2( m.uv[0],       m.pos[1] );
+            
             xPos += m.advX - m.bearX;
 
             glBufferSubData(
@@ -346,10 +346,16 @@ void string3d::setString( const font& f, const char* str ) {
 }
 
 void string3d::draw() const {
-    glEnable            ( GL_BLEND );
-    glBlendFunc         ( GL_SRC_ALPHA, GL_ONE );
-    glDepthMask         ( GL_FALSE );
-    glBindVertexArray   ( vao );
+    glEnable( GL_BLEND );
+    
+    // Premultiplied alpha
+//    glBlendEquationSeparate( GL_FUNC_ADD, GL_FUNC_ADD );
+//    glBlendFuncSeparate( GL_ONE, GL_ONE_MINUS_SRC_ALPHA, GL_ONE, GL_ZERO );
+    
+    // Additive Blending
+    glBlendFunc( GL_ONE, GL_ONE );
+    glDepthMask( GL_FALSE );
+    glBindVertexArray( vao );
 
     glMultiDrawArrays(
         GL_TRIANGLE_STRIP,
@@ -358,9 +364,9 @@ void string3d::draw() const {
         numChars
     );
 
-    glBindVertexArray   ( 0 );
-    glDepthMask         ( GL_TRUE );
-    glDisable           ( GL_BLEND );
+    glBindVertexArray( 0 );
+    glDepthMask( GL_TRUE );
+    glDisable( GL_BLEND );
 }
 
 } // End Harbinger namespace

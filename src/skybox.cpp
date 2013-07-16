@@ -24,15 +24,4 @@ bool skybox::load( const char* skyFiles[ 6 ] ) {
     return true;
 }
 
-void skybox::unload() {
-    skyTex.unload();
-    spherePrim.destroySphere();
-}
-
-void skybox::draw( const cubemap& c, const sphere& s ) {
-    c.activate();
-    s.draw();
-    c.deActivate();
-}
-
 } // End hge namespace

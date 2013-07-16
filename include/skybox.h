@@ -60,6 +60,17 @@ class HGE_API skybox {
         inline void draw    () const { draw( skyTex, spherePrim ); }
 };
 
+inline void skybox::unload() {
+    skyTex.unload();
+    spherePrim.destroySphere();
+}
+
+inline void skybox::draw( const cubemap& c, const sphere& s ) {
+    c.activate();
+    s.draw();
+    c.deActivate();
+}
+
 
 } // End hge namespace
 

@@ -53,24 +53,21 @@ class HGE_API skybox {
         skybox&     operator =  ( const skybox& ) = delete;
         skybox&     operator =  ( skybox&& ) = default;
         
-        bool load   ( const char* skyFiles[ 6 ] );
-        void unload ();
+        bool load( const char* skyFiles[ 6 ] );
         
-        static void draw    ( const cubemap&, const sphere& );
-        inline void draw    () const { draw( skyTex, spherePrim ); }
+        void unload() {
+            skyTex.unload();
+            spherePrim.destroySphere();
+        }
+        
+        inline static void draw( const cubemap& c, const sphere& s ) {
+            c.activate();
+            s.draw();
+            c.deActivate();
+        }
+        
+        inline void draw() const { draw( skyTex, spherePrim ); }
 };
-
-inline void skybox::unload() {
-    skyTex.unload();
-    spherePrim.destroySphere();
-}
-
-inline void skybox::draw( const cubemap& c, const sphere& s ) {
-    c.activate();
-    s.draw();
-    c.deActivate();
-}
-
 
 } // End hge namespace
 

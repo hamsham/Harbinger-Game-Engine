@@ -20,7 +20,7 @@ using namespace hamLibs::math;
  */
 // RAII Resources
 class   window;
-class   inputHandler;
+class   inputSystem;
 class   stockShaders;
 
 //vertex structures

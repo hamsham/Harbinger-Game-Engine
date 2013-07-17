@@ -11,17 +11,14 @@
 #include "types.h"
 #include "display.h"
 
+namespace hge {
+
 /*/
  * Keyboard and mouse inputs.
  * These functions have a 1:1 correlation to GLFW.
 /*/
-
-namespace hge {
     
-class HGE_API inputHandler {
-    private:
-        window::context* pContext = nullptr;
-
+class HGE_API inputSystem {
     public:
         enum action_t   : int;
         enum key_t      : int;
@@ -34,32 +31,41 @@ class HGE_API inputHandler {
         typedef void (*mouseCallback_t)     ( window::context*, mouse_t, action_t, mod_t );
         typedef void (*mousePosCallback_t)  ( window::context*, double x, double y );
         typedef void (*mouseWheelCallback_t)( window::context*, double x, double y );
+        
+    private:
+        window::context*        pContext        = nullptr;
+        keyboardCallback_t      pKeyButtonCB    = nullptr;
+        textCallback_t          pKeyTextCB      = nullptr;
+        mouseCallback_t         pMouseButtonCB  = nullptr;
+        mousePosCallback_t      pMousePosCB     = nullptr;
+        mouseWheelCallback_t    pMouseWheelCB   = nullptr;
 
-        inputHandler    ( window& );
-        inputHandler    () = delete;
-        inputHandler    ( inputHandler&& );
-        inputHandler    ( const inputHandler& ) = delete;
+    public:
+        inputSystem    ( window& );
+        inputSystem    () = delete;
+        inputSystem    ( inputSystem&& );
+        inputSystem    ( const inputSystem& ) = delete;
 
-        virtual ~inputHandler()     { pContext = nullptr; }
+        virtual ~inputSystem();
 
-        inputHandler&   operator =  ( inputHandler&& );
-        inputHandler&   operator =  ( const inputHandler& ) = delete;
+        inputSystem& operator =        ( inputSystem&& );
+        inputSystem& operator =        ( const inputSystem& ) = delete;
 
         // Button Callbacks
-        void setKeyCallback         ( keyboardCallback_t );
-        void setTextCallback        ( textCallback_t );
-        void setMouseCallback       ( mouseCallback_t );
-        void setMousePosCallback    ( mousePosCallback_t );
-        void setMouseWheelCallback  ( mouseWheelCallback_t );
+        void        setKeyboardCB      ( keyboardCallback_t cb )   { pKeyButtonCB = cb; }
+        void        setMouseButtonCB   ( mouseCallback_t cb )      { pMouseButtonCB = cb; }
+        void        setMousePosCB      ( mousePosCallback_t cb )   { pMousePosCB = cb; }
+        void        setMouseWheelCB    ( mouseWheelCallback_t cb ) { pMouseWheelCB = cb; }
+        void        applyCallbacks     ();
 
         // Button Pressing
-        action_t getKeyButtonState  ( key_t );
-        action_t getMouseButtonState( mouse_t );
+        action_t    getKeyButtonState  ( key_t );
+        action_t    getMouseButtonState( mouse_t );
 
         // Mouse Positioning
-        void    setMousePos         ( const vec2d& );
-        vec2d   getMousePos         ();
-        void    showCursor          ( bool );
+        void        setMousePos         ( const vec2d& );
+        vec2d       getMousePos         ();
+        void        showCursor          ( bool );
 
         /*/
          * These key codes have been copied and pasted directly from the GLFW Header.

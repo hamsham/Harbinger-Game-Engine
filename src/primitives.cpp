@@ -338,7 +338,7 @@ bool sphere::createSphere( int rings, int sectors ) {
     
     for( int r = 0, i = 0; r < rings; r++ ) {
         for( int s = 0; s < sectors; s++ ) {
-            float const y = std::sin( -HL_PI_OVR2 + HL_PI * r * R );
+            float const y = std::sin( -HL_PI_OVER_2 + HL_PI * r * R );
             float const x = std::cos( HL_TWO_PI * s * S ) * std::sin( HL_PI * r * R );
             float const z = std::sin( HL_TWO_PI * s * S ) * std::sin( HL_PI * r * R );
             

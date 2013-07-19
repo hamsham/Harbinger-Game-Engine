@@ -26,7 +26,7 @@ class HGE_API inputSystem {
         enum mouse_t    : int;
         enum joy_t      : int;
         
-        typedef void (*keyboardCallback_t)  ( window::context*, key_t, int, action_t, mod_t );
+        typedef void (*keyButtonCallback_t) ( window::context*, key_t, int, action_t, mod_t );
         typedef void (*textCallback_t)      ( window::context*, int utf8_char );
         typedef void (*mouseCallback_t)     ( window::context*, mouse_t, action_t, mod_t );
         typedef void (*mousePosCallback_t)  ( window::context*, double x, double y );
@@ -34,7 +34,7 @@ class HGE_API inputSystem {
         
     private:
         window::context*        pContext        = nullptr;
-        keyboardCallback_t      pKeyButtonCB    = nullptr;
+        keyButtonCallback_t     pKeyButtonCB    = nullptr;
         textCallback_t          pKeyTextCB      = nullptr;
         mouseCallback_t         pMouseButtonCB  = nullptr;
         mousePosCallback_t      pMousePosCB     = nullptr;
@@ -52,11 +52,12 @@ class HGE_API inputSystem {
         inputSystem& operator =        ( const inputSystem& ) = delete;
 
         // Button Callbacks
-        void        setKeyboardCB      ( keyboardCallback_t cb )   { pKeyButtonCB = cb; }
+        void        setKeyButtonCB     ( keyButtonCallback_t cb )  { pKeyButtonCB = cb; }
+        void        setKeyTextCB       ( textCallback_t cb )       { pKeyTextCB = cb; }
         void        setMouseButtonCB   ( mouseCallback_t cb )      { pMouseButtonCB = cb; }
         void        setMousePosCB      ( mousePosCallback_t cb )   { pMousePosCB = cb; }
         void        setMouseWheelCB    ( mouseWheelCallback_t cb ) { pMouseWheelCB = cb; }
-        void        applyCallbacks     ();
+        virtual void applyCallbacks    ();
 
         // Button Pressing
         action_t    getKeyButtonState  ( key_t );

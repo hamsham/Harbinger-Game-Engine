@@ -60,7 +60,7 @@ struct pointLight : baseLight {
 struct spotLight : baseLight {
     vec3    pos         = vec3( 0.f );
     vec3    dir         = vec3( 0.f, 0.f, -1.f );
-    float   coneAngle   = HL_PI / 3.15f;
+    float   coneAngle   = HL_PI_INVERSE * 3.15f;
     float   attenuation = 1.f;
 };
 

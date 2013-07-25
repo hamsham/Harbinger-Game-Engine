@@ -99,8 +99,8 @@ camera& camera::operator = ( const camera& c ) {
  * Setting the projection type
 ******************************************************************************/
 void camera::makeOrtho() {
-    //projMatrix = ortho( -aspectW, aspectW, -aspectH, aspectH, zNear, zFar );
-    projMatrix = ortho( -aspectW, aspectW, -aspectH, aspectH );
+    projMatrix = ortho( -aspectW, aspectW, -aspectH, aspectH, zNear, zFar );
+    //projMatrix = ortho( -aspectW, aspectW, -aspectH, aspectH );
 }
 
 void camera::makePerspective() {

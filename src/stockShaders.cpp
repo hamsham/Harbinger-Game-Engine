@@ -196,6 +196,33 @@ bool stockShaders::initBillboardShader() {
 }
 
 /******************************************************************************
+ * NBT SHADER
+ ******************************************************************************/
+bool stockShaders::initNbtShader() {
+    std::cout
+        << "Setting up the Normal/Tangent/Billboard visualization shader.\nID: "
+        << nbtShader.getProgramId()
+        << std::endl;
+    
+    hge::stockShaders::applyShader( nbtShader.getProgramId() );
+    
+    nbtShowNormId = nbtShader.getVariableId( "showNormals" );
+    nbtShowTangId = nbtShader.getVariableId( "showTangents" );
+    nbtShowBtngId = nbtShader.getVariableId( "showBitangents" );
+    printGlError("Shader setup error");
+    
+    if (    nbtShowNormId == pipeline::INVALID_UNIFORM
+    ||      nbtShowTangId == pipeline::INVALID_UNIFORM
+    ||      nbtShowBtngId == pipeline::INVALID_UNIFORM
+    ) {
+        printGlError("Error accessing an NBT uniform variable");
+        return false;
+    }
+    
+    return true;
+}
+
+/******************************************************************************
  * Shader Manager Initialization
  ******************************************************************************/
 stockShaders::stockShaders() {
@@ -225,6 +252,11 @@ stockShaders::stockShaders() {
     HL_ASSERT( bbShader.loadBuffer( billboardFS, sizeof( billboardFS ), GL_FRAGMENT_SHADER ) );
     HL_ASSERT( bbShader.compile() );
     
+    HL_ASSERT( nbtShader.loadBuffer( ntbVisualizerVS, sizeof( ntbVisualizerVS ),GL_VERTEX_SHADER ) );
+    HL_ASSERT( nbtShader.loadBuffer( ntbVisualizerGS, sizeof( ntbVisualizerGS ),GL_GEOMETRY_SHADER ) );
+    HL_ASSERT( nbtShader.loadBuffer( ntbVisualizerFS, sizeof( ntbVisualizerFS ),GL_FRAGMENT_SHADER ) );
+    HL_ASSERT( nbtShader.compile() );
+    
     printGlError("Shader compilation error");
     
     HL_ASSERT( initPointLightShader() );
@@ -232,6 +264,7 @@ stockShaders::stockShaders() {
     HL_ASSERT( initSkyShader() );
     HL_ASSERT( initFontShader() );
     HL_ASSERT( initBillboardShader() );
+    HL_ASSERT( initNbtShader() );
 }
 
 /******************************************************************************
@@ -247,6 +280,7 @@ stockShaders::~stockShaders() {
     fontShader.unload();
     skyShader.unload();
     bbShader.unload();
+    nbtShader.unload();
     
     ambColorId      = 0;
     ambIntId        = 0;
@@ -269,6 +303,10 @@ stockShaders::~stockShaders() {
     fontSampler     = 0;
     
     camPosId        = 0;
+    
+    nbtShowNormId   = 0;
+    nbtShowTangId   = 0;
+    nbtShowBtngId   = 0;
 }
 
 /******************************************************************************
@@ -381,8 +419,30 @@ void stockShaders::setFontColor( const vec4& v ) {
     glUniform4fv( fontColId, 1, v.v );
 }
 
+/******************************************************************************
+ * Skybox
+ ******************************************************************************/
 void stockShaders::applySkyShader() {
     stockShaders::applyShader( skyShader.getProgramId() );
+}
+
+/******************************************************************************
+ * Normal/Tangent/Bitangent Visualization
+ ******************************************************************************/
+void stockShaders::applyNbtShader() {
+    stockShaders::applyShader( nbtShader.getProgramId() );
+}
+
+void stockShaders::showNormals( bool b ) {
+    glUniform1i( nbtShowNormId, (int)b );
+}
+
+void stockShaders::showTangents( bool b ) {
+    glUniform1i( nbtShowTangId, (int)b );
+}
+
+void stockShaders::showBitangents( bool b ) {
+    glUniform1i( nbtShowBtngId, (int)b );
 }
 
 } // end harbinger namespace

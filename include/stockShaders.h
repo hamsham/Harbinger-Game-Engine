@@ -43,6 +43,11 @@ class HGE_API stockShaders {
         hge::shader     bbShader;
         GLint           camPosId        = 0;
         GLint           bbTexSampler    = 0;
+        // Normal/Tangent/Bitangent visualizer
+        hge::shader     nbtShader;
+        GLint           nbtShowNormId   = 0;
+        GLint           nbtShowTangId   = 0;
+        GLint           nbtShowBtngId   = 0;
 
         // Commonly shared Uniform buffer object
         GLuint ubo = 0;
@@ -58,6 +63,7 @@ class HGE_API stockShaders {
         bool initSkyShader();
         bool initFontShader();
         bool initBillboardShader();
+        bool initNbtShader();
         
         // Shader Matrix Updating
         void updateMatricesImpl();
@@ -98,6 +104,14 @@ class HGE_API stockShaders {
         void    setFontColor        ( const vec4& );
 
         void    applySkyShader      ();
+        
+        // The NBT shader only works with objects that have been drawn using
+        // the GL_TRIANGLE* specifiers. Objects drawn with GL_LINES, GL_POINTS,
+        // or the GL_*_ADJACENCY specifiers will not work
+        void    applyNbtShader      ();
+        void    showNormals         ( bool );
+        void    showTangents        ( bool );
+        void    showBitangents      ( bool );
         
 };
 

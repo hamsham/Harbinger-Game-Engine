@@ -308,6 +308,103 @@ const char billboardFS[] = R"***(
     }
 )***";
 
+/******************************************************************************
+ * Normal/Tangent/Bitangent Visualizer
+ ******************************************************************************/
+const char ntbVisualizerVS[] = R"***(
+    #version 330
+    
+    layout ( std140 ) uniform matrixBlock {
+        mat4 modelMatrix;
+        mat4 vpMatrix;
+        mat4 mvpMatrix;
+    };
+
+    layout ( location = 0 ) in vec3 posVerts;
+    layout ( location = 1 ) in vec2 texVerts;
+    layout ( location = 2 ) in vec3 normVerts;
+    layout ( location = 3 ) in vec3 tangVerts;
+    layout ( location = 4 ) in vec3 btngVerts;
+    
+    out vec4 normPos;
+    out vec4 tangPos;
+    out vec4 btngPos;
+    
+    void main() {
+        gl_Position = vec4( posVerts, 1.0 );
+        normPos     = vec4( normVerts, 0.0 );
+        tangPos     = vec4( tangVerts, 0.0 );
+        btngPos     = vec4( btngVerts, 0.0 );
+    }
+    
+)***";
+
+const char ntbVisualizerGS[] = R"***(
+    #version 330
+    
+    layout ( std140 ) uniform matrixBlock {
+        mat4 modelMatrix;
+        mat4 vpMatrix;
+        mat4 mvpMatrix;
+    };
+    
+    layout( triangles ) in;
+    layout( line_strip, max_vertices = 18 ) out;
+    
+    uniform bool showNormals    = true;
+    uniform bool showTangents   = false;
+    uniform bool showBitangents = false;
+    
+    in vec4 normPos[];
+    in vec4 tangPos[];
+    in vec4 btngPos[];
+    out vec4 lineCol;
+    
+    void main() {
+        for ( int i = 0; i < 3; ++i ) {
+            if ( showBitangents ) {
+                lineCol = vec4( 0.0, 0.0, 1.0, 1.0 );
+                gl_Position = mvpMatrix * gl_in[i].gl_Position;
+                EmitVertex();
+                gl_Position = mvpMatrix * (gl_in[i].gl_Position + btngPos[i]);
+                EmitVertex();
+                EndPrimitive();
+            }
+            
+            if ( showTangents ) {
+                lineCol = vec4( 1.0, 0.0, 0.0, 1.0 );
+                gl_Position = mvpMatrix * gl_in[i].gl_Position;
+                EmitVertex();
+                gl_Position = mvpMatrix * (gl_in[i].gl_Position + tangPos[i]);
+                EmitVertex();
+                EndPrimitive();
+            }
+
+            if ( showNormals ) {
+                lineCol = vec4( 0.0, 1.0, 0.0, 1.0 );
+                gl_Position = mvpMatrix * gl_in[i].gl_Position;
+                EmitVertex();
+                gl_Position = mvpMatrix * (gl_in[i].gl_Position + normPos[i]);
+                EmitVertex();
+                EndPrimitive();
+            }
+        }
+    }
+    
+)***";
+
+const char ntbVisualizerFS[] = R"***(
+    #version 330
+    
+    in vec4 lineCol;
+    out vec4 fragCol;
+    
+    void main() {
+        fragCol = lineCol;
+    }
+    
+)***";
+
 } // end anonymous namespace
 
 #endif	/* __HGE_STOCKSHADERS_GLSL_H__ */

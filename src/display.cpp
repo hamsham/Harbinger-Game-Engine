@@ -155,7 +155,10 @@ window::window(
 	 * Initialize GLEW
 	 */
 	glewExperimental = GL_TRUE; // Ensure core extensions are loaded
-    HGE_ASSERT( glewInit() == GLEW_OK );
+    if ( glewInit() != GLEW_OK ) {
+        glfwDestroyWindow( pContext );
+        HGE_ASSERT( false );
+    }
     
 	std::cout
         << "Created a window. OpenGL 3.3 initialized.\n\t0x"
@@ -172,16 +175,12 @@ window::window(
 	glFrontFace ( GL_CCW );
 	glEnable    ( GL_DEPTH_TEST );		// Depth/Z-Buffer
 	glDepthFunc ( GL_LEQUAL );
-    
-    // PRIMITIVE INITIALIZATION
-    HGE_ASSERT( initPrimitives() );
 }
 
 //-----------------------------------------------------------------------------
 //	Window Termination
 //-----------------------------------------------------------------------------
 window::~window() {
-    terminatePrimitives();
     glfwDestroyWindow( pContext );
     glfwDefaultWindowHints();
     pContext = nullptr;

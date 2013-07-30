@@ -12,43 +12,6 @@
 namespace hge {
 
 /******************************************************************************
- *      PRIMITIVE SETUP
-******************************************************************************/
-bool initPrimitives() {
-    if (    !quad::init()
-    ||      !triangle::init()
-    ||      !line::init()
-    ||      !cube::init()
-    ) {
-        terminatePrimitives();
-        return false;
-    }
-    return true;
-}
-
-void terminatePrimitives() {
-    quad::terminate();
-    triangle::terminate();
-    line::terminate();
-    cube::terminate();
-}
-
-/******************************************************************************
- *      STATIC MEMBER CONSTRUCTION
-******************************************************************************/
-GLuint quad::vao( 0 );
-GLuint quad::vbo( 0 );
-
-GLuint triangle::vao( 0 );
-GLuint triangle::vbo( 0 );
-
-GLuint line::vao( 0 );
-GLuint line::vbo( 0 );
-
-GLuint cube::vao( 0 );
-GLuint cube::vbo( 0 );
-
-/******************************************************************************
  *      QUADS
 ******************************************************************************/
 bool quad::init() {
@@ -317,7 +280,7 @@ void cube::terminate() {
 /******************************************************************************
  *      SPHERES
 ******************************************************************************/
-bool sphere::createSphere( int rings, int sectors ) {
+bool sphere::init( int rings, int sectors ) {
     float const R = 1.f / (float)(rings-1);
     float const S = 1.f / (float)(sectors-1);
     
@@ -396,7 +359,7 @@ bool sphere::createSphere( int rings, int sectors ) {
 	return true;
 }
 
-void sphere::destroySphere() {
+void sphere::terminate() {
     glDeleteVertexArrays( 1, &vao );
     glDeleteBuffers( 2, vbo );
 

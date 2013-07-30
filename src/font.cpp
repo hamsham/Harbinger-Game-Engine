@@ -288,7 +288,7 @@ void string3d::setString( const font& f, const char* str ) {
     tempQuad[0].norm =
         tempQuad[1].norm =
             tempQuad[2].norm =
-                tempQuad[3].norm = vec3( 0.f, 0.f, -1.f );
+                tempQuad[3].norm = vec3( 0.f, 0.f, 1.f );
     
     // Create and send the vertices to OpenGL
     int charCount = 0;

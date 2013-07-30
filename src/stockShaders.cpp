@@ -31,10 +31,6 @@ void stockShaders::updateMatricesImpl() {
 }
 
 /******************************************************************************
- * Shader Manager Private Functions
- ******************************************************************************/
-
-/******************************************************************************
  * POINT LIGHT SHADER
  ******************************************************************************/
 bool stockShaders::initPointLightShader() {
@@ -226,51 +222,57 @@ bool stockShaders::initNbtShader() {
  * Shader Manager Initialization
  ******************************************************************************/
 stockShaders::stockShaders() {
-    glGenBuffers( 1, &ubo );
-    printGlError( "Creating pipeline uniform block" );
+    try {
+        glGenBuffers( 1, &ubo );
+        printGlError( "Creating pipeline uniform block" );
 
-    HL_ASSERT( ubo != 0 );
-    
-    HL_ASSERT( shadowShader.loadBuffer( plainVS, sizeof( plainVS ), GL_VERTEX_SHADER ) );
-    HL_ASSERT( shadowShader.loadBuffer( shadowFS, sizeof( shadowFS ), GL_FRAGMENT_SHADER ) );
-    HL_ASSERT( shadowShader.compile() );
-            
-    HL_ASSERT( pointLightShader.loadBuffer( pointVS, sizeof( pointVS ), GL_VERTEX_SHADER ) );
-    HL_ASSERT( pointLightShader.loadBuffer( pointFS, sizeof( pointFS ), GL_FRAGMENT_SHADER ) );
-    HL_ASSERT( pointLightShader.compile() );
-            
-    HL_ASSERT( skyShader.loadBuffer( skyVS, sizeof( skyVS ), GL_VERTEX_SHADER ) );
-    HL_ASSERT( skyShader.loadBuffer( skyFS, sizeof( skyFS ), GL_FRAGMENT_SHADER ) );
-    HL_ASSERT( skyShader.compile() );
-            
-    HL_ASSERT( fontShader.loadBuffer( plainVS, sizeof( plainVS ), GL_VERTEX_SHADER ) );
-    HL_ASSERT( fontShader.loadBuffer( fontFS, sizeof( fontFS ), GL_FRAGMENT_SHADER ) );
-    HL_ASSERT( fontShader.compile() );
-            
-    HL_ASSERT( bbShader.loadBuffer( billboardVS, sizeof( billboardVS ), GL_VERTEX_SHADER ) );
-    HL_ASSERT( bbShader.loadBuffer( billboardGS, sizeof( billboardGS ), GL_GEOMETRY_SHADER ) );
-    HL_ASSERT( bbShader.loadBuffer( billboardFS, sizeof( billboardFS ), GL_FRAGMENT_SHADER ) );
-    HL_ASSERT( bbShader.compile() );
-    
-    HL_ASSERT( nbtShader.loadBuffer( ntbVisualizerVS, sizeof( ntbVisualizerVS ),GL_VERTEX_SHADER ) );
-    HL_ASSERT( nbtShader.loadBuffer( ntbVisualizerGS, sizeof( ntbVisualizerGS ),GL_GEOMETRY_SHADER ) );
-    HL_ASSERT( nbtShader.loadBuffer( ntbVisualizerFS, sizeof( ntbVisualizerFS ),GL_FRAGMENT_SHADER ) );
-    HL_ASSERT( nbtShader.compile() );
-    
-    printGlError("Shader compilation error");
-    
-    HL_ASSERT( initPointLightShader() );
-    HL_ASSERT( initShadowShader() );
-    HL_ASSERT( initSkyShader() );
-    HL_ASSERT( initFontShader() );
-    HL_ASSERT( initBillboardShader() );
-    HL_ASSERT( initNbtShader() );
+        HL_ASSERT( ubo != 0 );
+
+        HL_ASSERT( shadowShader.loadBuffer( plainVS, sizeof( plainVS ), GL_VERTEX_SHADER ) );
+        HL_ASSERT( shadowShader.loadBuffer( shadowFS, sizeof( shadowFS ), GL_FRAGMENT_SHADER ) );
+        HL_ASSERT( shadowShader.compile() );
+
+        HL_ASSERT( pointLightShader.loadBuffer( pointVS, sizeof( pointVS ), GL_VERTEX_SHADER ) );
+        HL_ASSERT( pointLightShader.loadBuffer( pointFS, sizeof( pointFS ), GL_FRAGMENT_SHADER ) );
+        HL_ASSERT( pointLightShader.compile() );
+
+        HL_ASSERT( skyShader.loadBuffer( skyVS, sizeof( skyVS ), GL_VERTEX_SHADER ) );
+        HL_ASSERT( skyShader.loadBuffer( skyFS, sizeof( skyFS ), GL_FRAGMENT_SHADER ) );
+        HL_ASSERT( skyShader.compile() );
+
+        HL_ASSERT( fontShader.loadBuffer( plainVS, sizeof( plainVS ), GL_VERTEX_SHADER ) );
+        HL_ASSERT( fontShader.loadBuffer( fontFS, sizeof( fontFS ), GL_FRAGMENT_SHADER ) );
+        HL_ASSERT( fontShader.compile() );
+
+        HL_ASSERT( bbShader.loadBuffer( billboardVS, sizeof( billboardVS ), GL_VERTEX_SHADER ) );
+        HL_ASSERT( bbShader.loadBuffer( billboardGS, sizeof( billboardGS ), GL_GEOMETRY_SHADER ) );
+        HL_ASSERT( bbShader.loadBuffer( billboardFS, sizeof( billboardFS ), GL_FRAGMENT_SHADER ) );
+        HL_ASSERT( bbShader.compile() );
+
+        HL_ASSERT( nbtShader.loadBuffer( ntbVisualizerVS, sizeof( ntbVisualizerVS ),GL_VERTEX_SHADER ) );
+        HL_ASSERT( nbtShader.loadBuffer( ntbVisualizerGS, sizeof( ntbVisualizerGS ),GL_GEOMETRY_SHADER ) );
+        HL_ASSERT( nbtShader.loadBuffer( ntbVisualizerFS, sizeof( ntbVisualizerFS ),GL_FRAGMENT_SHADER ) );
+        HL_ASSERT( nbtShader.compile() );
+
+        printGlError("Shader compilation error");
+
+        HL_ASSERT( initPointLightShader() );
+        HL_ASSERT( initShadowShader() );
+        HL_ASSERT( initSkyShader() );
+        HL_ASSERT( initFontShader() );
+        HL_ASSERT( initBillboardShader() );
+        HL_ASSERT( initNbtShader() );
+    }
+    catch( const hamLibs::utils::errorType& e ) {
+        terminate();
+        throw hamLibs::utils::ERROR;
+    }
 }
 
 /******************************************************************************
  * Shader Manager Termination
  ******************************************************************************/
-stockShaders::~stockShaders() {
+void stockShaders::terminate() {
     glDeleteBuffers( 1, &ubo );
     ubo = currShader = 0;
     matrixIndexId = GL_INVALID_INDEX;

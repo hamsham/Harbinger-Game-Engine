@@ -64,6 +64,7 @@ class HGE_API stockShaders {
         bool initFontShader();
         bool initBillboardShader();
         bool initNbtShader();
+        void terminate();
         
         // Shader Matrix Updating
         void updateMatricesImpl();
@@ -81,7 +82,7 @@ class HGE_API stockShaders {
         stockShaders& operator = ( const stockShaders& ) = delete;
         stockShaders& operator = ( stockShaders&& ) = delete;
         
-        ~stockShaders();
+        ~stockShaders() { terminate(); }
 
         void    applyShader( GLuint shaderId );
 

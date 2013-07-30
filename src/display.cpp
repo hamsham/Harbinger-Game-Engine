@@ -157,7 +157,7 @@ window::window(
 	glewExperimental = GL_TRUE; // Ensure core extensions are loaded
     if ( glewInit() != GLEW_OK ) {
         glfwDestroyWindow( pContext );
-        HGE_ASSERT( false );
+        throw hamLibs::utils::ERROR;
     }
     
 	std::cout

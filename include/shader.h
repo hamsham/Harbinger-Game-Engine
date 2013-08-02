@@ -24,8 +24,6 @@ class HGE_API shader : public resource {
         GLuint programId = 0;
 
     public:
-        enum : GLint { INVALID_UNIFORM = -1 };
-        
         shader      ()              {}
         ~shader     ()              { unload(); }
 

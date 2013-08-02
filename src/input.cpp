@@ -12,7 +12,20 @@ inputSystem::inputSystem( window& w ) {
 }
 
 inputSystem::inputSystem( inputSystem&& i ) {
-    *this = i;
+    HGE_ASSERT( i.pContext != nullptr );
+    pContext = i.pContext;
+    
+    pKeyButtonCB    = i.pKeyButtonCB;
+    pKeyTextCB      = i.pKeyTextCB;
+    pMouseButtonCB  = i.pMouseButtonCB;
+    pMousePosCB     = i.pMousePosCB;
+    pMouseWheelCB   = i.pMouseWheelCB;
+    
+    i.pKeyButtonCB  = nullptr;
+    i.pKeyTextCB    = nullptr;
+    i.pMouseButtonCB= nullptr;
+    i.pMousePosCB   = nullptr;
+    i.pMouseWheelCB = nullptr;
 }
 
 inputSystem& inputSystem::operator = ( inputSystem&& i ) {

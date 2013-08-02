@@ -284,7 +284,7 @@ bool sphere::init( int rings, int sectors ) {
     float const R = 1.f / (float)(rings-1);
     float const S = 1.f / (float)(sectors-1);
     
-    destroySphere();
+    terminate();
     
     unsigned numVerts = rings * sectors;
     
@@ -336,7 +336,7 @@ bool sphere::init( int rings, int sectors ) {
         std::cerr
             << "An error occurred while initializing the sphere primitives"
             << std::endl;
-        destroySphere();
+        terminate();
         return false;
     }
     

@@ -29,8 +29,8 @@ class primitive {
 ******************************************************************************/
 class HGE_API quad : public primitive {
     private:
-        GLuint   vao;
-        GLuint   vbo;
+        GLuint vao = 0;
+        GLuint vbo = 0;
 
     public:
         quad    () {}
@@ -56,8 +56,8 @@ class HGE_API quad : public primitive {
 ******************************************************************************/
 class HGE_API triangle : public primitive {
     private:
-        GLuint   vao;
-        GLuint   vbo;
+        GLuint vao = 0;
+        GLuint vbo = 0;
 
     public:
         triangle    () {}
@@ -116,8 +116,8 @@ class HGE_API line : public primitive {
 ******************************************************************************/
 class HGE_API cube : public primitive {
     private:
-        GLuint   vao;
-        GLuint   vbo;
+        GLuint   vao = 0;
+        GLuint   vbo = 0;
 
     public:
         cube    () {}
@@ -161,7 +161,7 @@ class HGE_API sphere : public primitive {
         sphere&     operator =  ( sphere&& ) = default;
         
         bool init   ( int rings, int sectors );
-        bool init   () { init( 10, 10 ); }
+        bool init   () { return init( 10, 10 ); }
         void terminate();
         
         void draw() const {

@@ -71,6 +71,7 @@ bool stockShaders::initPointLightShader() {
     ||  camPosId        == pipeline::INVALID_UNIFORM
     ) {
         printGlError("Error accessing a point light uniform variable");
+        glUseProgram( 0 );
         return false;
     }
     
@@ -80,6 +81,7 @@ bool stockShaders::initPointLightShader() {
     printGlError( "Normal Sampler error" );
     glUniform1i( shadowId, pipeline::HGE_SAMPLER_SHADOWMAP );
     printGlError( "Shadowmap Sampler error" );
+    glUseProgram( 0 );
     
     return true;
 }
@@ -100,11 +102,13 @@ bool stockShaders::initShadowShader() {
     
     if ( shadowMapId == pipeline::INVALID_UNIFORM ) {
         printGlError("Error accessing a shadowmap uniform variable");
+        glUseProgram( 0 );
         return false;
     }
     
     glUniform1i( shadowMapId, pipeline::HGE_SAMPLER_SHADOWMAP );
     printGlError( "Shadowmap sampler error" );
+    glUseProgram( 0 );
     
     return true;
 }
@@ -125,11 +129,13 @@ bool stockShaders::initSkyShader() {
     
     if ( skyTexId == pipeline::INVALID_UNIFORM ) {
         printGlError("Error accessing a skybox uniform variable");
+        glUseProgram( 0 );
         return false;
     }
     
     glUniform1i( skyTexId, pipeline::HGE_SAMPLER_DIFFUSE );
     printGlError( "Skybox sampler error" );
+    glUseProgram( 0 );
     
     return true;
 }
@@ -153,11 +159,13 @@ bool stockShaders::initFontShader() {
     ||      fontColId   == pipeline::INVALID_UNIFORM
     ) {
         printGlError("Error accessing a font uniform variable");
+        glUseProgram( 0 );
         return false;
     }
     
     glUniform1i( fontSampler, pipeline::HGE_SAMPLER_DIFFUSE );
     printGlError( "Font Sampler error" );
+    glUseProgram( 0 );
     
     return true;
 }
@@ -181,12 +189,14 @@ bool stockShaders::initBillboardShader() {
     ||      bbTexSampler== pipeline::INVALID_UNIFORM
     ) {
         printGlError("Error accessing a billboard uniform variable");
+        glUseProgram( 0 );
         return false;
     }
     
     glUniform1i( bbTexSampler, pipeline::HGE_SAMPLER_DEFAULT );
     
     printGlError( "Billboard Sampler error" );
+    glUseProgram( 0 );
     
     return true;
 }
@@ -213,7 +223,10 @@ bool stockShaders::initNbtShader() {
     ) {
         printGlError("Error accessing an NBT uniform variable");
         return false;
+        glUseProgram( 0 );
     }
+    
+    glUseProgram( 0 );
     
     return true;
 }
@@ -263,7 +276,7 @@ stockShaders::stockShaders() {
         HL_ASSERT( initBillboardShader() );
         HL_ASSERT( initNbtShader() );
     }
-    catch( const hamLibs::utils::errorType& e ) {
+    catch( hamLibs::utils::errorType e ) {
         terminate();
         throw hamLibs::utils::ERROR;
     }

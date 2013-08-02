@@ -57,7 +57,7 @@ class HGE_API skybox {
         
         void unload() {
             skyTex.unload();
-            spherePrim.destroySphere();
+            spherePrim.terminate();
         }
         
         inline static void draw( const cubemap& c, const sphere& s ) {

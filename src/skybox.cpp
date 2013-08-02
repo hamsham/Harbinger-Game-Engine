@@ -16,7 +16,7 @@ bool skybox::load( const char* skyFiles[ 6 ] ) {
     ||      !skyTex.load( skyFiles[ 3 ], 3 )
     ||      !skyTex.load( skyFiles[ 4 ], 4 )
     ||      !skyTex.load( skyFiles[ 5 ], 5 )
-    ||      !spherePrim.createSphere( 10, 10 )
+    ||      !spherePrim.init( 10, 10 )
     ) {
         unload();
         return false;

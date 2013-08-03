@@ -10,7 +10,6 @@ namespace {
 //-----------------------------------------------------------------------------
 void printShaderError(GLuint programId, GLuint shaderId ) {
     printGlError("Error with shader subroutine");
-
     int infoLogLength = 0;
     GLchar* programInfoLog = 0;
     GLchar* shaderInfoLog = 0;
@@ -59,18 +58,7 @@ bool shader::compile() {
         std::cerr << "WARNING: Attempted to compile a shader program without input" << std::endl;
         return false;
     }
-
-    if (programId) {
-        glDeleteProgram(programId);
-        programId = 0;
-    }
-    programId = glCreateProgram();
     GLint shaderStatus(0);
-
-    // Link the shader files
-    for (unsigned i(0); i < shaderIds.size(); ++i) {
-        glAttachShader(programId, shaderIds[ i ]);
-    }
     
     glLinkProgram(programId);
     glGetProgramiv(programId, GL_LINK_STATUS, &shaderStatus);
@@ -116,6 +104,16 @@ bool shader::load( const char* shaderFilePath, int shaderType ) {
 bool shader::loadBuffer( const char* buffer, int length, int shaderType ) {
     GLint shaderStatus(0);
     GLuint shaderId( 0 );
+    
+    if ( !programId ) {
+        programId = glCreateProgram();
+        
+        if ( !programId ) {
+            std::cerr << "ERROR: Unable to create a shader program." << std::endl;
+            return false;
+        }
+    }
+    
 
     shaderId = glCreateShader( shaderType ); // Fragment shader or Vertex Shader
     glShaderSource( shaderId, 1, (const GLchar**)&buffer, (const GLint*)&length );
@@ -128,6 +126,7 @@ bool shader::loadBuffer( const char* buffer, int length, int shaderType ) {
         return false;
     }
     
+    glAttachShader( programId, shaderId );
     shaderIds.push_back( shaderId );
 
     printGlError("General shader loading error");

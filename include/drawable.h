@@ -27,7 +27,7 @@ class HGE_API drawable {
         GLenum renderMode = DRAW_DEFAULT;
     
     public:
-        drawable        ();
+        drawable        () {}
         drawable        ( drawable&& );
         drawable        ( const drawable& ) = delete;
         

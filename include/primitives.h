@@ -17,7 +17,7 @@ namespace hge {
 /******************************************************************************
  * Primitive Setup
 ******************************************************************************/
-class primitive : public drawable {
+class HGE_API primitive : public drawable {
     public:
         primitive       () {}
         primitive       ( primitive&& );

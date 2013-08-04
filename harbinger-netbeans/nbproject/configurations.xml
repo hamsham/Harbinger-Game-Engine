@@ -18,6 +18,7 @@
       <itemPath>../include/bitmap.h</itemPath>
       <itemPath>../include/camera.h</itemPath>
       <itemPath>../include/display.h</itemPath>
+      <itemPath>../include/drawable.h</itemPath>
       <itemPath>../include/font.h</itemPath>
       <itemPath>../include/geometry.h</itemPath>
       <itemPath>../include/harbinger.h</itemPath>
@@ -41,6 +42,7 @@
       <itemPath>../src/bitmap.cpp</itemPath>
       <itemPath>../src/camera.cpp</itemPath>
       <itemPath>../src/display.cpp</itemPath>
+      <itemPath>../src/drawable.cpp</itemPath>
       <itemPath>../src/font.cpp</itemPath>
       <itemPath>../src/geometry.cpp</itemPath>
       <itemPath>../src/harbinger.cpp</itemPath>
@@ -157,6 +159,8 @@
       </item>
       <item path="../include/display.h" ex="false" tool="3" flavor2="0">
       </item>
+      <item path="../include/drawable.h" ex="false" tool="3" flavor2="0">
+      </item>
       <item path="../include/font.h" ex="false" tool="3" flavor2="0">
       </item>
       <item path="../include/geometry.h" ex="false" tool="3" flavor2="0">
@@ -198,6 +202,8 @@
       <item path="../src/camera.cpp" ex="false" tool="1" flavor2="0">
       </item>
       <item path="../src/display.cpp" ex="false" tool="1" flavor2="0">
+      </item>
+      <item path="../src/drawable.cpp" ex="false" tool="1" flavor2="0">
       </item>
       <item path="../src/font.cpp" ex="false" tool="1" flavor2="0">
       </item>
@@ -322,6 +328,8 @@
       </item>
       <item path="../include/display.h" ex="false" tool="3" flavor2="0">
       </item>
+      <item path="../include/drawable.h" ex="false" tool="3" flavor2="0">
+      </item>
       <item path="../include/font.h" ex="false" tool="3" flavor2="0">
       </item>
       <item path="../include/geometry.h" ex="false" tool="3" flavor2="0">
@@ -363,6 +371,8 @@
       <item path="../src/camera.cpp" ex="false" tool="1" flavor2="0">
       </item>
       <item path="../src/display.cpp" ex="false" tool="1" flavor2="0">
+      </item>
+      <item path="../src/drawable.cpp" ex="false" tool="1" flavor2="0">
       </item>
       <item path="../src/font.cpp" ex="false" tool="1" flavor2="0">
       </item>
@@ -473,6 +483,8 @@
       </item>
       <item path="../include/display.h" ex="false" tool="3" flavor2="0">
       </item>
+      <item path="../include/drawable.h" ex="false" tool="3" flavor2="0">
+      </item>
       <item path="../include/font.h" ex="false" tool="3" flavor2="0">
       </item>
       <item path="../include/geometry.h" ex="false" tool="3" flavor2="0">
@@ -514,6 +526,8 @@
       <item path="../src/camera.cpp" ex="false" tool="1" flavor2="0">
       </item>
       <item path="../src/display.cpp" ex="false" tool="1" flavor2="0">
+      </item>
+      <item path="../src/drawable.cpp" ex="false" tool="1" flavor2="0">
       </item>
       <item path="../src/font.cpp" ex="false" tool="1" flavor2="0">
       </item>
@@ -632,6 +646,8 @@
       </item>
       <item path="../include/display.h" ex="false" tool="3" flavor2="0">
       </item>
+      <item path="../include/drawable.h" ex="false" tool="3" flavor2="0">
+      </item>
       <item path="../include/font.h" ex="false" tool="3" flavor2="0">
       </item>
       <item path="../include/geometry.h" ex="false" tool="3" flavor2="0">
@@ -673,6 +689,8 @@
       <item path="../src/camera.cpp" ex="false" tool="1" flavor2="0">
       </item>
       <item path="../src/display.cpp" ex="false" tool="1" flavor2="0">
+      </item>
+      <item path="../src/drawable.cpp" ex="false" tool="1" flavor2="0">
       </item>
       <item path="../src/font.cpp" ex="false" tool="1" flavor2="0">
       </item>

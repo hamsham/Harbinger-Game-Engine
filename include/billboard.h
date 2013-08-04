@@ -9,10 +9,11 @@
 #define	__HGE_BILLBOARD_H__
 
 #include "pipeline.h"
+#include "drawable.h"
 
 namespace hge {
 
-class HGE_API billboard {
+class HGE_API billboard final : public drawable {
     private:
         GLuint      vao     = 0;
         GLuint      vbo     = 0;
@@ -32,6 +33,11 @@ class HGE_API billboard {
         
         // Ensure that a bitmap has been bound before drawing
         void        draw            () const;
+        
+        // Billboards only have one available draw mode and one attribute
+        void        enableAttribute ( pipeline::attribute ) {}
+        void        disableAttribute( pipeline::attribute ) {}
+        void        setDrawMode     ( drawable::drawMode ) {}
 };
 
 } // end ge namespace

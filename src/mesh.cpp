@@ -7,6 +7,7 @@
 
 #include <iostream>
 #include <cstring>
+#include <utility>
 #include <assimp/scene.h>
 #include <assimp/Importer.hpp>
 #include <assimp/postprocess.h>
@@ -15,95 +16,107 @@
 
 namespace hge {
 
-///////////////////////////////////////////////////////////////////////////////
-//	Mesh Structure
-///////////////////////////////////////////////////////////////////////////////
-mesh::meshEntry::meshEntry() :
-	matIndex	( 0 ),
-	baseVertex	( 0 ),
-	baseIndex	( 0 ),
-	numIndices	( 0 )
-{}
+/******************************************************************************
+ * Mesh Entry Structure
+******************************************************************************/
+//mesh::meshEntry::meshEntry() :
+//	matIndex	( 0 ),
+//	baseVertex	( 0 ),
+//	baseIndex	( 0 ),
+//	numIndices	( 0 )
+//{}
+//
+//mesh::meshEntry::meshEntry( const mesh::meshEntry& meCopy) :
+//	matIndex	( meCopy.matIndex ),
+//	baseVertex	( meCopy.baseVertex ),
+//	baseIndex	( meCopy.baseIndex ),
+//	numIndices	( meCopy.numIndices )
+//{}
+//
+//mesh::meshEntry& mesh::meshEntry::operator = ( const mesh::meshEntry& meCopy ) {
+//	matIndex	= meCopy.matIndex;
+//	baseVertex	= meCopy.baseVertex;
+//	baseIndex	= meCopy.baseIndex;
+//	numIndices	= meCopy.numIndices;
+//	return *this;
+//}
 
-mesh::meshEntry::meshEntry( const mesh::meshEntry& meCopy) :
-	matIndex	( meCopy.matIndex ),
-	baseVertex	( meCopy.baseVertex ),
-	baseIndex	( meCopy.baseIndex ),
-	numIndices	( meCopy.numIndices )
-{}
-
-mesh::meshEntry& mesh::meshEntry::operator = ( const mesh::meshEntry& meCopy ) {
-	matIndex	= meCopy.matIndex;
-	baseVertex	= meCopy.baseVertex;
-	baseIndex	= meCopy.baseIndex;
-	numIndices	= meCopy.numIndices;
-	return *this;
-}
-
-///////////////////////////////////////////////////////////////////////////////
-//	Mesh Resources
-///////////////////////////////////////////////////////////////////////////////
-//-----------------------------------------------------------------------------
-// Mesh - Move Operators
-//-----------------------------------------------------------------------------
+/******************************************************************************
+ * Mesh -- Construction & Move Semantics
+******************************************************************************/
 mesh::mesh( mesh&& m ) :
-    resource( m ),
-    numMeshes( m.numMeshes ),
-    numTextures( m.numTextures ),
-    vao( m.vao ),
-    buffers{ m.buffers[ 0 ], m.buffers[ 1 ] },
-    entries( m.entries ),
-    textures( m.textures )
+    resource    ( std::move( m ) ),
+    drawable    ( std::move( m ) ),
+    numMeshes   ( m.numMeshes ),
+    numTextures ( m.numTextures ),
+    buffers     { m.buffers[ 0 ], m.buffers[ 1 ] },
+    entries     ( m.entries ),
+    textures    ( m.textures )
 {
-    m.entries = nullptr;
-    m.textures = nullptr;
+    m.numMeshes     = 0;
+    m.numTextures   = 0;
+    m.buffers[0]    = m.buffers[1] = 0;
+    m.entries       = nullptr;
+    m.textures      = nullptr;
 }
 
 mesh& mesh::operator = ( mesh&& m ) {
-    numMeshes       = m.numMeshes;
-    numTextures     = m.numTextures;
-    vao             = m.vao;
-    buffers[ 0 ]    = m.buffers[ 0 ];
-    buffers[ 1 ]    = m.buffers[ 1 ];
-    entries         = m.entries;
-    textures        = m.textures;
+    resource::operator =( std::move( m ) );
+    drawable::operator =( std::move( m ) );
     
-    m.entries = nullptr;
-    m.textures = nullptr;
+    numMeshes       = m.numMeshes;
+    m.numMeshes     = 0;
+    
+    numTextures     = m.numTextures;
+    m.numTextures   = 0;
+    
+    buffers[ 0 ]    = m.buffers[ 0 ];
+    m.buffers[0]    = 0;
+    buffers[ 1 ]    = m.buffers[ 1 ];
+    m.buffers[1]    = 0;
+    
+    delete [] entries;
+    entries         = m.entries;
+    m.entries       = nullptr;
+    
+    delete [] textures;
+    textures        = m.textures;
+    m.textures      = nullptr;
+    
+    return *this;
 }
 
-//-----------------------------------------------------------------------------
-// Mesh - Unloading
-//-----------------------------------------------------------------------------
+/******************************************************************************
+ * Mesh Unloading
+******************************************************************************/
 void mesh::unload() {
-	if ( entries ) {
-		delete [] entries;
-		entries = nullptr;
-		numMeshes = 0;
-	}
-	if ( textures ) {
-		delete [] textures;
-		textures = nullptr;
-		numTextures = 0;
-	}
+    delete [] entries;
+    entries = nullptr;
+    numMeshes = 0;
+
+    delete [] textures;
+    textures = nullptr;
+    numTextures = 0;
     
 	glDeleteVertexArrays( 1, &vao );
 	vao = 0;
     
 	glDeleteBuffers( 2, buffers );
     buffers[ 0 ] = buffers[ 1 ] = 0;
+    
+    resetDrawMode();
 }
 
-//-----------------------------------------------------------------------------
-// Mesh - Loading Check
-//-----------------------------------------------------------------------------
+/******************************************************************************
+ * Mesh load check
+******************************************************************************/
 bool mesh::isLoaded() const {
 	return ( entries != nullptr && textures != nullptr );
 }
 
-//-----------------------------------------------------------------------------
-// Mesh - Loading
-//-----------------------------------------------------------------------------
+/******************************************************************************
+ * Mesh loading
+******************************************************************************/
 bool mesh::load( const char* fileName, int flags ) {
 	std::cout << "Loading 3d mesh data:" << "\n\tFile:\t" << fileName << "\n";
 	
@@ -116,23 +129,24 @@ bool mesh::load( const char* fileName, int flags ) {
 	unsigned numIndices         = 0;
 	
 	std::cout << "\tReading data from the file...\n";
-	//pScene = importer.ReadFile( fileName, aiProcessPreset_TargetRealtime_MaxQuality );
-	pScene = importer.ReadFile( fileName,   aiProcess_Triangulate           |
-                                            aiProcess_GenSmoothNormals      |
-                                            aiProcess_GenUVCoords           |
-                                            aiProcess_CalcTangentSpace      |
-                                            aiProcess_JoinIdenticalVertices |
-                                            aiProcess_SplitLargeMeshes      |
-                                            aiProcess_OptimizeMeshes        |
-                                            aiProcess_FindInstances         |
-                                            aiProcess_ValidateDataStructure |
-                                            aiProcess_RemoveRedundantMaterials |
-                                            aiProcess_ImproveCacheLocality  |
-                                            aiProcess_SortByPType           |
-                                            aiProcess_FindDegenerates       |
-                                            aiProcess_FindInvalidData       |
-                                            aiProcess_RemoveComponent       |
-                                            0
+	pScene = importer.ReadFile(
+        fileName,
+        aiProcess_Triangulate               |
+        aiProcess_GenSmoothNormals          |
+        aiProcess_GenUVCoords               |
+        aiProcess_CalcTangentSpace          |
+        aiProcess_JoinIdenticalVertices     |
+        aiProcess_SplitLargeMeshes          |
+        aiProcess_OptimizeMeshes            |
+        aiProcess_FindInstances             |
+        aiProcess_ValidateDataStructure     |
+        aiProcess_RemoveRedundantMaterials  |
+        aiProcess_ImproveCacheLocality      |
+        aiProcess_SortByPType               |
+        aiProcess_FindDegenerates           |
+        aiProcess_FindInvalidData           |
+        aiProcess_RemoveComponent           |
+        0
     );
 	if ( pScene == nullptr ) {
 		std::cout << "\tFailed. " << importer.GetErrorString() << std::endl;
@@ -181,12 +195,13 @@ bool mesh::load( const char* fileName, int flags ) {
 	delete [] indexArray;
 	
 	std::cout << "Successfully loaded " << fileName << std::endl;
+    resetDrawMode();
 	return true;
 }
 
-//-----------------------------------------------------------------------------
-// Mesh - Data preparation process
-//-----------------------------------------------------------------------------
+/******************************************************************************
+ * Mesh Data preparation
+******************************************************************************/
 bool mesh::prepMeshes( const aiScene* pScene, unsigned& numVerts, unsigned& numIndices ) {
 	numVerts    = 0;
 	numIndices  = 0;
@@ -216,9 +231,9 @@ bool mesh::prepMeshes( const aiScene* pScene, unsigned& numVerts, unsigned& numI
 	return true;
 }
 
-//-----------------------------------------------------------------------------
-// Mesh - Mesh data loading
-//-----------------------------------------------------------------------------
+/******************************************************************************
+ * Mesh loading
+******************************************************************************/
 bool mesh::loadMeshes( const aiScene* pScene, bumpVertex* vertArray, unsigned* indexArray ) {
 	const aiMesh* pMesh( nullptr );
     unsigned vertIter   = 0;
@@ -283,9 +298,9 @@ bool mesh::loadMeshes( const aiScene* pScene, bumpVertex* vertArray, unsigned* i
     return true;
 }
 
-//-----------------------------------------------------------------------------
-// Mesh - Texture Loading
-//-----------------------------------------------------------------------------
+/******************************************************************************
+ * Mesh texture loading
+******************************************************************************/
 bool mesh::loadTextures( const aiScene* pScene, const char* fileName ) {
     std::string currDir = fileName;
     std::string::size_type slash = currDir.find_last_of("/\\");
@@ -317,9 +332,9 @@ bool mesh::loadTextures( const aiScene* pScene, const char* fileName ) {
     return true;
 }
 
-//-----------------------------------------------------------------------------
-// Mesh - Loading Specific Texture Types
-//-----------------------------------------------------------------------------
+/******************************************************************************
+ * Mesh loading specific texture types
+******************************************************************************/
 void mesh::loadTexType(
     int index,
     const aiMaterial* pMaterial,
@@ -343,9 +358,9 @@ void mesh::loadTexType(
     }
 }
 
-//-----------------------------------------------------------------------------
-// Mesh - Send data to the GPU
-//-----------------------------------------------------------------------------
+/******************************************************************************
+ * Mesh uploading to GPU
+******************************************************************************/
 void mesh::loadVao(
 	bumpVertex* vertices, unsigned numVertices,
 	unsigned* indices, unsigned numIndices
@@ -369,9 +384,9 @@ void mesh::loadVao(
 	glBindVertexArray( 0 );
 }
 
-//-----------------------------------------------------------------------------
-// Scene Drawing
-//-----------------------------------------------------------------------------
+/******************************************************************************
+ * Mesh drawing
+******************************************************************************/
 void mesh::draw() const {
 	glBindVertexArray( vao );
 	
@@ -383,7 +398,7 @@ void mesh::draw() const {
             textures[ matIndex ].activate();
 		
 		glDrawElementsBaseVertex(
-			GL_TRIANGLES, entries[ i ].numIndices, GL_UNSIGNED_INT,
+			renderMode, entries[ i ].numIndices, GL_UNSIGNED_INT,
 			( GLvoid* )( sizeof( unsigned ) * entries[ i ].baseIndex ),
 			entries[ i ].baseVertex
 		);

@@ -6,14 +6,43 @@
  */
 
 #include <iostream>
+#include <utility>
 #include "primitives.h"
 #include "geometry.h"
 
 namespace hge {
 
 /******************************************************************************
+ *      PRIMITIVE BASE CLASS
+******************************************************************************/
+primitive::primitive( primitive&& p ) :
+    drawable( std::move( p ) )
+{
+    p.vao = 0;
+}
+
+primitive& primitive::operator = ( primitive&& p ) {
+    drawable::operator=( std::move( p ) );
+    return *this;
+}
+
+/******************************************************************************
  *      QUADS
 ******************************************************************************/
+quad::quad( quad&& q ) :
+    primitive( std::move( q ) ),
+    vbo( q.vbo )
+{
+    q.vbo = 0;
+}
+
+quad& quad::operator = ( quad&& q ) {
+    primitive::operator=( std::move( q ) );
+    vbo = q.vbo;
+    q.vbo = 0;
+    return *this;
+}
+
 bool quad::init() {
 	if ( vao )
         return true;
@@ -58,6 +87,8 @@ bool quad::init() {
 	
 	glBindVertexArray( 0 );
     
+    resetDrawMode();
+    
 	return true;
 }
 
@@ -71,6 +102,20 @@ void quad::terminate() {
 /******************************************************************************
  *      TRIANGLES
 ******************************************************************************/
+triangle::triangle( triangle&& t ) :
+    primitive( std::move( t ) ),
+    vbo( t.vbo )
+{
+    t.vbo = 0;
+}
+
+triangle& triangle::operator = ( triangle&& t ) {
+    primitive::operator=( std::move( t ) );
+    vbo = t.vbo;
+    t.vbo = 0;
+    return *this;
+}
+
 bool triangle::init() {
 	if ( vao )
         return true;
@@ -111,6 +156,8 @@ bool triangle::init() {
 	
 	glBindVertexArray( 0 );
     
+    resetDrawMode();
+    
 	return true;
 }
 
@@ -124,6 +171,23 @@ void triangle::terminate() {
 /******************************************************************************
  *      LINES
 ******************************************************************************/
+line::line( line&& l ) :
+    primitive( std::move( l ) ),
+    vbo( l.vbo ),
+    points{ l.points[0], l.points[1] }
+{
+    l.vbo = 0;
+}
+
+line& line::operator = ( line&& l ) {
+    primitive::operator=( std::move( l ) );
+    vbo = l.vbo;
+    l.vbo = 0;
+    points[0] = l.points[0];
+    points[1] = l.points[1];
+    return *this;
+}
+
 bool line::init() {
     if ( vao )
         return true;
@@ -140,8 +204,8 @@ bool line::init() {
     glBindBuffer( GL_ARRAY_BUFFER, vbo );
     
     glBufferData(
-        GL_ARRAY_BUFFER, sizeof( line().points ),
-        &line().points[0].v, GL_STREAM_DRAW
+        GL_ARRAY_BUFFER, sizeof( points ),
+        points[0].v, GL_STREAM_DRAW
     );
     printGlError( "Initializing a line primitive" );
     glVertexAttribPointer( pipeline::VERTEX_ATTRIB, 3, GL_FLOAT, GL_FALSE, 0, 0 );
@@ -152,6 +216,9 @@ bool line::init() {
     glDisableVertexAttribArray( pipeline::TANGENT_ATTRIB );
     
     glBindVertexArray( 0 );
+    
+    resetDrawMode();
+    
     return true;
 }
 
@@ -174,6 +241,20 @@ void line::setVertPos( int index, const vec3& inPos ) {
 /******************************************************************************
  *      CUBES
 ******************************************************************************/
+cube::cube( cube&& c ) :
+    primitive( std::move( c ) ),
+    vbo( c.vbo )
+{
+    c.vbo = 0;
+}
+
+cube& cube::operator = ( cube&& c ) {
+    primitive::operator=( std::move( c ) );
+    vbo = c.vbo;
+    c.vbo = 0;
+    return *this;
+}
+
 bool cube::init() {
     
     if ( vao )
@@ -267,6 +348,8 @@ bool cube::init() {
     glBindVertexArray( 0 );
     printGlError( "Creating a cube object" );
     
+    resetDrawMode();
+    
     return true;
 }
 
@@ -280,6 +363,21 @@ void cube::terminate() {
 /******************************************************************************
  *      SPHERES
 ******************************************************************************/
+sphere::sphere( sphere&& s ) :
+    primitive( std::move( s ) ),
+    vbo{ s.vbo[0], s.vbo[1] }
+{
+    s.vbo[0] = s.vbo[1] = 0;
+}
+
+sphere& sphere::operator = ( sphere&& s ) {
+    primitive::operator=( std::move( s ) );
+    vbo[0] = s.vbo[0];
+    vbo[1] = s.vbo[1];
+    s.vbo[0] = s.vbo[1] = 0;
+    return *this;
+}
+
 bool sphere::init( int rings, int sectors ) {
     float const R = 1.f / (float)(rings-1);
     float const S = 1.f / (float)(sectors-1);
@@ -355,6 +453,8 @@ bool sphere::init( int rings, int sectors ) {
     
     delete [] vertices;
     delete [] indices;
+    
+    resetDrawMode();
     
 	return true;
 }

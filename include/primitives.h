@@ -10,102 +10,119 @@
 
 #include "types.h"
 #include "pipeline.h"
+#include "drawable.h"
 
 namespace hge {
 
 /******************************************************************************
  * Primitive Setup
 ******************************************************************************/
-class primitive {
+class primitive : public drawable {
     public:
+        primitive       () {}
+        primitive       ( primitive&& );
+        primitive       ( const primitive& ) = delete;
+        
         virtual ~primitive() {}
         
-        virtual bool init() = 0;
-        virtual void terminate() = 0;
+        primitive&      operator =      ( const primitive& ) = delete;
+        primitive&      operator =      ( primitive&& );
+        
+        virtual bool    init            () = 0;
+        virtual void    terminate       () = 0;
 };
 
 /******************************************************************************
  * Quad Primitives
 ******************************************************************************/
-class HGE_API quad : public primitive {
+class HGE_API quad final : public primitive {
     private:
-        GLuint vao = 0;
         GLuint vbo = 0;
 
     public:
         quad    () {}
+        quad    ( const quad& ) = delete;
+        quad    ( quad&& );
+        
         ~quad   () { terminate(); }
         
-        quad    ( const quad& ) = delete;
-        quad    ( quad&& ) = default;
-        quad&   operator =  ( const quad& ) = delete;
-        quad&   operator =  ( quad&& ) = default;
+        quad&   operator =      ( const quad& ) = delete;
+        quad&   operator =      ( quad&& );
         
-        bool init();
-        void terminate();
+        bool    init            ();
+        void    terminate       ();
 
-        void draw() const {
-            glBindVertexArray( vao );
-            glDrawArrays( GL_TRIANGLE_STRIP, 0, 4 );
-            glBindVertexArray( 0 );
-        }
+        // drawing
+        void    resetDrawMode   () { renderMode = GL_TRIANGLE_STRIP; }
+        void    draw            () const {
+                                    glBindVertexArray( vao );
+                                    glDrawArrays( renderMode, 0, 4 );
+                                    glBindVertexArray( 0 );
+                                }
 };
 
 /******************************************************************************
  * Triangle Primitives
 ******************************************************************************/
-class HGE_API triangle : public primitive {
+class HGE_API triangle final : public primitive {
     private:
-        GLuint vao = 0;
         GLuint vbo = 0;
 
     public:
         triangle    () {}
+        triangle    ( const triangle& ) = delete;
+        triangle    ( triangle&& );
+        
         ~triangle   () { terminate(); }
         
-        triangle    ( const triangle& ) = delete;
-        triangle    ( triangle&& ) = default;
-        triangle&   operator =  ( const triangle& ) = delete;
-        triangle&   operator =  ( triangle&& ) = default;
+        triangle&   operator =      ( const triangle& ) = delete;
+        triangle&   operator =      ( triangle&& );
         
-        bool init();
-        void terminate();
+        bool        init            ();
+        void        terminate       ();
 
-        void draw() const {
-            glBindVertexArray( vao );
-            glDrawArrays( GL_TRIANGLE_STRIP, 0, 3 );
-            glBindVertexArray( 0 );
-        }
+        // drawing
+        void        resetDrawMode   () { renderMode = GL_TRIANGLES; }
+        void        draw            () const {
+                                        glBindVertexArray( vao );
+                                        glDrawArrays( renderMode, 0, 3 );
+                                        glBindVertexArray( 0 );
+                                    }
 };
 
 /******************************************************************************
  * Line Primitive
 ******************************************************************************/
-class HGE_API line : public primitive {
-        
-        GLuint  vao = 0;
+class HGE_API line final : public primitive {
         GLuint  vbo = 0;
         vec3    points[ 2 ] = { {0.f}, {1.f} };
         
     public:
-        line    () {}
-        ~line   () { terminate(); }
+        line        () {}
+        line        ( const line& ) = delete;
+        line        ( line&& );
         
-        line    ( const line& ) = delete;
-        line    ( line&& ) = default;
-        line&   operator =  ( const line& ) = delete;
-        line&   operator =  ( line&& ) = default;
+        ~line       () { terminate(); }
         
-        bool init();
-        void terminate();
+        line&       operator =      ( const line& ) = delete;
+        line&       operator =      ( line&& );
         
-        void setVertPos( int index, const vec3& inPos );
+        bool        init            ();
+        void        terminate       ();
         
-        void draw() const {
-            glBindVertexArray( vao );
-            glDrawArrays( GL_LINES, 0, 2 );
-            glBindVertexArray( 0 );
-        }
+        // attribute manipulation
+        void        enableAttribute ( pipeline::attribute ) override {}
+        void        disableAttribute( pipeline::attribute ) override {}
+        
+        void        setVertPos      ( int index, const vec3& inPos );
+
+        // drawing
+        void        resetDrawMode   () { renderMode = GL_LINES; }
+        void        draw            () const {
+                                        glBindVertexArray( vao );
+                                        glDrawArrays( renderMode, 0, 2 );
+                                        glBindVertexArray( 0 );
+                                    }
 };
 
 /******************************************************************************
@@ -114,28 +131,30 @@ class HGE_API line : public primitive {
  * NOTE:
  *      Cubes can also be rendered using a cubemap texture
 ******************************************************************************/
-class HGE_API cube : public primitive {
+class HGE_API cube final : public primitive {
     private:
-        GLuint   vao = 0;
         GLuint   vbo = 0;
 
     public:
         cube    () {}
+        cube    ( const cube& ) = delete;
+        cube    ( cube&& );
+        
         ~cube   () { terminate(); }
         
-        cube    ( const cube& ) = delete;
-        cube    ( cube&& ) = default;
-        cube&   operator =  ( const cube& ) = delete;
-        cube&   operator =  ( cube&& ) = default;
+        cube&   operator =      ( const cube& ) = delete;
+        cube&   operator =      ( cube&& );
         
-        bool init();
-        void terminate();
-        
-        void draw() const {
-            glBindVertexArray( vao );
-            glDrawArrays( GL_TRIANGLE_STRIP, 0, 26 );
-            glBindVertexArray( 0 );
-        }
+        bool    init            ();
+        void    terminate       ();
+
+        // drawing
+        void    resetDrawMode   () { renderMode = GL_TRIANGLE_STRIP; }
+        void    draw            () const {
+                                    glBindVertexArray( vao );
+                                    glDrawArrays( renderMode, 0, 26 );
+                                    glBindVertexArray( 0 );
+                                }
 };
 
 /******************************************************************************
@@ -145,30 +164,35 @@ class HGE_API cube : public primitive {
  *      Use c_drawable::scale as the sphere's radius
  *      Spheres can also be rendered using a cubemap texture
 ******************************************************************************/
-class HGE_API sphere : public primitive {
+class HGE_API sphere final : public primitive {
     private:
-        GLuint vao = 0;
         GLuint vbo[ 2 ] = { 0, 0 };
         unsigned numIndices = 0;
         
     public:
         sphere      () {}
+        sphere      ( const sphere& ) = delete;
+        sphere      ( sphere&& );
+        
         ~sphere     () { terminate(); }
         
-        sphere      ( const sphere& ) = delete;
-        sphere      ( sphere&& ) = default;
-        sphere&     operator =  ( const sphere& ) = delete;
-        sphere&     operator =  ( sphere&& ) = default;
+        sphere&     operator =      ( const sphere& ) = delete;
+        sphere&     operator =      ( sphere&& );
         
-        bool init   ( int rings, int sectors );
-        bool init   () { return init( 10, 10 ); }
-        void terminate();
-        
-        void draw() const {
-            glBindVertexArray( vao );
-            glDrawElements( GL_TRIANGLE_STRIP, numIndices, GL_UNSIGNED_INT, 0 );
-            glBindVertexArray( 0 );
-        }
+        bool        init            ( int rings, int sectors );
+        bool        init            () { return init( 10, 10 ); }
+        void        terminate       ();
+
+        // drawing
+        void        resetDrawMode   () { renderMode = GL_TRIANGLE_STRIP; }
+        void        draw            () const {
+                                        glBindVertexArray( vao );
+                                        glDrawElements(
+                                            renderMode, numIndices,
+                                            GL_UNSIGNED_INT, 0
+                                        );
+                                        glBindVertexArray( 0 );
+                                    }
 };
 
 } // end hge namespace

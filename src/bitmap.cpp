@@ -6,6 +6,7 @@
  */
 
 #include <iostream>
+#include <utility>
 #include <FreeImage.h>
 #include "pipeline.h"
 #include "bitmap.h"
@@ -166,34 +167,30 @@ namespace hge {
 /******************************************************************************
  *      2D Bitmaps
 ******************************************************************************/
-bitmap::bitmap( bitmap&& orig ) :
-	resource(),
-	oglTexture( orig.oglTexture ),
-	bmpWidth( orig.bmpWidth ),
-	bmpHeight( orig.bmpHeight )
+bitmap::bitmap( bitmap&& bmpCopy ) :
+    resource    ( std::move( bmpCopy ) ),
+    texture     ( std::move( bmpCopy ) ),
+	bmpWidth    ( bmpCopy.bmpWidth ),
+	bmpHeight   ( bmpCopy.bmpHeight )
 {
-	orig.oglTexture = 0;
-	orig.bmpWidth = 0;
-	orig.bmpHeight = 0;
+	bmpCopy.bmpWidth = 0;
+	bmpCopy.bmpHeight = 0;
 }
 
 bitmap& bitmap::operator =( bitmap&& bmpCopy ) {
-	oglTexture = bmpCopy.oglTexture;
-	bmpWidth = bmpCopy.bmpWidth;
-	bmpHeight = bmpCopy.bmpHeight;
+    resource::operator=( std::move( bmpCopy ) );
+    texture::operator=( std::move( bmpCopy ) );
+	textureUnit = bmpCopy.textureUnit;
+	textureId   = bmpCopy.textureId;
+	bmpWidth    = bmpCopy.bmpWidth;
+	bmpHeight   = bmpCopy.bmpHeight;
     
-	bmpCopy.oglTexture = 0;
-	bmpCopy.bmpWidth = 0;
-	bmpCopy.bmpHeight = 0;
+	bmpCopy.textureUnit = 0;
+	bmpCopy.textureId   = 0;
+	bmpCopy.bmpWidth    = 0;
+	bmpCopy.bmpHeight   = 0;
 	
 	return *this;
-}
-
-//-----------------------------------------------------------------------------
-//	Bitmap - Check if an image is loaded within OpenGL
-//-----------------------------------------------------------------------------
-bool bitmap::isLoaded() const {
-	return ( oglTexture != 0 );
 }
 
 //-----------------------------------------------------------------------------
@@ -201,7 +198,7 @@ bool bitmap::isLoaded() const {
 //-----------------------------------------------------------------------------
 bool bitmap::load( const char* fileName, int ) {
     
-    if ( oglTexture )
+    if ( textureId )
         unload();
     
 	FIBITMAP* image = nullptr;
@@ -209,16 +206,16 @@ bool bitmap::load( const char* fileName, int ) {
     if ( !loadImageFile( fileName, &image, &bmpWidth, &bmpHeight ) )
         return false;
     
-	glGenTextures( 1, &oglTexture );
+	glGenTextures( 1, &textureId );
     
-    if ( !oglTexture ) {
+    if ( !textureId ) {
         std::cerr << "ERROR: OpenGL could not create a texture buffer" << std::endl;
         FreeImage_Unload( image );
         bmpWidth = bmpHeight = 0;
         return false;
     }
     
-	glBindTexture( GL_TEXTURE_2D, oglTexture );
+	glBindTexture( GL_TEXTURE_2D, textureId );
     send2DToOpenGL( FreeImage_GetBits( image ), bmpWidth, bmpHeight );
 	glBindTexture( GL_TEXTURE_2D, 0 );
     
@@ -231,11 +228,11 @@ bool bitmap::load( const char* fileName, int ) {
 //	Bitmap - Unloading
 //-----------------------------------------------------------------------------
 void bitmap::unload() {
-	glDeleteTextures( 1, &oglTexture );
-	oglTexture = 0; // insurance
+    textureUnit = pipeline::HGE_TEXTURE_DEFAULT;
+	glDeleteTextures( 1, &textureId );
+	textureId = 0; // insurance
 	bmpWidth = 0;
 	bmpHeight = 0;
-    textureUnit = pipeline::HGE_TEXTURE_DEFAULT;
 }
 
 //-----------------------------------------------------------------------------
@@ -243,7 +240,7 @@ void bitmap::unload() {
 //-----------------------------------------------------------------------------
 void bitmap::activate() const {
 	glActiveTexture( textureUnit );
-	glBindTexture( GL_TEXTURE_2D, oglTexture );
+	glBindTexture( GL_TEXTURE_2D, textureId );
 }
 
 //-----------------------------------------------------------------------------
@@ -257,15 +254,20 @@ void bitmap::deActivate() const {
 /******************************************************************************
  * 3D (CUBEMAP) TEXTURES
 ******************************************************************************/
-cubemap::cubemap( cubemap&& orig ) :
-    textureObj( orig.textureObj )
-{
-    orig.textureObj = 0;
-}
+cubemap::cubemap( cubemap&& bmpCopy ) :
+    resource    ( std::move( bmpCopy ) ),
+    texture     ( std::move( bmpCopy ) )
+{}
 
 cubemap& cubemap::operator =( cubemap&& bmpCopy ) {
-    textureObj = bmpCopy.textureObj;
-    bmpCopy.textureObj = 0;
+    resource::operator=( std::move( bmpCopy ) );
+    texture::operator=( std::move( bmpCopy ) );
+	textureUnit = bmpCopy.textureUnit;
+	textureId   = bmpCopy.textureId;
+    
+	bmpCopy.textureUnit = 0;
+	bmpCopy.textureId   = 0;
+    
 	return *this;
 }
 
@@ -281,10 +283,10 @@ bool cubemap::load( const char* fileName, int cubeIndex ) {
     if ( !loadImageFile( fileName, &image, &texWidth, &texHeight ) )
         return false;
     
-    if ( !textureObj ) {
-        glGenTextures( 1, &textureObj );
+    if ( !textureId ) {
+        glGenTextures( 1, &textureId );
         
-        if ( !textureObj ) {
+        if ( !textureId ) {
             std::cerr
                 << "ERROR: OpenGL could not create a texture buffer"
                 << std::endl;
@@ -295,7 +297,7 @@ bool cubemap::load( const char* fileName, int cubeIndex ) {
     }
     
     // All checks gave finished properly. Load the rest of the image
-    glBindTexture( GL_TEXTURE_CUBE_MAP, textureObj );
+    glBindTexture( GL_TEXTURE_CUBE_MAP, textureId );
     send3DToOpenGL( cubeIndex, FreeImage_GetBits( image ), texWidth, texHeight );
     glBindTexture( GL_TEXTURE_CUBE_MAP, 0 );
 
@@ -308,9 +310,9 @@ bool cubemap::load( const char* fileName, int cubeIndex ) {
 //	Cubemap unloading
 //-----------------------------------------------------------------------------
 void cubemap::unload() {
-    glDeleteTextures( 1, &textureObj );
-    textureObj = 0;
     textureUnit = pipeline::HGE_TEXTURE_DEFAULT;
+    glDeleteTextures( 1, &textureId );
+    textureId = 0;
 }
 
 //-----------------------------------------------------------------------------
@@ -318,7 +320,7 @@ void cubemap::unload() {
 //-----------------------------------------------------------------------------
 void cubemap::activate() const {
     glActiveTexture( textureUnit );
-    glBindTexture( GL_TEXTURE_CUBE_MAP, textureObj );
+    glBindTexture( GL_TEXTURE_CUBE_MAP, textureId );
 }
 
 void cubemap::deActivate() const {

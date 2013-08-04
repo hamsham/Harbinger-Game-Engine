@@ -10,16 +10,15 @@
 
 #include "pipeline.h"
 #include "resource.h"
+#include "drawable.h"
 
 namespace hge {
 
 /******************************************************************************
  *      2D Bitmaps
 ******************************************************************************/
-class HGE_API bitmap : virtual public resource {
+class HGE_API bitmap final : public resource, public texture {
     private:
-        GLint textureUnit   = pipeline::HGE_TEXTURE_DEFAULT;
-        unsigned oglTexture = 0;
         int bmpWidth        = 0;
         int bmpHeight       = 0;
 
@@ -30,42 +29,38 @@ class HGE_API bitmap : virtual public resource {
         };
 
         // con/destruction
-        bitmap      () {}
+        bitmap      () = default;
         bitmap      ( const bitmap& ) = delete;
         bitmap      ( bitmap&& );
         ~bitmap     ()          { unload(); }
         
         bitmap&     operator =  ( const bitmap& ) = delete;
         bitmap&     operator =  ( bitmap&& );
-        bool        operator == ( const bitmap& s ) { return oglTexture == s.oglTexture; }
-        bool        operator != ( const bitmap& s ) { return oglTexture != s.oglTexture; }
 
         // memory-based operations
-        bool        isLoaded    () const;
+        bool        isLoaded    () const { return ( textureId != 0 ); }
         bool        load        ( const char* filename, int unused = 0 );
         void        unload      ();
 
         // data operations
         unsigned    getWidth    () const { return bmpWidth; }
         unsigned    getHeight   () const { return bmpHeight; }
-        unsigned    getTexID    () const { return oglTexture; }
+        unsigned    getTexID    () const { return textureId; }
 
         void        activate    () const;
         void        deActivate  () const;
         
-        void        setTexUnit  ( GLint texUnit = pipeline::HGE_TEXTURE_DEFAULT ) {
-                                    textureUnit = texUnit;
-                                }
+        inline void setTexUnit  ( GLint texUnit = pipeline::HGE_TEXTURE_DEFAULT );
 };
+
+inline void bitmap::setTexUnit( GLint texUnit ) {
+    textureUnit = texUnit;
+}
 
 /******************************************************************************
  *      3D Textures (Cube Maps)
 ******************************************************************************/
-class HGE_API cubemap : virtual public resource {
-    private:
-        GLint       textureUnit     = pipeline::HGE_TEXTURE_DEFAULT;
-        GLuint      textureObj      = 0;
-
+class HGE_API cubemap final : public resource, public texture {
     public:
         cubemap     () {}
         cubemap     ( const cubemap& ) = delete;
@@ -74,18 +69,20 @@ class HGE_API cubemap : virtual public resource {
         
         cubemap&    operator =      ( const cubemap& ) = delete;
         cubemap&    operator =      ( cubemap&& );
-        bool        operator ==     ( const cubemap& s ) { return textureObj == s.textureObj; }
-        bool        operator !=     ( const cubemap& s ) { return textureObj != s.textureObj; }
         
         bool        load            ( const char* texFile, int cubeIndex );
-        bool        isLoaded        () const { return textureObj != 0; }
+        bool        isLoaded        () const { return textureId != 0; }
         void        unload          ();
         
         void        activate        () const;
         void        deActivate      () const;
         
-        void        setTexUnit      ( GLint texUnit = pipeline::HGE_TEXTURE_DEFAULT ) { textureUnit = texUnit; }
+        void        setTexUnit      ( GLint texUnit = pipeline::HGE_TEXTURE_DEFAULT );
 };
+
+inline void cubemap::setTexUnit( GLint texUnit ) {
+    textureUnit = texUnit;
+}
 
 } // end hge namespace
 #endif	/* __HGE_BITMAP_H__ */

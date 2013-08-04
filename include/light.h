@@ -50,8 +50,8 @@ struct specularLight : baseLight {
 struct pointLight : baseLight {
     vec3    pos         = vec3( 0.f );
     float   constant    = 1.f;
-    float   linear      = 1.f;
     float   exponential = 1.f;
+    float   linear      = 1.f;
 };
 
 ///////////////////////////////////////////////////////////////////////////////

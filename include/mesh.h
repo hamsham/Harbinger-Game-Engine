@@ -11,6 +11,7 @@
 #include <string>
 #include "types.h"
 #include "pipeline.h"
+#include "drawable.h"
 #include "resource.h"
 #include "bitmap.h"
 
@@ -20,29 +21,28 @@ struct aiMaterial;
 
 namespace hge {
 
-///////////////////////////////////////////////////////////////////////////////
+/******************************************************************************
 //	Mesh Scene & Structure
-///////////////////////////////////////////////////////////////////////////////
-class HGE_API mesh : virtual public resource {
+******************************************************************************/
+class HGE_API mesh final : public resource, public drawable {
     private:
         // Mesh Structure
         struct meshEntry {
-            unsigned    matIndex;
-            unsigned    baseVertex;
-            unsigned    baseIndex;
-            unsigned    numIndices;
+            unsigned    matIndex    = 0;
+            unsigned    baseVertex  = 0;
+            unsigned    baseIndex   = 0;
+            unsigned    numIndices  = 0;
 
-            meshEntry           ();
-            meshEntry           ( const meshEntry& );
-            ~meshEntry          () {}
-
-            meshEntry& operator= ( const meshEntry& );
+//            meshEntry           ();
+//            meshEntry           ( const meshEntry& );
+//            ~meshEntry          () {}
+//
+//            meshEntry& operator= ( const meshEntry& );
         };
 
         //Private Members
         unsigned                numMeshes       = 0;
         unsigned                numTextures     = 0;
-        GLuint                  vao             = 0u;
         GLuint                  buffers[ 2 ]    = { 0u, 0u }; // Vertices & Indices
         meshEntry*              entries         = nullptr;
         bitmap*                 textures        = nullptr;
@@ -71,6 +71,7 @@ class HGE_API mesh : virtual public resource {
         void	unload			();
 
         // drawing
+        void    resetDrawMode   () { renderMode = GL_TRIANGLES; }
         void	draw			() const;
 };
 

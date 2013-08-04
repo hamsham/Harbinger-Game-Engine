@@ -22,7 +22,7 @@
 namespace hge {
 namespace pipeline {
 
-enum e_attributes : GLint {
+enum attribute : GLint {
     INVALID_UNIFORM     = -1,
     VERTEX_ATTRIB       = 0,
     TEXTURE_ATTRIB      = 1,
@@ -32,8 +32,9 @@ enum e_attributes : GLint {
 };
 
 // These are based off the enumerations defined in Assimp's "material.h" header
-// Due to OpenGL limitations, no more than 32 enum types will be defined here
-enum e_texType : GLint {
+// Due to OpenGL limitations, no more than 32 enum types will be defined here.
+// Samplers are provided for aiding in the setup of shader sampler locations.
+enum textureType : GLint {
     HGE_TEXTURE_DEFAULT         = GL_TEXTURE0,  HGE_SAMPLER_DEFAULT         = 0,
     HGE_TEXTURE_DIFFUSE         = GL_TEXTURE0,  HGE_SAMPLER_DIFFUSE         = 0,
     HGE_TEXTURE_SPECULAR        = GL_TEXTURE1,  HGE_SAMPLER_SPECULAR        = 1,

@@ -37,13 +37,16 @@ class   shader;
 // Visual-Related
 class   billboard;
 class   camera;
+class   drawable; // inherited ADT
 class   drawTransform;
 class   mesh;
 class   skybox;
 class   string3d;
+class   texture; // inherited ADT
 
 // Drawable Primitives
 class   line;
+class   primitive; // inherited ADT
 class   quad;
 class   sphere;
 class   triangle;
@@ -54,11 +57,6 @@ struct  diffuseLight;
 struct  specularLight;
 struct  pointLight;
 struct  spotLight;
-
-// Time Types
-class   clock;	// time base class
-class   timer;		// count down
-class   stopwatch;	// count upward, with lapping
 
 } // end hge namespace
 #endif	/* __HGE_TYPES_H__ */

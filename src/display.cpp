@@ -137,6 +137,8 @@ window::window(
 	glfwWindowHint( GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE );
 	glfwWindowHint( GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE );
 	glfwWindowHint( GLFW_RESIZABLE, (resizeable ? GL_TRUE : GL_FALSE) );
+    glfwWindowHint( GLFW_DEPTH_BITS, 32 );
+    glfwWindowHint( GLFW_STENCIL_BITS, 8 );
 #ifdef DEBUG
     glfwWindowHint( GLFW_OPENGL_DEBUG_CONTEXT, GL_TRUE );
 #endif
@@ -147,7 +149,7 @@ window::window(
     glfwMakeContextCurrent  ( pContext );
     glfwGetWindowSize       ( pContext, &resolution[0], &resolution[1] );
     glfwSetInputMode        ( pContext, GLFW_STICKY_KEYS, GL_TRUE );
-    glfwSwapInterval        ( useVsync );
+    glfwSwapInterval        ( (int)useVsync );
     
     displayFullscreen = fullscreen != nullptr;
     

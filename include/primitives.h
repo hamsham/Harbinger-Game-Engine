@@ -53,7 +53,7 @@ class HGE_API quad final : public primitive {
         void    terminate       ();
 
         // drawing
-        void    resetDrawMode   () { renderMode = GL_TRIANGLE_STRIP; }
+        void    resetDrawMode   () { renderMode = pipeline::HGE_TRIANGLE_STRIP; }
         void    draw            () const {
                                     glBindVertexArray( vao );
                                     glDrawArrays( renderMode, 0, 4 );
@@ -82,7 +82,7 @@ class HGE_API triangle final : public primitive {
         void        terminate       ();
 
         // drawing
-        void        resetDrawMode   () { renderMode = GL_TRIANGLES; }
+        void        resetDrawMode   () { renderMode = pipeline::HGE_TRIANGLES; }
         void        draw            () const {
                                         glBindVertexArray( vao );
                                         glDrawArrays( renderMode, 0, 3 );
@@ -117,7 +117,7 @@ class HGE_API line final : public primitive {
         void        setVertPos      ( int index, const vec3& inPos );
 
         // drawing
-        void        resetDrawMode   () { renderMode = GL_LINES; }
+        void        resetDrawMode   () { renderMode = pipeline::HGE_LINES; }
         void        draw            () const {
                                         glBindVertexArray( vao );
                                         glDrawArrays( renderMode, 0, 2 );
@@ -149,7 +149,7 @@ class HGE_API cube final : public primitive {
         void    terminate       ();
 
         // drawing
-        void    resetDrawMode   () { renderMode = GL_TRIANGLE_STRIP; }
+        void    resetDrawMode   () { renderMode = pipeline::HGE_TRIANGLE_STRIP; }
         void    draw            () const {
                                     glBindVertexArray( vao );
                                     glDrawArrays( renderMode, 0, 26 );
@@ -184,7 +184,7 @@ class HGE_API sphere final : public primitive {
         void        terminate       ();
 
         // drawing
-        void        resetDrawMode   () { renderMode = GL_TRIANGLE_STRIP; }
+        void        resetDrawMode   () { renderMode = pipeline::HGE_TRIANGLE_STRIP; }
         void        draw            () const {
                                         glBindVertexArray( vao );
                                         glDrawElements(

@@ -22,6 +22,20 @@
 namespace hge {
 namespace pipeline {
 
+enum drawMode : GLenum {
+    HGE_DEFAULT                     = (GLenum)-1,
+    HGE_POINTS                      = GL_POINTS,
+    HGE_LINES                       = GL_LINES,
+    HGE_LINE_STRIP                  = GL_LINE_STRIP,
+    HGE_LINE_LOOP                   = GL_LINE_LOOP,
+    HGE_LINE_STRIP_ADJACENCY        = GL_LINE_LOOP,
+    HGE_TRIANGLES                   = GL_TRIANGLES,
+    HGE_TRIANGLES_ADJACENCY         = GL_TRIANGLES,
+    HGE_TRIANGLE_FAN                = GL_TRIANGLES,
+    HGE_TRIANGLE_STRIP              = GL_TRIANGLE_STRIP,
+    HGE_TRIANGLE_STRIP_ADJACENCY    = GL_TRIANGLE_STRIP
+};
+
 enum attribute : GLint {
     INVALID_UNIFORM     = -1,
     VERTEX_ATTRIB       = 0,

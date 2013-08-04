@@ -15,6 +15,7 @@
 #include "bitmap.h"
 #include "camera.h"
 #include "display.h"
+#include "drawable.h"
 #include "font.h"
 #include "geometry.h"
 #include "input.h"
@@ -27,6 +28,7 @@
 #include "shadowMap.h"
 #include "skybox.h"
 #include "stockShaders.h"
+#include "text.h"
 #include "transformations.h"
 
 namespace hge {

@@ -235,22 +235,6 @@ void bitmap::unload() {
 	bmpHeight = 0;
 }
 
-//-----------------------------------------------------------------------------
-//	Bitmap - Enable a texture within OpenGL
-//-----------------------------------------------------------------------------
-void bitmap::activate() const {
-	glActiveTexture( textureUnit );
-	glBindTexture( GL_TEXTURE_2D, textureId );
-}
-
-//-----------------------------------------------------------------------------
-//	Bitmap - Disable an OpenGL texture
-//-----------------------------------------------------------------------------
-void bitmap::deActivate() const {
-	glActiveTexture( textureUnit );
-	glBindTexture( GL_TEXTURE_2D, 0 );
-}
-
 /******************************************************************************
  * 3D (CUBEMAP) TEXTURES
 ******************************************************************************/
@@ -313,19 +297,6 @@ void cubemap::unload() {
     textureUnit = pipeline::HGE_TEXTURE_DEFAULT;
     glDeleteTextures( 1, &textureId );
     textureId = 0;
-}
-
-//-----------------------------------------------------------------------------
-//	Cubemap Binding
-//-----------------------------------------------------------------------------
-void cubemap::activate() const {
-    glActiveTexture( textureUnit );
-    glBindTexture( GL_TEXTURE_CUBE_MAP, textureId );
-}
-
-void cubemap::deActivate() const {
-	glActiveTexture( textureUnit );
-	glBindTexture( GL_TEXTURE_CUBE_MAP, 0 );
 }
 
 } // end hge namespace

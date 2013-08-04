@@ -71,7 +71,7 @@ class HGE_API mesh final : public resource, public drawable {
         void	unload			();
 
         // drawing
-        void    resetDrawMode   () { renderMode = GL_TRIANGLES; }
+        void    resetDrawMode   () { renderMode = pipeline::HGE_TRIANGLES; }
         void	draw			() const;
 };
 

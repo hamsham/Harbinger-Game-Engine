@@ -34,6 +34,7 @@
       <itemPath>../include/skybox.h</itemPath>
       <itemPath>../include/stockShaders.h</itemPath>
       <itemPath>../include/stockShaders_glsl.h</itemPath>
+      <itemPath>../include/text.h</itemPath>
       <itemPath>../include/transformations.h</itemPath>
       <itemPath>../include/types.h</itemPath>
     </logicalFolder>
@@ -55,6 +56,7 @@
       <itemPath>../src/shadowMap.cpp</itemPath>
       <itemPath>../src/skybox.cpp</itemPath>
       <itemPath>../src/stockShaders.cpp</itemPath>
+      <itemPath>../src/text.cpp</itemPath>
       <itemPath>../src/transformations.cpp</itemPath>
     </logicalFolder>
     <logicalFolder name="TestFiles"
@@ -191,6 +193,8 @@
       </item>
       <item path="../include/stockShaders_glsl.h" ex="false" tool="3" flavor2="0">
       </item>
+      <item path="../include/text.h" ex="false" tool="3" flavor2="0">
+      </item>
       <item path="../include/transformations.h" ex="false" tool="3" flavor2="0">
       </item>
       <item path="../include/types.h" ex="false" tool="3" flavor2="0">
@@ -228,6 +232,8 @@
       <item path="../src/skybox.cpp" ex="false" tool="1" flavor2="0">
       </item>
       <item path="../src/stockShaders.cpp" ex="false" tool="1" flavor2="0">
+      </item>
+      <item path="../src/text.cpp" ex="false" tool="1" flavor2="0">
       </item>
       <item path="../src/transformations.cpp" ex="false" tool="1" flavor2="0">
       </item>
@@ -360,6 +366,8 @@
       </item>
       <item path="../include/stockShaders_glsl.h" ex="false" tool="3" flavor2="0">
       </item>
+      <item path="../include/text.h" ex="false" tool="3" flavor2="0">
+      </item>
       <item path="../include/transformations.h" ex="false" tool="3" flavor2="0">
       </item>
       <item path="../include/types.h" ex="false" tool="3" flavor2="0">
@@ -397,6 +405,8 @@
       <item path="../src/skybox.cpp" ex="false" tool="1" flavor2="0">
       </item>
       <item path="../src/stockShaders.cpp" ex="false" tool="1" flavor2="0">
+      </item>
+      <item path="../src/text.cpp" ex="false" tool="1" flavor2="0">
       </item>
       <item path="../src/transformations.cpp" ex="false" tool="1" flavor2="0">
       </item>
@@ -515,6 +525,8 @@
       </item>
       <item path="../include/stockShaders_glsl.h" ex="false" tool="3" flavor2="0">
       </item>
+      <item path="../include/text.h" ex="false" tool="3" flavor2="0">
+      </item>
       <item path="../include/transformations.h" ex="false" tool="3" flavor2="0">
       </item>
       <item path="../include/types.h" ex="false" tool="3" flavor2="0">
@@ -552,6 +564,8 @@
       <item path="../src/skybox.cpp" ex="false" tool="1" flavor2="0">
       </item>
       <item path="../src/stockShaders.cpp" ex="false" tool="1" flavor2="0">
+      </item>
+      <item path="../src/text.cpp" ex="false" tool="1" flavor2="0">
       </item>
       <item path="../src/transformations.cpp" ex="false" tool="1" flavor2="0">
       </item>
@@ -678,6 +692,8 @@
       </item>
       <item path="../include/stockShaders_glsl.h" ex="false" tool="3" flavor2="0">
       </item>
+      <item path="../include/text.h" ex="false" tool="3" flavor2="0">
+      </item>
       <item path="../include/transformations.h" ex="false" tool="3" flavor2="0">
       </item>
       <item path="../include/types.h" ex="false" tool="3" flavor2="0">
@@ -715,6 +731,8 @@
       <item path="../src/skybox.cpp" ex="false" tool="1" flavor2="0">
       </item>
       <item path="../src/stockShaders.cpp" ex="false" tool="1" flavor2="0">
+      </item>
+      <item path="../src/text.cpp" ex="false" tool="1" flavor2="0">
       </item>
       <item path="../src/transformations.cpp" ex="false" tool="1" flavor2="0">
       </item>

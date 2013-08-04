@@ -41,7 +41,9 @@ class   drawable; // inherited ADT
 class   drawTransform;
 class   mesh;
 class   skybox;
-class   string3d;
+class   text;
+
+template < int >
 class   texture; // inherited ADT
 
 // Drawable Primitives

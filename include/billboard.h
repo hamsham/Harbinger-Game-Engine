@@ -15,13 +15,18 @@ namespace hge {
 
 class HGE_API billboard final : public drawable {
     private:
-        GLuint      vao     = 0;
         GLuint      vbo     = 0;
-        unsigned    numBmps = 10;
+        unsigned    numBmps = 0;
 
     public:
-        billboard   ()              {}
+        billboard   () {}
+        billboard   ( const billboard& ) = delete;
+        billboard   ( billboard&& );
+        
         ~billboard  ()              { clearImages(); }
+        
+        billboard&  operator =      ( const billboard& ) = delete;
+        billboard&  operator =      ( billboard&& );
         
         void        clearImages     ();
         
@@ -31,13 +36,17 @@ class HGE_API billboard final : public drawable {
         
         void        setImagePos     ( unsigned index, const vec3& pos );
         
-        // Ensure that a bitmap has been bound before drawing
-        void        draw            () const;
-        
         // Billboards only have one available draw mode and one attribute
-        void        enableAttribute ( pipeline::attribute ) {}
-        void        disableAttribute( pipeline::attribute ) {}
-        void        setDrawMode     ( drawable::drawMode ) {}
+        void        enableAttribute ( pipeline::attribute ) override {}
+        void        disableAttribute( pipeline::attribute ) override {}
+        
+        // Ensure that a bitmap has been bound before drawing
+        void        resetDrawMode   () override { renderMode = pipeline::HGE_POINTS; }
+        void        draw            () const {
+                                        glBindVertexArray( vao );
+                                        glDrawArrays( pipeline::HGE_POINTS, 0, numBmps );
+                                        glBindVertexArray( 0 );
+                                    }
 };
 
 } // end ge namespace

@@ -6,13 +6,12 @@
  */
 
 #include <iostream>
-#include <stdexcept>
+#include <utility>
 
 #include <ft2build.h>
 #include FT_FREETYPE_H
 
 #include "font.h"
-#include "geometry.h"
 
 using namespace hamLibs::math;
 
@@ -23,6 +22,33 @@ void printFontError( const char* msg, int error ) {
 }
 
 namespace hge {
+
+///////////////////////////////////////////////////////////////////////////////
+// FONT -- Move semantics
+///////////////////////////////////////////////////////////////////////////////
+font::font( font&& f ) :
+    texture( std::move( f ) ),
+    newLine( f.newLine ),
+    maxWidth( f.maxWidth ),
+    maxHeight( f.maxHeight ),
+    metrics( f.metrics )
+{}
+
+font& font::operator = ( font&& f ) {
+    texture::operator = ( std::move( f ) );
+    
+    newLine = f.newLine;
+    f.newLine = 0;
+    
+    maxWidth = f.maxWidth;
+    f.maxWidth = 0;
+    
+    maxHeight = f.maxHeight;
+    f.maxHeight = 0;
+    
+    metrics = f.metrics;
+    f.metrics = nullptr;
+}
 
 ///////////////////////////////////////////////////////////////////////////////
 // FONT -- LOADING
@@ -49,6 +75,7 @@ bool font::load( const char* filename, int fontsize ) {
     // Modify the font's size
     FT_Set_Pixel_Sizes( ftFace, fontsize, fontsize );
     
+    metrics = new metric_t[ MAX_NUM_GLYPHS ];
     loadGlyphs( ftFace );
     
     FT_Done_Face( ftFace );
@@ -68,11 +95,15 @@ bool font::isLoaded() const {
 // FONT -- UNLOADING
 ///////////////////////////////////////////////////////////////////////////////
 void font::unload() {
-    glDeleteTextures( 1, &textureId );
+    textureUnit = pipeline::HGE_TEXTURE_DEFAULT;
     
+    glDeleteTextures( 1, &textureId );
     textureId = 0;
     
     maxWidth = maxHeight = 0;
+    
+    delete [] metrics;
+    metrics = nullptr;
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -194,179 +225,4 @@ void font::createCharAtlas( GLubyte* bitmaps[ MAX_NUM_GLYPHS ] ) {
     printGlError( "Error while creating mipmaps for a font atlas" );
 }
 
-///////////////////////////////////////////////////////////////////////////////
-//	FONT - TEXTURE ACTIVATION/BINDING
-///////////////////////////////////////////////////////////////////////////////
-void font::activate() const {
-	glActiveTexture ( textureUnit );
-	glBindTexture   ( GL_TEXTURE_2D, textureId );
-}
-
-///////////////////////////////////////////////////////////////////////////////
-//	FONT - TEXTURE DEACTIVATION
-///////////////////////////////////////////////////////////////////////////////
-void font::deActivate() const {
-	glActiveTexture ( textureUnit );
-	glBindTexture   ( GL_TEXTURE_2D, 0 );
-}
-
-///////////////////////////////////////////////////////////////////////////////
-// TEST STRING CLASS
-///////////////////////////////////////////////////////////////////////////////
-///////////////////////////////////////////////////////////////////////////////
-// STRING - UNLOADING
-///////////////////////////////////////////////////////////////////////////////
-void string3d::clearString() {
-    glDeleteVertexArrays( 1, &vao );
-    glDeleteBuffers( 1, &vbo );
-    
-    indices.clear();
-    
-    vao = vbo = 0;
-    numChars = 0;
-}
-
-///////////////////////////////////////////////////////////////////////////////
-// STRING - Buffer Data
-///////////////////////////////////////////////////////////////////////////////
-void string3d::createVertexBuffer( unsigned numVerts ) {
-    if ( !vao )
-        glGenVertexArrays( 1, &vao );
-    
-	glBindVertexArray( vao );
-    
-    if ( !vbo )
-        glGenBuffers( 1, &vbo );
-	
-	glBindBuffer( GL_ARRAY_BUFFER, vbo );
-    glBufferData(
-        GL_ARRAY_BUFFER, sizeof( plainVertex ) * 4 * numVerts,
-        nullptr, GL_DYNAMIC_DRAW
-    );
-	printGlError( "Error while creating a string object's vertex buffer.");
-    
-    pipeline::enablePlainVertexAttribs();
-}
-
-///////////////////////////////////////////////////////////////////////////////
-// STRING - TEXT FORMATTING
-///////////////////////////////////////////////////////////////////////////////
-void string3d::setString( const font& f, const char* str ) {
-    
-    if ( !str ) {
-        clearString();
-        return;
-    }
-    
-    float xPos = 0.f;
-    float yPos = 0.f;
-    plainVertex tempQuad[ 4 ];
-    numChars = 0;
-    
-    //count all the whitespace
-    for( int i = 0; str[ i ] != '\0'; ++i ) {
-        if (    str[ i ] != '\n'
-        &&      str[ i ] != '\r'
-        &&      str[ i ] != '\t'
-        &&      str[ i ] != ' '
-        ) {
-            ++numChars;
-        }
-    }
-	
-    // Resize the text buffer
-    try {
-        indices.reserve( numChars * 2 );
-    }
-    catch( const std::length_error& err ) {
-        std::cerr << "ERROR: Unable to create the string of text: " << str << std::endl;
-        clearString();
-        return;
-    }
-    createVertexBuffer( numChars );
-    
-    tempQuad[0].norm =
-        tempQuad[1].norm =
-            tempQuad[2].norm =
-                tempQuad[3].norm = vec3( 0.f, 0.f, 1.f );
-    
-    // Create and send the vertices to OpenGL
-    int charCount = 0;
-    for ( int i = 0; str[ i ] != '\0'; ++i ) {
-        const int currChar = (int)str[ i ];
-        const font::metric_t& m = f.metrics[ currChar ];
-        
-        if ( currChar == '\n' ) {
-            yPos -= f.newLine;
-            xPos = 0.f;
-        }
-        else if ( currChar == '\r' ) {
-            xPos = 0.f;
-        }
-        else if ( currChar == ' ' ) {
-            xPos += (f.metrics[' '].advX - f.metrics[' '].bearX);
-        }
-        else if ( currChar == '\t' ) {
-            xPos += (f.metrics[' '].advX - f.metrics[' '].bearX)
-                * font::SPACES_PER_TAB;
-        }
-        else {
-            // populate the index array
-            indices[ charCount ] = charCount * 4;
-            indices[ charCount + numChars ] = 4;
-            
-            /*
-             * 0--------2
-             * |     /  |
-             * |   /    |
-             * | /      |
-             * 1--------3
-             */
-            tempQuad[ 0 ].pos = vec3( xPos,         yPos+m.advY+m.height,   0.f );
-            tempQuad[ 1 ].pos = vec3( xPos,         yPos+m.advY,            0.f );
-            tempQuad[ 2 ].pos = vec3( xPos+m.width, yPos+m.advY+m.height,   0.f );
-            tempQuad[ 3 ].pos = vec3( xPos+m.width, yPos+m.advY,            0.f );
-            
-            tempQuad[ 0 ].uv = vec2( m.pos[0],      m.uv[1] );
-            tempQuad[ 1 ].uv = vec2( m.pos[0],      m.pos[1] );
-            tempQuad[ 2 ].uv = vec2( m.uv[0],       m.uv[1] );
-            tempQuad[ 3 ].uv = vec2( m.uv[0],       m.pos[1] );
-            
-            xPos += m.advX - m.bearX;
-
-            glBufferSubData(
-                GL_ARRAY_BUFFER, sizeof( tempQuad ) * charCount,
-                sizeof( tempQuad ), tempQuad
-            );
-            ++charCount;
-            printGlError( "Error while updating string buffer data on the GPU.");
-        }
-    }
-	glBindVertexArray( 0 );
-}
-
-void string3d::draw() const {
-    glEnable( GL_BLEND );
-    
-    // Premultiplied alpha
-//    glBlendEquationSeparate( GL_FUNC_ADD, GL_FUNC_ADD );
-//    glBlendFuncSeparate( GL_ONE, GL_ONE_MINUS_SRC_ALPHA, GL_ONE, GL_ZERO );
-    
-    // Additive Blending
-    glBlendFunc( GL_ONE, GL_ONE );
-    glDepthMask( GL_FALSE );
-    glBindVertexArray( vao );
-
-    glMultiDrawArrays(
-        GL_TRIANGLE_STRIP,
-        (const GLint*)indices.data(),
-        (const GLsizei*)(indices.data() + numChars),
-        numChars
-    );
-
-    glBindVertexArray( 0 );
-    glDepthMask( GL_TRUE );
-    glDisable( GL_BLEND );
-}
-
-} // End Harbinger namespace
+} // end hge namespace

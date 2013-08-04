@@ -8,9 +8,9 @@
 #ifndef __HGE_FONT_H__
 #define	__HGE_FONT_H__
 
-#include <vector>
 #include "resource.h"
 #include "pipeline.h"
+#include "drawable.h"
 
 struct FT_FaceRec_;
 
@@ -19,9 +19,9 @@ namespace hge {
 ///////////////////////////////////////////////////////////////////////////////
 // FONT TEXTURE ATLAS
 ///////////////////////////////////////////////////////////////////////////////
-class HGE_API font : virtual public resource {
+class HGE_API font final : public resource, public texture< GL_TEXTURE_2D > {
     
-    friend class string3d;
+    friend class text;
     
     enum : int {
         SPACES_PER_TAB = 5,
@@ -40,72 +40,28 @@ class HGE_API font : virtual public resource {
     };
     
     private:
-        GLint textureUnit   = pipeline::HGE_TEXTURE_DEFAULT;
-        unsigned    textureId   = 0;
         int         newLine     = 0;
         int         maxWidth    = 0;
         int         maxHeight   = 0;
-        metric_t    metrics[ MAX_NUM_GLYPHS ];
+        metric_t*   metrics     = nullptr;
         
         void        loadGlyphs( FT_FaceRec_* );
         void        createCharAtlas( GLubyte* bitmaps[ MAX_NUM_GLYPHS ] );
         
     public:
         
-        font  ()            {}
-        ~font ()            { unload(); }
-        
+        font    () {}
         font    ( const font& ) = delete;
+        font    ( font&& );
+        
+        ~font   ()           { unload(); }
         
         font&   operator =  ( const font& ) = delete;
-        bool    operator == ( const font& f ) { return textureId == f.textureId; }
-        bool    operator != ( const font& f ) { return textureId != f.textureId; }
+        font&   operator =  ( font&& );
         
         bool    load        ( const char* filename, int fontsize );
         bool    isLoaded    () const;
         void    unload      ();
-        
-        void    activate    () const;
-        void    deActivate  () const;
-        
-        void    setTexUnit  ( GLint texUnit = pipeline::HGE_TEXTURE_DEFAULT ) {
-                                textureUnit = texUnit;
-                            }
-};
-
-///////////////////////////////////////////////////////////////////////////////
-// CHARACTER STRING CLASS
-///////////////////////////////////////////////////////////////////////////////
-class HGE_API string3d {
-    typedef std::vector< int > intArr;
-    
-    private:
-        unsigned    vao         = 0;
-        unsigned    vbo         = 0;
-        int         numChars    = 0;
-        intArr      indices;
-        // "indices" contains the starting elements of each character
-        // plus the number of elements to draw (specified by an offset of "numChars")
-        
-        void        createVertexBuffer( unsigned numVerts );
-        
-    public:
-        string3d()  {}
-        ~string3d() { clearString(); }
-        
-        string3d    ( const string3d& ) = delete;
-        string3d    ( string3d&& ) = default;
-        string3d&   operator =  ( const string3d& ) = delete;
-        string3d&   operator =  ( string3d&& ) = default;
-        bool        operator == ( const string3d& s ) { return vao == s.vao; }
-        bool        operator != ( const string3d& s ) { return vao != s.vao; }
-        
-        
-        void        setString   ( const font&, const char* );
-        void        clearString ();
-        
-        // USERS: ensure a font atlas has been activated before drawing
-        void        draw        () const;
 };
 
 } // end hge namespace

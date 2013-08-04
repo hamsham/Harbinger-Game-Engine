@@ -49,34 +49,11 @@ void drawable::disableAttribute( pipeline::attribute a ) {
     glBindVertexArray( 0 );
 }
 
-void drawable::setDrawMode( drawMode d ) {
-    if ( d == DRAW_DEFAULT )
+void drawable::setDrawMode( pipeline::drawMode d ) {
+    if ( d == pipeline::HGE_DEFAULT )
         resetDrawMode();
     else
         renderMode = (GLenum)d;
-}
-
-/******************************************************************************
- * Texture Objects
-******************************************************************************/
-texture::texture( texture&& t ) :
-    textureUnit( t.textureUnit ),
-    textureId( t.textureId )
-{
-    t.textureUnit = 0;
-    t.textureId = 0;
-}
-
-texture& texture::operator=( texture&& t ) {
-    textureUnit = t.textureUnit;
-    t.textureUnit = 0;
-    textureId = t.textureId;
-    t.textureId = 0;
-    
-    return *this;
-}
-
-texture::~texture() {
 }
 
 } // end hge namespace

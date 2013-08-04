@@ -6,11 +6,36 @@
  */
 
 #include <iostream>
-
+#include <utility>
 #include "billboard.h"
 
 namespace hge {
 
+/******************************************************************************
+ * move semantics
+******************************************************************************/
+billboard::billboard( billboard&& b ) :
+    drawable( std::move( b ) ),
+    vbo( b.vbo ),
+    numBmps( b.numBmps)
+{
+    b.vbo = 0;
+    b.numBmps = 0;
+}
+
+billboard& billboard::operator = ( billboard&& b ) {
+    drawable::operator = ( std::move( b ) );
+    
+    vbo = b.vbo;
+    b.vbo = 0;
+    
+    numBmps = b.numBmps;
+    b.numBmps = 0;
+}
+
+/******************************************************************************
+ * setting the number of images to draw
+******************************************************************************/
 bool billboard::setNumImages( unsigned r, unsigned c ) {
     
     if ( !vao ) {
@@ -58,6 +83,9 @@ bool billboard::setNumImages( unsigned r, unsigned c ) {
     return true;
 }
 
+/******************************************************************************
+ * clearing all drawable points from the buffer
+******************************************************************************/
 void billboard::clearImages() {
     glDeleteVertexArrays( 1, &vao );
     glDeleteBuffers( 1, &vbo );
@@ -77,12 +105,6 @@ void billboard::setImagePos( unsigned index, const vec3& pos ) {
         sizeof( vec3 ), pos.v
     );
     
-    glBindVertexArray( 0 );
-}
-
-void billboard::draw() const {
-    glBindVertexArray( vao );
-    glDrawArrays( GL_POINTS, 0, numBmps );
     glBindVertexArray( 0 );
 }
 

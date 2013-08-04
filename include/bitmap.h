@@ -17,7 +17,7 @@ namespace hge {
 /******************************************************************************
  *      2D Bitmaps
 ******************************************************************************/
-class HGE_API bitmap final : public resource, public texture {
+class HGE_API bitmap final : public resource, public texture< GL_TEXTURE_2D > {
     private:
         int bmpWidth        = 0;
         int bmpHeight       = 0;
@@ -46,21 +46,12 @@ class HGE_API bitmap final : public resource, public texture {
         unsigned    getWidth    () const { return bmpWidth; }
         unsigned    getHeight   () const { return bmpHeight; }
         unsigned    getTexID    () const { return textureId; }
-
-        void        activate    () const;
-        void        deActivate  () const;
-        
-        inline void setTexUnit  ( GLint texUnit = pipeline::HGE_TEXTURE_DEFAULT );
 };
-
-inline void bitmap::setTexUnit( GLint texUnit ) {
-    textureUnit = texUnit;
-}
 
 /******************************************************************************
  *      3D Textures (Cube Maps)
 ******************************************************************************/
-class HGE_API cubemap final : public resource, public texture {
+class HGE_API cubemap final : public resource, public texture< GL_TEXTURE_CUBE_MAP > {
     public:
         cubemap     () {}
         cubemap     ( const cubemap& ) = delete;
@@ -73,16 +64,7 @@ class HGE_API cubemap final : public resource, public texture {
         bool        load            ( const char* texFile, int cubeIndex );
         bool        isLoaded        () const { return textureId != 0; }
         void        unload          ();
-        
-        void        activate        () const;
-        void        deActivate      () const;
-        
-        void        setTexUnit      ( GLint texUnit = pipeline::HGE_TEXTURE_DEFAULT );
 };
-
-inline void cubemap::setTexUnit( GLint texUnit ) {
-    textureUnit = texUnit;
-}
 
 } // end hge namespace
 #endif	/* __HGE_BITMAP_H__ */

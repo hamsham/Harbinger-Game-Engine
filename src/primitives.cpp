@@ -508,29 +508,33 @@ bool cone::init( int sectors ) {
     apexVerts[0].uv     = vec2( 0.5f );
     apexVerts[0].norm   = vec3( 0.f, 1.f, 0.f );
     
-    float angle = 0.f;
+    float apexAngle = 0.f;
+    float baseAngle = 0.f;
     const float resolution = HL_TWO_PI / (float)sectors;
     
     for ( unsigned i = 0; i <= sectors; ++i ) {
+        float bs = std::sin( baseAngle ) * 0.5f;
+        float bc = std::cos( baseAngle ) * 0.5f;
+        float as = std::sin( apexAngle ) * 0.5f;
+        float ac = std::cos( apexAngle ) * 0.5f;
+        
         bumpVertex& base = baseVerts[i+1];
         bumpVertex& apex = apexVerts[i+1];
         
-        float s = std::sin( angle ) * 0.5f;
-        float c = std::cos( angle ) * 0.5f;
-        
-        base.pos    = vec3( c, 0.f, s );
-        base.uv     = vec2( c+0.5f, s+0.5f );
+        base.pos    = vec3( bs, 0.f, bc );
+        base.uv     = vec2( bs+0.5f, bc+0.5f );
         base.norm   = vec3( 0.f, -1.f, 0.f );
         
-        apex.pos    = vec3( s, 0.f, c );
-        apex.uv     = vec2( s+0.5f, c+0.5f );
-        apex.norm   = normalize( vec3( s, -std::sqrt( (c*c)+(s*s) ), c ) );
+        apex.pos    = vec3( as, 0.f, ac );
+        apex.uv     = vec2( as+0.5f, ac+0.5f );
+        apex.norm   = normalize( vec3( as, -std::sqrt( (ac*ac)+(as*as) ), ac ) );
         
         if ( i >= 2 ) {
             calcTangents( baseVerts[i-0], baseVerts[i-1], baseVerts[i-2] );
             calcTangents( apexVerts[i-0], apexVerts[i-1], apexVerts[i-2] );
         }
-        angle += resolution;
+        apexAngle += resolution;
+        baseAngle -= resolution;
     }
     // it took a lot of trial and error to figure this out
     apexVerts[0].tng[1] = 0.f;

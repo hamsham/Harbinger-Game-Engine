@@ -195,6 +195,33 @@ class HGE_API sphere final : public primitive {
                                     }
 };
 
+/******************************************************************************
+ * Cone Primitive
+******************************************************************************/
+class HGE_API cone final : public primitive {
+    private:
+        GLuint vbo = 0;
+        int numVerts = 0;
+        
+    public:
+        cone    () {}
+        cone    ( const cone& ) = delete;
+        cone    ( cone&& );
+        
+        ~cone   () { terminate(); }
+        
+        cone&   operator =      ( const cone& ) = delete;
+        cone&   operator =      ( cone&& );
+        
+        bool    init            ( int sectors );
+        bool    init            () { return init( 10 ); }
+        void    terminate       ();
+
+        // drawing
+        void    resetDrawMode   () { renderMode = pipeline::HGE_TRIANGLE_FAN; }
+        void    draw            () const;
+};
+
 } // end hge namespace
 
 #endif	/* __HGE_PRIMITIVES_H__ */

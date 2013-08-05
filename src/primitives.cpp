@@ -397,7 +397,7 @@ bool sphere::init( int rings, int sectors ) {
         return false;
     }
     
-    for( int r = 0, i = 0; r < rings; r++ ) {
+    for( int r = 0, i = 0, j = 0; r < rings; r++ ) {
         for( int s = 0; s < sectors; s++ ) {
             float const y = std::sin( -HL_PI_OVER_2 + HL_PI * r * R );
             float const x = std::cos( HL_TWO_PI * s * S ) * std::sin( HL_PI * r * R );
@@ -414,15 +414,14 @@ bool sphere::init( int rings, int sectors ) {
             vertices[ i ].norm[1] = y;
             vertices[ i ].norm[2] = z;
             ++i;
-        }
-    }
-    
-    for( int r = 0, i = 0; r < rings; r++ ) {
-        for( int s = 0; s < sectors; s++ ) {
-            indices[ i++ ] = r * sectors + s;
-            indices[ i++ ] = (r+1) * sectors + s;
-            indices[ i++ ] = r * sectors + (s+1);
-            indices[ i++ ] = (r+1) * sectors + (s+1);
+            
+            if ( i >= 2 )
+                calcTangents( vertices[i-0], vertices[i-1], vertices[i-2] );
+            
+            indices[ j++ ] = r * sectors + s;
+            indices[ j++ ] = (r+1) * sectors + s;
+            indices[ j++ ] = r * sectors + (s+1);
+            indices[ j++ ] = (r+1) * sectors + (s+1);
         }
     }
     
@@ -465,6 +464,120 @@ void sphere::terminate() {
 
     vao = vbo[0] = vbo[1] = 0;
     numIndices = 0;
+}
+
+/******************************************************************************
+ *      CONES
+******************************************************************************/
+cone::cone( cone&& c ) :
+    primitive( std::move( c ) ),
+    vbo( c.vbo ),
+    numVerts( c.numVerts )
+{
+    c.vbo = 0;
+    c.numVerts = 0;
+}
+
+cone& cone::operator = ( cone&& c ) {
+    primitive::operator=( std::move( c ) );
+    vbo = c.vbo;
+    c.vbo = 0;
+    numVerts = c.numVerts;
+    c.numVerts = 0;
+    return *this;
+}
+
+bool cone::init( int sectors ) {
+    terminate();
+    
+    // make sure there are enough points for a minimal pyramid
+    if ( sectors < 3 )
+        sectors = 3;
+    
+    // add an offset of + 4 for the starting & ending vertices of the cone
+    bumpVertex* baseVerts = new( std::nothrow ) bumpVertex[ (sectors*2) + 4 ];
+    if ( !baseVerts ) {
+        return false;
+    }
+    bumpVertex* apexVerts = &baseVerts[ sectors+2 ];
+    
+    baseVerts[0].pos    = vec3( 0.f );
+    baseVerts[0].uv     = vec2( 0.5f );
+    baseVerts[0].norm   = vec3( 0.f, -1.f, 0.f );
+    apexVerts[0].pos    = vec3( 0.f, 1.f, 0.f );
+    apexVerts[0].uv     = vec2( 0.5f );
+    apexVerts[0].norm   = vec3( 0.f, 1.f, 0.f );
+    
+    float angle = 0.f;
+    const float resolution = HL_TWO_PI / (float)sectors;
+    
+    for ( unsigned i = 0; i <= sectors; ++i ) {
+        bumpVertex& base = baseVerts[i+1];
+        bumpVertex& apex = apexVerts[i+1];
+        
+        float s = std::sin( angle ) * 0.5f;
+        float c = std::cos( angle ) * 0.5f;
+        
+        base.pos    = vec3( c, 0.f, s );
+        base.uv     = vec2( c+0.5f, s+0.5f );
+        base.norm   = vec3( 0.f, -1.f, 0.f );
+        
+        apex.pos    = vec3( s, 0.f, c );
+        apex.uv     = vec2( s+0.5f, c+0.5f );
+        apex.norm   = normalize( vec3( s, -std::sqrt( (c*c)+(s*s) ), c ) );
+        
+        if ( i >= 2 ) {
+            calcTangents( baseVerts[i-0], baseVerts[i-1], baseVerts[i-2] );
+            calcTangents( apexVerts[i-0], apexVerts[i-1], apexVerts[i-2] );
+        }
+        angle += resolution;
+    }
+    // it took a lot of trial and error to figure this out
+    apexVerts[0].tng[1] = 0.f;
+    apexVerts[0].btng[1] = 0.f;
+    
+	glGenVertexArrays( 1, &vao );
+	glBindVertexArray( vao );
+	glGenBuffers( 1, &vbo );
+    
+    if ( !vao || !vbo ) {
+        std::cerr
+            << "An error occurred while initializing the cone primitives"
+            << std::endl;
+        terminate();
+        return false;
+    }
+	
+	glBindBuffer( GL_ARRAY_BUFFER, vbo );
+    glBufferData( GL_ARRAY_BUFFER, (sectors+4) * sizeof( bumpVertex ) * 2, baseVerts, GL_STATIC_DRAW );
+	printGlError( "Error while sending sphere primitive data to the GPU.");
+    
+    pipeline::enableBumpVertexAttribs();
+	
+	glBindVertexArray( 0 );
+    
+    delete [] baseVerts;
+    
+    numVerts = sectors+2;
+    resetDrawMode();
+    
+    return true;
+}
+
+void cone::terminate() {
+    glDeleteVertexArrays( 1, &vao );
+    glDeleteBuffers( 1, &vbo );
+
+    vao = vbo = 0;
+    numVerts = 0;
+}
+void cone::draw() const {
+    const GLint     first[] = {0,numVerts};
+    const GLsizei   count[] = {numVerts, numVerts};
+    
+    glBindVertexArray( vao );
+    glMultiDrawArrays( renderMode, first, count, 2 );
+    glBindVertexArray( 0 );
 }
 
 } // end hge namespace

@@ -47,6 +47,7 @@ template < int >
 class   texture; // inherited ADT
 
 // Drawable Primitives
+class   cone;
 class   line;
 class   primitive; // inherited ADT
 class   quad;

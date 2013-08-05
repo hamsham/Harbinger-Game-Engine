@@ -9,6 +9,26 @@
 
 namespace hge {
 
+/*
+ * Computation of a polygon normal from 3 points.
+ * This code was found on Gamedev.StackExchange.com:
+ * http://gamedev.stackexchange.com/questions/8191/any-reliable-polygon-normal-calculation-code
+ * 
+ * Which was found from:
+ * http://www.fullonsoftware.co.uk/snippets/content/
+ */
+vec3 calcNormal( const vec3& v0, const vec3& v1, const vec3& v2 ) {
+    vec3 outVec1 = v1-v0;
+    vec3 outVec2 = v2-v0;
+    vec3 normal;
+    
+    normal[0] = (outVec1[1]*outVec2[2]) - (outVec1[2] - outVec2[1]);
+    normal[1] = -( (outVec2[2]*outVec1[0]) - (outVec2[0] - outVec1[2]) );
+    normal[2] = (outVec1[0] - outVec2[1]) - (outVec1[1] - outVec2[0]);
+    
+    return normalize( normal );
+}
+
 /* Code for the tangent and biTangent calculation is credited towards:
  * OpenGL-Tutorial.org, Tutorial 13 (Normal Mapping)
  * 

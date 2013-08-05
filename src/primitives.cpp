@@ -16,33 +16,32 @@ namespace hge {
  *      PRIMITIVE BASE CLASS
 ******************************************************************************/
 primitive::primitive( primitive&& p ) :
-    drawable( std::move( p ) )
+    drawable( std::move( p ) ),
+    vbo( p.vbo )
 {
-    p.vao = 0;
+    p.vbo = 0;
 }
 
 primitive& primitive::operator = ( primitive&& p ) {
     drawable::operator=( std::move( p ) );
+    vbo = p.vbo;
+    p.vbo = 0;
+    
     return *this;
+}
+
+primitive::~primitive() {}
+
+void primitive::terminate() {
+    glDeleteVertexArrays( 1, &vao );
+    glDeleteBuffers( 1, &vbo );
+    
+    vao = vbo = 0;
 }
 
 /******************************************************************************
  *      QUADS
 ******************************************************************************/
-quad::quad( quad&& q ) :
-    primitive( std::move( q ) ),
-    vbo( q.vbo )
-{
-    q.vbo = 0;
-}
-
-quad& quad::operator = ( quad&& q ) {
-    primitive::operator=( std::move( q ) );
-    vbo = q.vbo;
-    q.vbo = 0;
-    return *this;
-}
-
 bool quad::init() {
 	if ( vao )
         return true;
@@ -92,30 +91,9 @@ bool quad::init() {
 	return true;
 }
 
-void quad::terminate() {
-    glDeleteVertexArrays( 1, &vao );
-    glDeleteBuffers( 1, &vbo );
-
-    vao = vbo = 0;
-}
-
 /******************************************************************************
  *      TRIANGLES
 ******************************************************************************/
-triangle::triangle( triangle&& t ) :
-    primitive( std::move( t ) ),
-    vbo( t.vbo )
-{
-    t.vbo = 0;
-}
-
-triangle& triangle::operator = ( triangle&& t ) {
-    primitive::operator=( std::move( t ) );
-    vbo = t.vbo;
-    t.vbo = 0;
-    return *this;
-}
-
 bool triangle::init() {
 	if ( vao )
         return true;
@@ -161,30 +139,23 @@ bool triangle::init() {
 	return true;
 }
 
-void triangle::terminate() {
-    glDeleteVertexArrays( 1, &vao );
-    glDeleteBuffers( 1, &vbo );
-
-    vao = vbo = 0;
-}
-
 /******************************************************************************
  *      LINES
 ******************************************************************************/
 line::line( line&& l ) :
     primitive( std::move( l ) ),
-    vbo( l.vbo ),
     points{ l.points[0], l.points[1] }
 {
-    l.vbo = 0;
+    l.points[0] = vec3( 0.f );
+    l.points[1] = vec3( 1.f );
 }
 
 line& line::operator = ( line&& l ) {
     primitive::operator=( std::move( l ) );
-    vbo = l.vbo;
-    l.vbo = 0;
     points[0] = l.points[0];
     points[1] = l.points[1];
+    l.points[0] = vec3( 0.f );
+    l.points[1] = vec3( 1.f );
     return *this;
 }
 
@@ -222,13 +193,6 @@ bool line::init() {
     return true;
 }
 
-void line::terminate() {
-    glDeleteVertexArrays( 1, &vao );
-    glDeleteBuffers( 1, &vbo );
-    
-    vao = vbo = 0;
-}
-
 void line::setVertPos( int index, const vec3& inPos ) {
     HGE_ASSERT( (index >= 0) && (index < 2) );
     points[ index ] = inPos;
@@ -238,23 +202,15 @@ void line::setVertPos( int index, const vec3& inPos ) {
     glBufferData( GL_ARRAY_BUFFER, sizeof( points ), &points[0].v, GL_STREAM_DRAW );
 }
 
+void line::terminate() {
+    primitive::terminate();
+    points[0] = vec3( 0.f );
+    points[1] = vec3( 1.f );
+}
+
 /******************************************************************************
  *      CUBES
 ******************************************************************************/
-cube::cube( cube&& c ) :
-    primitive( std::move( c ) ),
-    vbo( c.vbo )
-{
-    c.vbo = 0;
-}
-
-cube& cube::operator = ( cube&& c ) {
-    primitive::operator=( std::move( c ) );
-    vbo = c.vbo;
-    c.vbo = 0;
-    return *this;
-}
-
 bool cube::init() {
     
     if ( vao )
@@ -353,28 +309,20 @@ bool cube::init() {
     return true;
 }
 
-void cube::terminate() {
-    glDeleteVertexArrays( 1, &vao );
-    glDeleteBuffers( 1, &vbo );
-    
-    vao = vbo = 0;
-}
-
 /******************************************************************************
  *      SPHERES
 ******************************************************************************/
 sphere::sphere( sphere&& s ) :
     primitive( std::move( s ) ),
-    vbo{ s.vbo[0], s.vbo[1] }
+    ibo( s.ibo )
 {
-    s.vbo[0] = s.vbo[1] = 0;
+    s.ibo = 0;
 }
 
 sphere& sphere::operator = ( sphere&& s ) {
     primitive::operator=( std::move( s ) );
-    vbo[0] = s.vbo[0];
-    vbo[1] = s.vbo[1];
-    s.vbo[0] = s.vbo[1] = 0;
+    ibo = s.ibo;
+    s.ibo = 0;
     return *this;
 }
 
@@ -426,10 +374,10 @@ bool sphere::init( int rings, int sectors ) {
     }
     
 	glGenVertexArrays( 1, &vao );
-	glBindVertexArray( vao );
-	glGenBuffers( 2, vbo );
+	glGenBuffers( 1, &vbo );
+	glGenBuffers( 1, &ibo );
     
-    if ( !vao || !vbo[0] || !vbo[1] ) {
+    if ( !vao || !vbo || !ibo ) {
         std::cerr
             << "An error occurred while initializing the sphere primitives"
             << std::endl;
@@ -438,14 +386,16 @@ bool sphere::init( int rings, int sectors ) {
     }
     
     numIndices = numVerts * 4;
+    
+	glBindVertexArray( vao );
 	
-	glBindBuffer( GL_ARRAY_BUFFER, vbo[0] );
+	glBindBuffer( GL_ARRAY_BUFFER, vbo );
     glBufferData( GL_ARRAY_BUFFER, numVerts * sizeof( bumpVertex ), vertices, GL_STATIC_DRAW );
 	printGlError( "Error while sending sphere primitive data to the GPU.");
     
     pipeline::enableBumpVertexAttribs();
     
-    glBindBuffer( GL_ELEMENT_ARRAY_BUFFER, vbo[1] );
+    glBindBuffer( GL_ELEMENT_ARRAY_BUFFER, ibo );
     glBufferData( GL_ELEMENT_ARRAY_BUFFER, numIndices * sizeof( GLuint ), indices, GL_STATIC_DRAW );
 	
 	glBindVertexArray( 0 );
@@ -460,9 +410,10 @@ bool sphere::init( int rings, int sectors ) {
 
 void sphere::terminate() {
     glDeleteVertexArrays( 1, &vao );
-    glDeleteBuffers( 2, vbo );
+    glDeleteBuffers( 1, &vbo );
+    glDeleteBuffers( 1, &ibo );
 
-    vao = vbo[0] = vbo[1] = 0;
+    vao = vbo = ibo = 0;
     numIndices = 0;
 }
 
@@ -471,34 +422,38 @@ void sphere::terminate() {
 ******************************************************************************/
 cone::cone( cone&& c ) :
     primitive( std::move( c ) ),
-    vbo( c.vbo ),
     numVerts( c.numVerts )
 {
-    c.vbo = 0;
     c.numVerts = 0;
 }
 
 cone& cone::operator = ( cone&& c ) {
     primitive::operator=( std::move( c ) );
-    vbo = c.vbo;
-    c.vbo = 0;
     numVerts = c.numVerts;
     c.numVerts = 0;
     return *this;
 }
 
 bool cone::init( int sectors ) {
-    terminate();
-    
     // make sure there are enough points for a minimal pyramid
-    if ( sectors < 3 )
+    if ( sectors < 3 ) {
         sectors = 3;
+    }
+    
+    if ( vao && (numVerts == sectors+2 ) ) {
+        return true;
+    }
+    else {
+        terminate();
+    }
     
     // add an offset of + 4 for the starting & ending vertices of the cone
     bumpVertex* baseVerts = new( std::nothrow ) bumpVertex[ (sectors*2) + 4 ];
     if ( !baseVerts ) {
         return false;
     }
+    
+    // add a +2 offset for the start and end vertices of the base of the cone
     bumpVertex* apexVerts = &baseVerts[ sectors+2 ];
     
     baseVerts[0].pos    = vec3( 0.f );
@@ -553,6 +508,8 @@ bool cone::init( int sectors ) {
     }
 	
 	glBindBuffer( GL_ARRAY_BUFFER, vbo );
+    // add a +4 offset to "sectors" in order to account for the starting and
+    // ending vertices of the base & apex of the cone
     glBufferData( GL_ARRAY_BUFFER, (sectors+4) * sizeof( bumpVertex ) * 2, baseVerts, GL_STATIC_DRAW );
 	printGlError( "Error while sending sphere primitive data to the GPU.");
     
@@ -562,6 +519,7 @@ bool cone::init( int sectors ) {
     
     delete [] baseVerts;
     
+    // again, account for the start and end vertices
     numVerts = sectors+2;
     resetDrawMode();
     

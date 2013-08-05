@@ -18,39 +18,38 @@ namespace hge {
  * Primitive Setup
 ******************************************************************************/
 class HGE_API primitive : public drawable {
+    protected:
+        GLuint vbo = 0;
+        
     public:
         primitive       () {}
         primitive       ( primitive&& );
         primitive       ( const primitive& ) = delete;
         
-        virtual ~primitive() {}
+        virtual ~primitive() = 0;
         
         primitive&      operator =      ( const primitive& ) = delete;
         primitive&      operator =      ( primitive&& );
         
         virtual bool    init            () = 0;
-        virtual void    terminate       () = 0;
+        virtual void    terminate       ();
 };
 
 /******************************************************************************
  * Quad Primitives
 ******************************************************************************/
 class HGE_API quad final : public primitive {
-    private:
-        GLuint vbo = 0;
-
     public:
         quad    () {}
         quad    ( const quad& ) = delete;
-        quad    ( quad&& );
+        quad    ( quad&& ) = default;
         
         ~quad   () { terminate(); }
         
         quad&   operator =      ( const quad& ) = delete;
-        quad&   operator =      ( quad&& );
+        quad&   operator =      ( quad&& ) = default;
         
         bool    init            ();
-        void    terminate       ();
 
         // drawing
         void    resetDrawMode   () { renderMode = pipeline::HGE_TRIANGLE_STRIP; }
@@ -65,21 +64,17 @@ class HGE_API quad final : public primitive {
  * Triangle Primitives
 ******************************************************************************/
 class HGE_API triangle final : public primitive {
-    private:
-        GLuint vbo = 0;
-
     public:
         triangle    () {}
         triangle    ( const triangle& ) = delete;
-        triangle    ( triangle&& );
+        triangle    ( triangle&& ) = default;
         
         ~triangle   () { terminate(); }
         
         triangle&   operator =      ( const triangle& ) = delete;
-        triangle&   operator =      ( triangle&& );
+        triangle&   operator =      ( triangle&& ) = default;
         
         bool        init            ();
-        void        terminate       ();
 
         // drawing
         void        resetDrawMode   () { renderMode = pipeline::HGE_TRIANGLES; }
@@ -94,7 +89,6 @@ class HGE_API triangle final : public primitive {
  * Line Primitive
 ******************************************************************************/
 class HGE_API line final : public primitive {
-        GLuint  vbo = 0;
         vec3    points[ 2 ] = { {0.f}, {1.f} };
         
     public:
@@ -108,7 +102,7 @@ class HGE_API line final : public primitive {
         line&       operator =      ( line&& );
         
         bool        init            ();
-        void        terminate       ();
+        void        terminate       () override;
         
         // attribute manipulation
         void        enableAttribute ( pipeline::attribute ) override {}
@@ -132,21 +126,17 @@ class HGE_API line final : public primitive {
  *      Cubes can also be rendered using a cubemap texture
 ******************************************************************************/
 class HGE_API cube final : public primitive {
-    private:
-        GLuint   vbo = 0;
-
     public:
         cube    () {}
         cube    ( const cube& ) = delete;
-        cube    ( cube&& );
+        cube    ( cube&& ) = default;
         
         ~cube   () { terminate(); }
         
         cube&   operator =      ( const cube& ) = delete;
-        cube&   operator =      ( cube&& );
+        cube&   operator =      ( cube&& ) = default;
         
         bool    init            ();
-        void    terminate       ();
 
         // drawing
         void    resetDrawMode   () { renderMode = pipeline::HGE_TRIANGLE_STRIP; }
@@ -166,7 +156,7 @@ class HGE_API cube final : public primitive {
 ******************************************************************************/
 class HGE_API sphere final : public primitive {
     private:
-        GLuint vbo[ 2 ] = { 0, 0 };
+        GLuint ibo = 0;
         unsigned numIndices = 0;
         
     public:
@@ -181,7 +171,7 @@ class HGE_API sphere final : public primitive {
         
         bool        init            ( int rings, int sectors );
         bool        init            () { return init( 10, 10 ); }
-        void        terminate       ();
+        void        terminate       () override;
 
         // drawing
         void        resetDrawMode   () { renderMode = pipeline::HGE_TRIANGLE_STRIP; }
@@ -200,7 +190,6 @@ class HGE_API sphere final : public primitive {
 ******************************************************************************/
 class HGE_API cone final : public primitive {
     private:
-        GLuint vbo = 0;
         int numVerts = 0;
         
     public:
@@ -215,7 +204,7 @@ class HGE_API cone final : public primitive {
         
         bool    init            ( int sectors );
         bool    init            () { return init( 10 ); }
-        void    terminate       ();
+        void    terminate       () override;
 
         // drawing
         void    resetDrawMode   () { renderMode = pipeline::HGE_TRIANGLE_FAN; }

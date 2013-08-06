@@ -45,6 +45,7 @@ class HGE_API stockShaders {
         GLint           bbTexSampler    = 0;
         // Normal/Tangent/Bitangent visualizer
         hge::shader     nbtShader;
+        GLint           nbtShowVertId   = 0;
         GLint           nbtShowNormId   = 0;
         GLint           nbtShowTangId   = 0;
         GLint           nbtShowBtngId   = 0;
@@ -110,6 +111,7 @@ class HGE_API stockShaders {
         // the GL_TRIANGLE* specifiers. Objects drawn with GL_LINES, GL_POINTS,
         // or the GL_*_ADJACENCY specifiers will not work
         void    applyNbtShader      ();
+        void    showVertices        ( bool );
         void    showNormals         ( bool );
         void    showTangents        ( bool );
         void    showBitangents      ( bool );

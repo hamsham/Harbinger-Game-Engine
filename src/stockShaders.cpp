@@ -212,12 +212,14 @@ bool stockShaders::initNbtShader() {
     
     hge::stockShaders::applyShader( nbtShader.getProgramId() );
     
+    nbtShowVertId = nbtShader.getVariableId( "showVertices" );
     nbtShowNormId = nbtShader.getVariableId( "showNormals" );
     nbtShowTangId = nbtShader.getVariableId( "showTangents" );
     nbtShowBtngId = nbtShader.getVariableId( "showBitangents" );
     printGlError("Shader setup error");
     
-    if (    nbtShowNormId == pipeline::INVALID_UNIFORM
+    if (    nbtShowVertId == pipeline::INVALID_UNIFORM
+    ||      nbtShowNormId == pipeline::INVALID_UNIFORM
     ||      nbtShowTangId == pipeline::INVALID_UNIFORM
     ||      nbtShowBtngId == pipeline::INVALID_UNIFORM
     ) {
@@ -319,6 +321,7 @@ void stockShaders::terminate() {
     
     camPosId        = 0;
     
+    nbtShowVertId   = 0;
     nbtShowNormId   = 0;
     nbtShowTangId   = 0;
     nbtShowBtngId   = 0;
@@ -446,6 +449,10 @@ void stockShaders::applySkyShader() {
  ******************************************************************************/
 void stockShaders::applyNbtShader() {
     stockShaders::applyShader( nbtShader.getProgramId() );
+}
+
+void stockShaders::showVertices( bool b ) {
+    glUniform1i( nbtShowVertId, (int)b );
 }
 
 void stockShaders::showNormals( bool b ) {

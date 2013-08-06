@@ -349,9 +349,10 @@ const char ntbVisualizerGS[] = R"***(
     };
     
     layout( triangles ) in;
-    layout( line_strip, max_vertices = 18 ) out;
+    layout( line_strip, max_vertices = 21 ) out;
     
-    uniform bool showNormals    = true;
+    uniform bool showVertices   = true;
+    uniform bool showNormals    = false;
     uniform bool showTangents   = false;
     uniform bool showBitangents = false;
     
@@ -361,10 +362,13 @@ const char ntbVisualizerGS[] = R"***(
     out vec4 lineCol;
     
     void main() {
+        
         for ( int i = 0; i < 3; ++i ) {
+            vec4 origin = mvpMatrix * gl_in[i].gl_Position;
+            
             if ( showBitangents ) {
                 lineCol = vec4( 0.0, 0.0, 1.0, 1.0 );
-                gl_Position = mvpMatrix * gl_in[i].gl_Position;
+                gl_Position = origin;
                 EmitVertex();
                 gl_Position = mvpMatrix * (gl_in[i].gl_Position + btngPos[i]);
                 EmitVertex();
@@ -373,7 +377,7 @@ const char ntbVisualizerGS[] = R"***(
             
             if ( showTangents ) {
                 lineCol = vec4( 1.0, 0.0, 0.0, 1.0 );
-                gl_Position = mvpMatrix * gl_in[i].gl_Position;
+                gl_Position = origin;
                 EmitVertex();
                 gl_Position = mvpMatrix * (gl_in[i].gl_Position + tangPos[i]);
                 EmitVertex();
@@ -382,12 +386,37 @@ const char ntbVisualizerGS[] = R"***(
 
             if ( showNormals ) {
                 lineCol = vec4( 0.0, 1.0, 0.0, 1.0 );
-                gl_Position = mvpMatrix * gl_in[i].gl_Position;
+                gl_Position = origin;
                 EmitVertex();
                 gl_Position = mvpMatrix * (gl_in[i].gl_Position + normPos[i]);
                 EmitVertex();
                 EndPrimitive();
             }
+        }
+
+        if ( showVertices ) {
+            lineCol = vec4( 1.0, 0.0, 1.0, 1.0 );
+            vec4 a = mvpMatrix * gl_in[0].gl_Position;
+            vec4 b = mvpMatrix * gl_in[1].gl_Position;
+            vec4 c = mvpMatrix * gl_in[2].gl_Position;
+
+            gl_Position = a;
+            EmitVertex();
+            gl_Position = b;
+            EmitVertex();
+            EndPrimitive();
+
+            gl_Position = b;
+            EmitVertex();
+            gl_Position = c;
+            EmitVertex();
+            EndPrimitive();
+
+            gl_Position = c;
+            EmitVertex();
+            gl_Position = a;
+            EmitVertex();
+            EndPrimitive();
         }
     }
     

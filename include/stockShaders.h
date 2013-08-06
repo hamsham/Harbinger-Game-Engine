@@ -10,13 +10,44 @@
 
 #include <string>
 #include "types.h"
+#include "pipeline.h"
+#include "shader.h"
+#include "camera.h"
 
 namespace hge {
-    
-class HGE_API stockShaders {
+
+/******************************************************************************
+ * Stock Shader Base Class
+******************************************************************************/
+class HGE_API stockShader {
+    protected:
+        pipeline* currPipeline = nullptr;
+        shader program;
+        
+    public:
+        stockShader             () {}
+        stockShader             ( const stockShader& ) = delete;
+        stockShader             ( stockShader&& );
+        virtual ~stockShader    () {}
+        
+        stockShader& operator = ( const stockShader& ) = delete;
+        stockShader& operator = ( stockShader&& );
+        
+        virtual bool init       ( pipeline* const p ) = 0;
+        virtual void terminate  () = 0;
+        
+        void        activate    ();
+};
+
+inline void stockShader::activate() {
+    currPipeline->applyStockShader( program.getProgramId() );
+}
+
+/******************************************************************************
+ * Point Light Shader
+******************************************************************************/
+class HGE_API pointLightShader final : public stockShader {
     private:
-        //Point Light Shader
-        hge::shader     pointLightShader;
         GLint           ambColorId      = 0;
         GLint           ambIntId        = 0;
         GLint           pointColorId    = 0;
@@ -25,100 +56,139 @@ class HGE_API stockShaders {
         GLint           pointConstId    = 0;
         GLint           pointExpId      = 0;
         GLint           pointPosId      = 0;
-        GLint           shadowId        = 0;
         GLint           lightMatrixId   = 0;
-        GLint           textureId       = 0;
-        GLint           normalId        = 0;
-        // Shadow Shader
-        hge::shader     shadowShader;
-        GLint           shadowMapId     = 0;
-        // Skybox Shader
-        hge::shader     skyShader;
-        GLint           skyTexId        = 0;
-        // Font Shader Setup
-        hge::shader     fontShader;
-        GLint           fontColId       = 0;
-        GLint           fontSampler     = 0;
-        // Billboard Setup
-        hge::shader     bbShader;
-        GLint           camPosId        = 0;
-        GLint           bbTexSampler    = 0;
-        // Normal/Tangent/Bitangent visualizer
-        hge::shader     nbtShader;
-        GLint           nbtShowVertId   = 0;
-        GLint           nbtShowNormId   = 0;
-        GLint           nbtShowTangId   = 0;
-        GLint           nbtShowBtngId   = 0;
-
-        // Commonly shared Uniform buffer object
-        GLuint ubo = 0;
-        GLuint matrixIndexId = GL_INVALID_INDEX;
-        GLuint currShader = 0;
-
-        // Creating an array of four 4x4 Matrices. Model, View, Projection, and MVP
-        mat4 transforms[ 3 ] = { mat4( 1.f ) };
-        
-        // Shader initializations
-        bool initPointLightShader();
-        bool initShadowShader();
-        bool initSkyShader();
-        bool initFontShader();
-        bool initBillboardShader();
-        bool initNbtShader();
-        void terminate();
-        
-        // Shader Matrix Updating
-        void updateMatricesImpl();
         
     public:
-        enum e_matrixState : int {
-            HGE_MODEL_MAT   = 0,
-            HGE_VP_MAT      = 1
-        };
-
-        stockShaders();
-        stockShaders( const stockShaders& ) = delete;
-        stockShaders( stockShaders&& ) = delete;
+        pointLightShader                () {}
+        pointLightShader                ( const pointLightShader& ) = delete;
+        pointLightShader                ( pointLightShader&& );
+        ~pointLightShader               () { terminate(); }
         
-        stockShaders& operator = ( const stockShaders& ) = delete;
-        stockShaders& operator = ( stockShaders&& ) = delete;
+        pointLightShader& operator =    ( const pointLightShader& ) = delete;
+        pointLightShader& operator =    ( pointLightShader&& );
         
-        ~stockShaders() { terminate(); }
-
-        void    applyShader( GLuint shaderId );
-
-        // The matrix stack will only hold (at most) a single user-applied matrix of
-        // each type (model, view, and projection).
-        void    applyMatrix         ( e_matrixState s, const mat4& m = mat4( 1.f ) );
-        void    applyMatrix         ( const drawTransform&, const camera& );
-        void    removeMatrix        ( e_matrixState s );
-
-        void    applyBillboardShader();
-        void    setBillboardCam     ( const camera& );
-
-        void    applyPointLightShader();
-        void    setPointLight       ( const ambientLight&, const pointLight& );
-        void    setPointLightMvp    ( const mat4& );
-
-        void    applyShadowShader   ();
-
-        void    applyFontShader     ();
-        void    setFontColor        ( const vec4& );
-
-        void    applySkyShader      ();
+        bool init                       ( pipeline* const p );
+        void terminate                  ();
         
-        // The NBT shader only works with objects that have been drawn using
-        // the GL_TRIANGLE* specifiers. Objects drawn with GL_LINES, GL_POINTS,
-        // or the GL_*_ADJACENCY specifiers will not work
-        void    applyNbtShader      ();
-        void    showVertices        ( bool );
-        void    showNormals         ( bool );
-        void    showTangents        ( bool );
-        void    showBitangents      ( bool );
+        void setPointLight              ( const pointLight& );
+        void setAmbientLight            ( const ambientLight& );
+        void setLightMvp                ( const mat4& );
+};
+
+/******************************************************************************
+ * Shadow Map Shader
+******************************************************************************/
+class HGE_API shadowShader final : public stockShader {
+    public:
+        shadowShader                () {}
+        shadowShader                ( const shadowShader& ) = delete;
+        shadowShader                ( shadowShader&& ) = default;
+        ~shadowShader               () { terminate(); }
         
+        shadowShader& operator =    ( const shadowShader& ) = delete;
+        shadowShader& operator =    ( shadowShader&& ) = default;
+        
+        bool init                   ( pipeline* const p );
+        void terminate              () { program.unload(); }
+};
+
+/******************************************************************************
+ * Skybox Shader
+******************************************************************************/
+class HGE_API skyShader final : public stockShader {
+    public:
+        skyShader               () {}
+        skyShader               ( const skyShader& ) = delete;
+        skyShader               ( skyShader&& ) = default;
+        ~skyShader              () { terminate(); }
+        
+        skyShader& operator =   ( const skyShader& ) = delete;
+        skyShader& operator =   ( skyShader&& ) = default;
+        
+        bool init               ( pipeline* const p );
+        void terminate          () { program.unload(); }
+};
+
+/******************************************************************************
+ * Font Shader
+ * 
+ * NOTE: These must be drawn after a skybox due to transparency issues
+******************************************************************************/
+class HGE_API fontShader final : public stockShader {
+    private:
+        GLint fontColId = 0;
+        
+    public:
+        fontShader              () {}
+        fontShader              ( const fontShader& ) = delete;
+        fontShader              ( fontShader&& );
+        ~fontShader             () { terminate(); }
+        
+        fontShader& operator =  ( const fontShader& ) = delete;
+        fontShader& operator =  ( fontShader&& );
+        
+        bool init               ( pipeline* const p );
+        void terminate          ();
+        
+        void setFontColor       ( const vec4& v ) { glUniform4fv( fontColId, 1, v.v ); }
+};
+
+/******************************************************************************
+ * Billboard Shader
+******************************************************************************/
+class HGE_API billboardShader final : public stockShader {
+    private:
+        GLint camPosId = 0;
+        
+    public:
+        billboardShader             () {}
+        billboardShader             ( const billboardShader& ) = delete;
+        billboardShader             ( billboardShader&& );
+        ~billboardShader            () { terminate(); }
+        
+        billboardShader& operator = ( const billboardShader& ) = delete;
+        billboardShader& operator = ( billboardShader&& );
+        
+        bool init                   ( pipeline* const p );
+        void terminate              ();
+        
+        void setCameraPos           ( const camera& c ) { glUniform3fv( camPosId, 1, c.getPos().v ); }
+};
+
+/******************************************************************************
+ * Debug Shader to view Vertices, normals, tangents, and bitangents
+ * 
+ * NOTE:
+ *      The NBT shader only works with objects that have been drawn using
+ *      the GL_TRIANGLE* specifiers. Objects drawn with GL_LINES or
+ *      GL_POINTS specifiers will not work
+******************************************************************************/
+class HGE_API vnbtShader final : public stockShader {
+    private:
+        GLint showVertId = 0;
+        GLint showNormId = 0;
+        GLint showTangId = 0;
+        GLint showBtngId = 0;
+        
+    public:
+        vnbtShader              () {}
+        vnbtShader              ( const vnbtShader& ) = delete;
+        vnbtShader              ( vnbtShader&& );
+        
+        vnbtShader& operator =  ( const vnbtShader& ) = delete;
+        vnbtShader& operator =  ( vnbtShader&& );
+        
+        ~vnbtShader             () { terminate(); }
+        
+        bool init               ( pipeline* const p );
+        void terminate          ();
+        
+        void    showVertices    ( bool b ) { glUniform1i( showVertId, (int)b ); }
+        void    showNormals     ( bool b ) { glUniform1i( showNormId, (int)b ); }
+        void    showTangents    ( bool b ) { glUniform1i( showTangId, (int)b ); }
+        void    showBitangents  ( bool b ) { glUniform1i( showBtngId, (int)b ); }
 };
 
 } // end hge namespace
 
 #endif	/* __HGE_STOCK_SHADERS_H__ */
-

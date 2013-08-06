@@ -1,5 +1,6 @@
 
 #include <iostream>
+#include <utility>
 #include "shader.h"
 
 using namespace std;
@@ -49,6 +50,23 @@ void printShaderError(GLuint programId, GLuint shaderId ) {
 //		OpenGL Shader Class
 ///////////////////////////////////////////////////////////////////////////////
 namespace hge {
+
+//-----------------------------------------------------------------------------
+//	Shader - Move Operations
+//-----------------------------------------------------------------------------
+shader::shader( shader&& s ) :
+    shaderIds( std::move( s.shaderIds ) ),
+    programId( s.programId )
+{
+    s.programId = 0;
+}
+
+shader& shader::operator=( shader&& s ) {
+    shaderIds = std::move( s.shaderIds );
+    programId = s.programId;
+    s.programId = 0;
+    return *this;
+}
 
 //-----------------------------------------------------------------------------
 //	Shader - Compilation
@@ -147,13 +165,6 @@ void shader::unload() {
         glDeleteProgram(programId);
         programId = 0;
     }
-}
-
-//-----------------------------------------------------------------------------
-//	Shader - Variable Acquisition
-//-----------------------------------------------------------------------------
-GLint shader::getVariableId( const char* v ) {
-    return glGetUniformLocation( programId, v );
 }
 
 } // End hge namespace

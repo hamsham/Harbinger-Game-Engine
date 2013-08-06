@@ -23,6 +23,16 @@ class   window;
 class   inputSystem;
 class   stockShaders;
 
+// Builit-In graphics pipeline
+class pipeline;
+class stockShader;
+class pointLightShader;
+class shadowShader;
+class skyShader;
+class fontShader;
+class billboardShader;
+class vnbtShader;
+
 //vertex structures
 struct  plainVertex; // position, uv, normal
 struct  bumpVertex; // plainVertex + tangent & bitangent

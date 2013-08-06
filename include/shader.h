@@ -25,7 +25,13 @@ class HGE_API shader : public resource {
 
     public:
         shader      ()              {}
+        shader      ( const shader& ) = delete;
+        shader      ( shader&& );
+        
         ~shader     ()              { unload(); }
+        
+        shader&     operator =      ( const shader& ) = delete;
+        shader&     operator =      ( shader&& );
 
         bool        isLoaded        () const { return (programId) ? true : false; }
         bool        load            ( const char* shaderFilePath, int shaderType );
@@ -35,6 +41,13 @@ class HGE_API shader : public resource {
         GLuint      getProgramId    () const { return programId; }
         GLint       getVariableId   ( const char* );
 };
+
+//-----------------------------------------------------------------------------
+//	Shader - Variable Acquisition
+//-----------------------------------------------------------------------------
+inline GLint shader::getVariableId( const char* v ) {
+    return glGetUniformLocation( programId, v );
+}
 
 } // end hge namespace
 

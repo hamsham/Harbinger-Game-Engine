@@ -6,69 +6,132 @@
  */
 
 #include <iostream>
+#include <utility>
 
-#include "camera.h"
 #include "light.h"
 #include "pipeline.h"
 #include "shader.h"
 #include "stockShaders.h"
 #include "stockShaders_glsl.h"
-#include "transformations.h"
 
-namespace pipeline = hge::pipeline;
-using hamLibs::math::mat4;
 namespace hge {
+    
+stockShader::stockShader( stockShader&& s ) :
+    currPipeline( s.currPipeline ),
+    program( std::move( s.program ) )
+{
+    s.currPipeline = nullptr;
+}
 
-void stockShaders::updateMatricesImpl() {
-    // Upload the matrix data to the current shader
-    glUniformBlockBinding( currShader, matrixIndexId, HGE_PIPELINE_MATRIX_BINDING );
-    glBindBuffer( GL_UNIFORM_BUFFER, ubo );
-    glBindBufferBase( GL_UNIFORM_BUFFER, HGE_PIPELINE_MATRIX_BINDING, ubo );
-
-    glBufferData(
-        GL_UNIFORM_BUFFER, sizeof( transforms ), transforms, GL_DYNAMIC_DRAW
-    );
+stockShader& stockShader::operator = ( stockShader&& s ) {
+    program = std::move( s.program );
+    currPipeline = s.currPipeline;
+    s.currPipeline = nullptr;
+    
+    return *this;
 }
 
 /******************************************************************************
  * POINT LIGHT SHADER
  ******************************************************************************/
-bool stockShaders::initPointLightShader() {
+pointLightShader::pointLightShader( pointLightShader&& p ) :
+    stockShader( std::move( p ) ),
+    ambColorId( p.ambColorId ),
+    ambIntId( p.ambIntId ),
+    pointColorId( p.pointColorId ),
+    pointIntId( p.pointIntId ),
+    pointLinearId( p.pointLinearId ),
+    pointConstId( p.pointConstId ),
+    pointExpId( p.pointExpId ),
+    pointPosId( p.pointPosId ),
+    lightMatrixId( p.lightMatrixId )
+{
+    p.ambColorId      = 0;
+    p.ambIntId        = 0;
+    p.pointColorId    = 0;
+    p.pointIntId      = 0;
+    p.pointLinearId   = 0;
+    p.pointConstId    = 0;
+    p.pointExpId      = 0;
+    p.pointPosId      = 0;
+    p.lightMatrixId   = 0;
+}
+
+pointLightShader& pointLightShader::operator = ( pointLightShader&& p ) {
+    stockShader::operator=( std::move( p ) );
+    ambColorId      = p.ambColorId;
+    ambIntId        = p.ambIntId;
+    pointColorId    = p.pointColorId;
+    pointIntId      = p.pointIntId;
+    pointLinearId   = p.pointLinearId;
+    pointConstId    = p.pointConstId;
+    pointExpId      = p.pointExpId;
+    pointPosId      = p.pointPosId;
+    lightMatrixId   = p.lightMatrixId;
+    
+    p.ambColorId      = 0;
+    p.ambIntId        = 0;
+    p.pointColorId    = 0;
+    p.pointIntId      = 0;
+    p.pointLinearId   = 0;
+    p.pointConstId    = 0;
+    p.pointExpId      = 0;
+    p.pointPosId      = 0;
+    p.lightMatrixId   = 0;
+    return *this;
+}
+
+bool pointLightShader::init( pipeline* const p ) {
+    // don't do anything if there already is a shader program in memory
+    if ( program.getProgramId() )
+        return true;
+    
+    std::cout << "Loading a point light shader." << std::endl;
+    if (    !program.loadBuffer( pointVS, sizeof( pointVS ), GL_VERTEX_SHADER )
+    ||      !program.loadBuffer( pointFS, sizeof( pointFS ), GL_FRAGMENT_SHADER )
+    ||      !program.compile()
+    ) {
+        std::cerr << "Failed to load a point light shader." << std::endl;
+        return false;
+    }
+    
     std::cout
-        << "Setting up the point light shader.\nID: "
-        << pointLightShader.getProgramId()
+        << "Setting up a point light shader.\n\tID: "
+        << program.getProgramId()
         << std::endl;
     
-    hge::stockShaders::applyShader( pointLightShader.getProgramId() );
+    GLint textureId = 0;
+    GLint shadowId  = 0;
+    GLint normalId  = 0;
+    GLint progId    = program.getProgramId();
+    p->applyStockShader( progId );
     
-    ambColorId      = pointLightShader.getVariableId( "ambientLight.color" );
-    ambIntId        = pointLightShader.getVariableId( "ambientLight.intensity" );
-    pointColorId    = pointLightShader.getVariableId( "pointLight.color" );
-    pointIntId      = pointLightShader.getVariableId( "pointLight.intensity" );
-    pointConstId    = pointLightShader.getVariableId( "pointLight.constant" );
-    pointLinearId   = pointLightShader.getVariableId( "pointLight.linear" );
-    pointExpId      = pointLightShader.getVariableId( "pointLight.exponential" );
-    pointPosId      = pointLightShader.getVariableId( "pointLight.position" );
-    shadowId        = pointLightShader.getVariableId( "shadowMap" );
-    lightMatrixId   = pointLightShader.getVariableId( "lightMVP" );
-    textureId       = pointLightShader.getVariableId( "texSampler" );
-    normalId        = pointLightShader.getVariableId( "normalMap" );
+    ambColorId      = program.getVariableId( "ambientLight.color" );
+    ambIntId        = program.getVariableId( "ambientLight.intensity" );
+    pointColorId    = program.getVariableId( "pointLight.color" );
+    pointIntId      = program.getVariableId( "pointLight.intensity" );
+    pointConstId    = program.getVariableId( "pointLight.constant" );
+    pointLinearId   = program.getVariableId( "pointLight.linear" );
+    pointExpId      = program.getVariableId( "pointLight.exponential" );
+    pointPosId      = program.getVariableId( "pointLight.position" );
+    shadowId        = program.getVariableId( "shadowMap" );
+    lightMatrixId   = program.getVariableId( "lightMVP" );
+    textureId       = program.getVariableId( "texSampler" );
+    normalId        = program.getVariableId( "normalMap" );
     printGlError("Point light shader setup error");
     
-    if (
-        ambColorId      == pipeline::INVALID_UNIFORM
-    ||  ambIntId        == pipeline::INVALID_UNIFORM
-    ||  pointColorId    == pipeline::INVALID_UNIFORM
-    ||  pointIntId      == pipeline::INVALID_UNIFORM
-    ||  pointConstId    == pipeline::INVALID_UNIFORM
-    ||  pointLinearId   == pipeline::INVALID_UNIFORM
-    ||  pointExpId      == pipeline::INVALID_UNIFORM
-    ||  pointPosId      == pipeline::INVALID_UNIFORM
-    ||  shadowId        == pipeline::INVALID_UNIFORM
-    ||  lightMatrixId   == pipeline::INVALID_UNIFORM
-    ||  textureId       == pipeline::INVALID_UNIFORM
-    ||  normalId        == pipeline::INVALID_UNIFORM
-    ||  camPosId        == pipeline::INVALID_UNIFORM
+    if (    ambColorId      == pipeline::INVALID_UNIFORM
+    ||      ambIntId        == pipeline::INVALID_UNIFORM
+    ||      pointColorId    == pipeline::INVALID_UNIFORM
+    ||      pointIntId      == pipeline::INVALID_UNIFORM
+    ||      pointConstId    == pipeline::INVALID_UNIFORM
+    ||      pointLinearId   == pipeline::INVALID_UNIFORM
+    ||      pointExpId      == pipeline::INVALID_UNIFORM
+    ||      pointPosId      == pipeline::INVALID_UNIFORM
+    ||      shadowId        == pipeline::INVALID_UNIFORM
+    ||      lightMatrixId   == pipeline::INVALID_UNIFORM
+    ||      textureId       == pipeline::INVALID_UNIFORM
+    ||      normalId        == pipeline::INVALID_UNIFORM
     ) {
         printGlError("Error accessing a point light uniform variable");
         glUseProgram( 0 );
@@ -83,21 +146,66 @@ bool stockShaders::initPointLightShader() {
     printGlError( "Shadowmap Sampler error" );
     glUseProgram( 0 );
     
+    currPipeline = p;
     return true;
+}
+
+void pointLightShader::terminate() {
+    currPipeline = nullptr;
+    program.unload();
+    
+    ambColorId      = 0;
+    ambIntId        = 0;
+    pointColorId    = 0;
+    pointIntId      = 0;
+    pointLinearId   = 0;
+    pointConstId    = 0;
+    pointExpId      = 0;
+    pointPosId      = 0;
+    lightMatrixId   = 0;
+}
+
+void pointLightShader::setLightMvp( const mat4& mvp ) {
+    glUniformMatrix4fv( lightMatrixId, 1, GL_FALSE, (GLfloat*)mvp.m );
+}
+
+void pointLightShader::setPointLight( const pointLight& p ) {
+    glUniform1f(    pointIntId,     p.intensity );
+    glUniform1f(    pointLinearId,  p.linear );
+    glUniform1f(    pointConstId,   p.constant );
+    glUniform1f(    pointExpId,     p.exponential );
+    glUniform4fv(   pointColorId,   1, p.color.v );
+    glUniform3fv(   pointPosId,     1, p.pos.v );
+}
+
+void pointLightShader::setAmbientLight( const ambientLight& a ) {
+    glUniform1f(    ambIntId,       a.intensity );
+    glUniform4fv(   ambColorId,     1, a.color.v );
 }
 
 /******************************************************************************
  * SHADOW SHADER
  ******************************************************************************/
-bool stockShaders::initShadowShader() {
+bool shadowShader::init( pipeline* const p ) {
+    // don't do anything if there already is a shader program in memory
+    if ( program.getProgramId() )
+        return true;
+    
+    if (    !program.loadBuffer( plainVS, sizeof( plainVS ), GL_VERTEX_SHADER )
+    ||      !program.loadBuffer( shadowFS, sizeof( shadowFS ), GL_FRAGMENT_SHADER )
+    ||      !program.compile()
+    ) {
+        return false;
+    }
     std::cout
-        << "Setting up the shadowmap shader.\nID: "
-        << shadowShader.getProgramId()
+        << "Setting up a shadow map shader.\n\tID: "
+        << program.getProgramId()
         << std::endl;
     
-    hge::stockShaders::applyShader( shadowShader.getProgramId() );
+    GLint progId = program.getProgramId();
+    p->applyStockShader( progId );
+    GLint shadowMapId = program.getVariableId( "shadowMap" );
     
-    shadowMapId = shadowShader.getVariableId( "shadowMap" );
     printGlError("Shader setup error");
     
     if ( shadowMapId == pipeline::INVALID_UNIFORM ) {
@@ -110,21 +218,33 @@ bool stockShaders::initShadowShader() {
     printGlError( "Shadowmap sampler error" );
     glUseProgram( 0 );
     
+    currPipeline = p;
     return true;
 }
 
 /******************************************************************************
  * SKY SHADER
  ******************************************************************************/
-bool stockShaders::initSkyShader() {
+bool skyShader::init( pipeline* const p ) {
+    // don't do anything if there already is a shader program in memory
+    if ( program.getProgramId() )
+        return true;
+    
+    if (    !program.loadBuffer( skyVS, sizeof( skyVS ), GL_VERTEX_SHADER )
+    ||      !program.loadBuffer( skyFS, sizeof( skyFS ), GL_FRAGMENT_SHADER )
+    ||      !program.compile()
+    ) {
+        return false;
+    }
+    
     std::cout
         << "Setting up the Skybox shader.\nID: "
-        << skyShader.getProgramId()
+        << program.getProgramId()
         << std::endl;
     
-    hge::stockShaders::applyShader( skyShader.getProgramId() );
-    
-    skyTexId = skyShader.getVariableId( "cubeTex" );
+    GLint progId = program.getProgramId();
+    p->applyStockShader( progId );
+    GLint skyTexId = program.getVariableId( "cubeTex" );
     printGlError("Skybox shader setup error");
     
     if ( skyTexId == pipeline::INVALID_UNIFORM ) {
@@ -137,22 +257,49 @@ bool stockShaders::initSkyShader() {
     printGlError( "Skybox sampler error" );
     glUseProgram( 0 );
     
+    currPipeline = p;
     return true;
 }
 
 /******************************************************************************
  * FONT SHADER
  ******************************************************************************/
-bool stockShaders::initFontShader() {
+fontShader::fontShader( fontShader&& f ) :
+    stockShader( std::move( f ) ),
+    fontColId( f.fontColId )
+{
+    f.fontColId = 0;
+}
+
+fontShader& fontShader::operator = ( fontShader&& f ) {
+    stockShader::operator=( std::move( f ) );
+    fontColId = f.fontColId;
+    f.fontColId = 0;
+    return *this;
+}
+
+bool fontShader::init( pipeline* const p ) {
+    // don't do anything if there already is a shader program in memory
+    if ( program.getProgramId() )
+        return true;
+    
+    if (    !program.loadBuffer( plainVS, sizeof( plainVS ), GL_VERTEX_SHADER )
+    ||      !program.loadBuffer( fontFS, sizeof( fontFS ), GL_FRAGMENT_SHADER )
+    ||      !program.compile()
+    ) {
+        return false;
+    }
+    
     std::cout
         << "Setting up the font shader.\nID: "
-        << fontShader.getProgramId()
+        << program.getProgramId()
         << std::endl;
     
-    hge::stockShaders::applyShader( fontShader.getProgramId() );
+    GLint progId = program.getProgramId();
+    p->applyStockShader( progId );
     
-    fontColId   = fontShader.getVariableId( "color" );
-    fontSampler = fontShader.getVariableId( "texSampler" );
+    fontColId = program.getVariableId( "color" );
+    GLint fontSampler = program.getVariableId( "texSampler" );
     printGlError("Font shader setup error");
     
     if (    fontSampler == pipeline::INVALID_UNIFORM
@@ -167,61 +314,142 @@ bool stockShaders::initFontShader() {
     printGlError( "Font Sampler error" );
     glUseProgram( 0 );
     
+    currPipeline = p;
     return true;
+}
+
+void fontShader::terminate() {
+    currPipeline = nullptr;
+    program.unload();
+    fontColId = 0;
 }
 
 /******************************************************************************
  * BILLBOARD SHADER
  ******************************************************************************/
-bool stockShaders::initBillboardShader() {
+billboardShader::billboardShader( billboardShader&& b ) :
+    stockShader( std::move( b ) ),
+    camPosId( b.camPosId )
+{
+    b.camPosId = 0;
+}
+
+billboardShader& billboardShader::operator = ( billboardShader&& b ) {
+    stockShader::operator=( std::move( b ) );
+    camPosId = b.camPosId;
+    b.camPosId = 0;
+    return *this;
+}
+
+bool billboardShader::init( pipeline* const p ) {
+    // don't do anything if there already is a shader program in memory
+    if ( program.getProgramId() )
+        return true;
+    
+    if (    !program.loadBuffer( billboardVS, sizeof( billboardVS ), GL_VERTEX_SHADER )
+    ||      !program.loadBuffer( billboardGS, sizeof( billboardGS ), GL_GEOMETRY_SHADER )
+    ||      !program.loadBuffer( billboardFS, sizeof( billboardFS ), GL_FRAGMENT_SHADER )
+    ||      !program.compile()
+    ) {
+        return false;
+    }
+    
     std::cout
         << "Setting up the billboard shader.\nID: "
-        << bbShader.getProgramId()
+        << program.getProgramId()
         << std::endl;
     
-    hge::stockShaders::applyShader( bbShader.getProgramId() );
+    GLint progId = program.getProgramId();
+    p->applyStockShader( progId );
     
-    camPosId        = bbShader.getVariableId( "camPos" );
-    bbTexSampler    = bbShader.getVariableId( "texSampler" );
+    camPosId = program.getVariableId( "camPos" );
+    GLint texSampler = program.getVariableId( "texSampler" );
     printGlError("Shader setup error");
     
     if (    camPosId    == pipeline::INVALID_UNIFORM
-    ||      bbTexSampler== pipeline::INVALID_UNIFORM
+    ||      texSampler== pipeline::INVALID_UNIFORM
     ) {
         printGlError("Error accessing a billboard uniform variable");
         glUseProgram( 0 );
         return false;
     }
     
-    glUniform1i( bbTexSampler, pipeline::HGE_SAMPLER_DEFAULT );
+    glUniform1i( texSampler, pipeline::HGE_SAMPLER_DEFAULT );
     
     printGlError( "Billboard Sampler error" );
     glUseProgram( 0 );
     
+    currPipeline = p;
     return true;
+}
+
+void billboardShader::terminate() {
+    currPipeline = nullptr;
+    program.unload();
+    camPosId = 0;
 }
 
 /******************************************************************************
  * NBT SHADER
  ******************************************************************************/
-bool stockShaders::initNbtShader() {
+vnbtShader::vnbtShader( vnbtShader&& s ) :
+    stockShader     ( std::move( s ) ),
+    showVertId      ( s.showVertId ),
+    showNormId      ( s.showNormId ),
+    showTangId      ( s.showTangId ),
+    showBtngId      ( s.showBtngId )
+{
+    s.showVertId    = 0;
+    s.showNormId    = 0;
+    s.showTangId    = 0;
+    s.showBtngId    = 0;
+}
+
+vnbtShader& vnbtShader::operator = ( vnbtShader&& s ) {
+    stockShader::operator=( std::move( s ) );
+    showVertId     = s.showVertId;
+    showNormId      = s.showNormId;
+    showTangId      = s.showTangId;
+    showBtngId      = s.showBtngId;
+    
+    s.showVertId    = 0;
+    s.showNormId    = 0;
+    s.showTangId    = 0;
+    s.showBtngId    = 0;
+    return *this;
+}
+
+bool vnbtShader::init( pipeline* const p ) {
+    // don't do anything if there already is a shader program in memory
+    if ( program.getProgramId() )
+        return true;
+    
+    if (    !program.loadBuffer( ntbVisualizerVS, sizeof( ntbVisualizerVS ), GL_VERTEX_SHADER )
+    ||      !program.loadBuffer( ntbVisualizerGS, sizeof( ntbVisualizerGS ), GL_GEOMETRY_SHADER )
+    ||      !program.loadBuffer( ntbVisualizerFS, sizeof( ntbVisualizerFS ), GL_FRAGMENT_SHADER )
+    ||      !program.compile()
+    ) {
+        return false;
+    }
+    
     std::cout
         << "Setting up the Normal/Tangent/Billboard visualization shader.\nID: "
-        << nbtShader.getProgramId()
+        << program.getProgramId()
         << std::endl;
     
-    hge::stockShaders::applyShader( nbtShader.getProgramId() );
+    GLint progId = program.getProgramId();
+    p->applyStockShader( progId );
     
-    nbtShowVertId = nbtShader.getVariableId( "showVertices" );
-    nbtShowNormId = nbtShader.getVariableId( "showNormals" );
-    nbtShowTangId = nbtShader.getVariableId( "showTangents" );
-    nbtShowBtngId = nbtShader.getVariableId( "showBitangents" );
+    showVertId = program.getVariableId( "showVertices" );
+    showNormId = program.getVariableId( "showNormals" );
+    showTangId = program.getVariableId( "showTangents" );
+    showBtngId = program.getVariableId( "showBitangents" );
     printGlError("Shader setup error");
     
-    if (    nbtShowVertId == pipeline::INVALID_UNIFORM
-    ||      nbtShowNormId == pipeline::INVALID_UNIFORM
-    ||      nbtShowTangId == pipeline::INVALID_UNIFORM
-    ||      nbtShowBtngId == pipeline::INVALID_UNIFORM
+    if (    showVertId == pipeline::INVALID_UNIFORM
+    ||      showNormId == pipeline::INVALID_UNIFORM
+    ||      showTangId == pipeline::INVALID_UNIFORM
+    ||      showBtngId == pipeline::INVALID_UNIFORM
     ) {
         printGlError("Error accessing an NBT uniform variable");
         return false;
@@ -230,241 +458,17 @@ bool stockShaders::initNbtShader() {
     
     glUseProgram( 0 );
     
+    currPipeline = p;
     return true;
 }
 
-/******************************************************************************
- * Shader Manager Initialization
- ******************************************************************************/
-stockShaders::stockShaders() {
-    try {
-        glGenBuffers( 1, &ubo );
-        printGlError( "Creating pipeline uniform block" );
-
-        HL_ASSERT( ubo != 0 );
-
-        HL_ASSERT( shadowShader.loadBuffer( plainVS, sizeof( plainVS ), GL_VERTEX_SHADER ) );
-        HL_ASSERT( shadowShader.loadBuffer( shadowFS, sizeof( shadowFS ), GL_FRAGMENT_SHADER ) );
-        HL_ASSERT( shadowShader.compile() );
-
-        HL_ASSERT( pointLightShader.loadBuffer( pointVS, sizeof( pointVS ), GL_VERTEX_SHADER ) );
-        HL_ASSERT( pointLightShader.loadBuffer( pointFS, sizeof( pointFS ), GL_FRAGMENT_SHADER ) );
-        HL_ASSERT( pointLightShader.compile() );
-
-        HL_ASSERT( skyShader.loadBuffer( skyVS, sizeof( skyVS ), GL_VERTEX_SHADER ) );
-        HL_ASSERT( skyShader.loadBuffer( skyFS, sizeof( skyFS ), GL_FRAGMENT_SHADER ) );
-        HL_ASSERT( skyShader.compile() );
-
-        HL_ASSERT( fontShader.loadBuffer( plainVS, sizeof( plainVS ), GL_VERTEX_SHADER ) );
-        HL_ASSERT( fontShader.loadBuffer( fontFS, sizeof( fontFS ), GL_FRAGMENT_SHADER ) );
-        HL_ASSERT( fontShader.compile() );
-
-        HL_ASSERT( bbShader.loadBuffer( billboardVS, sizeof( billboardVS ), GL_VERTEX_SHADER ) );
-        HL_ASSERT( bbShader.loadBuffer( billboardGS, sizeof( billboardGS ), GL_GEOMETRY_SHADER ) );
-        HL_ASSERT( bbShader.loadBuffer( billboardFS, sizeof( billboardFS ), GL_FRAGMENT_SHADER ) );
-        HL_ASSERT( bbShader.compile() );
-
-        HL_ASSERT( nbtShader.loadBuffer( ntbVisualizerVS, sizeof( ntbVisualizerVS ),GL_VERTEX_SHADER ) );
-        HL_ASSERT( nbtShader.loadBuffer( ntbVisualizerGS, sizeof( ntbVisualizerGS ),GL_GEOMETRY_SHADER ) );
-        HL_ASSERT( nbtShader.loadBuffer( ntbVisualizerFS, sizeof( ntbVisualizerFS ),GL_FRAGMENT_SHADER ) );
-        HL_ASSERT( nbtShader.compile() );
-
-        printGlError("Shader compilation error");
-
-        HL_ASSERT( initPointLightShader() );
-        HL_ASSERT( initShadowShader() );
-        HL_ASSERT( initSkyShader() );
-        HL_ASSERT( initFontShader() );
-        HL_ASSERT( initBillboardShader() );
-        HL_ASSERT( initNbtShader() );
-    }
-    catch( hamLibs::utils::errorType e ) {
-        terminate();
-        throw hamLibs::utils::ERROR;
-    }
+void vnbtShader::terminate() {
+    currPipeline = nullptr;
+    program.unload();
+    showVertId = 0;
+    showNormId = 0;
+    showTangId = 0;
+    showBtngId = 0;
 }
 
-/******************************************************************************
- * Shader Manager Termination
- ******************************************************************************/
-void stockShaders::terminate() {
-    glDeleteBuffers( 1, &ubo );
-    ubo = currShader = 0;
-    matrixIndexId = GL_INVALID_INDEX;
-    
-    pointLightShader.unload();
-    shadowShader.unload();
-    fontShader.unload();
-    skyShader.unload();
-    bbShader.unload();
-    nbtShader.unload();
-    
-    ambColorId      = 0;
-    ambIntId        = 0;
-    pointColorId    = 0;
-    pointIntId      = 0;
-    pointLinearId   = 0;
-    pointConstId    = 0;
-    pointExpId      = 0;
-    pointPosId      = 0;
-    shadowId        = 0;
-    lightMatrixId   = 0;
-    textureId       = 0;
-    normalId        = 0;
-    
-    shadowMapId     = 0;
-    
-    skyTexId        = 0;
-    
-    fontColId       = 0;
-    fontSampler     = 0;
-    
-    camPosId        = 0;
-    
-    nbtShowVertId   = 0;
-    nbtShowNormId   = 0;
-    nbtShowTangId   = 0;
-    nbtShowBtngId   = 0;
-}
-
-/******************************************************************************
- * Shader Management
-******************************************************************************/
-void stockShaders::applyShader( GLuint shaderId ) {
-    currShader = shaderId;
-    
-    if ( !currShader )
-        return;
-    
-    glUseProgram( currShader );
-    printGlError( "Applying a shader to the pipeline" );
-    
-    glBindBuffer( GL_UNIFORM_BUFFER, ubo );
-    glBindBufferBase( GL_UNIFORM_BUFFER, HGE_PIPELINE_MATRIX_BINDING, ubo );
-    glBufferData( GL_UNIFORM_BUFFER, sizeof( transforms ), transforms, GL_DYNAMIC_DRAW );
-    
-    matrixIndexId = glGetUniformBlockIndex( currShader, "matrixBlock" );
-    printGlError( "Accessing the Matrix Uniform Block" );
-    
-#ifdef DEBUG
-    if ( matrixIndexId == GL_INVALID_INDEX ) {
-        std::cerr
-            << "ERROR: Incompatible shader detected. "
-            << "Please ensure that the current shader has a uniform block "
-            << "titled \"matrixBlock\" which contains the mat4 identifiers "
-            << "\"modelMatrix\", \"viewMatrix\", "
-            << "\"projMatrix\", and \"mvpMatrix\"."
-            << std::endl;
-        
-        return;
-    }
-#endif
-    
-    glUniformBlockBinding( currShader, matrixIndexId, HGE_PIPELINE_MATRIX_BINDING );
-    printGlError( "Sending Matrix Uniform Binding" );
-    glBindBuffer( GL_UNIFORM_BUFFER, 0 );
-}
-
-/******************************************************************************
- * Pushing to the matrix stack
-******************************************************************************/
-void stockShaders::applyMatrix( e_matrixState s, const mat4& m ) {
-    // Update the current MVP matrix
-    transforms[ s ] = m;
-    transforms[ 2 ] = transforms[ HGE_MODEL_MAT ] * transforms[ HGE_VP_MAT ];
-    
-    updateMatricesImpl();
-}
-
-void stockShaders::applyMatrix( const drawTransform& obj, const camera& cam ) {
-    // Update the current MVP matrix
-    transforms[ HGE_MODEL_MAT ] = obj.getModelMatrix();
-    transforms[ HGE_VP_MAT ] = cam.getVPMatrix();
-    transforms[ 2 ] = transforms[ HGE_MODEL_MAT ] * transforms[ HGE_VP_MAT ];
-    
-    updateMatricesImpl();
-}
-
-/******************************************************************************
- * Popping off a matrix from the stack
-******************************************************************************/
-void stockShaders::removeMatrix( e_matrixState s ) {
-    transforms[ s ] = mat4( 1.f );
-}
-
-/******************************************************************************
- * Billboards
- ******************************************************************************/
-void stockShaders::applyBillboardShader() {
-    stockShaders::applyShader( bbShader.getProgramId() );
-}
-
-void stockShaders::setBillboardCam( const camera& c ) {
-    glUniform3fv( camPosId, 1, c.getPos().v );
-}
-
-/******************************************************************************
- * Point Lights & Shadows
- ******************************************************************************/
-void stockShaders::setPointLightMvp( const mat4& mvp ) {
-    glUniformMatrix4fv( lightMatrixId, 1, GL_FALSE, (GLfloat*)mvp.m );
-}
-
-void stockShaders::applyPointLightShader() {
-    stockShaders::applyShader( pointLightShader.getProgramId() );
-}
-
-void stockShaders::setPointLight( const ambientLight& a, const pointLight& p ) {
-    glUniform1f(    ambIntId,       a.intensity );
-    glUniform1f(    pointIntId,     p.intensity );
-    glUniform1f(    pointLinearId,  p.linear );
-    glUniform1f(    pointConstId,   p.constant );
-    glUniform1f(    pointExpId,     p.exponential );
-    glUniform4fv(   ambColorId,     1, a.color.v );
-    glUniform4fv(   pointColorId,   1, p.color.v );
-    glUniform3fv(   pointPosId,     1, p.pos.v );
-}
-
-void stockShaders::applyShadowShader() {
-    stockShaders::applyShader( shadowShader.getProgramId() );
-}
-
-void stockShaders::applyFontShader() {
-    stockShaders::applyShader( fontShader.getProgramId() );
-}
-
-void stockShaders::setFontColor( const vec4& v ) {
-    glUniform4fv( fontColId, 1, v.v );
-}
-
-/******************************************************************************
- * Skybox
- ******************************************************************************/
-void stockShaders::applySkyShader() {
-    stockShaders::applyShader( skyShader.getProgramId() );
-}
-
-/******************************************************************************
- * Normal/Tangent/Bitangent Visualization
- ******************************************************************************/
-void stockShaders::applyNbtShader() {
-    stockShaders::applyShader( nbtShader.getProgramId() );
-}
-
-void stockShaders::showVertices( bool b ) {
-    glUniform1i( nbtShowVertId, (int)b );
-}
-
-void stockShaders::showNormals( bool b ) {
-    glUniform1i( nbtShowNormId, (int)b );
-}
-
-void stockShaders::showTangents( bool b ) {
-    glUniform1i( nbtShowTangId, (int)b );
-}
-
-void stockShaders::showBitangents( bool b ) {
-    glUniform1i( nbtShowBtngId, (int)b );
-}
-
-} // end harbinger namespace
+} // end hge namespace

@@ -11,7 +11,99 @@
 #include "math/math.h"
 #include "pipeline.h"
 
+#include "camera.h"
+#include "transformations.h"
+
 using namespace hge;
+
+/******************************************************************************
+ * Pipeline Construction and Destruction
+******************************************************************************/
+bool pipeline::init() {
+    glGenBuffers( 1, &ubo );
+    printGlError( "Creating pipeline uniform block" );
+    
+    if ( ubo == 0 )
+        return false;
+    
+    updateMatricesImpl();
+    return true;
+}
+void pipeline::terminate() {
+    glDeleteBuffers( 1, &ubo );
+    ubo = currShader = 0;
+    matrixIndexId = GL_INVALID_INDEX;
+}
+
+/******************************************************************************
+ * Matrix UBO Modification
+******************************************************************************/
+void pipeline::updateMatricesImpl() {
+    // Upload the matrix data to the current shader
+    glUniformBlockBinding( currShader, matrixIndexId, HGE_PIPELINE_MATRIX_BINDING );
+    glBindBuffer( GL_UNIFORM_BUFFER, ubo );
+    glBindBufferBase( GL_UNIFORM_BUFFER, HGE_PIPELINE_MATRIX_BINDING, ubo );
+
+    glBufferData(
+        GL_UNIFORM_BUFFER, sizeof( transforms ), transforms, GL_DYNAMIC_DRAW
+    );
+}
+
+/******************************************************************************
+ * Pushing/Popping the matrix stack
+******************************************************************************/
+void pipeline::applyMatrix( matrixType s, const mat4& m ) {
+    // Update the current MVP matrix
+    transforms[ s ] = m;
+    transforms[ 2 ] = transforms[ HGE_MODEL_MAT ] * transforms[ HGE_VP_MAT ];
+    
+    updateMatricesImpl();
+}
+
+void pipeline::applyMatrix( const drawTransform& obj, const camera& cam ) {
+    // Update the current MVP matrix
+    transforms[ HGE_MODEL_MAT ] = obj.getModelMatrix();
+    transforms[ HGE_VP_MAT ] = cam.getVPMatrix();
+    transforms[ 2 ] = transforms[ HGE_MODEL_MAT ] * transforms[ HGE_VP_MAT ];
+    
+    updateMatricesImpl();
+}
+
+void pipeline::removeMatrix( matrixType s ) {
+    transforms[ s ] = mat4( 1.f );
+}
+
+/******************************************************************************
+ * Shader Management
+******************************************************************************/
+void pipeline::applyStockShader( GLint shaderId ) {
+    currShader = shaderId;
+    
+    // Early bail out
+    if ( !currShader ) {
+        glUseProgram( 0 );
+        return;
+    }
+    glUseProgram( currShader );
+    printGlError( "Applying a shader to the pipeline" );
+    
+    glBindBuffer( GL_UNIFORM_BUFFER, ubo );
+    glBindBufferBase( GL_UNIFORM_BUFFER, HGE_PIPELINE_MATRIX_BINDING, ubo );
+    //glBufferData( GL_UNIFORM_BUFFER, sizeof( transforms ), transforms, GL_DYNAMIC_DRAW );
+    
+    matrixIndexId = glGetUniformBlockIndex( currShader, "matrixBlock" );
+    
+    // don't attach the matrix UBO if a binding point doesn't exist
+    printGlError( "Accessing the Matrix Uniform Block" );
+    
+    if ( matrixIndexId == GL_INVALID_INDEX ) {
+        return;
+    }
+    
+    glUniformBlockBinding( currShader, matrixIndexId, HGE_PIPELINE_MATRIX_BINDING );
+    printGlError( "Sending Matrix Uniform Binding" );
+    glBindBuffer( GL_UNIFORM_BUFFER, 0 );
+}
 
 /******************************************************************************
  * Enabling Vertex Attributes

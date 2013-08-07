@@ -87,10 +87,6 @@ void pipeline::applyStockShader( GLint shaderId ) {
     glUseProgram( currShader );
     printGlError( "Applying a shader to the pipeline" );
     
-    glBindBuffer( GL_UNIFORM_BUFFER, ubo );
-    glBindBufferBase( GL_UNIFORM_BUFFER, HGE_PIPELINE_MATRIX_BINDING, ubo );
-    //glBufferData( GL_UNIFORM_BUFFER, sizeof( transforms ), transforms, GL_DYNAMIC_DRAW );
-    
     matrixIndexId = glGetUniformBlockIndex( currShader, "matrixBlock" );
     
     // don't attach the matrix UBO if a binding point doesn't exist
@@ -99,6 +95,10 @@ void pipeline::applyStockShader( GLint shaderId ) {
     if ( matrixIndexId == GL_INVALID_INDEX ) {
         return;
     }
+    
+    glBindBuffer( GL_UNIFORM_BUFFER, ubo );
+    glBindBufferBase( GL_UNIFORM_BUFFER, HGE_PIPELINE_MATRIX_BINDING, ubo );
+    //glBufferData( GL_UNIFORM_BUFFER, sizeof( transforms ), transforms, GL_DYNAMIC_DRAW );
     
     glUniformBlockBinding( currShader, matrixIndexId, HGE_PIPELINE_MATRIX_BINDING );
     printGlError( "Sending Matrix Uniform Binding" );

@@ -211,6 +211,7 @@ void line::terminate() {
 /******************************************************************************
  *      CUBES
 ******************************************************************************/
+/*
 bool cube::init() {
     
     if ( vao )
@@ -300,6 +301,153 @@ bool cube::init() {
         hge::pipeline::NORMAL_ATTRIB, 3, GL_FLOAT, GL_FALSE,
         0, (GLvoid*)(sizeof( verts ) + sizeof( uvs ))
     );
+    
+    glBindVertexArray( 0 );
+    printGlError( "Creating a cube object" );
+    
+    resetDrawMode();
+    
+    return true;
+}
+*/
+bool cube::init() {
+    
+    if ( vao )
+        return true;
+    
+    glGenVertexArrays( 1, &vao );
+    if ( !vao ) {
+        std::cerr << "ERROR: Unable to create a cube VAO." << std::endl;
+        return false;
+    }
+    
+    glBindVertexArray( vao );
+    glGenBuffers( 1, &vbo );
+    
+    if ( !vbo ) {
+        std::cerr << "ERROR: Unable to create a cube VBO." << std::endl;
+        glDeleteVertexArrays( 1, &vao );
+        return false;
+    }
+    
+    glBindBuffer( GL_ARRAY_BUFFER, vbo );
+    hge::bumpVertex verts[24];
+
+    /*
+     * POSITIONS
+     */
+    // back face
+    verts[0].pos = vec3( -0.5f, -0.5f, -0.5f );
+    verts[1].pos = vec3( -0.5f, 0.5f, -0.5f );
+    verts[2].pos = vec3( 0.5f, -0.5f, -0.5f );
+    verts[3].pos = vec3( 0.5f, 0.5f, -0.5f );
+
+    // front face
+    verts[4].pos = vec3( 0.5f, -0.5f, 0.5f );
+    verts[5].pos = vec3( 0.5f, 0.5f, 0.5f );
+    verts[6].pos = vec3( -0.5f, -0.5f, 0.5f );
+    verts[7].pos = vec3( -0.5f, 0.5f, 0.5f );
+
+    // right
+    verts[8].pos = vec3( 0.5f, -0.5f, -0.5f );
+    verts[9].pos = vec3( 0.5f, 0.5f, -0.5f );
+    verts[10].pos = vec3( 0.5f, -0.5f, 0.5f );
+    verts[11].pos = vec3( 0.5f, 0.5f, 0.5f );
+
+    // left
+    verts[12].pos = vec3( -0.5f, -0.5f, 0.5f );
+    verts[13].pos = vec3( -0.5f, 0.5f, 0.5f );
+    verts[14].pos = vec3( -0.5f, -0.5f, -0.5f );
+    verts[15].pos = vec3( -0.5f, 0.5f, -0.5f );
+
+    // bottom
+    verts[16].pos = vec3( -0.5f, -0.5f, 0.5f );
+    verts[17].pos = vec3( -0.5f, -0.5f, -0.5f );
+    verts[18].pos = vec3( 0.5f, -0.5f, 0.5f );
+    verts[19].pos = vec3( 0.5f, -0.5f, -0.5f );
+
+    // top
+    verts[20].pos = vec3( -0.5f, 0.5f, -0.5f );
+    verts[21].pos = vec3( -0.5f, 0.5f, 0.5f );
+    verts[22].pos = vec3( 0.5f, 0.5f, -0.5f );
+    verts[23].pos = vec3( 0.5f, 0.5f, 0.5f );
+
+    /*
+     *  UV
+     */
+    verts[0].uv = vec2( 0.f, 0.f );
+    verts[1].uv = vec2( 0.f, 1.f );
+    verts[2].uv = vec2( 1.f, 0.f );
+    verts[3].uv = vec2( 1.f, 1.f );
+
+    verts[4].uv = vec2( 0.f, 0.f );
+    verts[5].uv = vec2( 0.f, 1.f );
+    verts[6].uv = vec2( 1.f, 0.f );
+    verts[7].uv = vec2( 1.f, 1.f );
+
+    verts[8].uv = vec2( 0.f, 0.f );
+    verts[9].uv = vec2( 0.f, 1.f );
+    verts[10].uv = vec2( 1.f, 0.f );
+    verts[11].uv = vec2( 1.f, 1.f );
+
+    verts[12].uv = vec2( 0.f, 0.f );
+    verts[13].uv = vec2( 0.f, 1.f );
+    verts[14].uv = vec2( 1.f, 0.f );
+    verts[15].uv = vec2( 1.f, 1.f );
+
+    verts[16].uv = vec2( 0.f, 0.f );
+    verts[17].uv = vec2( 0.f, 1.f );
+    verts[18].uv = vec2( 1.f, 0.f );
+    verts[19].uv = vec2( 1.f, 1.f );
+
+    verts[20].uv = vec2( 0.f, 0.f );
+    verts[21].uv = vec2( 0.f, 1.f );
+    verts[22].uv = vec2( 1.f, 0.f );
+    verts[23].uv = vec2( 1.f, 1.f );
+
+    /*
+     * NORMALS
+     */
+    verts[0].norm = vec3( 0.f, 0.f, -1.f );
+    verts[1].norm = vec3( 0.f, 0.f, -1.f );
+    verts[2].norm = vec3( 0.f, 0.f, -1.f );
+    verts[3].norm = vec3( 0.f, 0.f, -1.f );
+
+    verts[4].norm = vec3( 0.f, 0.f, 1.f );
+    verts[5].norm = vec3( 0.f, 0.f, 1.f );
+    verts[6].norm = vec3( 0.f, 0.f, 1.f );
+    verts[7].norm = vec3( 0.f, 0.f, 1.f );
+
+    verts[8].norm = vec3( 1.f, 0.f, 0.f );
+    verts[9].norm = vec3( 1.f, 0.f, 0.f );
+    verts[10].norm = vec3( 1.f, 0.f, 0.f );
+    verts[11].norm = vec3( 1.f, 0.f, 0.f );
+
+    verts[12].norm = vec3( -1.f, 0.f, 0.f );
+    verts[13].norm = vec3( -1.f, 0.f, 0.f );
+    verts[14].norm = vec3( -1.f, 0.f, 0.f );
+    verts[15].norm = vec3( -1.f, 0.f, 0.f );
+
+    verts[16].norm = vec3( 0.f, -1.f, 0.f );
+    verts[17].norm = vec3( 0.f, -1.f, 0.f );
+    verts[18].norm = vec3( 0.f, -1.f, 0.f );
+    verts[19].norm = vec3( 0.f, -1.f, 0.f );
+
+    verts[20].norm = vec3( 0.f, 1.f, 0.f );
+    verts[21].norm = vec3( 0.f, 1.f, 0.f );
+    verts[22].norm = vec3( 0.f, 1.f, 0.f );
+    verts[23].norm = vec3( 0.f, 1.f, 0.f );
+
+    for ( unsigned i = 0; i < 24; i+=3 ) {
+        calcTangents( verts[i+0], verts[i+2], verts[i+3] );
+    }
+//    for ( unsigned i = 0; i < 22; ++i ) {
+//        calcTangents( verts[i+0], verts[i+2], verts[i+3] );
+//    }
+    
+    glBufferData( GL_ARRAY_BUFFER, sizeof( verts ), verts, GL_STATIC_DRAW );
+    
+    pipeline::enableBumpVertexAttribs();
     
     glBindVertexArray( 0 );
     printGlError( "Creating a cube object" );

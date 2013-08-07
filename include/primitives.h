@@ -141,8 +141,10 @@ class HGE_API cube final : public primitive {
         // drawing
         void    resetDrawMode   () { renderMode = pipeline::HGE_TRIANGLE_STRIP; }
         void    draw            () const {
+                                    const GLint first[6] = {0,4,8,12,16,20};
+                                    const GLsizei count[6] = {4,4,4,4,4,4};
                                     glBindVertexArray( vao );
-                                    glDrawArrays( renderMode, 0, 26 );
+                                    glMultiDrawArrays( renderMode, first, count, 6 );
                                     glBindVertexArray( 0 );
                                 }
 };

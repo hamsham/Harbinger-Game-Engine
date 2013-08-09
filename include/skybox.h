@@ -15,7 +15,14 @@
 #include "bitmap.h"
 #include "primitives.h"
 
-/*
+namespace hge {
+
+/******************************************************************************
+ * Skybox Object
+ * 
+ * Enable blending when drawing in order to draw transparent objects
+ * in front of the skybox
+ * 
  * Skybox images should be loaded in the following order:
  * Right, left, bottom, top, front, back.
  * 
@@ -35,10 +42,7 @@
  *             | bottom |
  *             |        |
  *              --------
- */
-
-namespace hge {
-
+******************************************************************************/
 class HGE_API skybox {
     private:
         hge::cubemap  skyTex;
@@ -60,14 +64,23 @@ class HGE_API skybox {
             spherePrim.terminate();
         }
         
-        inline static void draw( const cubemap& c, const sphere& s ) {
-            c.activate();
-            s.draw();
-            c.deActivate();
-        }
+        static void draw( const cubemap&, const sphere& );
+        static void draw( const cubemap&, const cube& );
         
         inline void draw() const { draw( skyTex, spherePrim ); }
 };
+        
+inline void skybox::draw( const cubemap& cm, const sphere& s ) {
+    cm.activate();
+    s.draw();
+    cm.deActivate();
+}
+
+inline void skybox::draw( const cubemap& cm, const cube& c ) {
+    cm.activate();
+    c.draw();
+    cm.deActivate();
+}
 
 } // End hge namespace
 

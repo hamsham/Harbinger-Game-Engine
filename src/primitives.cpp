@@ -48,20 +48,23 @@ bool quad::init() {
     
     bumpVertex verts[ 4 ];
     
-    verts[0].pos = vec3( -0.5f, 0.5f, 0.f );
-    verts[1].pos = vec3( 0.5f, 0.5f, 0.f );
-    verts[2].pos = vec3( -0.5f, -0.5f, 0.f );
-    verts[3].pos = vec3( 0.5f, -0.5f, 0.f );
+    /* 1----0
+     * | \\ |
+     * 3----2 */
+    verts[0].pos = vec3( 0.5f, 0.5f, 0.f );
+    verts[1].pos = vec3( -0.5f, 0.5f, 0.f );
+    verts[2].pos = vec3( 0.5f, -0.5f, 0.f );
+    verts[3].pos = vec3( -0.5f, -0.5f, 0.f );
     
-    verts[0].uv = vec2( 0.f, 1.f );
-    verts[1].uv = vec2( 1.f, 1.f );
-    verts[2].uv = vec2( 0.f, 0.f );
-    verts[3].uv = vec2( 1.f, 0.f );
+    verts[0].uv = vec2( 1.f, 1.f );
+    verts[1].uv = vec2( 0.f, 1.f );
+    verts[2].uv = vec2( 1.f, 0.f );
+    verts[3].uv = vec2( 0.f, 0.f );
     
-    verts[0].norm = vec3( 0.f, 0.f, -1.f );
-    verts[1].norm = vec3( 0.f, 0.f, -1.f );
-    verts[2].norm = vec3( 0.f, 0.f, -1.f );
-    verts[3].norm = vec3( 0.f, 0.f, -1.f );
+    verts[0].norm =
+        verts[1].norm =
+            verts[2].norm =
+                verts[3].norm = vec3( 0.f, 0.f, 1.f );
     
     calcTangents( verts[0], verts[1], verts[2] );
     calcTangents( verts[1], verts[2], verts[3] );
@@ -100,17 +103,15 @@ bool triangle::init() {
     
     bumpVertex verts[ 3 ];
     
-    verts[0].pos = vec3( -0.5f, -0.5f, 0.f );
-    verts[1].pos = vec3( 0.f, 0.5f, 0.f );
+    verts[0].pos = vec3( 0.f, 0.5f, 0.f );
+    verts[1].pos = vec3( -0.5f, -0.5f, 0.f );
     verts[2].pos = vec3( 0.5f, -0.5f, 0.f );
     
-    verts[0].uv = vec2( 0.f, 0.f );
-    verts[1].uv = vec2( 0.5f, 1.f );
+    verts[0].uv = vec2( 0.5f, 1.f );
+    verts[1].uv = vec2( 0.f, 0.f );
     verts[2].uv = vec2( 1.f, 0.f );
     
-    verts[0].norm = vec3( 0.f, 0.f, -1.f );
-    verts[1].norm = vec3( 0.f, 0.f, -1.f );
-    verts[2].norm = vec3( 0.f, 0.f, -1.f );
+    verts[0].norm = verts[1].norm = verts[2].norm = vec3( 0.f, 0.f, -1.f );
     
     calcTangents( verts[0], verts[1], verts[2] );
 	

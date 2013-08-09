@@ -40,7 +40,7 @@ class HGE_API primitive : public drawable {
 ******************************************************************************/
 class HGE_API quad final : public primitive {
     public:
-        quad    () {}
+        quad    () { resetDrawMode(); }
         quad    ( const quad& ) = delete;
         quad    ( quad&& ) = default;
         
@@ -65,7 +65,7 @@ class HGE_API quad final : public primitive {
 ******************************************************************************/
 class HGE_API triangle final : public primitive {
     public:
-        triangle    () {}
+        triangle    () { resetDrawMode(); }
         triangle    ( const triangle& ) = delete;
         triangle    ( triangle&& ) = default;
         
@@ -92,7 +92,7 @@ class HGE_API line final : public primitive {
         vec3    points[ 2 ] = { {0.f}, {1.f} };
         
     public:
-        line        () {}
+        line        () { resetDrawMode(); }
         line        ( const line& ) = delete;
         line        ( line&& );
         
@@ -127,7 +127,7 @@ class HGE_API line final : public primitive {
 ******************************************************************************/
 class HGE_API cube final : public primitive {
     public:
-        cube    () {}
+        cube    () { resetDrawMode(); }
         cube    ( const cube& ) = delete;
         cube    ( cube&& ) = default;
         
@@ -162,7 +162,7 @@ class HGE_API sphere final : public primitive {
         unsigned numIndices = 0;
         
     public:
-        sphere      () {}
+        sphere      () { resetDrawMode(); }
         sphere      ( const sphere& ) = delete;
         sphere      ( sphere&& );
         
@@ -195,7 +195,7 @@ class HGE_API cone final : public primitive {
         int numVerts = 0;
         
     public:
-        cone    () {}
+        cone    () { resetDrawMode(); }
         cone    ( const cone& ) = delete;
         cone    ( cone&& );
         

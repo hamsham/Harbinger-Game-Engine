@@ -31,7 +31,7 @@ class shadowShader;
 class skyShader;
 class fontShader;
 class billboardShader;
-class vnbtShader;
+class enbtShader;
 
 //vertex structures
 struct  plainVertex; // position, uv, normal

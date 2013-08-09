@@ -17,31 +17,6 @@
 namespace hge {
 
 /******************************************************************************
- * Mesh Entry Structure
-******************************************************************************/
-//mesh::meshEntry::meshEntry() :
-//	matIndex	( 0 ),
-//	baseVertex	( 0 ),
-//	baseIndex	( 0 ),
-//	numIndices	( 0 )
-//{}
-//
-//mesh::meshEntry::meshEntry( const mesh::meshEntry& meCopy) :
-//	matIndex	( meCopy.matIndex ),
-//	baseVertex	( meCopy.baseVertex ),
-//	baseIndex	( meCopy.baseIndex ),
-//	numIndices	( meCopy.numIndices )
-//{}
-//
-//mesh::meshEntry& mesh::meshEntry::operator = ( const mesh::meshEntry& meCopy ) {
-//	matIndex	= meCopy.matIndex;
-//	baseVertex	= meCopy.baseVertex;
-//	baseIndex	= meCopy.baseIndex;
-//	numIndices	= meCopy.numIndices;
-//	return *this;
-//}
-
-/******************************************************************************
  * Mesh -- Construction & Move Semantics
 ******************************************************************************/
 mesh::mesh( mesh&& m ) :

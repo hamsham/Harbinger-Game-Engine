@@ -32,12 +32,6 @@ class HGE_API mesh final : public resource, public drawable {
             unsigned    baseVertex  = 0;
             unsigned    baseIndex   = 0;
             unsigned    numIndices  = 0;
-
-//            meshEntry           ();
-//            meshEntry           ( const meshEntry& );
-//            ~meshEntry          () {}
-//
-//            meshEntry& operator= ( const meshEntry& );
         };
 
         //Private Members
@@ -55,7 +49,7 @@ class HGE_API mesh final : public resource, public drawable {
         void	loadVao         ( bumpVertex* vertices, unsigned numVertices, unsigned* indices, unsigned numIndices );
 
     public:
-        mesh	() {}
+        mesh	() { resetDrawMode(); }
         mesh    ( mesh&& );
         mesh    ( const mesh& ) = delete;
         ~mesh	() { unload(); }

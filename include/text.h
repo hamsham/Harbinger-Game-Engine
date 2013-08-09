@@ -32,7 +32,7 @@ class HGE_API text final : public drawable {
         void        createVertexBuffer( unsigned numVerts );
         
     public:
-        text    ()  {}
+        text    ()  { resetDrawMode(); }
         text    ( const text& ) = delete;
         text    ( text&& );
         

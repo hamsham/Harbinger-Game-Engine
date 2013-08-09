@@ -26,7 +26,12 @@ bool pipeline::init() {
     if ( ubo == 0 )
         return false;
     
-    updateMatricesImpl();
+    glBindBufferBase( GL_UNIFORM_BUFFER, HGE_PIPELINE_MATRIX_BINDING, ubo );
+
+    glBufferData(
+        GL_UNIFORM_BUFFER, sizeof( transforms ), nullptr, GL_DYNAMIC_DRAW
+    );
+    
     return true;
 }
 void pipeline::terminate() {
@@ -41,7 +46,7 @@ void pipeline::terminate() {
 void pipeline::updateMatricesImpl() {
     // Upload the matrix data to the current shader
     glUniformBlockBinding( currShader, matrixIndexId, HGE_PIPELINE_MATRIX_BINDING );
-    glBindBuffer( GL_UNIFORM_BUFFER, ubo );
+    
     glBindBufferBase( GL_UNIFORM_BUFFER, HGE_PIPELINE_MATRIX_BINDING, ubo );
 
     glBufferData(

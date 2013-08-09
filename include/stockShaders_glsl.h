@@ -311,7 +311,7 @@ const char billboardFS[] = R"***(
 /******************************************************************************
  * Normal/Tangent/Bitangent Visualizer
  ******************************************************************************/
-const char ntbVisualizerVS[] = R"***(
+const char enbtVS[] = R"***(
     #version 330
     
     layout ( std140 ) uniform matrixBlock {
@@ -331,27 +331,21 @@ const char ntbVisualizerVS[] = R"***(
     out vec4 btngPos;
     
     void main() {
-        gl_Position = vec4( posVerts, 1.0 );
-        normPos     = vec4( normVerts, 0.0 );
-        tangPos     = vec4( tangVerts, 0.0 );
-        btngPos     = vec4( btngVerts, 0.0 );
+        gl_Position = mvpMatrix * vec4( posVerts, 1.0 );
+        normPos     = mvpMatrix * vec4( normVerts, 0.0 );
+        tangPos     = mvpMatrix * vec4( tangVerts, 0.0 );
+        btngPos     = mvpMatrix * vec4( btngVerts, 0.0 );
     }
     
 )***";
 
-const char ntbVisualizerGS[] = R"***(
+const char enbtGS[] = R"***(
     #version 330
-    
-    layout ( std140 ) uniform matrixBlock {
-        mat4 modelMatrix;
-        mat4 vpMatrix;
-        mat4 mvpMatrix;
-    };
     
     layout( triangles ) in;
     layout( line_strip, max_vertices = 21 ) out;
     
-    uniform bool showVertices   = true;
+    uniform bool showEdges      = true;
     uniform bool showNormals    = false;
     uniform bool showTangents   = false;
     uniform bool showBitangents = false;
@@ -364,13 +358,13 @@ const char ntbVisualizerGS[] = R"***(
     void main() {
         
         for ( int i = 0; i < 3; ++i ) {
-            vec4 origin = mvpMatrix * gl_in[i].gl_Position;
+            vec4 origin = gl_in[i].gl_Position;
             
             if ( showBitangents ) {
                 lineCol = vec4( 0.0, 0.0, 1.0, 1.0 );
                 gl_Position = origin;
                 EmitVertex();
-                gl_Position = mvpMatrix * (gl_in[i].gl_Position + btngPos[i]);
+                gl_Position = origin + btngPos[i];
                 EmitVertex();
                 EndPrimitive();
             }
@@ -379,7 +373,7 @@ const char ntbVisualizerGS[] = R"***(
                 lineCol = vec4( 1.0, 0.0, 0.0, 1.0 );
                 gl_Position = origin;
                 EmitVertex();
-                gl_Position = mvpMatrix * (gl_in[i].gl_Position + tangPos[i]);
+                gl_Position = origin + tangPos[i];
                 EmitVertex();
                 EndPrimitive();
             }
@@ -388,17 +382,17 @@ const char ntbVisualizerGS[] = R"***(
                 lineCol = vec4( 0.0, 1.0, 0.0, 1.0 );
                 gl_Position = origin;
                 EmitVertex();
-                gl_Position = mvpMatrix * (gl_in[i].gl_Position + normPos[i]);
+                gl_Position = origin + normPos[i];
                 EmitVertex();
                 EndPrimitive();
             }
         }
 
-        if ( showVertices ) {
+        if ( showEdges ) {
             lineCol = vec4( 1.0, 0.0, 1.0, 1.0 );
-            vec4 a = mvpMatrix * gl_in[0].gl_Position;
-            vec4 b = mvpMatrix * gl_in[1].gl_Position;
-            vec4 c = mvpMatrix * gl_in[2].gl_Position;
+            vec4 a = gl_in[0].gl_Position;
+            vec4 b = gl_in[1].gl_Position;
+            vec4 c = gl_in[2].gl_Position;
 
             gl_Position = a;
             EmitVertex();
@@ -422,7 +416,7 @@ const char ntbVisualizerGS[] = R"***(
     
 )***";
 
-const char ntbVisualizerFS[] = R"***(
+const char enbtFS[] = R"***(
     #version 330
     
     in vec4 lineCol;

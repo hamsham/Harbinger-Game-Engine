@@ -163,27 +163,27 @@ class HGE_API billboardShader final : public stockShader {
  *      the GL_TRIANGLE* specifiers. Objects drawn with GL_LINES or
  *      GL_POINTS specifiers will not work
 ******************************************************************************/
-class HGE_API vnbtShader final : public stockShader {
+class HGE_API enbtShader final : public stockShader {
     private:
-        GLint showVertId = 0;
+        GLint showEdgeId = 0;
         GLint showNormId = 0;
         GLint showTangId = 0;
         GLint showBtngId = 0;
         
     public:
-        vnbtShader              () {}
-        vnbtShader              ( const vnbtShader& ) = delete;
-        vnbtShader              ( vnbtShader&& );
+        enbtShader              () {}
+        enbtShader              ( const enbtShader& ) = delete;
+        enbtShader              ( enbtShader&& );
         
-        vnbtShader& operator =  ( const vnbtShader& ) = delete;
-        vnbtShader& operator =  ( vnbtShader&& );
+        enbtShader& operator =  ( const enbtShader& ) = delete;
+        enbtShader& operator =  ( enbtShader&& );
         
-        ~vnbtShader             () { terminate(); }
+        ~enbtShader             () { terminate(); }
         
         bool init               ( pipeline* const p );
         void terminate          ();
         
-        void    showVertices    ( bool b ) { glUniform1i( showVertId, (int)b ); }
+        void    showEdges       ( bool b ) { glUniform1i( showEdgeId, (int)b ); }
         void    showNormals     ( bool b ) { glUniform1i( showNormId, (int)b ); }
         void    showTangents    ( bool b ) { glUniform1i( showTangId, (int)b ); }
         void    showBitangents  ( bool b ) { glUniform1i( showBtngId, (int)b ); }

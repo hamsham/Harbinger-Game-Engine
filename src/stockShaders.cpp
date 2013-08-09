@@ -238,7 +238,7 @@ bool skyShader::init( pipeline* const p ) {
     }
     
     std::cout
-        << "Setting up the Skybox shader.\nID: "
+        << "Setting up the Skybox shader.\n\tID: "
         << program.getProgramId()
         << std::endl;
     
@@ -291,7 +291,7 @@ bool fontShader::init( pipeline* const p ) {
     }
     
     std::cout
-        << "Setting up the font shader.\nID: "
+        << "Setting up the font shader.\n\tID: "
         << program.getProgramId()
         << std::endl;
     
@@ -355,7 +355,7 @@ bool billboardShader::init( pipeline* const p ) {
     }
     
     std::cout
-        << "Setting up the billboard shader.\nID: "
+        << "Setting up the billboard shader.\n\tID: "
         << program.getProgramId()
         << std::endl;
     
@@ -392,61 +392,61 @@ void billboardShader::terminate() {
 /******************************************************************************
  * NBT SHADER
  ******************************************************************************/
-vnbtShader::vnbtShader( vnbtShader&& s ) :
+enbtShader::enbtShader( enbtShader&& s ) :
     stockShader     ( std::move( s ) ),
-    showVertId      ( s.showVertId ),
+    showEdgeId      ( s.showEdgeId ),
     showNormId      ( s.showNormId ),
     showTangId      ( s.showTangId ),
     showBtngId      ( s.showBtngId )
 {
-    s.showVertId    = 0;
+    s.showEdgeId    = 0;
     s.showNormId    = 0;
     s.showTangId    = 0;
     s.showBtngId    = 0;
 }
 
-vnbtShader& vnbtShader::operator = ( vnbtShader&& s ) {
+enbtShader& enbtShader::operator = ( enbtShader&& s ) {
     stockShader::operator=( std::move( s ) );
-    showVertId     = s.showVertId;
+    showEdgeId     = s.showEdgeId;
     showNormId      = s.showNormId;
     showTangId      = s.showTangId;
     showBtngId      = s.showBtngId;
     
-    s.showVertId    = 0;
+    s.showEdgeId    = 0;
     s.showNormId    = 0;
     s.showTangId    = 0;
     s.showBtngId    = 0;
     return *this;
 }
 
-bool vnbtShader::init( pipeline* const p ) {
+bool enbtShader::init( pipeline* const p ) {
     // don't do anything if there already is a shader program in memory
     if ( program.getProgramId() )
         return true;
     
-    if (    !program.loadBuffer( ntbVisualizerVS, sizeof( ntbVisualizerVS ), GL_VERTEX_SHADER )
-    ||      !program.loadBuffer( ntbVisualizerGS, sizeof( ntbVisualizerGS ), GL_GEOMETRY_SHADER )
-    ||      !program.loadBuffer( ntbVisualizerFS, sizeof( ntbVisualizerFS ), GL_FRAGMENT_SHADER )
+    if (    !program.loadBuffer( enbtVS, sizeof( enbtVS ), GL_VERTEX_SHADER )
+    ||      !program.loadBuffer( enbtGS, sizeof( enbtGS ), GL_GEOMETRY_SHADER )
+    ||      !program.loadBuffer( enbtFS, sizeof( enbtFS ), GL_FRAGMENT_SHADER )
     ||      !program.compile()
     ) {
         return false;
     }
     
     std::cout
-        << "Setting up the Normal/Tangent/Billboard visualization shader.\nID: "
+        << "Setting up the Normal/Tangent/Billboard visualization shader.\n\tID: "
         << program.getProgramId()
         << std::endl;
     
     GLint progId = program.getProgramId();
     p->applyStockShader( progId );
     
-    showVertId = program.getVariableId( "showVertices" );
+    showEdgeId = program.getVariableId( "showEdges" );
     showNormId = program.getVariableId( "showNormals" );
     showTangId = program.getVariableId( "showTangents" );
     showBtngId = program.getVariableId( "showBitangents" );
     printGlError("Shader setup error");
     
-    if (    showVertId == pipeline::INVALID_UNIFORM
+    if (    showEdgeId == pipeline::INVALID_UNIFORM
     ||      showNormId == pipeline::INVALID_UNIFORM
     ||      showTangId == pipeline::INVALID_UNIFORM
     ||      showBtngId == pipeline::INVALID_UNIFORM
@@ -462,10 +462,10 @@ bool vnbtShader::init( pipeline* const p ) {
     return true;
 }
 
-void vnbtShader::terminate() {
+void enbtShader::terminate() {
     currPipeline = nullptr;
     program.unload();
-    showVertId = 0;
+    showEdgeId = 0;
     showNormId = 0;
     showTangId = 0;
     showBtngId = 0;

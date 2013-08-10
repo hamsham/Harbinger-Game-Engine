@@ -64,23 +64,20 @@ class HGE_API skybox {
             spherePrim.terminate();
         }
         
-        static void draw( const cubemap&, const sphere& );
-        static void draw( const cubemap&, const cube& );
+        static void draw( const cubemap& cm, const sphere& s ) {
+            cm.activate();
+            s.draw();
+            cm.deActivate();
+        }
+        
+        static void draw( const cubemap& cm, const cube& c ) {
+            cm.activate();
+            c.draw();
+            cm.deActivate();
+        }
         
         inline void draw() const { draw( skyTex, spherePrim ); }
 };
-        
-inline void skybox::draw( const cubemap& cm, const sphere& s ) {
-    cm.activate();
-    s.draw();
-    cm.deActivate();
-}
-
-inline void skybox::draw( const cubemap& cm, const cube& c ) {
-    cm.activate();
-    c.draw();
-    cm.deActivate();
-}
 
 } // End hge namespace
 

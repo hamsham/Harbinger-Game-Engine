@@ -127,14 +127,13 @@ class HGE_API dsLightSphere {
         void            setLightBuffer  ( const dsPointLight*, unsigned lightCount );
         void            setLight        ( unsigned index, const dsPointLight& );
         unsigned        getNumLights    () const { return numInstances; }
-        void            draw            () const;
-};
         
-inline void dsLightSphere::draw() const {
-    glBindVertexArray( vao );
-    glDrawElementsInstanced( GL_TRIANGLE_STRIP, numIndices, GL_UNSIGNED_INT, 0, numInstances );
-    glBindVertexArray( 0 );
-}
+        void draw() const {
+            glBindVertexArray( vao );
+            glDrawElementsInstanced( GL_TRIANGLE_STRIP, numIndices, GL_UNSIGNED_INT, 0, numInstances );
+            glBindVertexArray( 0 );
+        }
+};
 
 } // end hge namespace
 

@@ -201,6 +201,7 @@ void line::setVertPos( int index, const vec3& inPos ) {
     glBindVertexArray( vao );
     glBindBuffer( GL_ARRAY_BUFFER, vbo );
     glBufferData( GL_ARRAY_BUFFER, sizeof( points ), &points[0].v, GL_STREAM_DRAW );
+    glBindVertexArray( 0 );
 }
 
 void line::terminate() {

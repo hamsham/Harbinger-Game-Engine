@@ -180,12 +180,12 @@ bool line::init() {
         points[0].v, GL_STREAM_DRAW
     );
     printGlError( "Initializing a line primitive" );
-    glVertexAttribPointer( pipeline::VERTEX_ATTRIB, 3, GL_FLOAT, GL_FALSE, 0, 0 );
-    glEnableVertexAttribArray( pipeline::VERTEX_ATTRIB );
+    glVertexAttribPointer( pipeline::HGE_ATTRIB_VERTEX, 3, GL_FLOAT, GL_FALSE, 0, 0 );
+    glEnableVertexAttribArray( pipeline::HGE_ATTRIB_VERTEX );
     
-    glDisableVertexAttribArray( pipeline::TEXTURE_ATTRIB );
-    glDisableVertexAttribArray( pipeline::NORMAL_ATTRIB );
-    glDisableVertexAttribArray( pipeline::TANGENT_ATTRIB );
+    glDisableVertexAttribArray( pipeline::HGE_ATTRIB_TEXTURE );
+    glDisableVertexAttribArray( pipeline::HGE_ATTRIB_NORMAL );
+    glDisableVertexAttribArray( pipeline::HGE_ATTRIB_TANGENT );
     
     glBindVertexArray( 0 );
     

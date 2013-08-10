@@ -59,7 +59,7 @@ bool billboard::setNumImages( unsigned r, unsigned c ) {
     }
     
     glBindVertexArray( vao );
-    glEnableVertexAttribArray( pipeline::VERTEX_ATTRIB );
+    glEnableVertexAttribArray( pipeline::HGE_ATTRIB_VERTEX );
     glBindBuffer( GL_ARRAY_BUFFER, vbo );
     glVertexAttribPointer( 0, 3, GL_FLOAT, GL_FALSE, 0, 0 );
     

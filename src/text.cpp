@@ -189,8 +189,8 @@ void text::setString( const font& f, const char* str ) {
 ///////////////////////////////////////////////////////////////////////////////
 void text::enableAttribute( pipeline::attribute a ) {
     HL_DEBUG_ASSERT(
-        (a > pipeline::INVALID_UNIFORM) &&
-        (a <= pipeline::NORMAL_ATTRIB)
+        (a > pipeline::HGE_ATTRIB_INVALID) &&
+        (a <= pipeline::HGE_ATTRIB_NORMAL)
     );
     
     glBindVertexArray( vao );
@@ -200,8 +200,8 @@ void text::enableAttribute( pipeline::attribute a ) {
 
 void text::disableAttribute( pipeline::attribute a ) {
     HL_DEBUG_ASSERT(
-        (a > pipeline::INVALID_UNIFORM) &&
-        (a <= pipeline::NORMAL_ATTRIB)
+        (a > pipeline::HGE_ATTRIB_INVALID) &&
+        (a <= pipeline::HGE_ATTRIB_NORMAL)
     );
     glBindVertexArray( vao );
     glDisableVertexAttribArray( (GLint)a );

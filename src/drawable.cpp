@@ -31,8 +31,8 @@ drawable& drawable::operator=( drawable&& d ) {
 
 void drawable::enableAttribute( pipeline::attribute a ) {
     HL_DEBUG_ASSERT(
-        (a > pipeline::INVALID_UNIFORM) &&
-        (a <= pipeline::BITANGENT_ATTRIB)
+        (a > pipeline::HGE_ATTRIB_INVALID) &&
+        (a <= pipeline::HGE_ATTRIB_BITANGENT)
     );
     glBindVertexArray( vao );
     glEnableVertexAttribArray( (GLint)a );
@@ -41,8 +41,8 @@ void drawable::enableAttribute( pipeline::attribute a ) {
 
 void drawable::disableAttribute( pipeline::attribute a ) {
     HL_DEBUG_ASSERT(
-        (a > pipeline::INVALID_UNIFORM) &&
-        (a <= pipeline::BITANGENT_ATTRIB)
+        (a > pipeline::HGE_ATTRIB_INVALID) &&
+        (a <= pipeline::HGE_ATTRIB_BITANGENT)
     );
     glBindVertexArray( vao );
     glDisableVertexAttribArray( (GLint)a );

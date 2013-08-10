@@ -17,6 +17,7 @@
 #include "display.h"
 #include "drawable.h"
 #include "font.h"
+#include "gBuffer.h"
 #include "geometry.h"
 #include "input.h"
 #include "light.h"

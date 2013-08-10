@@ -20,6 +20,7 @@
       <itemPath>../include/display.h</itemPath>
       <itemPath>../include/drawable.h</itemPath>
       <itemPath>../include/font.h</itemPath>
+      <itemPath>../include/gBuffer.h</itemPath>
       <itemPath>../include/geometry.h</itemPath>
       <itemPath>../include/harbinger.h</itemPath>
       <itemPath>../include/input.h</itemPath>
@@ -45,9 +46,11 @@
       <itemPath>../src/display.cpp</itemPath>
       <itemPath>../src/drawable.cpp</itemPath>
       <itemPath>../src/font.cpp</itemPath>
+      <itemPath>../src/gBuffer.cpp</itemPath>
       <itemPath>../src/geometry.cpp</itemPath>
       <itemPath>../src/harbinger.cpp</itemPath>
       <itemPath>../src/input.cpp</itemPath>
+      <itemPath>../src/light.cpp</itemPath>
       <itemPath>../src/mesh.cpp</itemPath>
       <itemPath>../src/pipeline.cpp</itemPath>
       <itemPath>../src/primitives.cpp</itemPath>
@@ -165,6 +168,8 @@
       </item>
       <item path="../include/font.h" ex="false" tool="3" flavor2="0">
       </item>
+      <item path="../include/gBuffer.h" ex="false" tool="3" flavor2="0">
+      </item>
       <item path="../include/geometry.h" ex="false" tool="3" flavor2="0">
       </item>
       <item path="../include/harbinger.h" ex="false" tool="3" flavor2="0">
@@ -211,11 +216,15 @@
       </item>
       <item path="../src/font.cpp" ex="false" tool="1" flavor2="0">
       </item>
+      <item path="../src/gBuffer.cpp" ex="false" tool="1" flavor2="0">
+      </item>
       <item path="../src/geometry.cpp" ex="false" tool="1" flavor2="0">
       </item>
       <item path="../src/harbinger.cpp" ex="false" tool="1" flavor2="0">
       </item>
       <item path="../src/input.cpp" ex="false" tool="1" flavor2="0">
+      </item>
+      <item path="../src/light.cpp" ex="false" tool="1" flavor2="0">
       </item>
       <item path="../src/mesh.cpp" ex="false" tool="1" flavor2="0">
       </item>
@@ -338,6 +347,8 @@
       </item>
       <item path="../include/font.h" ex="false" tool="3" flavor2="0">
       </item>
+      <item path="../include/gBuffer.h" ex="false" tool="3" flavor2="0">
+      </item>
       <item path="../include/geometry.h" ex="false" tool="3" flavor2="0">
       </item>
       <item path="../include/harbinger.h" ex="false" tool="3" flavor2="0">
@@ -384,11 +395,15 @@
       </item>
       <item path="../src/font.cpp" ex="false" tool="1" flavor2="0">
       </item>
+      <item path="../src/gBuffer.cpp" ex="false" tool="1" flavor2="0">
+      </item>
       <item path="../src/geometry.cpp" ex="false" tool="1" flavor2="0">
       </item>
       <item path="../src/harbinger.cpp" ex="false" tool="1" flavor2="0">
       </item>
       <item path="../src/input.cpp" ex="false" tool="1" flavor2="0">
+      </item>
+      <item path="../src/light.cpp" ex="false" tool="1" flavor2="0">
       </item>
       <item path="../src/mesh.cpp" ex="false" tool="1" flavor2="0">
       </item>
@@ -497,6 +512,8 @@
       </item>
       <item path="../include/font.h" ex="false" tool="3" flavor2="0">
       </item>
+      <item path="../include/gBuffer.h" ex="false" tool="3" flavor2="0">
+      </item>
       <item path="../include/geometry.h" ex="false" tool="3" flavor2="0">
       </item>
       <item path="../include/harbinger.h" ex="false" tool="3" flavor2="0">
@@ -543,11 +560,15 @@
       </item>
       <item path="../src/font.cpp" ex="false" tool="1" flavor2="0">
       </item>
+      <item path="../src/gBuffer.cpp" ex="false" tool="1" flavor2="0">
+      </item>
       <item path="../src/geometry.cpp" ex="false" tool="1" flavor2="0">
       </item>
       <item path="../src/harbinger.cpp" ex="false" tool="1" flavor2="0">
       </item>
       <item path="../src/input.cpp" ex="false" tool="1" flavor2="0">
+      </item>
+      <item path="../src/light.cpp" ex="false" tool="1" flavor2="0">
       </item>
       <item path="../src/mesh.cpp" ex="false" tool="1" flavor2="0">
       </item>
@@ -664,6 +685,8 @@
       </item>
       <item path="../include/font.h" ex="false" tool="3" flavor2="0">
       </item>
+      <item path="../include/gBuffer.h" ex="false" tool="3" flavor2="0">
+      </item>
       <item path="../include/geometry.h" ex="false" tool="3" flavor2="0">
       </item>
       <item path="../include/harbinger.h" ex="false" tool="3" flavor2="0">
@@ -710,11 +733,15 @@
       </item>
       <item path="../src/font.cpp" ex="false" tool="1" flavor2="0">
       </item>
+      <item path="../src/gBuffer.cpp" ex="false" tool="1" flavor2="0">
+      </item>
       <item path="../src/geometry.cpp" ex="false" tool="1" flavor2="0">
       </item>
       <item path="../src/harbinger.cpp" ex="false" tool="1" flavor2="0">
       </item>
       <item path="../src/input.cpp" ex="false" tool="1" flavor2="0">
+      </item>
+      <item path="../src/light.cpp" ex="false" tool="1" flavor2="0">
       </item>
       <item path="../src/mesh.cpp" ex="false" tool="1" flavor2="0">
       </item>

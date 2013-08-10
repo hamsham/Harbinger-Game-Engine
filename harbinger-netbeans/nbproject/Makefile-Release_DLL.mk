@@ -41,9 +41,11 @@ OBJECTFILES= \
 	${OBJECTDIR}/_ext/1360937237/display.o \
 	${OBJECTDIR}/_ext/1360937237/drawable.o \
 	${OBJECTDIR}/_ext/1360937237/font.o \
+	${OBJECTDIR}/_ext/1360937237/gBuffer.o \
 	${OBJECTDIR}/_ext/1360937237/geometry.o \
 	${OBJECTDIR}/_ext/1360937237/harbinger.o \
 	${OBJECTDIR}/_ext/1360937237/input.o \
+	${OBJECTDIR}/_ext/1360937237/light.o \
 	${OBJECTDIR}/_ext/1360937237/mesh.o \
 	${OBJECTDIR}/_ext/1360937237/pipeline.o \
 	${OBJECTDIR}/_ext/1360937237/primitives.o \
@@ -112,6 +114,11 @@ ${OBJECTDIR}/_ext/1360937237/font.o: nbproject/Makefile-${CND_CONF}.mk ../src/fo
 	${RM} $@.d
 	$(COMPILE.cc) -w -s -DHGE_BUILD_DYNAMIC -I../include -I../../hamlibs/include -I../../../../../../mingw4.8.1/mingw32/i686-w64-mingw32/include/freetype2 -std=c++11 -Wall -Werror -Wextra -pedantic -mmmx -msse -msse2 -msse3 -mfpmath=sse -O3 -s -shared -fPIC -fPIC  -MMD -MP -MF $@.d -o ${OBJECTDIR}/_ext/1360937237/font.o ../src/font.cpp
 
+${OBJECTDIR}/_ext/1360937237/gBuffer.o: nbproject/Makefile-${CND_CONF}.mk ../src/gBuffer.cpp 
+	${MKDIR} -p ${OBJECTDIR}/_ext/1360937237
+	${RM} $@.d
+	$(COMPILE.cc) -w -s -DHGE_BUILD_DYNAMIC -I../include -I../../hamlibs/include -I../../../../../../mingw4.8.1/mingw32/i686-w64-mingw32/include/freetype2 -std=c++11 -Wall -Werror -Wextra -pedantic -mmmx -msse -msse2 -msse3 -mfpmath=sse -O3 -s -shared -fPIC -fPIC  -MMD -MP -MF $@.d -o ${OBJECTDIR}/_ext/1360937237/gBuffer.o ../src/gBuffer.cpp
+
 ${OBJECTDIR}/_ext/1360937237/geometry.o: nbproject/Makefile-${CND_CONF}.mk ../src/geometry.cpp 
 	${MKDIR} -p ${OBJECTDIR}/_ext/1360937237
 	${RM} $@.d
@@ -126,6 +133,11 @@ ${OBJECTDIR}/_ext/1360937237/input.o: nbproject/Makefile-${CND_CONF}.mk ../src/i
 	${MKDIR} -p ${OBJECTDIR}/_ext/1360937237
 	${RM} $@.d
 	$(COMPILE.cc) -w -s -DHGE_BUILD_DYNAMIC -I../include -I../../hamlibs/include -I../../../../../../mingw4.8.1/mingw32/i686-w64-mingw32/include/freetype2 -std=c++11 -Wall -Werror -Wextra -pedantic -mmmx -msse -msse2 -msse3 -mfpmath=sse -O3 -s -shared -fPIC -fPIC  -MMD -MP -MF $@.d -o ${OBJECTDIR}/_ext/1360937237/input.o ../src/input.cpp
+
+${OBJECTDIR}/_ext/1360937237/light.o: nbproject/Makefile-${CND_CONF}.mk ../src/light.cpp 
+	${MKDIR} -p ${OBJECTDIR}/_ext/1360937237
+	${RM} $@.d
+	$(COMPILE.cc) -w -s -DHGE_BUILD_DYNAMIC -I../include -I../../hamlibs/include -I../../../../../../mingw4.8.1/mingw32/i686-w64-mingw32/include/freetype2 -std=c++11 -Wall -Werror -Wextra -pedantic -mmmx -msse -msse2 -msse3 -mfpmath=sse -O3 -s -shared -fPIC -fPIC  -MMD -MP -MF $@.d -o ${OBJECTDIR}/_ext/1360937237/light.o ../src/light.cpp
 
 ${OBJECTDIR}/_ext/1360937237/mesh.o: nbproject/Makefile-${CND_CONF}.mk ../src/mesh.cpp 
 	${MKDIR} -p ${OBJECTDIR}/_ext/1360937237

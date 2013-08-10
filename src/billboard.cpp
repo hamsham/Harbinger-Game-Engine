@@ -77,6 +77,7 @@ bool billboard::setNumImages( unsigned r, unsigned c ) {
         GL_ARRAY_BUFFER, sizeof( vec3 ) * numBmps, positions,
         GL_STREAM_DRAW
     );
+    glBindVertexArray( 0 );
     
     delete [] positions;
     

@@ -29,7 +29,7 @@ class HGE_API text final : public drawable {
         // "indices" contains the starting elements of each character
         // plus the number of elements to draw (specified by an offset of "numChars")
         
-        void        createVertexBuffer( unsigned numVerts );
+        void        createVertexBuffer( const char* str );
         
     public:
         text    ()  { resetDrawMode(); }

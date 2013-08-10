@@ -48,46 +48,16 @@ void text::clearString() {
     
     vao = vbo = 0;
     numChars = 0;
-}
-
-///////////////////////////////////////////////////////////////////////////////
-// STRING - Buffer Data
-///////////////////////////////////////////////////////////////////////////////
-void text::createVertexBuffer( unsigned numVerts ) {
-    if ( !vao )
-        glGenVertexArrays( 1, &vao );
     
-	glBindVertexArray( vao );
-    
-    if ( !vbo )
-        glGenBuffers( 1, &vbo );
-	
-	glBindBuffer( GL_ARRAY_BUFFER, vbo );
-    glBufferData(
-        GL_ARRAY_BUFFER, sizeof( plainVertex ) * 4 * numVerts,
-        nullptr, GL_DYNAMIC_DRAW
-    );
-	printGlError( "Error while creating a string object's vertex buffer.");
-    
-    pipeline::enablePlainVertexAttribs();
     resetDrawMode();
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-// STRING - TEXT FORMATTING
+// STRING - Buffer Data
+// This function will bind the current object's VAO and VBO
 ///////////////////////////////////////////////////////////////////////////////
-void text::setString( const font& f, const char* str ) {
-    
-    if ( !str ) {
-        clearString();
-        return;
-    }
-    
-    float xPos = 0.f;
-    float yPos = 0.f;
-    plainVertex tempQuad[ 4 ];
+void text::createVertexBuffer( const char* str ) {
     numChars = 0;
-    
     //count all the whitespace
     for( int i = 0; str[ i ] != '\0'; ++i ) {
         if (    str[ i ] != '\n'
@@ -98,28 +68,65 @@ void text::setString( const font& f, const char* str ) {
             ++numChars;
         }
     }
-	
-    // Resize the text buffer
+    
+    if ( !vao ) {
+        glGenVertexArrays( 1, &vao );
+    }
+    glBindVertexArray( vao );
+    
+    if ( !vbo ) {
+        glGenBuffers( 1, &vbo );
+    }
+	glBindBuffer( GL_ARRAY_BUFFER, vbo );
+    pipeline::enablePlainVertexAttribs();
+    
+    // Check if the text buffer needs to be resized
+    if ( numChars == (indices.size() / 2)) {
+        return;
+    }
+
     try {
         indices.resize( numChars * 2 );
+        glBufferData(
+            GL_ARRAY_BUFFER, sizeof( plainVertex ) * 4 * numChars, nullptr, GL_DYNAMIC_DRAW
+        );
     }
     catch( const std::length_error& err ) {
         std::cerr << "ERROR: Unable to create the string of text: " << str << std::endl;
         clearString();
         return;
     }
-    createVertexBuffer( numChars );
+	printGlError( "Error while creating a string object's vertex buffer.");
+}
+
+///////////////////////////////////////////////////////////////////////////////
+// STRING - TEXT FORMATTING
+// This function will un-bind the VAO and VBO after uploading the text data
+///////////////////////////////////////////////////////////////////////////////
+void text::setString( const font& f, const char* str ) {
     
-    tempQuad[0].norm =
-        tempQuad[1].norm =
-            tempQuad[2].norm =
-                tempQuad[3].norm = vec3( 0.f, 0.f, 1.f );
+    if ( !str ) {
+        createVertexBuffer( 0 );
+        return;
+    }
+    
+    float xPos = 0.f;
+    float yPos = 0.f;
+    plainVertex* tempQuad = nullptr;
+    
+    createVertexBuffer( str );
+    
+    tempQuad = (plainVertex*)glMapBuffer( GL_ARRAY_BUFFER, GL_WRITE_ONLY );
+    
+    if ( !tempQuad ) {
+        glBindVertexArray( 0 );
+        return;
+    }
     
     // Create and send the vertices to OpenGL
     int charCount = 0;
     for ( int i = 0; str[ i ] != '\0'; ++i ) {
         const int currChar = (int)str[ i ];
-        const font::metric_t& m = f.metrics[ currChar ];
         
         if ( currChar == '\n' ) {
             yPos -= f.newLine;
@@ -136,17 +143,18 @@ void text::setString( const font& f, const char* str ) {
                 * font::SPACES_PER_TAB;
         }
         else {
+            const font::metric_t& m = f.metrics[ currChar ];
+            
             // populate the index array
             indices[ charCount ] = charCount * 4;
             indices[ charCount + numChars ] = 4;
             
-            /*
-             * 0--------2
-             * |     /  |
-             * |   /    |
-             * | /      |
-             * 1--------3
-             */
+            // 0--------2
+            // |     /  |
+            // |   /    |
+            // | /      |
+            // 1--------3
+            //
             tempQuad[ 0 ].pos = vec3( xPos,         yPos+m.advY+m.height,   0.f );
             tempQuad[ 1 ].pos = vec3( xPos,         yPos+m.advY,            0.f );
             tempQuad[ 2 ].pos = vec3( xPos+m.width, yPos+m.advY+m.height,   0.f );
@@ -157,15 +165,21 @@ void text::setString( const font& f, const char* str ) {
             tempQuad[ 2 ].uv = vec2( m.uv[0],       m.uv[1] );
             tempQuad[ 3 ].uv = vec2( m.uv[0],       m.pos[1] );
             
+            tempQuad[0].norm =
+                tempQuad[1].norm =
+                    tempQuad[2].norm =
+                        tempQuad[3].norm = vec3( 0.f, 0.f, 1.f );
+            
             xPos += m.advX - m.bearX;
-
-            glBufferSubData(
-                GL_ARRAY_BUFFER, sizeof( tempQuad ) * charCount,
-                sizeof( tempQuad ), tempQuad
-            );
+            
+            tempQuad += 4; // increment the pointer to the buffer map
             ++charCount;
             printGlError( "Error while updating string buffer data on the GPU.");
         }
+    }
+    
+    if ( !glUnmapBuffer( GL_ARRAY_BUFFER ) ) {
+        std::cerr << "ERROR: Unable to unmap the current text buffer." << std::endl;
     }
 	glBindVertexArray( 0 );
 }

@@ -10,7 +10,6 @@
 
 #include <GL/glew.h>
 #include "types.h"
-#include "geometry.h"
 
 #ifndef HGE_PIPELINE_MATRIX_BINDING
     #define HGE_PIPELINE_MATRIX_BINDING 1
@@ -43,12 +42,12 @@ class HGE_API pipeline {
         };
 
         enum attribute : GLint {
-            INVALID_UNIFORM     = -1,
-            VERTEX_ATTRIB       = 0,
-            TEXTURE_ATTRIB      = 1,
-            NORMAL_ATTRIB       = 2,
-            TANGENT_ATTRIB      = 3,
-            BITANGENT_ATTRIB    = 4
+            HGE_ATTRIB_INVALID      = -1,
+            HGE_ATTRIB_VERTEX       = 0,
+            HGE_ATTRIB_TEXTURE      = 1,
+            HGE_ATTRIB_NORMAL       = 2,
+            HGE_ATTRIB_TANGENT      = 3,
+            HGE_ATTRIB_BITANGENT    = 4
         };
 
         // These are based off the enumerations defined in Assimp's "material.h" header
@@ -94,18 +93,24 @@ class HGE_API pipeline {
     private:
         // Commonly shared Uniform buffer object
         GLuint ubo = 0;
-        GLuint matrixIndexId = GL_INVALID_INDEX;
         GLuint currShader = 0;
+        GLuint matrixIndexId = GL_INVALID_INDEX;
+        // Array to contain the current model, view-projection, and mvp matrix transformations
+        mat4* transforms = nullptr;
         
         // Shader Matrix Updating
         void updateMatricesImpl();
-
-        // Array to contain the current model, view-projection, and mvp matrix transformations
-        mat4 transforms[ 3 ] = { mat4( 1.f ) };
         
     public:
         pipeline() {}
+        
+        pipeline( const pipeline& ) = delete;
+        pipeline( pipeline&& ) = delete;
+        
         ~pipeline() { terminate(); }
+        
+        pipeline& operator = ( const pipeline& ) = delete;
+        pipeline& operator = ( pipeline&& ) = delete;
         
         bool init();
         void terminate();

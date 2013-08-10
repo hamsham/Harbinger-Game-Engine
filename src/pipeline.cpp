@@ -12,6 +12,7 @@
 #include "pipeline.h"
 
 #include "camera.h"
+#include "geometry.h"
 #include "transformations.h"
 
 using namespace hge;
@@ -20,6 +21,9 @@ using namespace hge;
  * Pipeline Construction and Destruction
 ******************************************************************************/
 bool pipeline::init() {
+    if ( ubo )
+        return true;
+    
     glGenBuffers( 1, &ubo );
     printGlError( "Creating pipeline uniform block" );
     
@@ -29,8 +33,14 @@ bool pipeline::init() {
     glBindBufferBase( GL_UNIFORM_BUFFER, HGE_PIPELINE_MATRIX_BINDING, ubo );
 
     glBufferData(
-        GL_UNIFORM_BUFFER, sizeof( transforms ), nullptr, GL_DYNAMIC_DRAW
+        GL_UNIFORM_BUFFER, sizeof( mat4 ) * 3, nullptr, GL_DYNAMIC_DRAW
     );
+    
+    transforms = new( std::nothrow ) mat4[ 3 ];
+    if ( !transforms ) {
+        terminate();
+        return false;
+    }
     
     return true;
 }
@@ -38,6 +48,9 @@ void pipeline::terminate() {
     glDeleteBuffers( 1, &ubo );
     ubo = currShader = 0;
     matrixIndexId = GL_INVALID_INDEX;
+    
+    delete [] transforms;
+    transforms = nullptr;
 }
 
 /******************************************************************************
@@ -50,7 +63,7 @@ void pipeline::updateMatricesImpl() {
     glBindBufferBase( GL_UNIFORM_BUFFER, HGE_PIPELINE_MATRIX_BINDING, ubo );
 
     glBufferData(
-        GL_UNIFORM_BUFFER, sizeof( transforms ), transforms, GL_DYNAMIC_DRAW
+        GL_UNIFORM_BUFFER, sizeof( mat4 ) * 3, transforms, GL_DYNAMIC_DRAW
     );
 }
 
@@ -90,12 +103,12 @@ void pipeline::applyStockShader( GLint shaderId ) {
         return;
     }
     glUseProgram( currShader );
-    printGlError( "Applying a shader to the pipeline" );
+    printGlError( "Error while applying a shader to the pipeline" );
     
     matrixIndexId = glGetUniformBlockIndex( currShader, "matrixBlock" );
     
     // don't attach the matrix UBO if a binding point doesn't exist
-    printGlError( "Accessing the Matrix Uniform Block" );
+    printGlError( "Error accessing a shader's Matrix Uniform Block" );
     
     if ( matrixIndexId == GL_INVALID_INDEX ) {
         return;
@@ -103,10 +116,9 @@ void pipeline::applyStockShader( GLint shaderId ) {
     
     glBindBuffer( GL_UNIFORM_BUFFER, ubo );
     glBindBufferBase( GL_UNIFORM_BUFFER, HGE_PIPELINE_MATRIX_BINDING, ubo );
-    //glBufferData( GL_UNIFORM_BUFFER, sizeof( transforms ), transforms, GL_DYNAMIC_DRAW );
     
     glUniformBlockBinding( currShader, matrixIndexId, HGE_PIPELINE_MATRIX_BINDING );
-    printGlError( "Sending Matrix Uniform Binding" );
+    printGlError( "Error while binding a pipeline's matrix block to a shader" );
     glBindBuffer( GL_UNIFORM_BUFFER, 0 );
 }
 
@@ -114,60 +126,60 @@ void pipeline::applyStockShader( GLint shaderId ) {
  * Enabling Vertex Attributes
 ******************************************************************************/
 void pipeline::enablePlainVertexAttribs() {
-	glEnableVertexAttribArray( VERTEX_ATTRIB );
-	glEnableVertexAttribArray( TEXTURE_ATTRIB );
-	glEnableVertexAttribArray( NORMAL_ATTRIB );
+	glEnableVertexAttribArray( HGE_ATTRIB_VERTEX );
+	glEnableVertexAttribArray( HGE_ATTRIB_TEXTURE );
+	glEnableVertexAttribArray( HGE_ATTRIB_NORMAL );
     
 	glVertexAttribPointer(
-		VERTEX_ATTRIB, ARRAY_COUNT_FROM_SIZE( plainVertex::pos.v ), GL_FLOAT,
+		HGE_ATTRIB_VERTEX, ARRAY_COUNT_FROM_SIZE( plainVertex::pos.v ), GL_FLOAT,
         GL_FALSE, sizeof( plainVertex ), (GLvoid*)offsetof( plainVertex, pos.v )
 	);
     
 	glVertexAttribPointer(
-		TEXTURE_ATTRIB, ARRAY_COUNT_FROM_SIZE( plainVertex::uv.v ), GL_FLOAT,
+		HGE_ATTRIB_TEXTURE, ARRAY_COUNT_FROM_SIZE( plainVertex::uv.v ), GL_FLOAT,
         GL_FALSE, sizeof( plainVertex ), (GLvoid*)offsetof( plainVertex, uv.v )
 	);
     
 	glVertexAttribPointer(
-		NORMAL_ATTRIB, ARRAY_COUNT_FROM_SIZE( plainVertex::norm.v ), GL_FLOAT,
+		HGE_ATTRIB_NORMAL, ARRAY_COUNT_FROM_SIZE( plainVertex::norm.v ), GL_FLOAT,
         GL_FALSE, sizeof( plainVertex ), (GLvoid*)offsetof( plainVertex, norm.v )
 	);
     
-	glDisableVertexAttribArray( TANGENT_ATTRIB );
-	glDisableVertexAttribArray( BITANGENT_ATTRIB );
+	glDisableVertexAttribArray( HGE_ATTRIB_TANGENT );
+	glDisableVertexAttribArray( HGE_ATTRIB_BITANGENT );
     
 	printGlError( "Error while enabling plain vertex attributes.");
 }
 
 void pipeline::enableBumpVertexAttribs() {
-	glEnableVertexAttribArray( VERTEX_ATTRIB );
-	glEnableVertexAttribArray( TEXTURE_ATTRIB );
-	glEnableVertexAttribArray( NORMAL_ATTRIB );
-    glEnableVertexAttribArray( TANGENT_ATTRIB );
-    glEnableVertexAttribArray( BITANGENT_ATTRIB );
+	glEnableVertexAttribArray( HGE_ATTRIB_VERTEX );
+	glEnableVertexAttribArray( HGE_ATTRIB_TEXTURE );
+	glEnableVertexAttribArray( HGE_ATTRIB_NORMAL );
+    glEnableVertexAttribArray( HGE_ATTRIB_TANGENT );
+    glEnableVertexAttribArray( HGE_ATTRIB_BITANGENT );
     
 	glVertexAttribPointer(
-		VERTEX_ATTRIB, ARRAY_COUNT_FROM_SIZE( bumpVertex::pos.v ), GL_FLOAT,
+		HGE_ATTRIB_VERTEX, ARRAY_COUNT_FROM_SIZE( bumpVertex::pos.v ), GL_FLOAT,
         GL_FALSE, sizeof( bumpVertex ), (GLvoid*)offsetof( bumpVertex, pos.v )
 	);
     
 	glVertexAttribPointer(
-		TEXTURE_ATTRIB, ARRAY_COUNT_FROM_SIZE( bumpVertex::uv.v ), GL_FLOAT,
+		HGE_ATTRIB_TEXTURE, ARRAY_COUNT_FROM_SIZE( bumpVertex::uv.v ), GL_FLOAT,
         GL_FALSE, sizeof( bumpVertex ), (GLvoid*)offsetof( bumpVertex, uv.v )
 	);
     
 	glVertexAttribPointer(
-		NORMAL_ATTRIB, ARRAY_COUNT_FROM_SIZE( bumpVertex::norm.v ), GL_FLOAT,
+		HGE_ATTRIB_NORMAL, ARRAY_COUNT_FROM_SIZE( bumpVertex::norm.v ), GL_FLOAT,
         GL_FALSE, sizeof( bumpVertex ), (GLvoid*)offsetof( bumpVertex, norm.v )
 	);
     
 	glVertexAttribPointer(
-		TANGENT_ATTRIB, ARRAY_COUNT_FROM_SIZE( bumpVertex::tng.v ), GL_FLOAT,
+		HGE_ATTRIB_TANGENT, ARRAY_COUNT_FROM_SIZE( bumpVertex::tng.v ), GL_FLOAT,
         GL_FALSE, sizeof( bumpVertex ), (GLvoid*)offsetof( bumpVertex, tng.v )
 	);
     
 	glVertexAttribPointer(
-		BITANGENT_ATTRIB, ARRAY_COUNT_FROM_SIZE( bumpVertex::btng.v ), GL_FLOAT,
+		HGE_ATTRIB_BITANGENT, ARRAY_COUNT_FROM_SIZE( bumpVertex::btng.v ), GL_FLOAT,
         GL_FALSE, sizeof( bumpVertex ), (GLvoid*)offsetof( bumpVertex, btng.v )
 	);
     

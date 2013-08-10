@@ -21,27 +21,23 @@ namespace hge {
 ******************************************************************************/
 class HGE_API stockShader {
     protected:
-        pipeline* currPipeline = nullptr;
         shader program;
         
     public:
-        stockShader             () {}
-        stockShader             ( const stockShader& ) = delete;
-        stockShader             ( stockShader&& );
-        virtual ~stockShader    () {}
+        stockShader     () {}
+        stockShader     ( const stockShader& ) = delete;
+        stockShader     ( stockShader&& );
         
-        stockShader& operator = ( const stockShader& ) = delete;
-        stockShader& operator = ( stockShader&& );
+        virtual ~stockShader        () {}
         
-        virtual bool init       ( pipeline* const p ) = 0;
-        virtual void terminate  () = 0;
+        stockShader&    operator =  ( const stockShader& ) = delete;
+        stockShader&    operator =  ( stockShader&& );
         
-        void        activate    ();
+        virtual bool    init        () = 0;
+        virtual void    terminate   () { program.unload(); }
+        
+        GLuint          getProgramId() const { return program.getProgramId(); }
 };
-
-inline void stockShader::activate() {
-    currPipeline->applyStockShader( program.getProgramId() );
-}
 
 /******************************************************************************
  * Point Light Shader
@@ -67,7 +63,7 @@ class HGE_API pointLightShader final : public stockShader {
         pointLightShader& operator =    ( const pointLightShader& ) = delete;
         pointLightShader& operator =    ( pointLightShader&& );
         
-        bool init                       ( pipeline* const p );
+        bool init                       ();
         void terminate                  ();
         
         void setPointLight              ( const pointLight& );
@@ -88,8 +84,7 @@ class HGE_API shadowShader final : public stockShader {
         shadowShader& operator =    ( const shadowShader& ) = delete;
         shadowShader& operator =    ( shadowShader&& ) = default;
         
-        bool init                   ( pipeline* const p );
-        void terminate              () { program.unload(); }
+        bool init                   ();
 };
 
 /******************************************************************************
@@ -105,8 +100,7 @@ class HGE_API skyShader final : public stockShader {
         skyShader& operator =   ( const skyShader& ) = delete;
         skyShader& operator =   ( skyShader&& ) = default;
         
-        bool init               ( pipeline* const p );
-        void terminate          () { program.unload(); }
+        bool init               ();
 };
 
 /******************************************************************************
@@ -127,7 +121,7 @@ class HGE_API fontShader final : public stockShader {
         fontShader& operator =  ( const fontShader& ) = delete;
         fontShader& operator =  ( fontShader&& );
         
-        bool init               ( pipeline* const p );
+        bool init               ();
         void terminate          ();
         
         void setFontColor       ( const vec4& v ) { glUniform4fv( fontColId, 1, v.v ); }
@@ -149,7 +143,7 @@ class HGE_API billboardShader final : public stockShader {
         billboardShader& operator = ( const billboardShader& ) = delete;
         billboardShader& operator = ( billboardShader&& );
         
-        bool init                   ( pipeline* const p );
+        bool init                   ();
         void terminate              ();
         
         void setCameraPos           ( const camera& c ) { glUniform3fv( camPosId, 1, c.getPos().v ); }
@@ -180,7 +174,7 @@ class HGE_API enbtShader final : public stockShader {
         
         ~enbtShader             () { terminate(); }
         
-        bool init               ( pipeline* const p );
+        bool init               ();
         void terminate          ();
         
         void    showEdges       ( bool b ) { glUniform1i( showEdgeId, (int)b ); }

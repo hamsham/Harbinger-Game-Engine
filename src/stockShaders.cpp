@@ -17,17 +17,11 @@
 namespace hge {
     
 stockShader::stockShader( stockShader&& s ) :
-    currPipeline( s.currPipeline ),
     program( std::move( s.program ) )
-{
-    s.currPipeline = nullptr;
-}
+{}
 
 stockShader& stockShader::operator = ( stockShader&& s ) {
     program = std::move( s.program );
-    currPipeline = s.currPipeline;
-    s.currPipeline = nullptr;
-    
     return *this;
 }
 
@@ -81,7 +75,7 @@ pointLightShader& pointLightShader::operator = ( pointLightShader&& p ) {
     return *this;
 }
 
-bool pointLightShader::init( pipeline* const p ) {
+bool pointLightShader::init() {
     // don't do anything if there already is a shader program in memory
     if ( program.getProgramId() )
         return true;
@@ -103,8 +97,7 @@ bool pointLightShader::init( pipeline* const p ) {
     GLint textureId = 0;
     GLint shadowId  = 0;
     GLint normalId  = 0;
-    GLint progId    = program.getProgramId();
-    p->applyStockShader( progId );
+    glUseProgram( program.getProgramId() );
     
     ambColorId      = program.getVariableId( "ambientLight.color" );
     ambIntId        = program.getVariableId( "ambientLight.intensity" );
@@ -120,18 +113,18 @@ bool pointLightShader::init( pipeline* const p ) {
     normalId        = program.getVariableId( "normalMap" );
     printGlError("Point light shader setup error");
     
-    if (    ambColorId      == pipeline::INVALID_UNIFORM
-    ||      ambIntId        == pipeline::INVALID_UNIFORM
-    ||      pointColorId    == pipeline::INVALID_UNIFORM
-    ||      pointIntId      == pipeline::INVALID_UNIFORM
-    ||      pointConstId    == pipeline::INVALID_UNIFORM
-    ||      pointLinearId   == pipeline::INVALID_UNIFORM
-    ||      pointExpId      == pipeline::INVALID_UNIFORM
-    ||      pointPosId      == pipeline::INVALID_UNIFORM
-    ||      shadowId        == pipeline::INVALID_UNIFORM
-    ||      lightMatrixId   == pipeline::INVALID_UNIFORM
-    ||      textureId       == pipeline::INVALID_UNIFORM
-    ||      normalId        == pipeline::INVALID_UNIFORM
+    if (    ambColorId      == pipeline::HGE_ATTRIB_INVALID
+    ||      ambIntId        == pipeline::HGE_ATTRIB_INVALID
+    ||      pointColorId    == pipeline::HGE_ATTRIB_INVALID
+    ||      pointIntId      == pipeline::HGE_ATTRIB_INVALID
+    ||      pointConstId    == pipeline::HGE_ATTRIB_INVALID
+    ||      pointLinearId   == pipeline::HGE_ATTRIB_INVALID
+    ||      pointExpId      == pipeline::HGE_ATTRIB_INVALID
+    ||      pointPosId      == pipeline::HGE_ATTRIB_INVALID
+    ||      shadowId        == pipeline::HGE_ATTRIB_INVALID
+    ||      lightMatrixId   == pipeline::HGE_ATTRIB_INVALID
+    ||      textureId       == pipeline::HGE_ATTRIB_INVALID
+    ||      normalId        == pipeline::HGE_ATTRIB_INVALID
     ) {
         printGlError("Error accessing a point light uniform variable");
         glUseProgram( 0 );
@@ -146,12 +139,10 @@ bool pointLightShader::init( pipeline* const p ) {
     printGlError( "Shadowmap Sampler error" );
     glUseProgram( 0 );
     
-    currPipeline = p;
     return true;
 }
 
 void pointLightShader::terminate() {
-    currPipeline = nullptr;
     program.unload();
     
     ambColorId      = 0;
@@ -186,7 +177,7 @@ void pointLightShader::setAmbientLight( const ambientLight& a ) {
 /******************************************************************************
  * SHADOW SHADER
  ******************************************************************************/
-bool shadowShader::init( pipeline* const p ) {
+bool shadowShader::init() {
     // don't do anything if there already is a shader program in memory
     if ( program.getProgramId() )
         return true;
@@ -202,13 +193,12 @@ bool shadowShader::init( pipeline* const p ) {
         << program.getProgramId()
         << std::endl;
     
-    GLint progId = program.getProgramId();
-    p->applyStockShader( progId );
+    glUseProgram( program.getProgramId() );
     GLint shadowMapId = program.getVariableId( "shadowMap" );
     
     printGlError("Shader setup error");
     
-    if ( shadowMapId == pipeline::INVALID_UNIFORM ) {
+    if ( shadowMapId == pipeline::HGE_ATTRIB_INVALID ) {
         printGlError("Error accessing a shadowmap uniform variable");
         glUseProgram( 0 );
         return false;
@@ -218,14 +208,13 @@ bool shadowShader::init( pipeline* const p ) {
     printGlError( "Shadowmap sampler error" );
     glUseProgram( 0 );
     
-    currPipeline = p;
     return true;
 }
 
 /******************************************************************************
  * SKY SHADER
  ******************************************************************************/
-bool skyShader::init( pipeline* const p ) {
+bool skyShader::init() {
     // don't do anything if there already is a shader program in memory
     if ( program.getProgramId() )
         return true;
@@ -242,12 +231,11 @@ bool skyShader::init( pipeline* const p ) {
         << program.getProgramId()
         << std::endl;
     
-    GLint progId = program.getProgramId();
-    p->applyStockShader( progId );
+    glUseProgram( program.getProgramId() );
     GLint skyTexId = program.getVariableId( "cubeTex" );
     printGlError("Skybox shader setup error");
     
-    if ( skyTexId == pipeline::INVALID_UNIFORM ) {
+    if ( skyTexId == pipeline::HGE_ATTRIB_INVALID ) {
         printGlError("Error accessing a skybox uniform variable");
         glUseProgram( 0 );
         return false;
@@ -257,7 +245,6 @@ bool skyShader::init( pipeline* const p ) {
     printGlError( "Skybox sampler error" );
     glUseProgram( 0 );
     
-    currPipeline = p;
     return true;
 }
 
@@ -278,7 +265,7 @@ fontShader& fontShader::operator = ( fontShader&& f ) {
     return *this;
 }
 
-bool fontShader::init( pipeline* const p ) {
+bool fontShader::init() {
     // don't do anything if there already is a shader program in memory
     if ( program.getProgramId() )
         return true;
@@ -295,15 +282,14 @@ bool fontShader::init( pipeline* const p ) {
         << program.getProgramId()
         << std::endl;
     
-    GLint progId = program.getProgramId();
-    p->applyStockShader( progId );
+    glUseProgram( program.getProgramId() );
     
     fontColId = program.getVariableId( "color" );
     GLint fontSampler = program.getVariableId( "texSampler" );
     printGlError("Font shader setup error");
     
-    if (    fontSampler == pipeline::INVALID_UNIFORM
-    ||      fontColId   == pipeline::INVALID_UNIFORM
+    if (    fontSampler == pipeline::HGE_ATTRIB_INVALID
+    ||      fontColId   == pipeline::HGE_ATTRIB_INVALID
     ) {
         printGlError("Error accessing a font uniform variable");
         glUseProgram( 0 );
@@ -314,12 +300,10 @@ bool fontShader::init( pipeline* const p ) {
     printGlError( "Font Sampler error" );
     glUseProgram( 0 );
     
-    currPipeline = p;
     return true;
 }
 
 void fontShader::terminate() {
-    currPipeline = nullptr;
     program.unload();
     fontColId = 0;
 }
@@ -341,7 +325,7 @@ billboardShader& billboardShader::operator = ( billboardShader&& b ) {
     return *this;
 }
 
-bool billboardShader::init( pipeline* const p ) {
+bool billboardShader::init() {
     // don't do anything if there already is a shader program in memory
     if ( program.getProgramId() )
         return true;
@@ -359,15 +343,14 @@ bool billboardShader::init( pipeline* const p ) {
         << program.getProgramId()
         << std::endl;
     
-    GLint progId = program.getProgramId();
-    p->applyStockShader( progId );
+    glUseProgram( program.getProgramId() );
     
     camPosId = program.getVariableId( "camPos" );
     GLint texSampler = program.getVariableId( "texSampler" );
     printGlError("Shader setup error");
     
-    if (    camPosId    == pipeline::INVALID_UNIFORM
-    ||      texSampler== pipeline::INVALID_UNIFORM
+    if (    camPosId    == pipeline::HGE_ATTRIB_INVALID
+    ||      texSampler== pipeline::HGE_ATTRIB_INVALID
     ) {
         printGlError("Error accessing a billboard uniform variable");
         glUseProgram( 0 );
@@ -379,12 +362,10 @@ bool billboardShader::init( pipeline* const p ) {
     printGlError( "Billboard Sampler error" );
     glUseProgram( 0 );
     
-    currPipeline = p;
     return true;
 }
 
 void billboardShader::terminate() {
-    currPipeline = nullptr;
     program.unload();
     camPosId = 0;
 }
@@ -419,7 +400,7 @@ enbtShader& enbtShader::operator = ( enbtShader&& s ) {
     return *this;
 }
 
-bool enbtShader::init( pipeline* const p ) {
+bool enbtShader::init() {
     // don't do anything if there already is a shader program in memory
     if ( program.getProgramId() )
         return true;
@@ -437,8 +418,7 @@ bool enbtShader::init( pipeline* const p ) {
         << program.getProgramId()
         << std::endl;
     
-    GLint progId = program.getProgramId();
-    p->applyStockShader( progId );
+    glUseProgram( program.getProgramId() );
     
     showEdgeId = program.getVariableId( "showEdges" );
     showNormId = program.getVariableId( "showNormals" );
@@ -446,10 +426,10 @@ bool enbtShader::init( pipeline* const p ) {
     showBtngId = program.getVariableId( "showBitangents" );
     printGlError("Shader setup error");
     
-    if (    showEdgeId == pipeline::INVALID_UNIFORM
-    ||      showNormId == pipeline::INVALID_UNIFORM
-    ||      showTangId == pipeline::INVALID_UNIFORM
-    ||      showBtngId == pipeline::INVALID_UNIFORM
+    if (    showEdgeId == pipeline::HGE_ATTRIB_INVALID
+    ||      showNormId == pipeline::HGE_ATTRIB_INVALID
+    ||      showTangId == pipeline::HGE_ATTRIB_INVALID
+    ||      showBtngId == pipeline::HGE_ATTRIB_INVALID
     ) {
         printGlError("Error accessing an NBT uniform variable");
         return false;
@@ -458,12 +438,10 @@ bool enbtShader::init( pipeline* const p ) {
     
     glUseProgram( 0 );
     
-    currPipeline = p;
     return true;
 }
 
 void enbtShader::terminate() {
-    currPipeline = nullptr;
     program.unload();
     showEdgeId = 0;
     showNormId = 0;

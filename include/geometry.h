@@ -20,7 +20,10 @@ struct plainVertex {
 };
 
 // bumped vertex
-struct bumpVertex : plainVertex {
+struct bumpVertex {
+	vec3 pos;
+	vec2 uv;
+	vec3 norm;
 	vec3 tng;
     vec3 btng;
 };

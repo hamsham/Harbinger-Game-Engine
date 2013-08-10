@@ -428,6 +428,208 @@ const char enbtFS[] = R"***(
     
 )***";
 
+/******************************************************************************
+ * Deferred Renderer Geometry Pass
+******************************************************************************/
+/*
+ * Vertex Shader
+ */
+const char dsGeometryVs[] = R"***(
+    #version 330
+    
+    layout ( std140 ) uniform matrixBlock {
+        mat4 modelMatrix;
+        mat4 vpMatrix;
+        mat4 mvpMatrix;
+    };
+
+    layout ( location = 0 ) in vec3 posVerts;
+    layout ( location = 1 ) in vec2 texVerts;
+    layout ( location = 2 ) in vec3 nrmVerts;
+    layout ( location = 3 ) in vec3 tngVerts;
+    layout ( location = 4 ) in vec3 btngVerts;
+    
+    out vec3 posCoords;
+    out vec2 texCoords;
+    out vec3 nrmCoords;
+    out vec3 tngCoords;
+    out vec3 btngCoords;
+    
+    void main() {
+        gl_Position = mvpMatrix * vec4( posVerts, 1.0 );
+        posCoords   = (modelMatrix * vec4( posVerts, 1.0 )).xyz;
+        texCoords   = texVerts;
+        nrmCoords   = (modelMatrix * vec4( nrmVerts, 0.0 )).xyz;
+        tngCoords   = (modelMatrix * vec4(tngVerts, 0.0)).xyz;
+        btngCoords  = (modelMatrix * vec4(btngVerts, 0.0)).xyz;
+    }
+    
+)***";
+
+/*
+ * Fragment Shader
+ */
+const char dsGeometryFs[] = R"***(
+    #version 330
+    
+    in vec3 posCoords;
+    in vec2 texCoords;
+    in vec3 nrmCoords;
+    in vec3 tngCoords;
+    in vec3 btngCoords;
+    
+    layout ( location = 0 ) out vec3 gBufPosition;
+    layout ( location = 1 ) out vec3 gBufDiffuse;
+    layout ( location = 2 ) out vec3 gBufNormal;
+    
+    uniform sampler2D diffuseMap;
+    uniform sampler2D normalMap;
+
+    vec3 calcBumpedNormal() {
+        vec3 bumpNormal = 2.0 * texture( normalMap, texCoords ).rgb - 1.0;
+        mat3 tbn        = mat3( tngCoords, btngCoords, nrmCoords );
+
+        return normalize( tbn * bumpNormal ).xyz;
+    }
+    
+    void main() {
+        gBufPosition = posCoords;
+        gBufDiffuse = texture( diffuseMap, texCoords ).xyz;
+        gBufNormal = calcBumpedNormal();
+    }
+    
+)***";
+
+/******************************************************************************
+ * Deferred Renderer Lighting Pass
+******************************************************************************/
+/*
+ * Vertex Shader
+ */
+const char dsLightVs[] = R"***(
+    #version 330
+    
+    layout ( std140 ) uniform matrixBlock {
+        mat4 modelMatrix;
+        mat4 vpMatrix;
+        mat4 mvpMatrix;
+    };
+    
+    layout ( location = 0 ) in vec3 posVerts;
+    layout ( location = 1 ) in float inLightScale;
+    layout ( location = 2 ) in vec3 inLightPos;
+    layout ( location = 3 ) in vec4 inLightColors;
+    layout ( location = 4 ) in vec4 inLightAttribs;
+    
+    out vec3 lightPos;
+    out vec4 lightCol;
+    out vec4 lightAttrib;
+    
+    void main() {
+        vec4 sphereVertPos = vec4( inLightScale * posVerts + inLightPos, 1.0 );
+        gl_Position = vpMatrix * sphereVertPos;
+        
+        lightPos = inLightPos;
+        lightCol = inLightColors;
+        lightAttrib = inLightAttribs;
+    }
+    
+)***";
+
+/*
+ * Fragment Shader
+ */
+const char dsLightFs[] = R"***(
+    #version 330
+
+    struct s_ambientLight {
+        vec4    color;
+        float   intensity;
+    };
+    
+    uniform sampler2D       gBufPosition;
+    uniform sampler2D       gBufDiffuse;
+    uniform sampler2D       gBufNormal;
+    uniform vec2            gBufResolution;
+    uniform s_ambientLight  ambientLight;
+    
+    in vec3 lightPos;
+    in vec4 lightCol;
+    in vec4 lightAttrib;
+
+    out vec4 fragCol;
+
+    vec2 calcTextureCoord() {
+        return gl_FragCoord.xy / gBufResolution;
+    }
+
+    vec4 calcAmbientLight() {
+        return ambientLight.color * ambientLight.intensity;
+    }
+
+    vec4 calcPointLight( in vec3 worldPos, in vec3 normals ) {
+        vec3 lightDir   = worldPos - lightPos;
+        float distance  = length( lightDir );
+        lightDir        = -normalize( lightDir );
+
+        float diffuse = max( 0.0, dot( normals, lightDir ) );
+        float attenuation
+            = lightAttrib[0]
+            + ( lightAttrib[3] * distance )
+            + ( lightAttrib[1] * distance * distance );
+
+        return lightCol * lightAttrib[2] * diffuse / attenuation;
+    }
+
+    void main() {
+        vec2 textureCoords  = calcTextureCoord();
+        vec3 worldPosition  = texture( gBufPosition, textureCoords ).xyz;
+        vec3 screenColor    = texture( gBufDiffuse, textureCoords ).xyz;
+        vec3 normalCoords   = normalize( texture( gBufNormal, textureCoords ).xyz );
+        
+        fragCol
+            = vec4( screenColor, 1.0 )
+            * ( calcAmbientLight()
+            + calcPointLight( worldPosition, normalCoords ) );
+    }
+)***";
+
+/******************************************************************************
+ * Deferred Renderer Stencil Pass
+******************************************************************************/
+/*
+ * Vertex Shader
+ */
+const char nullVs[] = R"***(
+    #version 330
+    
+    layout ( std140 ) uniform matrixBlock {
+        mat4 modelMatrix;
+        mat4 vpMatrix;
+        mat4 mvpMatrix;
+    };
+    
+    layout ( location = 0 ) in vec3 posVerts;
+    layout ( location = 1 ) in float inLightScale;
+    layout ( location = 2 ) in vec3 inLightPos;
+    
+    void main() {
+        vec4 sphereVertPos = vec4( inLightScale * posVerts + inLightPos, 1.0 );
+        gl_Position = vpMatrix * sphereVertPos;
+    }
+    
+)***";
+
+/*
+ * Fragment Shader
+ */
+const char nullFs[] = R"***(
+    #version 330
+    
+    void main() {}
+    
+)***";
+
 } // end anonymous namespace
 
 #endif	/* __HGE_STOCKSHADERS_GLSL_H__ */

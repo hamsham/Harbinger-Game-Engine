@@ -449,4 +449,151 @@ void enbtShader::terminate() {
     showBtngId = 0;
 }
 
+/******************************************************************************
+ * Deferred Renderer Geometry Pass
+******************************************************************************/
+bool dsGeometryShader::init() {
+    if (    !program.loadBuffer( dsGeometryVs, sizeof( dsGeometryVs ), GL_VERTEX_SHADER )
+    ||      !program.loadBuffer( dsGeometryFs, sizeof( dsGeometryFs ), GL_FRAGMENT_SHADER )
+    ||      !program.compile()
+    ) {
+        program.unload();
+        return false;
+    }
+    
+    glUseProgram( program.getProgramId() );
+    
+    GLint diffuseMap = glGetUniformLocation( program.getProgramId(), "diffuseMap" );
+    GLint normalMap = glGetUniformLocation( program.getProgramId(), "normalMap" );
+    
+    if (    diffuseMap == hge::pipeline::HGE_ATTRIB_INVALID
+    ||      normalMap == hge::pipeline::HGE_ATTRIB_INVALID
+    ) {
+        std::cerr << "ERROR: Unable to access deferred shading uniforms." << std::endl;
+        program.unload();
+        return false;
+    }
+    glUniform1i( diffuseMap, hge::pipeline::HGE_SAMPLER_DIFFUSE );
+    glUniform1i( normalMap, hge::pipeline::HGE_SAMPLER_NORMAL );
+    
+    return true;
+}
+
+/******************************************************************************
+ * Deferred Renderer Light Pass for instanced lights
+******************************************************************************/
+dsLightShader::dsLightShader( dsLightShader&& ds ) :
+    stockShader::stockShader( std::move( ds ) ),
+    ambIntId        ( ds.ambIntId ),
+    ambColorId      ( ds.ambColorId ),
+    resolutionId    ( ds.resolutionId )
+{
+    ds.ambIntId     = 0;
+    ds.ambColorId   = 0;
+    ds.resolutionId = 0;
+}
+
+dsLightShader& dsLightShader::operator =( dsLightShader&& ds ) {
+    stockShader::operator =( std::move( ds ) );
+    ambIntId        = ds.ambIntId;
+    ambColorId      = ds.ambColorId;
+    resolutionId    = ds.resolutionId;
+    
+    ds.ambIntId     = 0;
+    ds.ambColorId   = 0;
+    ds.resolutionId = 0;
+}
+
+bool dsLightShader::init( const vec2i& gBufResolution ) {
+    if (    !program.loadBuffer( dsLightVs, sizeof( dsLightVs ), GL_VERTEX_SHADER )
+    ||      !program.loadBuffer( dsLightFs, sizeof( dsLightFs ), GL_FRAGMENT_SHADER )
+    ) {
+        program.unload();
+        return false;
+    }
+    
+    GLuint progId = program.getProgramId();
+    glBindAttribLocation( progId, 1, "inLightScale" );
+    glBindAttribLocation( progId, 2, "inLightPos" );
+    glBindAttribLocation( progId, 3, "inLightColors" );
+    glBindAttribLocation( progId, 4, "inLightAttribs" );
+    
+    if ( !program.compile() ) {
+        program.unload();
+        return false;
+    }
+    
+    glUseProgram( program.getProgramId() );
+    
+    GLint posSampler = glGetUniformLocation( program.getProgramId(), "gBufPosition" );
+    GLint colSampler = glGetUniformLocation( program.getProgramId(), "gBufDiffuse" );
+    GLint nrmSampler = glGetUniformLocation( program.getProgramId(), "gBufNormal" );
+    
+    resolutionId    = glGetUniformLocation( program.getProgramId(), "gBufResolution" );
+    ambColorId      = glGetUniformLocation( program.getProgramId(), "ambientLight.color" );
+    ambIntId        = glGetUniformLocation( program.getProgramId(), "ambientLight.intensity" );
+    
+    if (    posSampler      == hge::pipeline::HGE_ATTRIB_INVALID
+    ||      colSampler      == hge::pipeline::HGE_ATTRIB_INVALID
+    ||      nrmSampler      == hge::pipeline::HGE_ATTRIB_INVALID
+    ||      resolutionId    == hge::pipeline::HGE_ATTRIB_INVALID
+    ||      ambColorId      == hge::pipeline::HGE_ATTRIB_INVALID
+    ||      ambIntId        == hge::pipeline::HGE_ATTRIB_INVALID
+    ) {
+        std::cerr << "ERROR: Unable to access point light uniforms." << std::endl;
+        program.unload();
+        return false;
+    }
+    glUniform1i( posSampler, 0 ); // GL_COLOR_ATTACHMENT0
+    glUniform1i( colSampler, 1 ); // GL_COLOR_ATTACHMENT1
+    glUniform1i( nrmSampler, 2 ); // GL_COLOR_ATTACHMENT2
+    
+    setInputResolution( gBufResolution );
+    
+    glUseProgram( 0 );
+    
+    return true;
+}
+
+/*
+ * Resolution modification
+ */
+void dsLightShader::setInputResolution( const vec2i& gBufResolution ) {
+    const vec2 res = vec2( (float)gBufResolution[0], (float)gBufResolution[1] );
+    glUniform2fv( resolutionId, 1, res.v );
+}
+
+/*
+ * Binding
+ */
+void dsLightShader::terminate() {
+    program.unload();
+    
+    ambIntId        = 0;
+    ambColorId      = 0;
+    resolutionId    = 0;
+}
+
+void dsLightShader::setAmbientLight( const ambientLight& al ) {
+    glUniform1f(    ambIntId,       al.intensity );
+    glUniform4fv(   ambColorId,     1, al.color.v );
+}
+
+/******************************************************************************
+ * Deferred Renderer Stencil Pass
+******************************************************************************/
+bool dsNullShader::init() {
+    if (    !program.loadBuffer( nullVs, sizeof( nullVs ), GL_VERTEX_SHADER )
+    //||      !prog.loadBuffer( nullFs, sizeof( nullFs ), GL_FRAGMENT_SHADER )
+    ||      !program.compile()
+    ) {
+        program.unload();
+        return false;
+    }
+    
+    glUseProgram( 0 );
+    
+    return true;
+}
+
 } // end hge namespace

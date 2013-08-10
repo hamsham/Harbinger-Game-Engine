@@ -183,6 +183,70 @@ class HGE_API enbtShader final : public stockShader {
         void    showBitangents  ( bool b ) { glUniform1i( showBtngId, (int)b ); }
 };
 
+/******************************************************************************
+ * DEFERRED RENDERING-RELATED SHADERS
+******************************************************************************/
+/******************************************************************************
+ * Deferred Renderer Geometry Pass
+******************************************************************************/
+class HGE_API dsGeometryShader final : public stockShader {
+    public:
+        dsGeometryShader    () {}
+        dsGeometryShader    ( const dsGeometryShader& ) = delete;
+        dsGeometryShader    ( dsGeometryShader&& ) = default;
+        
+        dsGeometryShader&   operator =  ( const dsGeometryShader& ) = delete;
+        dsGeometryShader&   operator =  ( dsGeometryShader&& ) = default;
+        
+        ~dsGeometryShader   () { terminate(); }
+        
+        bool init();
+};
+
+/******************************************************************************
+ * Deferred Renderer Light Pass for instanced lights
+******************************************************************************/
+class HGE_API dsLightShader final : public stockShader {
+    private:
+        GLint ambIntId      = 0;
+        GLint ambColorId    = 0;
+        GLint resolutionId  = 0;
+        
+    public:
+        dsLightShader() {}
+        dsLightShader   ( const dsLightShader& ) = delete;
+        dsLightShader   ( dsLightShader&& );
+        
+        dsLightShader&  operator =  ( const dsLightShader& ) = delete;
+        dsLightShader&  operator =  ( dsLightShader&& );
+        
+        ~dsLightShader  () { terminate(); }
+        
+        bool init       ( const vec2i& gBufferResolution );
+        bool init       () { return init( vec2i( 0,0 ) ); }
+        void terminate  ();
+        
+        void setInputResolution( const vec2i& );
+        void setAmbientLight( const hge::ambientLight& );
+};
+
+/******************************************************************************
+ * Deferred Renderer Stencil Pass
+******************************************************************************/
+class HGE_API dsNullShader final : public stockShader {
+    public:
+        dsNullShader    () {}
+        dsNullShader    ( const dsNullShader& ) = delete;
+        dsNullShader    ( dsNullShader&& ) = default;
+        
+        dsNullShader&   operator =  ( const dsNullShader& ) = delete;
+        dsNullShader&   operator =  ( dsNullShader&& ) = default;
+        
+        ~dsNullShader   () { terminate(); }
+        
+        bool init();
+};
+
 } // end hge namespace
 
 #endif	/* __HGE_STOCK_SHADERS_H__ */

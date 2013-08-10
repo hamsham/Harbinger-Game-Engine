@@ -8,7 +8,7 @@
 #ifndef __HGE_LIGHT_H__
 #define	__HGE_LIGHT_H__
 
-#include "types.h"
+#include "pipeline.h"
 
 namespace hge {
 
@@ -63,6 +63,78 @@ struct spotLight : baseLight {
     float   coneAngle   = HL_PI_INVERSE * 3.15f;
     float   attenuation = 1.f;
 };
+
+///////////////////////////////////////////////////////////////////////////////
+//		Deferred Point Lighting
+///////////////////////////////////////////////////////////////////////////////
+struct HGE_API dsPointLight {
+    float scale;
+    vec3 position;
+    vec4 color;
+    
+    union {
+        vec4 attributes;
+        struct {
+            float constant;
+            float intensity;
+            float exponential;
+            float linear;
+        } attrib;
+    };
+    
+    dsPointLight();
+    dsPointLight( const dsPointLight& );
+    dsPointLight& operator = ( const dsPointLight& );
+    ~dsPointLight() {}
+};
+
+///////////////////////////////////////////////////////////////////////////////
+//		Deferred Point Light Instances
+//      To be used with a GBuffer and Deferred Shader
+///////////////////////////////////////////////////////////////////////////////
+class HGE_API dsLightSphere {
+    enum : int {
+        DEFAULT_NUM_RINGS   = 10,
+        DEFAULT_NUM_SECTORS = 10
+    };
+    
+    enum lightAttributes : int {
+        SCALE_ATTRIB    = 1,
+        POS_ATTRIB      = 2,
+        COLOR_ATTRIB    = 3,
+        PARAM_ATTRIB    = 4 // light constant, exponential, intensity, linear
+    };
+    
+    private:
+        GLuint vao = 0;
+        GLuint vbo[3] = {0,0,0}; // vertex buffer, index buffers, instanced light buffer
+        unsigned numIndices = 0;
+        unsigned numInstances = 0;
+        
+    public:
+        dsLightSphere   () {}
+        dsLightSphere   ( const dsLightSphere& ) = delete;
+        dsLightSphere   ( dsLightSphere&& );
+        
+        ~dsLightSphere  () { terminate(); }
+        
+        dsLightSphere&  operator =      ( const dsLightSphere& ) = delete;
+        dsLightSphere&  operator =      ( dsLightSphere&& );
+        
+        bool            init            ();
+        void            terminate       ();
+        
+        void            setLightBuffer  ( const dsPointLight*, unsigned lightCount );
+        void            setLight        ( unsigned index, const dsPointLight& );
+        unsigned        getNumLights    () const { return numInstances; }
+        void            draw            () const;
+};
+        
+inline void dsLightSphere::draw() const {
+    glBindVertexArray( vao );
+    glDrawElementsInstanced( GL_TRIANGLE_STRIP, numIndices, GL_UNSIGNED_INT, 0, numInstances );
+    glBindVertexArray( 0 );
+}
 
 } // end hge namespace
 

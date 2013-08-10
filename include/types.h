@@ -22,15 +22,21 @@ using namespace hamLibs::math;
 class   window;
 class   inputSystem;
 
-// Builit-In graphics pipeline
+// Graphics pipeline used by the stock shaders
 class pipeline;
-class stockShader;
+class gBuffer;
+
+// Stock Shaders
+class billboardShader;
+class enbtShader;
+class dsGeometryShader;
+class dsLightShader;
+class dsNullShader;
+class fontShader;
 class pointLightShader;
 class shadowShader;
 class skyShader;
-class fontShader;
-class billboardShader;
-class enbtShader;
+class stockShader; // base class
 
 //vertex structures
 struct  plainVertex; // position, uv, normal
@@ -66,6 +72,8 @@ class   triangle;
 // Lighting types
 struct  ambientLight;
 struct  diffuseLight;
+struct  dsPointLight;
+class   dsLightSphere;
 struct  specularLight;
 struct  pointLight;
 struct  spotLight;

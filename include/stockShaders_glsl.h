@@ -346,9 +346,9 @@ const char enbtGS[] = R"***(
     layout( line_strip, max_vertices = 21 ) out;
     
     uniform bool showEdges      = true;
-    uniform bool showNormals    = false;
-    uniform bool showTangents   = false;
-    uniform bool showBitangents = false;
+    uniform bool showNormals    = true;
+    uniform bool showTangents   = true;
+    uniform bool showBitangents = true;
     
     in vec4 normPos[];
     in vec4 tangPos[];

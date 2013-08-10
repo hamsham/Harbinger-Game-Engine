@@ -21,7 +21,6 @@ using namespace hamLibs::math;
 // RAII Resources
 class   window;
 class   inputSystem;
-class   stockShaders;
 
 // Builit-In graphics pipeline
 class pipeline;

@@ -8,7 +8,7 @@
 #include <iostream>
 #include "light.h"
 
-#define DEFAULT_POINT_INTENSITY     10.f
+#define DEFAULT_POINT_INTENSITY     1.f
 #define DEFAULT_POINT_CONSTANT      0.f
 #define DEFAULT_POINT_EXPONENTIAL   1.f
 #define DEFAULT_POINT_LINEAR        0.f
@@ -40,6 +40,16 @@ dsPointLight& dsPointLight::operator = ( const dsPointLight& pl ) {
     color = pl.color;
     attributes = pl.attributes;
     return *this;
+}
+
+float dsPointLight::calcInfluenceRadius() const {
+    float maxChannel = hamLibs::math::max(
+        hamLibs::math::max(
+            color[0], color[1]
+        ), color[2]
+    );
+    float c = maxChannel * attrib.intensity;
+    return 8.f * HL_SQRT(c);
 }
 
 /******************************************************************************

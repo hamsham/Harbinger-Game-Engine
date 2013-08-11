@@ -76,8 +76,8 @@ struct HGE_API dsPointLight {
         vec4 attributes;
         struct {
             float constant;
-            float intensity;
             float exponential;
+            float intensity;
             float linear;
         } attrib;
     };
@@ -86,6 +86,8 @@ struct HGE_API dsPointLight {
     dsPointLight( const dsPointLight& );
     dsPointLight& operator = ( const dsPointLight& );
     ~dsPointLight() {}
+    
+    float calcInfluenceRadius() const;
 };
 
 ///////////////////////////////////////////////////////////////////////////////

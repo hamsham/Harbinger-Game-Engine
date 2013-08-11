@@ -21,7 +21,7 @@ namespace hge {
 /******************************************************************************
  * Rendering Application Class
 ******************************************************************************/
-class dsRenderer : public hge::application, public hge::pipeline {
+class HGE_API dsRenderer : public hge::application, public hge::pipeline {
     
     private:
         hge::dsGeometryShader* pGeoShader   = nullptr; // Shader to draw geometry

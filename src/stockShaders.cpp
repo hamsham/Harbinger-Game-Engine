@@ -466,8 +466,8 @@ bool dsGeometryShader::init() {
     GLint diffuseMap = glGetUniformLocation( program.getProgramId(), "diffuseMap" );
     GLint normalMap = glGetUniformLocation( program.getProgramId(), "normalMap" );
     
-    if (    diffuseMap == hge::pipeline::HGE_ATTRIB_INVALID
-    ||      normalMap == hge::pipeline::HGE_ATTRIB_INVALID
+    if (    diffuseMap  == hge::pipeline::HGE_ATTRIB_INVALID
+    ||      normalMap   == hge::pipeline::HGE_ATTRIB_INVALID
     ) {
         std::cerr << "ERROR: Unable to access deferred shading uniforms." << std::endl;
         program.unload();
@@ -484,23 +484,15 @@ bool dsGeometryShader::init() {
 ******************************************************************************/
 dsLightShader::dsLightShader( dsLightShader&& ds ) :
     stockShader::stockShader( std::move( ds ) ),
-    ambIntId        ( ds.ambIntId ),
-    ambColorId      ( ds.ambColorId ),
     resolutionId    ( ds.resolutionId )
 {
-    ds.ambIntId     = 0;
-    ds.ambColorId   = 0;
     ds.resolutionId = 0;
 }
 
 dsLightShader& dsLightShader::operator =( dsLightShader&& ds ) {
     stockShader::operator =( std::move( ds ) );
-    ambIntId        = ds.ambIntId;
-    ambColorId      = ds.ambColorId;
     resolutionId    = ds.resolutionId;
     
-    ds.ambIntId     = 0;
-    ds.ambColorId   = 0;
     ds.resolutionId = 0;
 }
 
@@ -530,15 +522,11 @@ bool dsLightShader::init( const vec2i& gBufResolution ) {
     GLint nrmSampler = glGetUniformLocation( program.getProgramId(), "gBufNormal" );
     
     resolutionId    = glGetUniformLocation( program.getProgramId(), "gBufResolution" );
-    ambColorId      = glGetUniformLocation( program.getProgramId(), "ambientLight.color" );
-    ambIntId        = glGetUniformLocation( program.getProgramId(), "ambientLight.intensity" );
     
     if (    posSampler      == hge::pipeline::HGE_ATTRIB_INVALID
     ||      colSampler      == hge::pipeline::HGE_ATTRIB_INVALID
     ||      nrmSampler      == hge::pipeline::HGE_ATTRIB_INVALID
     ||      resolutionId    == hge::pipeline::HGE_ATTRIB_INVALID
-    ||      ambColorId      == hge::pipeline::HGE_ATTRIB_INVALID
-    ||      ambIntId        == hge::pipeline::HGE_ATTRIB_INVALID
     ) {
         std::cerr << "ERROR: Unable to access point light uniforms." << std::endl;
         program.unload();
@@ -569,14 +557,7 @@ void dsLightShader::setInputResolution( const vec2i& gBufResolution ) {
 void dsLightShader::terminate() {
     program.unload();
     
-    ambIntId        = 0;
-    ambColorId      = 0;
     resolutionId    = 0;
-}
-
-void dsLightShader::setAmbientLight( const ambientLight& al ) {
-    glUniform1f(    ambIntId,       al.intensity );
-    glUniform4fv(   ambColorId,     1, al.color.v );
 }
 
 /******************************************************************************

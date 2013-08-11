@@ -494,6 +494,7 @@ const char dsGeometryFs[] = R"***(
     
     void main() {
         gBufPosition = posCoords;
+//        gBufDiffuse = texture( diffuseMap, texCoords ).xyz * calcAmbientLight();
         gBufDiffuse = texture( diffuseMap, texCoords ).xyz;
         gBufNormal = calcBumpedNormal();
     }
@@ -541,30 +542,20 @@ const char dsLightVs[] = R"***(
  */
 const char dsLightFs[] = R"***(
     #version 330
-
-    struct s_ambientLight {
-        vec4    color;
-        float   intensity;
-    };
     
     uniform sampler2D       gBufPosition;
     uniform sampler2D       gBufDiffuse;
     uniform sampler2D       gBufNormal;
     uniform vec2            gBufResolution;
-    uniform s_ambientLight  ambientLight;
     
     in vec3 lightPos;
     in vec4 lightCol;
-    in vec4 lightAttrib;
+    in vec4 lightAttrib; // constant, exponential, intensity, linear
 
     out vec4 fragCol;
 
     vec2 calcTextureCoord() {
         return gl_FragCoord.xy / gBufResolution;
-    }
-
-    vec4 calcAmbientLight() {
-        return ambientLight.color * ambientLight.intensity;
     }
 
     vec4 calcPointLight( in vec3 worldPos, in vec3 normals ) {
@@ -574,11 +565,11 @@ const char dsLightFs[] = R"***(
 
         float diffuse = max( 0.0, dot( normals, lightDir ) );
         float attenuation
-            = lightAttrib[0]
-            + ( lightAttrib[3] * distance )
-            + ( lightAttrib[1] * distance * distance );
+            = lightAttrib[0] // constant
+            + ( lightAttrib[3] * distance ) // linear
+            + ( lightAttrib[1] * distance * distance ); // exponential
 
-        return lightCol * lightAttrib[2] * diffuse / attenuation;
+        return (lightCol * lightAttrib[2] * diffuse) / attenuation; // intensity
     }
 
     void main() {
@@ -589,8 +580,7 @@ const char dsLightFs[] = R"***(
         
         fragCol
             = vec4( screenColor, 1.0 )
-            * ( calcAmbientLight()
-            + calcPointLight( worldPosition, normalCoords ) );
+            * calcPointLight( worldPosition, normalCoords );
     }
 )***";
 

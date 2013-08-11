@@ -208,8 +208,6 @@ class HGE_API dsGeometryShader final : public stockShader {
 ******************************************************************************/
 class HGE_API dsLightShader final : public stockShader {
     private:
-        GLint ambIntId      = 0;
-        GLint ambColorId    = 0;
         GLint resolutionId  = 0;
         
     public:
@@ -227,7 +225,6 @@ class HGE_API dsLightShader final : public stockShader {
         void terminate  ();
         
         void setInputResolution( const vec2i& );
-        void setAmbientLight( const hge::ambientLight& );
 };
 
 /******************************************************************************

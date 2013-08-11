@@ -14,11 +14,13 @@
       </logicalFolder>
     </logicalFolder>
     <logicalFolder name="include" displayName="include" projectFiles="true">
+      <itemPath>../include/application.h</itemPath>
       <itemPath>../include/billboard.h</itemPath>
       <itemPath>../include/bitmap.h</itemPath>
       <itemPath>../include/camera.h</itemPath>
       <itemPath>../include/display.h</itemPath>
       <itemPath>../include/drawable.h</itemPath>
+      <itemPath>../include/dsRenderer.h</itemPath>
       <itemPath>../include/font.h</itemPath>
       <itemPath>../include/gBuffer.h</itemPath>
       <itemPath>../include/geometry.h</itemPath>
@@ -40,11 +42,13 @@
       <itemPath>../include/types.h</itemPath>
     </logicalFolder>
     <logicalFolder name="src" displayName="src" projectFiles="true">
+      <itemPath>../src/application.cpp</itemPath>
       <itemPath>../src/billboard.cpp</itemPath>
       <itemPath>../src/bitmap.cpp</itemPath>
       <itemPath>../src/camera.cpp</itemPath>
       <itemPath>../src/display.cpp</itemPath>
       <itemPath>../src/drawable.cpp</itemPath>
+      <itemPath>../src/dsRenderer.cpp</itemPath>
       <itemPath>../src/font.cpp</itemPath>
       <itemPath>../src/gBuffer.cpp</itemPath>
       <itemPath>../src/geometry.cpp</itemPath>
@@ -156,6 +160,8 @@
       </item>
       <item path="../bin/WIN32/libharbinger.dll.a" ex="false" tool="3" flavor2="0">
       </item>
+      <item path="../include/application.h" ex="false" tool="3" flavor2="0">
+      </item>
       <item path="../include/billboard.h" ex="false" tool="3" flavor2="0">
       </item>
       <item path="../include/bitmap.h" ex="false" tool="3" flavor2="0">
@@ -165,6 +171,8 @@
       <item path="../include/display.h" ex="false" tool="3" flavor2="0">
       </item>
       <item path="../include/drawable.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="../include/dsRenderer.h" ex="false" tool="3" flavor2="0">
       </item>
       <item path="../include/font.h" ex="false" tool="3" flavor2="0">
       </item>
@@ -204,6 +212,8 @@
       </item>
       <item path="../include/types.h" ex="false" tool="3" flavor2="0">
       </item>
+      <item path="../src/application.cpp" ex="false" tool="1" flavor2="0">
+      </item>
       <item path="../src/billboard.cpp" ex="false" tool="1" flavor2="0">
       </item>
       <item path="../src/bitmap.cpp" ex="false" tool="1" flavor2="0">
@@ -213,6 +223,8 @@
       <item path="../src/display.cpp" ex="false" tool="1" flavor2="0">
       </item>
       <item path="../src/drawable.cpp" ex="false" tool="1" flavor2="0">
+      </item>
+      <item path="../src/dsRenderer.cpp" ex="false" tool="1" flavor2="0">
       </item>
       <item path="../src/font.cpp" ex="false" tool="1" flavor2="0">
       </item>
@@ -335,6 +347,8 @@
       </item>
       <item path="../bin/WIN32/libharbinger.dll.a" ex="false" tool="3" flavor2="0">
       </item>
+      <item path="../include/application.h" ex="false" tool="3" flavor2="0">
+      </item>
       <item path="../include/billboard.h" ex="false" tool="3" flavor2="0">
       </item>
       <item path="../include/bitmap.h" ex="false" tool="3" flavor2="0">
@@ -344,6 +358,8 @@
       <item path="../include/display.h" ex="false" tool="3" flavor2="0">
       </item>
       <item path="../include/drawable.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="../include/dsRenderer.h" ex="false" tool="3" flavor2="0">
       </item>
       <item path="../include/font.h" ex="false" tool="3" flavor2="0">
       </item>
@@ -383,6 +399,8 @@
       </item>
       <item path="../include/types.h" ex="false" tool="3" flavor2="0">
       </item>
+      <item path="../src/application.cpp" ex="false" tool="1" flavor2="0">
+      </item>
       <item path="../src/billboard.cpp" ex="false" tool="1" flavor2="0">
       </item>
       <item path="../src/bitmap.cpp" ex="false" tool="1" flavor2="0">
@@ -392,6 +410,8 @@
       <item path="../src/display.cpp" ex="false" tool="1" flavor2="0">
       </item>
       <item path="../src/drawable.cpp" ex="false" tool="1" flavor2="0">
+      </item>
+      <item path="../src/dsRenderer.cpp" ex="false" tool="1" flavor2="0">
       </item>
       <item path="../src/font.cpp" ex="false" tool="1" flavor2="0">
       </item>
@@ -500,6 +520,8 @@
       </item>
       <item path="../bin/WIN32/libharbinger.dll.a" ex="false" tool="3" flavor2="0">
       </item>
+      <item path="../include/application.h" ex="false" tool="3" flavor2="0">
+      </item>
       <item path="../include/billboard.h" ex="false" tool="3" flavor2="0">
       </item>
       <item path="../include/bitmap.h" ex="false" tool="3" flavor2="0">
@@ -509,6 +531,8 @@
       <item path="../include/display.h" ex="false" tool="3" flavor2="0">
       </item>
       <item path="../include/drawable.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="../include/dsRenderer.h" ex="false" tool="3" flavor2="0">
       </item>
       <item path="../include/font.h" ex="false" tool="3" flavor2="0">
       </item>
@@ -548,6 +572,8 @@
       </item>
       <item path="../include/types.h" ex="false" tool="3" flavor2="0">
       </item>
+      <item path="../src/application.cpp" ex="false" tool="1" flavor2="0">
+      </item>
       <item path="../src/billboard.cpp" ex="false" tool="1" flavor2="0">
       </item>
       <item path="../src/bitmap.cpp" ex="false" tool="1" flavor2="0">
@@ -557,6 +583,8 @@
       <item path="../src/display.cpp" ex="false" tool="1" flavor2="0">
       </item>
       <item path="../src/drawable.cpp" ex="false" tool="1" flavor2="0">
+      </item>
+      <item path="../src/dsRenderer.cpp" ex="false" tool="1" flavor2="0">
       </item>
       <item path="../src/font.cpp" ex="false" tool="1" flavor2="0">
       </item>
@@ -673,6 +701,8 @@
       </item>
       <item path="../bin/WIN32/libharbinger.dll.a" ex="false" tool="3" flavor2="0">
       </item>
+      <item path="../include/application.h" ex="false" tool="3" flavor2="0">
+      </item>
       <item path="../include/billboard.h" ex="false" tool="3" flavor2="0">
       </item>
       <item path="../include/bitmap.h" ex="false" tool="3" flavor2="0">
@@ -682,6 +712,8 @@
       <item path="../include/display.h" ex="false" tool="3" flavor2="0">
       </item>
       <item path="../include/drawable.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="../include/dsRenderer.h" ex="false" tool="3" flavor2="0">
       </item>
       <item path="../include/font.h" ex="false" tool="3" flavor2="0">
       </item>
@@ -721,6 +753,8 @@
       </item>
       <item path="../include/types.h" ex="false" tool="3" flavor2="0">
       </item>
+      <item path="../src/application.cpp" ex="false" tool="1" flavor2="0">
+      </item>
       <item path="../src/billboard.cpp" ex="false" tool="1" flavor2="0">
       </item>
       <item path="../src/bitmap.cpp" ex="false" tool="1" flavor2="0">
@@ -730,6 +764,8 @@
       <item path="../src/display.cpp" ex="false" tool="1" flavor2="0">
       </item>
       <item path="../src/drawable.cpp" ex="false" tool="1" flavor2="0">
+      </item>
+      <item path="../src/dsRenderer.cpp" ex="false" tool="1" flavor2="0">
       </item>
       <item path="../src/font.cpp" ex="false" tool="1" flavor2="0">
       </item>

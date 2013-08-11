@@ -35,11 +35,13 @@ OBJECTDIR=${CND_BUILDDIR}/${CND_CONF}/${CND_PLATFORM}
 
 # Object Files
 OBJECTFILES= \
+	${OBJECTDIR}/_ext/1360937237/application.o \
 	${OBJECTDIR}/_ext/1360937237/billboard.o \
 	${OBJECTDIR}/_ext/1360937237/bitmap.o \
 	${OBJECTDIR}/_ext/1360937237/camera.o \
 	${OBJECTDIR}/_ext/1360937237/display.o \
 	${OBJECTDIR}/_ext/1360937237/drawable.o \
+	${OBJECTDIR}/_ext/1360937237/dsRenderer.o \
 	${OBJECTDIR}/_ext/1360937237/font.o \
 	${OBJECTDIR}/_ext/1360937237/gBuffer.o \
 	${OBJECTDIR}/_ext/1360937237/geometry.o \
@@ -84,6 +86,11 @@ LDLIBSOPTIONS=-lGLEW -lglfw -lGL -lfreeimage -lassimp -lfreetype ../../hamlibs/H
 	${MKDIR} -p ../bin/LINUX
 	${LINK.cc} -o ../bin/LINUX/libharbinger-debug.so ${OBJECTFILES} ${LDLIBSOPTIONS} -shared
 
+${OBJECTDIR}/_ext/1360937237/application.o: nbproject/Makefile-${CND_CONF}.mk ../src/application.cpp 
+	${MKDIR} -p ${OBJECTDIR}/_ext/1360937237
+	${RM} $@.d
+	$(COMPILE.cc) -w -DDEBUG -I../include -I../../hamlibs/include -I/usr/include/freetype2 -std=c++11 -Wall -Werror -Wextra -pedantic -mmmx -msse -msse2 -msse3 -mfpmath=sse -O2 -g -fPIC  -MMD -MP -MF $@.d -o ${OBJECTDIR}/_ext/1360937237/application.o ../src/application.cpp
+
 ${OBJECTDIR}/_ext/1360937237/billboard.o: nbproject/Makefile-${CND_CONF}.mk ../src/billboard.cpp 
 	${MKDIR} -p ${OBJECTDIR}/_ext/1360937237
 	${RM} $@.d
@@ -108,6 +115,11 @@ ${OBJECTDIR}/_ext/1360937237/drawable.o: nbproject/Makefile-${CND_CONF}.mk ../sr
 	${MKDIR} -p ${OBJECTDIR}/_ext/1360937237
 	${RM} $@.d
 	$(COMPILE.cc) -w -DDEBUG -I../include -I../../hamlibs/include -I/usr/include/freetype2 -std=c++11 -Wall -Werror -Wextra -pedantic -mmmx -msse -msse2 -msse3 -mfpmath=sse -O2 -g -fPIC  -MMD -MP -MF $@.d -o ${OBJECTDIR}/_ext/1360937237/drawable.o ../src/drawable.cpp
+
+${OBJECTDIR}/_ext/1360937237/dsRenderer.o: nbproject/Makefile-${CND_CONF}.mk ../src/dsRenderer.cpp 
+	${MKDIR} -p ${OBJECTDIR}/_ext/1360937237
+	${RM} $@.d
+	$(COMPILE.cc) -w -DDEBUG -I../include -I../../hamlibs/include -I/usr/include/freetype2 -std=c++11 -Wall -Werror -Wextra -pedantic -mmmx -msse -msse2 -msse3 -mfpmath=sse -O2 -g -fPIC  -MMD -MP -MF $@.d -o ${OBJECTDIR}/_ext/1360937237/dsRenderer.o ../src/dsRenderer.cpp
 
 ${OBJECTDIR}/_ext/1360937237/font.o: nbproject/Makefile-${CND_CONF}.mk ../src/font.cpp 
 	${MKDIR} -p ${OBJECTDIR}/_ext/1360937237

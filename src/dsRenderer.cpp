@@ -1,6 +1,8 @@
 
 #include "dsRenderer.h"
 
+namespace hge {
+
 /******************************************************************************
  * Renderer Construction & Destruction
 ******************************************************************************/
@@ -182,3 +184,5 @@ void dsRenderer::setFontColor( const vec4& c ) {
     applyStockShader ( pFontShader->getProgramId() );
     pFontShader->setFontColor   ( c );
 }
+
+} // end hge namespace

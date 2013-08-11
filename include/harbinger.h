@@ -11,11 +11,13 @@
 #include "setup.h"
 #include "types.h"
 
+#include "application.h"
 #include "billboard.h"
 #include "bitmap.h"
 #include "camera.h"
 #include "display.h"
 #include "drawable.h"
+#include "dsRenderer.h"
 #include "font.h"
 #include "gBuffer.h"
 #include "geometry.h"

@@ -22,7 +22,11 @@ using namespace hamLibs::math;
 class   window;
 class   inputSystem;
 
-// Graphics pipeline used by the stock shaders
+// Game Engine Classes
+class application; // base class
+class dsRenderer;
+
+// Graphics pipelines used by the stock shaders
 class pipeline;
 class gBuffer;
 

@@ -119,7 +119,7 @@ inline void dsRenderer::setPointLight( unsigned i, const hge::dsPointLight& l ) 
 ******************************************************************************/
 #ifdef DEBUG
 inline void dsRenderer::doNbtPass() {
-    pPipeline->applyStockShader( pEnbtShader->getProgramId() );
+    applyStockShader( pEnbtShader->getProgramId() );
     drawScene();
     drawFonts();
 }

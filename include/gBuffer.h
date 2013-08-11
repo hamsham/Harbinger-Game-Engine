@@ -5,8 +5,8 @@
  * Created on July 28, 2013, 11:00 PM
  */
 
-#ifndef __GBUFFER_H__
-#define	__GBUFFER_H__
+#ifndef __HGE_GBUFFER_H__
+#define	__HGE_GBUFFER_H__
 
 #include "pipeline.h"
 
@@ -82,5 +82,5 @@ inline void gBuffer::drawBuffer() const {
 
 } // end hge namespace
 
-#endif	/* GBUFFER_H */
+#endif	/* __HGE_GBUFFER_H__ */
 

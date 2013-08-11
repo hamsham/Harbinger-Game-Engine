@@ -102,7 +102,7 @@ bool gBuffer::init( const vec2i& windowRes ) {
     
     // setup the final frame texture
     glBindRenderbuffer( GL_RENDERBUFFER, renderBuffer[1] );
-    glRenderbufferStorage( GL_RENDERBUFFER, GL_RGBA, windowRes[0], windowRes[1] );
+    glRenderbufferStorage( GL_RENDERBUFFER, GL_RGBA8, windowRes[0], windowRes[1] );
     glFramebufferRenderbuffer(
         GL_DRAW_FRAMEBUFFER, GL_COLOR_ATTACHMENT3, GL_RENDERBUFFER, renderBuffer[1]
     );

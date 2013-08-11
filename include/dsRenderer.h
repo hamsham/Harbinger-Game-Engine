@@ -13,6 +13,8 @@
 #include "pipeline.h"
 #include "application.h"
 
+namespace hge {
+
 /******************************************************************************
  * Rendering Application Class
 ******************************************************************************/
@@ -136,6 +138,7 @@ inline void dsRenderer::doFontPass() {
     drawFonts();
 }
 
+} // end hge namespace
 
 #endif	/* __DEFERRED_RENDERER_H__ */
 

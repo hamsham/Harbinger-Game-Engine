@@ -107,7 +107,7 @@ class HGE_API pipeline {
         pipeline( const pipeline& ) = delete;
         pipeline( pipeline&& ) = delete;
         
-        ~pipeline() { terminate(); }
+        virtual ~pipeline() { terminate(); }
         
         pipeline& operator = ( const pipeline& ) = delete;
         pipeline& operator = ( pipeline&& ) = delete;

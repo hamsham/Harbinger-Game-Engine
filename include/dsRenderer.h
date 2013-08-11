@@ -12,6 +12,9 @@
 #include "types.h"
 #include "pipeline.h"
 #include "application.h"
+#include "stockShaders.h"
+#include "light.h"
+#include "gBuffer.h"
 
 namespace hge {
 

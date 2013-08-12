@@ -73,10 +73,20 @@ bool gBuffer::init( const vec2i& windowRes ) {
         glBindTexture( GL_TEXTURE_2D, textures[ i ] );
         
         // allocate space for the texture data
-        glTexImage2D(
-            GL_TEXTURE_2D, 0, GL_RGB16F, windowRes[0], windowRes[1],
-            0, GL_BGR, GL_FLOAT, nullptr
-        );
+        // positions
+        if ( i != 1 ) {
+            glTexImage2D(
+                GL_TEXTURE_2D, 0, GL_RGB16F, windowRes[0], windowRes[1],
+                0, GL_BGR, GL_FLOAT, nullptr
+            );
+        }
+        // diffuse
+        else {
+            glTexImage2D(
+                GL_TEXTURE_2D, 0, GL_RGB8, windowRes[0], windowRes[1],
+                0, GL_BGR, GL_UNSIGNED_BYTE, nullptr
+            );
+        }
         
         // Ensure a 1:1 mapping of the gBuffer's pixels to the framebuffer
         glTexParameterf( GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE );
@@ -95,7 +105,7 @@ bool gBuffer::init( const vec2i& windowRes ) {
     
     // do the same for the depth texture
     glBindRenderbuffer( GL_RENDERBUFFER, renderBuffer[0] );
-    glRenderbufferStorage( GL_RENDERBUFFER, GL_DEPTH32F_STENCIL8, windowRes[0], windowRes[1] );
+    glRenderbufferStorage( GL_RENDERBUFFER, GL_DEPTH24_STENCIL8, windowRes[0], windowRes[1] );
     glFramebufferRenderbuffer(
         GL_DRAW_FRAMEBUFFER, GL_DEPTH_STENCIL_ATTACHMENT, GL_RENDERBUFFER, renderBuffer[0]
     );
@@ -128,6 +138,7 @@ bool gBuffer::init( const vec2i& windowRes ) {
     
     // restore the default framebuffer
     glBindFramebuffer( GL_DRAW_FRAMEBUFFER, 0 );
+    glBindRenderbuffer( GL_RENDERBUFFER, 0 );
     
     readBuffer = GB_RENDER_BUFFER;
     bufferRes = windowRes;

@@ -122,8 +122,8 @@ void dsRenderer::doStencilPass() {
     // always pass the stencil test
     glStencilFunc( GL_ALWAYS, 0, 0 );
     
-    glStencilOpSeparate( GL_BACK, GL_KEEP, GL_INCR, GL_KEEP );
-    glStencilOpSeparate( GL_FRONT, GL_KEEP, GL_DECR, GL_KEEP );
+    glStencilOpSeparate( GL_BACK, GL_KEEP, GL_INCR_WRAP, GL_KEEP );
+    glStencilOpSeparate( GL_FRONT, GL_KEEP, GL_DECR_WRAP, GL_KEEP );
     
     lightSphere.draw();
     

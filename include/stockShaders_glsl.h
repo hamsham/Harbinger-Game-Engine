@@ -494,7 +494,6 @@ const char dsGeometryFs[] = R"***(
     
     void main() {
         gBufPosition = posCoords;
-//        gBufDiffuse = texture( diffuseMap, texCoords ).xyz * calcAmbientLight();
         gBufDiffuse = texture( diffuseMap, texCoords ).xyz;
         gBufNormal = calcBumpedNormal();
     }

@@ -204,7 +204,7 @@ void dsLightSphere::setLightBuffer( const dsPointLight* lights, unsigned lightCo
 	glBindBuffer( GL_ARRAY_BUFFER, vbo[2] );
     
     glBufferData(
-        GL_ARRAY_BUFFER, lightCount * sizeof( dsPointLight ), lights, GL_STREAM_DRAW
+        GL_ARRAY_BUFFER, lightCount * sizeof( dsPointLight ), lights, GL_DYNAMIC_DRAW
     );
 	printGlError( "Error while uploading point light parameter data.");
     

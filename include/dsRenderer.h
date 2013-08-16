@@ -21,19 +21,19 @@ namespace hge {
 /******************************************************************************
  * Rendering Application Class
 ******************************************************************************/
-class HGE_API dsRenderer : public hge::application, public hge::pipeline {
+class HGE_API dsRenderer : public application, public pipeline {
     
     private:
-        hge::dsGeometryShader* pGeoShader   = nullptr; // Shader to draw geometry
-        hge::dsLightShader* pDsLightShader  = nullptr; // point light shader
-        hge::dsNullShader*  pNullShader     = nullptr; // stencil buffer shader
-        hge::skyShader*     pSkyShader      = nullptr; // sky box
-        hge::fontShader*    pFontShader     = nullptr; // fonts
-        hge::gBuffer*       pGBuffer        = nullptr;
+        dsGeometryShader* pGeoShader   = nullptr; // Shader to draw geometry
+        dsLightShader* pDsLightShader  = nullptr; // point light shader
+        dsNullShader*  pNullShader     = nullptr; // stencil buffer shader
+        skyShader*     pSkyShader      = nullptr; // sky box
+        fontShader*    pFontShader     = nullptr; // fonts
+        gBuffer*       pGBuffer        = nullptr;
         
     protected:
-        std::vector< hge::dsPointLight > dsPointLights;
-        hge::dsLightSphere  lightSphere;
+        std::vector< dsPointLight > dsPointLights;
+        dsLightSphere  lightSphere;
 
     public:
         dsRenderer          ( const vec2i& resolution );
@@ -55,12 +55,12 @@ class HGE_API dsRenderer : public hge::application, public hge::pipeline {
         void                setResolution       ( const vec2i& );
         
         // Light handling
-        void                launchPointLight    ( const hge::dsPointLight& );
+        void                launchPointLight    ( const dsPointLight& );
         void                removePointLight    ( unsigned i );
         unsigned            getNumPointLights   () const;
         void                clearPointLights    ();
-        const hge::dsPointLight& getPointLight       ( unsigned i ) const;
-        void                setPointLight       ( unsigned i, const hge::dsPointLight& );
+        const dsPointLight& getPointLight       ( unsigned i ) const;
+        void                setPointLight       ( unsigned i, const dsPointLight& );
         
         // font handling
         void                setFontColor        ( const vec4& );
@@ -68,7 +68,7 @@ class HGE_API dsRenderer : public hge::application, public hge::pipeline {
     protected:
         virtual void        updateScene         ( float ) = 0;
         
-        virtual void        changeResolution    ( const vec2i& ) {}
+        virtual void        changeResolution    ( const vec2i& res ) { pGBuffer->setBufferResolution( res ); }
         
         virtual void        drawScene           () = 0;
         virtual void        drawSky             () = 0;
@@ -82,7 +82,7 @@ class HGE_API dsRenderer : public hge::application, public hge::pipeline {
         void doFontPass     ();
         
 #ifdef DEBUG
-        hge::enbtShader*    pEnbtShader = nullptr;
+        enbtShader*    pEnbtShader = nullptr;
         void doNbtPass      ();
         
     public:
@@ -106,11 +106,11 @@ inline void dsRenderer::clearPointLights() {
     lightSphere.setLightBuffer( nullptr, 0 );
 }
 
-inline const hge::dsPointLight& dsRenderer::getPointLight( unsigned i ) const {
+inline const dsPointLight& dsRenderer::getPointLight( unsigned i ) const {
     return dsPointLights[ i ];
 }
 
-inline void dsRenderer::setPointLight( unsigned i, const hge::dsPointLight& l ) {
+inline void dsRenderer::setPointLight( unsigned i, const dsPointLight& l ) {
     dsPointLights[ i ] = l;
 }
 

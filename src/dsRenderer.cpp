@@ -7,39 +7,39 @@ namespace hge {
  * Renderer Construction & Destruction
 ******************************************************************************/
 dsRenderer::dsRenderer( const vec2i& resolution ) {
-    HGE_ASSERT( hge::pipeline::init() );
+    HGE_ASSERT( pipeline::init() );
     /*
      * Deferred rendering
      */
-    pGBuffer = new( std::nothrow ) hge::gBuffer();
+    pGBuffer = new( std::nothrow ) gBuffer();
     HL_ASSERT( pGBuffer != nullptr );
     HL_ASSERT( pGBuffer->init( resolution ) );
 
     /*
      * Shaders
      */
-    pGeoShader = new( std::nothrow ) hge::dsGeometryShader();
+    pGeoShader = new( std::nothrow ) dsGeometryShader();
     HL_ASSERT( pGeoShader != nullptr );
     HL_ASSERT( pGeoShader->init() );
 
-    pDsLightShader = new( std::nothrow ) hge::dsLightShader();
+    pDsLightShader = new( std::nothrow ) dsLightShader();
     HL_ASSERT( pDsLightShader != nullptr );
     HL_ASSERT( pDsLightShader->init( resolution ) );
 
-    pNullShader = new( std::nothrow ) hge::dsNullShader();
+    pNullShader = new( std::nothrow ) dsNullShader();
     HL_ASSERT( pNullShader != nullptr );
     HL_ASSERT( pNullShader->init() );
 
-    pSkyShader = new( std::nothrow ) hge::skyShader;
+    pSkyShader = new( std::nothrow ) skyShader;
     HL_ASSERT( pSkyShader != nullptr );
     HL_ASSERT( pSkyShader->init() );
 
-    pFontShader = new( std::nothrow ) hge::fontShader();
+    pFontShader = new( std::nothrow ) fontShader();
     HL_ASSERT( pFontShader != nullptr );
     HL_ASSERT( pFontShader->init() );
 
 #ifdef DEBUG
-    pEnbtShader = new( std::nothrow ) hge::enbtShader();
+    pEnbtShader = new( std::nothrow ) enbtShader();
     HL_ASSERT( pEnbtShader != nullptr );
     HL_ASSERT( pEnbtShader->init() );
 #endif
@@ -172,7 +172,7 @@ void dsRenderer::setResolution( const vec2i& res ) {
 /******************************************************************************
  * LIGHTING LAUNCHING
 ******************************************************************************/
-void dsRenderer::launchPointLight( const hge::dsPointLight& l ) {
+void dsRenderer::launchPointLight( const dsPointLight& l ) {
     dsPointLights.push_back         ( l );
     lightSphere.setLightBuffer    ( dsPointLights.data(), dsPointLights.size() );
 }

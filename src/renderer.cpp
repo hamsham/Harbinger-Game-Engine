@@ -260,8 +260,6 @@ bool fwdRenderer::init() {
 }
 
 void fwdRenderer::terminate() {
-    pointLights.clear();
-    
     delete pPlainShader;
     pPlainShader = nullptr;
     delete pPointLightShader;
@@ -302,37 +300,26 @@ void fwdRenderer::tick() {
 }
 
 /*
- * LIGHTING PASS
- */
-void fwdRenderer::doLightingPass() {
-    if ( pointLights.size() ) {
-        applyStockShader( pPointLightShader->getProgramId() );
-        
-        for ( const pointLight& pl : pointLights ) {
-            pPointLightShader->setPointLight( pl );
-            drawSceneLit();
-        }
-    }
-    else {
-        drawSceneLit();
-    }
-}
-
-/*
  * LIGHT HANDLING
  */
-void fwdRenderer::clearPointLights() {
-    pointLights.clear();
+void fwdRenderer::removePointLight() {
+    pntLight.color        = vec4( 0.f, 0.f, 0.f, 1.f );
+    pntLight.intensity    = 0.f;
+    pntLight.constant     = 0.0f;
+    pntLight.exponential  = 0.0f;
+    pntLight.linear       = 0.0f;
+    pntLight.pos          = vec3( 0.f );
     
-    pointLight pl;
-    pl.color        = vec4( 0.f, 0.f, 0.f, 1.f );
-    pl.intensity    = 0.f;
-    pl.constant     = 0.0f;
-    pl.exponential  = 0.0f;
-    pl.linear       = 0.0f;
-    pl.pos          = vec3( 0.f );
+    applyStockShader( pPointLightShader->getProgramId() );
+    pPointLightShader->setPointLight( pntLight );
+}
+
+void fwdRenderer::removeAmbientLight() {
+    ambLight.color        = vec4( 0.f, 0.f, 0.f, 1.f );
+    ambLight.intensity    = 0.f;
     
-    pPointLightShader->setPointLight( pl );
+    applyStockShader( pPointLightShader->getProgramId() );
+    pPointLightShader->setAmbientLight( ambLight );
 }
 
 } // end hge namespace

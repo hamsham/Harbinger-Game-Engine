@@ -14,6 +14,13 @@
 #include "light.h"
 #include "gBuffer.h"
 
+/*
+ * NOTE:
+ *  Multiple lights with the forward renderer is not currently working. Only one
+ * light can be used to draw a scene at a time.
+ * Deferred shading can use multiple lights, however.
+ */
+
 namespace hge {
 
 /******************************************************************************
@@ -168,7 +175,8 @@ class HGE_API fwdRenderer : public pipeline {
         billboardShader*    pBillboardShader    = nullptr;
         
     protected:
-        std::vector< pointLight > pointLights;
+        ambientLight        ambLight;
+        pointLight          pntLight;
 
     public:
         fwdRenderer         () {}
@@ -188,13 +196,12 @@ class HGE_API fwdRenderer : public pipeline {
         void                setResolution       ( const vec2i& res ) final { changeResolution( res ); }
         
         // Light handling
-        void                launchPointLight    ( const pointLight& );
-        void                removePointLight    ( unsigned i );
-        unsigned            getNumPointLights   () const;
-        void                clearPointLights    ();
-        const pointLight&   getPointLight       ( unsigned i ) const;
-        void                setPointLight       ( unsigned i, const pointLight& );
-        void                setAmbientLight     ( const ambientLight& );
+        void                removePointLight    ();
+        const pointLight&   getPointLight       () const { return pntLight; }
+        void                setPointLight       ( const pointLight& pl );
+        void                removeAmbientLight  ();
+        const ambientLight& getAmbientLight     () const { return ambLight; }
+        void                setAmbientLight     ( const ambientLight& a );
         
         // font handling
         void                setFontColor        ( const vec4& ) final;
@@ -232,34 +239,24 @@ class HGE_API fwdRenderer : public pipeline {
 /*
  * LIGHT HANDLING
  */
-inline void fwdRenderer::launchPointLight( const pointLight& l ) {
-    pointLights.push_back( l );
-}
-
-inline void fwdRenderer::removePointLight( unsigned i ) {
-    pointLights.erase( pointLights.begin() + i );
-    if ( !pointLights.size() )
-        clearPointLights();
-}
-
-inline unsigned fwdRenderer::getNumPointLights() const {
-    return pointLights.size();
-}
-
-inline const pointLight& fwdRenderer::getPointLight( unsigned i ) const {
-    HL_ASSERT( i < pointLights.size() );
-    return pointLights[ i ];
-}
-
-inline void fwdRenderer::setPointLight( unsigned i, const pointLight& l ) {
-    HL_ASSERT( i < pointLights.size() );
+inline void fwdRenderer::setPointLight( const pointLight& l ) {
     applyStockShader( pPointLightShader->getProgramId() );
-    pointLights[ i ] = l;
+    pntLight = l;
+    pPointLightShader->setPointLight( pntLight );
 }
 
 inline void fwdRenderer::setAmbientLight( const ambientLight& l ) {
     applyStockShader( pPointLightShader->getProgramId() );
-    pPointLightShader->setAmbientLight( l );
+    ambLight = l;
+    pPointLightShader->setAmbientLight( ambLight );
+}
+
+/*
+ * LIGHTING PASS
+ */
+inline void fwdRenderer::doLightingPass() {
+    applyStockShader( pPointLightShader->getProgramId() );
+    drawSceneLit();
 }
 
 /*

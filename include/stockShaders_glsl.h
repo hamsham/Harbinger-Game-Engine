@@ -40,28 +40,12 @@ const char plainFS[] = R"***(
     #version 330
 
     uniform sampler2D diffuseTex;
-    
+
     in vec2 texCoords;
     out vec4 fragCol;
 
     void main() {
         fragCol = texture( diffuseTex, texCoords );
-    }
-)***";
-
-/******************************************************************************
- * Shadow Shader
- ******************************************************************************/
-const char shadowFS[] = R"***(
-    #version 330
-
-    uniform sampler2D shadowMap;
-
-    in vec2 texCoords;
-    out vec4 fragCol;
-
-    void main() {
-        fragCol = texture( shadowMap, texCoords );
     }
 )***";
 

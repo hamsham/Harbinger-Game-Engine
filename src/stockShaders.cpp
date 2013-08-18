@@ -28,45 +28,32 @@ stockShader& stockShader::operator = ( stockShader&& s ) {
 /******************************************************************************
  * POINT LIGHT SHADER
  ******************************************************************************/
-plainShader::plainShader( plainShader&& p ) :
-    stockShader( std::move( p ) ),
-    textureId( p.textureId )
-{
-    p.textureId = 0;
-}
-
-plainShader& plainShader::operator = ( plainShader&& p ) {
-    stockShader::operator=( std::move( p ) );
-    textureId = p.textureId;
-    return *this;
-}
-
 bool plainShader::init() {
     // don't do anything if there already is a shader program in memory
     if ( program.getProgramId() )
         return true;
     
-    std::cout << "Loading a point light shader." << std::endl;
-    if (    !program.loadBuffer( pointVS, sizeof( plainVS ), GL_VERTEX_SHADER )
-    ||      !program.loadBuffer( pointFS, sizeof( plainVS ), GL_FRAGMENT_SHADER )
+    std::cout << "Loading a plain shader." << std::endl;
+    if (    !program.loadBuffer( plainVS, sizeof( plainVS ), GL_VERTEX_SHADER )
+    ||      !program.loadBuffer( plainFS, sizeof( plainFS ), GL_FRAGMENT_SHADER )
     ||      !program.compile()
     ) {
-        std::cerr << "Failed to load a point light shader." << std::endl;
+        std::cerr << "Failed to load a plain shader." << std::endl;
         return false;
     }
     
     std::cout
-        << "Setting up a point light shader.\n\tID: "
+        << "Setting up a plain shader.\n\tID: "
         << program.getProgramId()
         << std::endl;
     
     glUseProgram( program.getProgramId() );
     
-    textureId = program.getVariableId( "diffuseTex" );
+    GLint textureId = program.getVariableId( "diffuseTex" );
     printGlError("Plain shader setup error");
     
     if ( textureId == pipeline::HGE_ATTRIB_INVALID ) {
-        printGlError("Error accessing a pplain shader uniform variable");
+        printGlError("Error accessing a plain shader uniform variable");
         glUseProgram( 0 );
         return false;
     }
@@ -76,11 +63,6 @@ bool plainShader::init() {
     glUseProgram( 0 );
     
     return true;
-}
-
-void plainShader::terminate() {
-    program.unload();
-    textureId = 0;
 }
 
 /******************************************************************************
@@ -241,7 +223,7 @@ bool shadowShader::init() {
         return true;
     
     if (    !program.loadBuffer( plainVS, sizeof( plainVS ), GL_VERTEX_SHADER )
-    ||      !program.loadBuffer( shadowFS, sizeof( shadowFS ), GL_FRAGMENT_SHADER )
+    ||      !program.loadBuffer( plainFS, sizeof( plainFS ), GL_FRAGMENT_SHADER )
     ||      !program.compile()
     ) {
         return false;
@@ -252,7 +234,7 @@ bool shadowShader::init() {
         << std::endl;
     
     glUseProgram( program.getProgramId() );
-    GLint shadowMapId = program.getVariableId( "shadowMap" );
+    GLint shadowMapId = program.getVariableId( "diffuseTex" );
     
     printGlError("Shader setup error");
     

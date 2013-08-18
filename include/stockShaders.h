@@ -48,20 +48,17 @@ class HGE_API stockShader {
  * Basic Shader
 ******************************************************************************/
 class HGE_API plainShader final : public stockShader {
-    private:
-        GLint textureId = 0;
-        
     public:
         plainShader     () {}
         plainShader     ( const plainShader& ) = delete;
-        plainShader     ( plainShader&& );
+        plainShader     ( plainShader&& ) = default;
         ~plainShader    () { terminate(); }
         
         plainShader&    operator =  ( const plainShader& ) = delete;
-        plainShader&    operator =  ( plainShader&& );
+        plainShader&    operator =  ( plainShader&& ) = default;
         
         bool            init        ();
-        void            terminate   ();
+        void            terminate   () { program.unload(); }
 };
 
 /******************************************************************************

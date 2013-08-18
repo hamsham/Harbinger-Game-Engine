@@ -1,48 +1,85 @@
 
 #include "dsRenderer.h"
 
+/*
+ * Exceptions are used during construction in order to catch any loaded resources
+ * and remove them before they become memory leaks
+ */
+
 namespace hge {
 
 /******************************************************************************
  * Renderer Construction & Destruction
 ******************************************************************************/
 dsRenderer::dsRenderer( const vec2i& resolution ) {
-    HGE_ASSERT( pipeline::init() );
-    /*
-     * Deferred rendering
-     */
-    pGBuffer = new( std::nothrow ) gBuffer();
-    HL_ASSERT( pGBuffer != nullptr );
-    HL_ASSERT( pGBuffer->init( resolution ) );
+    try {
+        HGE_ASSERT( pipeline::init() );
+        /*
+         * Deferred rendering
+         */
+        pGBuffer = new( std::nothrow ) gBuffer();
+        HL_ASSERT( pGBuffer != nullptr );
+        HL_ASSERT( pGBuffer->init( resolution ) );
 
-    /*
-     * Shaders
-     */
-    pGeoShader = new( std::nothrow ) dsGeometryShader();
-    HL_ASSERT( pGeoShader != nullptr );
-    HL_ASSERT( pGeoShader->init() );
+        /*
+         * Shaders
+         */
+        pGeoShader = new( std::nothrow ) dsGeometryShader();
+        HL_ASSERT( pGeoShader != nullptr );
+        HL_ASSERT( pGeoShader->init() );
 
-    pDsLightShader = new( std::nothrow ) dsLightShader();
-    HL_ASSERT( pDsLightShader != nullptr );
-    HL_ASSERT( pDsLightShader->init( resolution ) );
+        pDsLightShader = new( std::nothrow ) dsLightShader();
+        HL_ASSERT( pDsLightShader != nullptr );
+        HL_ASSERT( pDsLightShader->init( resolution ) );
 
-    pNullShader = new( std::nothrow ) dsNullShader();
-    HL_ASSERT( pNullShader != nullptr );
-    HL_ASSERT( pNullShader->init() );
+        pNullShader = new( std::nothrow ) dsNullShader();
+        HL_ASSERT( pNullShader != nullptr );
+        HL_ASSERT( pNullShader->init() );
 
-    pSkyShader = new( std::nothrow ) skyShader;
-    HL_ASSERT( pSkyShader != nullptr );
-    HL_ASSERT( pSkyShader->init() );
+        pSkyShader = new( std::nothrow ) skyShader;
+        HL_ASSERT( pSkyShader != nullptr );
+        HL_ASSERT( pSkyShader->init() );
 
-    pFontShader = new( std::nothrow ) fontShader();
-    HL_ASSERT( pFontShader != nullptr );
-    HL_ASSERT( pFontShader->init() );
+        pFontShader = new( std::nothrow ) fontShader();
+        HL_ASSERT( pFontShader != nullptr );
+        HL_ASSERT( pFontShader->init() );
 
+        pBillboardShader = new( std::nothrow ) billboardShader();
+        HL_ASSERT( pBillboardShader != nullptr );
+        HL_ASSERT( pBillboardShader->init() );
+        
 #ifdef DEBUG
-    pEnbtShader = new( std::nothrow ) enbtShader();
-    HL_ASSERT( pEnbtShader != nullptr );
-    HL_ASSERT( pEnbtShader->init() );
+        pEnbtShader = new( std::nothrow ) enbtShader();
+        HL_ASSERT( pEnbtShader != nullptr );
+        HL_ASSERT( pEnbtShader->init() );
 #endif
+    }
+    catch( const hamLibs::utils::errorType e ) {
+        lightSphere.terminate();
+        dsPointLights.clear();
+
+        delete pGBuffer;
+        pGBuffer        = nullptr;
+        delete pGeoShader;
+        pGeoShader      = nullptr;
+        delete pDsLightShader;
+        pDsLightShader  = nullptr;
+        delete pNullShader;
+        pNullShader     = nullptr;
+        delete pSkyShader;
+        pSkyShader      = nullptr;
+        delete pFontShader;
+        pFontShader     = nullptr;
+        delete pBillboardShader;
+        pBillboardShader = nullptr;
+        
+#ifdef DEBUG
+        delete pEnbtShader;
+        pEnbtShader = nullptr;
+#endif
+        
+        throw hamLibs::utils::ERROR;
+    }
 }
 
 dsRenderer::~dsRenderer() {
@@ -61,6 +98,8 @@ dsRenderer::~dsRenderer() {
     pSkyShader      = nullptr;
     delete pFontShader;
     pFontShader     = nullptr;
+    delete pBillboardShader;
+    pBillboardShader = nullptr;
     
 #ifdef DEBUG
     delete pEnbtShader;
@@ -86,6 +125,7 @@ void dsRenderer::tick() {
 #ifdef DEBUG
     //doNbtPass();
 #endif
+    doBillboardPass();
     doSkyPass();
     doFontPass();
     

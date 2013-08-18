@@ -29,6 +29,7 @@ class HGE_API dsRenderer : public application, public pipeline {
         dsNullShader*  pNullShader     = nullptr; // stencil buffer shader
         skyShader*     pSkyShader      = nullptr; // sky box
         fontShader*    pFontShader     = nullptr; // fonts
+        billboardShader* pBillboardShader = nullptr;
         gBuffer*       pGBuffer        = nullptr;
         
     protected:
@@ -65,6 +66,9 @@ class HGE_API dsRenderer : public application, public pipeline {
         // font handling
         void                setFontColor        ( const vec4& );
         
+        // billboard handling
+        void                setBillboardTarget  ( const vec3& );
+        
     protected:
         virtual void        updateScene         ( float ) = 0;
         
@@ -73,6 +77,7 @@ class HGE_API dsRenderer : public application, public pipeline {
         virtual void        drawScene           () = 0;
         virtual void        drawSky             () = 0;
         virtual void        drawFonts           () = 0;
+        virtual void        drawBillboards      () = 0;
         
     private:
         void doGeometryPass (); // calls "drawScene()"
@@ -80,6 +85,7 @@ class HGE_API dsRenderer : public application, public pipeline {
         void doLightingPass (); // draws all visible point lights
         void doSkyPass      ();
         void doFontPass     ();
+        void doBillboardPass();
         
 #ifdef DEBUG
         enbtShader*    pEnbtShader = nullptr;
@@ -139,6 +145,18 @@ inline void dsRenderer::doSkyPass() {
 inline void dsRenderer::doFontPass() {
     applyStockShader( pFontShader->getProgramId() );
     drawFonts();
+}
+
+/******************************************************************************
+ * Billboards
+******************************************************************************/
+inline void dsRenderer::setBillboardTarget( const vec3& target ) {
+    pBillboardShader->setTargetPos( target );
+}
+
+inline void dsRenderer::doBillboardPass() {
+    applyStockShader( pBillboardShader->getProgramId() );
+    drawBillboards();
 }
 
 } // end hge namespace

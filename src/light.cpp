@@ -68,6 +68,8 @@ dsLightSphere::dsLightSphere( dsLightSphere&& ds ) :
 }
 
 dsLightSphere& dsLightSphere::operator = ( dsLightSphere&& ds ) {
+    terminate();
+    
     vao = ds.vao;
     ds.vao = 0;
     

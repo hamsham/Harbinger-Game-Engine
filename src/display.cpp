@@ -110,6 +110,8 @@ window::window( window&& w ) :
 }
 
 window& window::operator = ( window&& w ) {
+    glfwDestroyWindow( pContext );
+    
     displayFullscreen   = w.displayFullscreen;
     w.displayFullscreen = false;
     

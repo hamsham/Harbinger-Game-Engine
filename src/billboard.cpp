@@ -24,6 +24,8 @@ billboard::billboard( billboard&& b ) :
 }
 
 billboard& billboard::operator = ( billboard&& b ) {
+    clearImages();
+    
     drawable::operator = ( std::move( b ) );
     
     vbo = b.vbo;

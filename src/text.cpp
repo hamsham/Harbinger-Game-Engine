@@ -26,6 +26,8 @@ text::text( text&& s ) :
 {}
 
 text& text::operator = ( text&& s ) {
+    clearString();
+    
     drawable::operator = ( std::move( s ) );
     
     vbo = s.vbo;

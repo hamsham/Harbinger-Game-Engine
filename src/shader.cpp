@@ -62,6 +62,7 @@ shader::shader( shader&& s ) :
 }
 
 shader& shader::operator=( shader&& s ) {
+    unload();
     shaderIds = std::move( s.shaderIds );
     programId = s.programId;
     s.programId = 0;

@@ -35,6 +35,7 @@ font::font( font&& f ) :
 {}
 
 font& font::operator = ( font&& f ) {
+    unload();
     texture::operator = ( std::move( f ) );
     
     newLine = f.newLine;

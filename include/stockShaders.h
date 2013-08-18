@@ -14,6 +14,11 @@
 #include "shader.h"
 #include "camera.h"
 
+/*
+ * Stock shader move operators unload their program using the "program" variable
+ * to avoid redundant calculations through variables with static data.
+ */
+
 namespace hge {
 
 /******************************************************************************
@@ -37,6 +42,26 @@ class HGE_API stockShader {
         virtual void    terminate   () { program.unload(); }
         
         GLuint          getProgramId() const { return program.getProgramId(); }
+};
+
+/******************************************************************************
+ * Basic Shader
+******************************************************************************/
+class HGE_API plainShader final : public stockShader {
+    private:
+        GLint textureId = 0;
+        
+    public:
+        plainShader     () {}
+        plainShader     ( const plainShader& ) = delete;
+        plainShader     ( plainShader&& );
+        ~plainShader    () { terminate(); }
+        
+        plainShader&    operator =  ( const plainShader& ) = delete;
+        plainShader&    operator =  ( plainShader&& );
+        
+        bool            init        ();
+        void            terminate   ();
 };
 
 /******************************************************************************
@@ -146,7 +171,7 @@ class HGE_API billboardShader final : public stockShader {
         bool init                   ();
         void terminate              ();
         
-        void setCameraPos           ( const camera& c ) { glUniform3fv( camPosId, 1, c.getPos().v ); }
+        void setTargetPos           ( const vec3& target ) { glUniform3fv( camPosId, 1, target.v ); }
 };
 
 /******************************************************************************

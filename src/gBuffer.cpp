@@ -28,6 +28,7 @@ gBuffer::gBuffer( gBuffer&& gb ) :
 }
 
 gBuffer& gBuffer::operator =( gBuffer&& gb ) {
+    terminate();
     readBuffer = gb.readBuffer;
     gb.readBuffer = GB_RENDER_BUFFER;
     

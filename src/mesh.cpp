@@ -36,6 +36,7 @@ mesh::mesh( mesh&& m ) :
 }
 
 mesh& mesh::operator = ( mesh&& m ) {
+    unload();
     resource::operator =( std::move( m ) );
     drawable::operator =( std::move( m ) );
     

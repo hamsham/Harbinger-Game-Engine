@@ -23,6 +23,8 @@ primitive::primitive( primitive&& p ) :
 }
 
 primitive& primitive::operator = ( primitive&& p ) {
+    terminate();
+    
     drawable::operator=( std::move( p ) );
     vbo = p.vbo;
     p.vbo = 0;

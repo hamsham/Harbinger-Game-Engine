@@ -178,6 +178,8 @@ bitmap::bitmap( bitmap&& bmpCopy ) :
 }
 
 bitmap& bitmap::operator =( bitmap&& bmpCopy ) {
+    unload();
+    
     resource::operator=( std::move( bmpCopy ) );
     texture::operator=( std::move( bmpCopy ) );
 	textureUnit = bmpCopy.textureUnit;
@@ -244,6 +246,7 @@ cubemap::cubemap( cubemap&& bmpCopy ) :
 {}
 
 cubemap& cubemap::operator =( cubemap&& bmpCopy ) {
+    unload();
     resource::operator=( std::move( bmpCopy ) );
     texture::operator=( std::move( bmpCopy ) );
 	textureUnit = bmpCopy.textureUnit;

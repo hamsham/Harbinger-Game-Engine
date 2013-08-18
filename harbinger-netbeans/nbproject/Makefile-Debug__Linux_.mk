@@ -41,7 +41,6 @@ OBJECTFILES= \
 	${OBJECTDIR}/_ext/1360937237/camera.o \
 	${OBJECTDIR}/_ext/1360937237/display.o \
 	${OBJECTDIR}/_ext/1360937237/drawable.o \
-	${OBJECTDIR}/_ext/1360937237/dsRenderer.o \
 	${OBJECTDIR}/_ext/1360937237/font.o \
 	${OBJECTDIR}/_ext/1360937237/gBuffer.o \
 	${OBJECTDIR}/_ext/1360937237/geometry.o \
@@ -51,6 +50,7 @@ OBJECTFILES= \
 	${OBJECTDIR}/_ext/1360937237/mesh.o \
 	${OBJECTDIR}/_ext/1360937237/pipeline.o \
 	${OBJECTDIR}/_ext/1360937237/primitives.o \
+	${OBJECTDIR}/_ext/1360937237/renderer.o \
 	${OBJECTDIR}/_ext/1360937237/resource.o \
 	${OBJECTDIR}/_ext/1360937237/shader.o \
 	${OBJECTDIR}/_ext/1360937237/shadowMap.o \
@@ -116,11 +116,6 @@ ${OBJECTDIR}/_ext/1360937237/drawable.o: nbproject/Makefile-${CND_CONF}.mk ../sr
 	${RM} $@.d
 	$(COMPILE.cc) -w -DDEBUG -I../include -I../../hamlibs/include -I/usr/include/freetype2 -std=c++11 -Wall -Werror -Wextra -pedantic -mmmx -msse -msse2 -msse3 -mfpmath=sse -O2 -g -fPIC  -MMD -MP -MF $@.d -o ${OBJECTDIR}/_ext/1360937237/drawable.o ../src/drawable.cpp
 
-${OBJECTDIR}/_ext/1360937237/dsRenderer.o: nbproject/Makefile-${CND_CONF}.mk ../src/dsRenderer.cpp 
-	${MKDIR} -p ${OBJECTDIR}/_ext/1360937237
-	${RM} $@.d
-	$(COMPILE.cc) -w -DDEBUG -I../include -I../../hamlibs/include -I/usr/include/freetype2 -std=c++11 -Wall -Werror -Wextra -pedantic -mmmx -msse -msse2 -msse3 -mfpmath=sse -O2 -g -fPIC  -MMD -MP -MF $@.d -o ${OBJECTDIR}/_ext/1360937237/dsRenderer.o ../src/dsRenderer.cpp
-
 ${OBJECTDIR}/_ext/1360937237/font.o: nbproject/Makefile-${CND_CONF}.mk ../src/font.cpp 
 	${MKDIR} -p ${OBJECTDIR}/_ext/1360937237
 	${RM} $@.d
@@ -165,6 +160,11 @@ ${OBJECTDIR}/_ext/1360937237/primitives.o: nbproject/Makefile-${CND_CONF}.mk ../
 	${MKDIR} -p ${OBJECTDIR}/_ext/1360937237
 	${RM} $@.d
 	$(COMPILE.cc) -w -DDEBUG -I../include -I../../hamlibs/include -I/usr/include/freetype2 -std=c++11 -Wall -Werror -Wextra -pedantic -mmmx -msse -msse2 -msse3 -mfpmath=sse -O2 -g -fPIC  -MMD -MP -MF $@.d -o ${OBJECTDIR}/_ext/1360937237/primitives.o ../src/primitives.cpp
+
+${OBJECTDIR}/_ext/1360937237/renderer.o: nbproject/Makefile-${CND_CONF}.mk ../src/renderer.cpp 
+	${MKDIR} -p ${OBJECTDIR}/_ext/1360937237
+	${RM} $@.d
+	$(COMPILE.cc) -w -DDEBUG -I../include -I../../hamlibs/include -I/usr/include/freetype2 -std=c++11 -Wall -Werror -Wextra -pedantic -mmmx -msse -msse2 -msse3 -mfpmath=sse -O2 -g -fPIC  -MMD -MP -MF $@.d -o ${OBJECTDIR}/_ext/1360937237/renderer.o ../src/renderer.cpp
 
 ${OBJECTDIR}/_ext/1360937237/resource.o: nbproject/Makefile-${CND_CONF}.mk ../src/resource.cpp 
 	${MKDIR} -p ${OBJECTDIR}/_ext/1360937237

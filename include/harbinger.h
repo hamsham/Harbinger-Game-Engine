@@ -17,7 +17,7 @@
 #include "camera.h"
 #include "display.h"
 #include "drawable.h"
-#include "dsRenderer.h"
+#include "renderer.h"
 #include "font.h"
 #include "gBuffer.h"
 #include "geometry.h"

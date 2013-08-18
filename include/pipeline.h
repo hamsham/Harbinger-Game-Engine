@@ -10,6 +10,7 @@
 
 #include <GL/glew.h>
 #include "types.h"
+#include "application.h"
 
 #ifndef HGE_PIPELINE_MATRIX_BINDING
     #define HGE_PIPELINE_MATRIX_BINDING 1
@@ -20,7 +21,7 @@ namespace hge {
 /******************************************************************************
  * OpenGL graphics pipeline functions
 ******************************************************************************/
-class HGE_API pipeline {
+class HGE_API pipeline : public application {
     public:
         enum matrixType : int {
             HGE_MODEL_MAT   = 0,
@@ -102,37 +103,67 @@ class HGE_API pipeline {
         void updateMatricesImpl();
         
     public:
-        pipeline() {}
+        pipeline        () {}
+        pipeline        ( const pipeline& ) = delete;
+        pipeline        ( pipeline&& )      = delete;
         
-        pipeline( const pipeline& ) = delete;
-        pipeline( pipeline&& ) = delete;
+        virtual         ~pipeline           () { this->terminate(); }
         
-        virtual ~pipeline() { terminate(); }
+        pipeline&       operator =          ( const pipeline& ) = delete;
+        pipeline&       operator =          ( pipeline&& ) = delete;
         
-        pipeline& operator = ( const pipeline& ) = delete;
-        pipeline& operator = ( pipeline&& ) = delete;
+        // these are called by harbinger's built-in renderers
+        virtual bool    init                ();
+        virtual void    terminate           ();
         
-        bool init();
-        void terminate();
-        
-        void applyStockShader( GLint shaderId );
+        void            applyStockShader    ( GLint shaderId );
         
         /******************************************************************************
          * Matrix UBO Modification
         ******************************************************************************/
         // The matrix stack will only hold (at most) a single user-applied matrix of
         // each type (model, view, and projection).
-        void    applyMatrix         ( matrixType s, const mat4& m );
-        void    applyMatrix         ( const drawTransform&, const camera& );
-        void    removeMatrix        ( matrixType s );
+        void            applyMatrix         ( matrixType s, const mat4& m );
+        void            applyMatrix         ( const drawTransform&, const camera& );
+        void            removeMatrix        ( matrixType s );
 
+        /******************************************************************************
+         * Renderer-implemented functions
+        ******************************************************************************/
+        virtual void    tick                () = 0;
+        // font handling
+        virtual void    setFontColor        ( const vec4& ) = 0;
+        // billboard handling
+        virtual void    setBillboardTarget  ( const vec3& ) = 0;
+        // resolution handling
+        virtual void    setResolution       ( const vec2i& ) = 0;
+        
+    protected:
+        virtual void    doGeometryPass      () = 0; // calls "drawSceneUnlit()"
+        virtual void    doLightingPass      () = 0; // calls "drawSceneLit();
+        virtual void    doSkyPass           () = 0;
+        virtual void    doFontPass          () = 0;
+        virtual void    doBillboardPass     () = 0;
+
+        /******************************************************************************
+         * User-implemented functions
+        ******************************************************************************/
+        virtual void    updateScene         ( float ) = 0;
+        virtual void    changeResolution    ( const vec2i& res ) = 0;
+        virtual void    drawSceneLit        () = 0;
+        virtual void    drawSceneUnlit      () = 0;
+        virtual void    drawSky             () = 0;
+        virtual void    drawFonts           () = 0;
+        virtual void    drawBillboards      () = 0;
+        
         /******************************************************************************
          * OpenGL Display Pipeline Functions
         ******************************************************************************/
-        static      void enablePlainVertexAttribs();
-        static      void enableBumpVertexAttribs();
+    public:
+        static void enablePlainVertexAttribs();
+        static void enableBumpVertexAttribs();
 
-        static      void printErrorMsg( const char* msg, unsigned lineNum, const char* sourceFile );
+        static void printErrorMsg( const char* msg, unsigned lineNum, const char* sourceFile );
 
         static constexpr vec3 getWorldAxisX() { return vec3( 1.f, 0.f, 0.f ); }
         static constexpr vec3 getWorldAxisY() { return vec3( 0.f, 1.f, 0.f ); }

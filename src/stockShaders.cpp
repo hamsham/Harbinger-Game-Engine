@@ -8,9 +8,7 @@
 #include <iostream>
 #include <utility>
 
-#include "light.h"
 #include "pipeline.h"
-#include "shader.h"
 #include "stockShaders.h"
 #include "stockShaders_glsl.h"
 

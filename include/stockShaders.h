@@ -8,9 +8,8 @@
 #ifndef __HGE_STOCK_SHADERS_H__
 #define	__HGE_STOCK_SHADERS_H__
 
-#include <string>
+#include "light.h"
 #include "types.h"
-#include "pipeline.h"
 #include "shader.h"
 #include "camera.h"
 

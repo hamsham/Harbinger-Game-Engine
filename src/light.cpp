@@ -87,7 +87,10 @@ dsLightSphere& dsLightSphere::operator = ( dsLightSphere&& ds ) {
 
 bool dsLightSphere::init() {
     
-    terminate();
+    if ( vao ) {
+        setLightBuffer( nullptr, 0 );
+        return true;
+    }
     
     const int rings = DEFAULT_NUM_RINGS;
     const int sectors = DEFAULT_NUM_SECTORS;

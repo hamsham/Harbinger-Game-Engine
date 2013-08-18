@@ -19,16 +19,17 @@ using namespace hamLibs::math;
  * Forward Declarations
  */
 // RAII Resources
-class   window;
+class   application;
 class   inputSystem;
+class   window;
 
-// Game Engine Classes
-class application; // base class
-class dsRenderer;
-
-// Graphics pipelines used by the stock shaders
+// Graphics routines used by the renderers
 class pipeline;
 class gBuffer;
+
+// Rendering Engine Classes
+class fwdRenderer;
+class dsRenderer;
 
 // Stock Shaders
 class billboardShader;

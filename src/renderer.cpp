@@ -1,5 +1,5 @@
 
-#include "dsRenderer.h"
+#include "renderer.h"
 
 /*
  * Exceptions are used during construction in order to catch any loaded resources
@@ -9,11 +9,14 @@
 namespace hge {
 
 /******************************************************************************
- * Renderer Construction & Destruction
+ * Deferred Renderer
 ******************************************************************************/
-dsRenderer::dsRenderer( const vec2i& resolution ) {
+/*
+ * Initialization and Termination
+ */
+bool dsRenderer::init( const vec2i& resolution ) {
     try {
-        HGE_ASSERT( pipeline::init() );
+        HL_ASSERT( pipeline::init() );
         /*
          * Deferred rendering
          */
@@ -24,9 +27,9 @@ dsRenderer::dsRenderer( const vec2i& resolution ) {
         /*
          * Shaders
          */
-        pGeoShader = new( std::nothrow ) dsGeometryShader();
-        HL_ASSERT( pGeoShader != nullptr );
-        HL_ASSERT( pGeoShader->init() );
+        pGeomShader = new( std::nothrow ) dsGeometryShader();
+        HL_ASSERT( pGeomShader != nullptr );
+        HL_ASSERT( pGeomShader->init() );
 
         pDsLightShader = new( std::nothrow ) dsLightShader();
         HL_ASSERT( pDsLightShader != nullptr );
@@ -53,43 +56,23 @@ dsRenderer::dsRenderer( const vec2i& resolution ) {
         HL_ASSERT( pEnbtShader != nullptr );
         HL_ASSERT( pEnbtShader->init() );
 #endif
+        HL_ASSERT( lightSphere.init() );
     }
     catch( const hamLibs::utils::errorType e ) {
-        lightSphere.terminate();
-        dsPointLights.clear();
-
-        delete pGBuffer;
-        pGBuffer        = nullptr;
-        delete pGeoShader;
-        pGeoShader      = nullptr;
-        delete pDsLightShader;
-        pDsLightShader  = nullptr;
-        delete pNullShader;
-        pNullShader     = nullptr;
-        delete pSkyShader;
-        pSkyShader      = nullptr;
-        delete pFontShader;
-        pFontShader     = nullptr;
-        delete pBillboardShader;
-        pBillboardShader = nullptr;
-        
-#ifdef DEBUG
-        delete pEnbtShader;
-        pEnbtShader = nullptr;
-#endif
-        
-        throw hamLibs::utils::ERROR;
+        terminate();
+        return false;
     }
+    return true;
 }
 
-dsRenderer::~dsRenderer() {
+void dsRenderer::terminate() {
     lightSphere.terminate();
     dsPointLights.clear();
     
     delete pGBuffer;
     pGBuffer        = nullptr;
-    delete pGeoShader;
-    pGeoShader      = nullptr;
+    delete pGeomShader;
+    pGeomShader      = nullptr;
     delete pDsLightShader;
     pDsLightShader  = nullptr;
     delete pNullShader;
@@ -105,11 +88,13 @@ dsRenderer::~dsRenderer() {
     delete pEnbtShader;
     pEnbtShader = nullptr;
 #endif
+    
+    pipeline::terminate();
 }
 
-/******************************************************************************
+/*
  * Renderer Main Operation
-******************************************************************************/
+ */
 void dsRenderer::tick() {
     appTimer.update();
     
@@ -121,7 +106,7 @@ void dsRenderer::tick() {
     doStencilPass();
     doLightingPass();
     glDisable( GL_STENCIL_TEST );
-    
+    drawSceneUnlit();
 #ifdef DEBUG
     //doNbtPass();
 #endif
@@ -133,24 +118,24 @@ void dsRenderer::tick() {
     pGBuffer->drawBuffer();
 }
 
-/******************************************************************************
+/*
  * GEOMETRY PASS
-******************************************************************************/
+ */
 void dsRenderer::doGeometryPass() {
     // Tell the GBuffer to prepare the next frame
-    applyStockShader( pGeoShader->getProgramId() );
+    applyStockShader( pGeomShader->getProgramId() );
     pGBuffer->bindForWriting();
     
     glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT );
     
     pGBuffer->bindForGeometryPass();
     
-    drawScene();
+    drawSceneLit();
 }
 
-/******************************************************************************
+/*
  * STENCIL BUFFER PASS
-******************************************************************************/
+ */
 void dsRenderer::doStencilPass() {
     // Disable color and depth writes to the stencil buffer
     applyStockShader( pNullShader->getProgramId() );
@@ -171,9 +156,9 @@ void dsRenderer::doStencilPass() {
     glDepthMask( GL_TRUE );
 }
 
-/******************************************************************************
+/*
  * LIGHTING PASS
-******************************************************************************/
+ */
 void dsRenderer::doLightingPass() {
     applyStockShader( pDsLightShader->getProgramId() );
     pGBuffer->bindForLightPass();
@@ -197,9 +182,9 @@ void dsRenderer::doLightingPass() {
     glEnable( GL_DEPTH_TEST );
 }
 
-/******************************************************************************
+/*
  * RESOLUTION HANDLING
-******************************************************************************/
+ */
 void dsRenderer::setResolution( const vec2i& res ) {
     pGBuffer->setBufferResolution( res );
     
@@ -209,20 +194,145 @@ void dsRenderer::setResolution( const vec2i& res ) {
     changeResolution( res );
 }
 
-/******************************************************************************
+/*
  * LIGHTING LAUNCHING
-******************************************************************************/
+ */
 void dsRenderer::launchPointLight( const dsPointLight& l ) {
     dsPointLights.push_back         ( l );
     lightSphere.setLightBuffer    ( dsPointLights.data(), dsPointLights.size() );
 }
 
-/******************************************************************************
+/*
  * FONT HANDLING
-******************************************************************************/
+ */
 void dsRenderer::setFontColor( const vec4& c ) {
     applyStockShader ( pFontShader->getProgramId() );
     pFontShader->setFontColor   ( c );
+}
+
+/******************************************************************************
+ * Forward Renderer
+******************************************************************************/
+/*
+ * Initialization & termination
+ */
+bool fwdRenderer::init() {
+    try {
+        HL_ASSERT( pipeline::init() );
+        /*
+         * Shaders
+         */
+        pPlainShader = new( std::nothrow ) plainShader();
+        HL_ASSERT( pPlainShader != nullptr );
+        HL_ASSERT( pPlainShader->init() );
+
+        pPointLightShader = new( std::nothrow ) pointLightShader();
+        HL_ASSERT( pPointLightShader != nullptr );
+        HL_ASSERT( pPointLightShader->init() );
+
+        pSkyShader = new( std::nothrow ) skyShader;
+        HL_ASSERT( pSkyShader != nullptr );
+        HL_ASSERT( pSkyShader->init() );
+
+        pFontShader = new( std::nothrow ) fontShader();
+        HL_ASSERT( pFontShader != nullptr );
+        HL_ASSERT( pFontShader->init() );
+
+        pBillboardShader = new( std::nothrow ) billboardShader();
+        HL_ASSERT( pBillboardShader != nullptr );
+        HL_ASSERT( pBillboardShader->init() );
+
+#ifdef DEBUG
+        pEnbtShader = new( std::nothrow ) enbtShader();
+        HL_ASSERT( pEnbtShader != nullptr );
+        HL_ASSERT( pEnbtShader->init() );
+        pEnbtShader->showEdges( false );
+        pEnbtShader->showNormals( false );
+        pEnbtShader->showTangents( false );
+        pEnbtShader->showBitangents( false );
+#endif
+    }
+    catch( const hamLibs::utils::errorType& e ) {
+        terminate();
+        return false;
+    }
+    return true;
+}
+
+void fwdRenderer::terminate() {
+    pointLights.clear();
+    
+    delete pPlainShader;
+    pPlainShader = nullptr;
+    delete pPointLightShader;
+    pPointLightShader = nullptr;
+    delete pSkyShader;
+    pSkyShader = nullptr;
+    delete pFontShader;
+    pFontShader = nullptr;
+    delete pBillboardShader;
+    pBillboardShader = nullptr;
+    
+#ifdef DEBUG
+    delete pEnbtShader;
+    pEnbtShader = nullptr;
+#endif
+    
+    pipeline::terminate();
+}
+
+/*
+ * Renderer Main Operation
+ */
+void fwdRenderer::tick() {
+    appTimer.update();
+    
+    updateScene( appTimer.getTickDuration() );
+    
+    glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
+    
+    doGeometryPass();
+    doLightingPass();
+    doBillboardPass();
+#ifdef DEBUG
+    //doNbtPass();
+#endif
+    doSkyPass();
+    doFontPass();
+}
+
+/*
+ * LIGHTING PASS
+ */
+void fwdRenderer::doLightingPass() {
+    if ( pointLights.size() ) {
+        applyStockShader( pPointLightShader->getProgramId() );
+        
+        for ( const pointLight& pl : pointLights ) {
+            pPointLightShader->setPointLight( pl );
+            drawSceneLit();
+        }
+    }
+    else {
+        drawSceneLit();
+    }
+}
+
+/*
+ * LIGHT HANDLING
+ */
+void fwdRenderer::clearPointLights() {
+    pointLights.clear();
+    
+    pointLight pl;
+    pl.color        = vec4( 0.f, 0.f, 0.f, 1.f );
+    pl.intensity    = 0.f;
+    pl.constant     = 0.0f;
+    pl.exponential  = 0.0f;
+    pl.linear       = 0.0f;
+    pl.pos          = vec3( 0.f );
+    
+    pPointLightShader->setPointLight( pl );
 }
 
 } // end hge namespace

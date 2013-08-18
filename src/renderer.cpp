@@ -27,6 +27,10 @@ bool dsRenderer::init( const vec2i& resolution ) {
         /*
          * Shaders
          */
+        pPlainShader = new( std::nothrow ) plainShader();
+        HL_ASSERT( pPlainShader != nullptr );
+        HL_ASSERT( pPlainShader->init() );
+
         pGeomShader = new( std::nothrow ) dsGeometryShader();
         HL_ASSERT( pGeomShader != nullptr );
         HL_ASSERT( pGeomShader->init() );
@@ -71,6 +75,8 @@ void dsRenderer::terminate() {
     
     delete pGBuffer;
     pGBuffer        = nullptr;
+    delete pPlainShader;
+    pPlainShader     = nullptr;
     delete pGeomShader;
     pGeomShader      = nullptr;
     delete pDsLightShader;
@@ -106,6 +112,7 @@ void dsRenderer::tick() {
     doStencilPass();
     doLightingPass();
     glDisable( GL_STENCIL_TEST );
+    applyStockShader( pPlainShader->getProgramId() );
     drawSceneUnlit();
 #ifdef DEBUG
     //doNbtPass();

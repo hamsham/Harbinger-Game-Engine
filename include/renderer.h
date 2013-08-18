@@ -30,6 +30,7 @@ class HGE_API dsRenderer : public pipeline {
     
     private:
         gBuffer*            pGBuffer        = nullptr;
+        plainShader*        pPlainShader    = nullptr;
         dsGeometryShader*   pGeomShader     = nullptr; // Shader to draw geometry
         dsLightShader*      pDsLightShader  = nullptr; // point light shader
         dsNullShader*       pNullShader     = nullptr; // stencil buffer shader

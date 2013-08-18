@@ -452,7 +452,7 @@ bool enbtShader::init() {
     }
     
     std::cout
-        << "Setting up the Normal/Tangent/Billboard visualization shader.\n\tID: "
+        << "Setting up the Normal/Tangent/Bitangent visualization shader.\n\tID: "
         << program.getProgramId()
         << std::endl;
     

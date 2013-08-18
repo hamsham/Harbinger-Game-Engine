@@ -219,6 +219,9 @@ const char fontFS[] = R"***(
     void main() {
         vec4 fontTexture = vec4( texture2D( texSampler, texCoords ).r );
         fragCol = fontTexture * color;
+
+        if ( fragCol.r == 0 && fragCol.g == 0 && fragCol.b == 0 )
+            discard;
     }
 )***";
 

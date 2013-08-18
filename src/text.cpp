@@ -222,7 +222,6 @@ void text::draw() const {
     
     // Additive Blending
     glBlendFunc( GL_ONE, GL_ONE );
-    glDepthMask( GL_FALSE );
     glBindVertexArray( vao );
 
     glMultiDrawArrays(
@@ -233,7 +232,6 @@ void text::draw() const {
     );
 
     glBindVertexArray( 0 );
-    glDepthMask( GL_TRUE );
     glDisable( GL_BLEND );
 }
 

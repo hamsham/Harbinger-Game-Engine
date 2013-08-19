@@ -160,7 +160,7 @@ bool dsLightSphere::init() {
      * Begin Setting instanced attributes
      */
 	glBindBuffer( GL_ARRAY_BUFFER, vbo[2] );
-    glBufferData( GL_ARRAY_BUFFER, sizeof( dsPointLight ), nullptr, GL_STREAM_DRAW );
+    glBufferData( GL_ARRAY_BUFFER, sizeof( dsPointLight ), nullptr, GL_DYNAMIC_DRAW );
     
     /* Set the scaling data location */
     glEnableVertexAttribArray( SCALE_ATTRIB );

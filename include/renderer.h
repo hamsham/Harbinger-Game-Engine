@@ -61,7 +61,7 @@ class HGE_API dsRenderer : public pipeline {
         void                setResolution       ( const vec2i& ) final;
         
         // Light handling
-        void                launchPointLight    ( const dsPointLight& );
+        void                addPointLight       ( const dsPointLight& );
         void                removePointLight    ( unsigned i );
         unsigned            getNumPointLights   () const;
         void                clearPointLights    ();
@@ -102,7 +102,16 @@ class HGE_API dsRenderer : public pipeline {
 #endif
 };
 
+/*
+ * LIGHTING LAUNCHING
+ */
+inline void dsRenderer::addPointLight( const dsPointLight& l ) {
+    dsPointLights.push_back( l );
+    lightSphere.setLightBuffer( dsPointLights.data(), dsPointLights.size() );
+}
+
 inline void dsRenderer::removePointLight( unsigned i ) {
+    HL_ASSERT( i < dsPointLights.size() );
     dsPointLights.erase( dsPointLights.begin() + i );
 }
 
@@ -116,11 +125,14 @@ inline void dsRenderer::clearPointLights() {
 }
 
 inline const dsPointLight& dsRenderer::getPointLight( unsigned i ) const {
+    HL_ASSERT( i < dsPointLights.size() );
     return dsPointLights[ i ];
 }
 
 inline void dsRenderer::setPointLight( unsigned i, const dsPointLight& l ) {
+    HL_ASSERT( i < dsPointLights.size() );
     dsPointLights[ i ] = l;
+    lightSphere.setLight( i, l );
 }
 
 /*

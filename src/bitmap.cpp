@@ -83,11 +83,14 @@ GLint loadImageFile( const char* filename, FIBITMAP** img, int* w, int* h ) {
     else if ( colorType == FIC_RGB ) {
         return GL_RGB;
     }
+    else if ( colorType == FIC_MINISBLACK || colorType == FIC_MINISWHITE ) {
+        return GL_DEPTH_COMPONENT; // monochrome
+    }
     
     std::cerr
         << "ERROR: The file "
         << filename
-        << " uses an unsupported file format."
+        << " uses an unsupported file format " << (int)colorType
         << std::endl;
     
     return false;;
@@ -126,11 +129,18 @@ void send2DToOpenGL( const void* buffer, int w, int h, GLint format ) {
     		GL_TEXTURE_2D, 0, GL_RGBA, w, h, 0, GL_BGRA, GL_UNSIGNED_BYTE, buffer
     	);
     }
-    else {
+    else if ( format == GL_RGB ) {
         glTexImage2D(
     		GL_TEXTURE_2D, 0, GL_RGB, w, h, 0, GL_BGR, GL_UNSIGNED_BYTE, buffer
     	);
     }
+    else {
+        glTexImage2D(
+            GL_TEXTURE_2D, 0, GL_DEPTH_COMPONENT, w, h,
+            0, GL_DEPTH_COMPONENT, GL_UNSIGNED_BYTE, buffer
+        );
+    }
+    
 	
 	//clamp each texture to the borders of whatever geometry holds it
 	glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE );
@@ -156,10 +166,16 @@ void send3DToOpenGL( unsigned index, const void* buffer, int w, int h, GLint for
             0, GL_RGBA, w, h, 0, GL_BGRA, GL_UNSIGNED_BYTE, buffer
         );
     }
-    else {
+    else if ( format == GL_RGB ) {
         glTexImage2D(
             GL_TEXTURE_CUBE_MAP_POSITIVE_X + index,
             0, GL_RGB, w, h, 0, GL_BGR, GL_UNSIGNED_BYTE, buffer
+        );
+    }
+    else {
+        glTexImage2D(
+            GL_TEXTURE_CUBE_MAP_POSITIVE_X + index, 0, GL_DEPTH_COMPONENT,
+            w, h, 0, GL_DEPTH_COMPONENT, GL_UNSIGNED_BYTE, buffer
         );
     }
 	

@@ -118,7 +118,12 @@ void text::setString( const font& f, const char* str ) {
     
     createVertexBuffer( str );
     
-    tempQuad = (plainVertex*)glMapBuffer( GL_ARRAY_BUFFER, GL_WRITE_ONLY );
+//    tempQuad = (plainVertex*)glMapBuffer( GL_ARRAY_BUFFER, GL_WRITE_ONLY );
+    // Harbinger is not currently multi-threaded. This operation will perform much quicker.
+    tempQuad = (plainVertex*)glMapBufferRange(
+        GL_ARRAY_BUFFER, 0, sizeof( plainVertex ) * 4 * numChars,
+        GL_MAP_WRITE_BIT | GL_MAP_UNSYNCHRONIZED_BIT
+    );
     
     if ( !tempQuad ) {
         glBindVertexArray( 0 );

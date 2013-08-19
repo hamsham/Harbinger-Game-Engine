@@ -499,6 +499,11 @@ bool dsGeometryShader::init() {
         return false;
     }
     
+    std::cout
+        << "Setting up the Geometry Buffer shader.\n\tID: "
+        << program.getProgramId()
+        << std::endl;
+    
     glUseProgram( program.getProgramId() );
     
     GLint diffuseMap = glGetUniformLocation( program.getProgramId(), "diffuseMap" );
@@ -541,6 +546,11 @@ bool dsLightShader::init( const vec2i& gBufResolution ) {
         program.unload();
         return false;
     }
+    
+    std::cout
+        << "Setting up the Deferred Lighting shader.\n\tID: "
+        << program.getProgramId()
+        << std::endl;
     
     GLuint progId = program.getProgramId();
     glBindAttribLocation( progId, 1, "inLightScale" );
@@ -609,6 +619,11 @@ bool dsNullShader::init() {
         program.unload();
         return false;
     }
+    
+    std::cout
+        << "Setting up the NULL shader.\n\tID: "
+        << program.getProgramId()
+        << std::endl;
     
     glUseProgram( 0 );
     

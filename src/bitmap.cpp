@@ -76,10 +76,21 @@ GLint loadImageFile( const char* filename, FIBITMAP** img, int* w, int* h ) {
     *img    = image;
 	
 	// Convert the image to RGBA. Unload if it cannot be converted
-	if ( FreeImage_GetColorType( image ) == FIC_RGBALPHA )
+    FREE_IMAGE_COLOR_TYPE colorType = FreeImage_GetColorType( image );
+	if ( colorType == FIC_RGBALPHA ) {
         return GL_RGBA;
+    }
+    else if ( colorType == FIC_RGB ) {
+        return GL_RGB;
+    }
     
-    return GL_RGB;
+    std::cerr
+        << "ERROR: The file "
+        << filename
+        << " uses an unsupported file format."
+        << std::endl;
+    
+    return false;;
 }
 
 //-----------------------------------------------------------------------------
@@ -212,8 +223,10 @@ bool bitmap::load( const char* fileName, int ) {
     
     GLint imgFormat = loadImageFile( fileName, &image, &bmpWidth, &bmpHeight );
     
-    if ( !imgFormat )
+    if ( !imgFormat ) {
+        FreeImage_Unload( image );
         return false;
+    }
     
 	glGenTextures( 1, &textureId );
     
@@ -276,8 +289,10 @@ bool cubemap::load( const char* fileName, int cubeIndex ) {
     
     GLint imgFormat = loadImageFile( fileName, &image, &texWidth, &texHeight );
     
-    if ( !imgFormat )
+    if ( !imgFormat ) {
+        FreeImage_Unload( image );
         return false;
+    }
     
     if ( !textureId ) {
         glGenTextures( 1, &textureId );

@@ -202,14 +202,6 @@ void dsRenderer::setResolution( const vec2i& res ) {
 }
 
 /*
- * LIGHTING LAUNCHING
- */
-void dsRenderer::launchPointLight( const dsPointLight& l ) {
-    dsPointLights.push_back         ( l );
-    lightSphere.setLightBuffer    ( dsPointLights.data(), dsPointLights.size() );
-}
-
-/*
  * FONT HANDLING
  */
 void dsRenderer::setFontColor( const vec4& c ) {

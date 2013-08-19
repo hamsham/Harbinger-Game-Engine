@@ -16,7 +16,7 @@
 //-----------------------------------------------------------------------------
 void printImageLoadError( FREE_IMAGE_FORMAT fif, const char* msg );
 
-bool loadImageFile( const char*, FIBITMAP**, int* w, int* h );
+GLint loadImageFile( const char*, FIBITMAP**, int* w, int* h );
 
 FREE_IMAGE_FORMAT deduceImageFormat( const char* inFile );
 
@@ -40,7 +40,7 @@ void printImageLoadError( FREE_IMAGE_FORMAT fif, const char* msg ) {
 //-----------------------------------------------------------------------------
 //	Generic image loading function
 //-----------------------------------------------------------------------------
-bool loadImageFile( const char* filename, FIBITMAP** img, int* w, int* h ) {
+GLint loadImageFile( const char* filename, FIBITMAP** img, int* w, int* h ) {
     
 	FREE_IMAGE_FORMAT imageFormat( FIF_UNKNOWN );
     
@@ -70,26 +70,16 @@ bool loadImageFile( const char* filename, FIBITMAP** img, int* w, int* h ) {
 		return false;
 	}
 	
-	// Convert the image to RGBA. Unload if it cannot be converted
-	if ( FreeImage_GetColorType( image ) != FIC_RGBALPHA ) {
-		FIBITMAP* temp = image;
-		image = FreeImage_ConvertTo32Bits( temp );
-		FreeImage_Unload( temp );
-		if ( !image ) {
-            std::cerr
-                << "ERROR: Could not convert " << filename
-                << " to RGBA format" << std::endl;
-            *w = *h = 0;
-			return false;
-		}
-	}
-	
 	// All checks gave finished properly. Load the rest of the image
 	*w      = FreeImage_GetWidth( image );
 	*h      = FreeImage_GetHeight( image );
     *img    = image;
+	
+	// Convert the image to RGBA. Unload if it cannot be converted
+	if ( FreeImage_GetColorType( image ) == FIC_RGBALPHA )
+        return GL_RGBA;
     
-    return true;
+    return GL_RGB;
 }
 
 //-----------------------------------------------------------------------------
@@ -117,12 +107,19 @@ int setBitmapFlags( FREE_IMAGE_FORMAT inFormat ) {
 //-----------------------------------------------------------------------------
 //	Sending 2D Image Data to OpenGL
 //-----------------------------------------------------------------------------
-void send2DToOpenGL( const void* buffer, int w, int h ) {
+void send2DToOpenGL( const void* buffer, int w, int h, GLint format ) {
 	
 	//Transfer the image data
-	glTexImage2D(
-		GL_TEXTURE_2D, 0, GL_RGBA, w, h, 0, GL_BGRA, GL_UNSIGNED_BYTE, buffer
-	);
+    if ( format == GL_RGBA ) {
+        glTexImage2D(
+    		GL_TEXTURE_2D, 0, GL_RGBA, w, h, 0, GL_BGRA, GL_UNSIGNED_BYTE, buffer
+    	);
+    }
+    else {
+        glTexImage2D(
+    		GL_TEXTURE_2D, 0, GL_RGB, w, h, 0, GL_BGR, GL_UNSIGNED_BYTE, buffer
+    	);
+    }
 	
 	//clamp each texture to the borders of whatever geometry holds it
 	glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE );
@@ -139,13 +136,21 @@ void send2DToOpenGL( const void* buffer, int w, int h ) {
 //-----------------------------------------------------------------------------
 //	Sending 3D Image Data to OpenGL
 //-----------------------------------------------------------------------------
-void send3DToOpenGL( unsigned index, const void* buffer, int w, int h ) {
+void send3DToOpenGL( unsigned index, const void* buffer, int w, int h, GLint format ) {
 	
 	//Transfer the image data
-	glTexImage2D(
-		GL_TEXTURE_CUBE_MAP_POSITIVE_X + index,
-        0, GL_RGBA, w, h, 0, GL_BGRA, GL_UNSIGNED_BYTE, buffer
-	);
+    if ( format == GL_RGBA ) {
+        glTexImage2D(
+            GL_TEXTURE_CUBE_MAP_POSITIVE_X + index,
+            0, GL_RGBA, w, h, 0, GL_BGRA, GL_UNSIGNED_BYTE, buffer
+        );
+    }
+    else {
+        glTexImage2D(
+            GL_TEXTURE_CUBE_MAP_POSITIVE_X + index,
+            0, GL_RGB, w, h, 0, GL_BGR, GL_UNSIGNED_BYTE, buffer
+        );
+    }
 	
 	//clamp each texture to the borders of whatever geometry holds it
 	glTexParameteri( GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE );
@@ -205,7 +210,9 @@ bool bitmap::load( const char* fileName, int ) {
     
 	FIBITMAP* image = nullptr;
     
-    if ( !loadImageFile( fileName, &image, &bmpWidth, &bmpHeight ) )
+    GLint imgFormat = loadImageFile( fileName, &image, &bmpWidth, &bmpHeight );
+    
+    if ( !imgFormat )
         return false;
     
 	glGenTextures( 1, &textureId );
@@ -218,7 +225,7 @@ bool bitmap::load( const char* fileName, int ) {
     }
     
 	glBindTexture( GL_TEXTURE_2D, textureId );
-    send2DToOpenGL( FreeImage_GetBits( image ), bmpWidth, bmpHeight );
+    send2DToOpenGL( FreeImage_GetBits( image ), bmpWidth, bmpHeight, imgFormat );
 	glBindTexture( GL_TEXTURE_2D, 0 );
     
 	FreeImage_Unload( image );
@@ -267,7 +274,9 @@ bool cubemap::load( const char* fileName, int cubeIndex ) {
     int texHeight = 0;
 	FIBITMAP* image = nullptr;
     
-    if ( !loadImageFile( fileName, &image, &texWidth, &texHeight ) )
+    GLint imgFormat = loadImageFile( fileName, &image, &texWidth, &texHeight );
+    
+    if ( !imgFormat )
         return false;
     
     if ( !textureId ) {
@@ -285,7 +294,7 @@ bool cubemap::load( const char* fileName, int cubeIndex ) {
     
     // All checks gave finished properly. Load the rest of the image
     glBindTexture( GL_TEXTURE_CUBE_MAP, textureId );
-    send3DToOpenGL( cubeIndex, FreeImage_GetBits( image ), texWidth, texHeight );
+    send3DToOpenGL( cubeIndex, FreeImage_GetBits( image ), texWidth, texHeight, imgFormat );
     glBindTexture( GL_TEXTURE_CUBE_MAP, 0 );
 
     FreeImage_Unload( image );

@@ -18,7 +18,7 @@ namespace hge {
  * These functions have a 1:1 correlation to GLFW.
 /*/
     
-class HGE_API inputSystem {
+class HGE_API input {
     public:
         enum action_t   : int;
         enum key_t      : int;
@@ -41,27 +41,27 @@ class HGE_API inputSystem {
         mouseWheelCallback_t    pMouseWheelCB   = nullptr;
 
     public:
-        inputSystem    ( window& );
-        inputSystem    () = delete;
-        inputSystem    ( inputSystem&& );
-        inputSystem    ( const inputSystem& ) = delete;
+        input       ( window& );
+        input       () = delete;
+        input       ( input&& );
+        input       ( const input& ) = delete;
 
-        virtual ~inputSystem();
+        virtual     ~input              ();
 
-        inputSystem& operator =        ( inputSystem&& );
-        inputSystem& operator =        ( const inputSystem& ) = delete;
+        input&      operator =          ( input&& );
+        input&      operator =          ( const input& ) = delete;
 
         // Button Callbacks
-        void        setKeyButtonCB     ( keyButtonCallback_t cb )  { pKeyButtonCB = cb; }
-        void        setKeyTextCB       ( textCallback_t cb )       { pKeyTextCB = cb; }
-        void        setMouseButtonCB   ( mouseCallback_t cb )      { pMouseButtonCB = cb; }
-        void        setMousePosCB      ( mousePosCallback_t cb )   { pMousePosCB = cb; }
-        void        setMouseWheelCB    ( mouseWheelCallback_t cb ) { pMouseWheelCB = cb; }
-        virtual void applyCallbacks    ();
+        void        setKeyButtonCB      ( keyButtonCallback_t cb )  { pKeyButtonCB = cb; }
+        void        setKeyTextCB        ( textCallback_t cb )       { pKeyTextCB = cb; }
+        void        setMouseButtonCB    ( mouseCallback_t cb )      { pMouseButtonCB = cb; }
+        void        setMousePosCB       ( mousePosCallback_t cb )   { pMousePosCB = cb; }
+        void        setMouseWheelCB     ( mouseWheelCallback_t cb ) { pMouseWheelCB = cb; }
+        virtual void applyCallbacks     ();
 
         // Button Pressing
-        action_t    getKeyButtonState  ( key_t );
-        action_t    getMouseButtonState( mouse_t );
+        action_t    getKeyButtonState   ( key_t );
+        action_t    getMouseButtonState ( mouse_t );
 
         // Mouse Positioning
         void        setMousePos         ( const vec2d& );

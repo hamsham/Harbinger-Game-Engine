@@ -20,7 +20,7 @@ using namespace hamLibs::math;
  */
 // RAII Resources
 class   application;
-class   inputSystem;
+class   input;
 class   window;
 
 // Graphics routines used by the renderers

@@ -7,11 +7,11 @@ using namespace hge;
 ///////////////////////////////////////////////////////////////////////////////
 //      INPUT CONSTRUCTION
 ///////////////////////////////////////////////////////////////////////////////
-inputSystem::inputSystem( window& w ) {
+input::input( window& w ) {
     HGE_ASSERT( pContext = w.getContext() );
 }
 
-inputSystem::inputSystem( inputSystem&& i ) {
+input::input( input&& i ) {
     HGE_ASSERT( i.pContext != nullptr );
     pContext = i.pContext;
     
@@ -28,7 +28,7 @@ inputSystem::inputSystem( inputSystem&& i ) {
     i.pMouseWheelCB = nullptr;
 }
 
-inputSystem& inputSystem::operator = ( inputSystem&& i ) {
+input& input::operator = ( input&& i ) {
     HGE_ASSERT( i.pContext != nullptr );
     pContext = i.pContext;
     
@@ -45,7 +45,7 @@ inputSystem& inputSystem::operator = ( inputSystem&& i ) {
     i.pMouseWheelCB = nullptr;
 }
 
-inputSystem::~inputSystem() {
+input::~input() {
     pContext        = nullptr;
     pKeyButtonCB    = nullptr;
     pKeyTextCB      = nullptr;
@@ -57,7 +57,7 @@ inputSystem::~inputSystem() {
 ///////////////////////////////////////////////////////////////////////////////
 //      INPUT CALLBACKS
 ///////////////////////////////////////////////////////////////////////////////
-void inputSystem::applyCallbacks() {
+void input::applyCallbacks() {
     glfwSetKeyCallback          ( pContext, (GLFWkeyfun)pKeyButtonCB );
     glfwSetCharCallback         ( pContext, (GLFWcharfun)pKeyTextCB );
     glfwSetMouseButtonCallback  ( pContext, (GLFWmousebuttonfun)pMouseButtonCB );
@@ -68,28 +68,28 @@ void inputSystem::applyCallbacks() {
 ///////////////////////////////////////////////////////////////////////////////
 //      BUTTON PRESSES
 ///////////////////////////////////////////////////////////////////////////////
-inputSystem::action_t inputSystem::getKeyButtonState( inputSystem::key_t k ) {
-    return (inputSystem::action_t)glfwGetKey( pContext, k );
+input::action_t input::getKeyButtonState( input::key_t k ) {
+    return (input::action_t)glfwGetKey( pContext, k );
 }
 
-inputSystem::action_t inputSystem::getMouseButtonState( inputSystem::mouse_t m ) {
-    return (inputSystem::action_t)glfwGetMouseButton( pContext, m );
+input::action_t input::getMouseButtonState( input::mouse_t m ) {
+    return (input::action_t)glfwGetMouseButton( pContext, m );
 }
 
 ///////////////////////////////////////////////////////////////////////////////
 //      MOUSE POSITIONING
 ///////////////////////////////////////////////////////////////////////////////
-void inputSystem::setMousePos( const vec2d& pos ) {
+void input::setMousePos( const vec2d& pos ) {
     glfwSetCursorPos( pContext, pos.index.x, pos.index.y );
 }
 
-vec2d inputSystem::getMousePos() {
+vec2d input::getMousePos() {
     vec2d pos;
     glfwGetCursorPos( pContext, &pos.index.x, &pos.index.y );
     return pos;
 }
 
-void inputSystem::showCursor( bool cursor ) {
+void input::showCursor( bool cursor ) {
     if ( cursor )
         glfwSetInputMode( pContext, GLFW_CURSOR, GLFW_CURSOR_NORMAL );
     else

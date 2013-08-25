@@ -115,7 +115,7 @@ void dsRenderer::tick() {
     applyStockShader( pPlainShader->getProgramId() );
     drawSceneUnlit();
 #ifdef DEBUG
-    //doNbtPass();
+    doNbtPass();
 #endif
     doBillboardPass();
     doSkyPass();

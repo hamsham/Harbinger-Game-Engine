@@ -95,10 +95,10 @@ class HGE_API dsRenderer : public pipeline {
         void doNbtPass      ();
         
     public:
-        void showEdges      ( bool b ) { pEnbtShader->showEdges(b); }
-        void showNormals    ( bool b ) { pEnbtShader->showNormals(b); }
-        void showTangents   ( bool b ) { pEnbtShader->showTangents(b); }
-        void showBitangents ( bool b ) { pEnbtShader->showBitangents(b); }
+        void showEdges      ( bool );
+        void showNormals    ( bool );
+        void showTangents   ( bool );
+        void showBitangents ( bool );
 #endif
 };
 
@@ -144,6 +144,26 @@ inline void dsRenderer::doNbtPass() {
     drawSceneLit();
     drawSceneUnlit();
     drawFonts();
+}
+
+inline void dsRenderer::showEdges( bool b ) {
+    applyStockShader( pEnbtShader->getProgramId() );
+    pEnbtShader->showEdges(b);
+}
+
+inline void dsRenderer::showNormals( bool b ) {
+    applyStockShader( pEnbtShader->getProgramId() );
+    pEnbtShader->showNormals(b);
+}
+
+inline void dsRenderer::showTangents( bool b ) {
+    applyStockShader( pEnbtShader->getProgramId() );
+    pEnbtShader->showTangents(b);
+}
+
+inline void dsRenderer::showBitangents( bool b ) {
+    applyStockShader( pEnbtShader->getProgramId() );
+    pEnbtShader->showBitangents(b);
 }
 #endif
 

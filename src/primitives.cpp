@@ -381,7 +381,8 @@ bool sphere::init( int rings, int sectors ) {
     float const R = 1.f / (float)(rings-1);
     float const S = 1.f / (float)(sectors-1);
     
-    terminate();
+    if (vao)
+        terminate();
     
     unsigned numVerts = rings * sectors;
     
@@ -459,6 +460,10 @@ bool sphere::init( int rings, int sectors ) {
 	return true;
 }
 
+bool sphere::init() {
+    return this->init( 10, 10 );
+}
+
 void sphere::terminate() {
     glDeleteVertexArrays( 1, &vao );
     glDeleteBuffers( 1, &vbo );
@@ -466,6 +471,8 @@ void sphere::terminate() {
 
     vao = vbo = ibo = 0;
     numIndices = 0;
+    
+    resetDrawMode();
 }
 
 /******************************************************************************
@@ -535,16 +542,22 @@ bool cone::init( int sectors ) {
         apex.uv     = vec2( as+0.5f, ac+0.5f );
         apex.norm   = normalize( vec3( as, -std::sqrt( (ac*ac)+(as*as) ), ac ) );
         
-        if ( i >= 2 ) {
+        if ( i > 2 ) {
             calcTangents( baseVerts[i-0], baseVerts[i-1], baseVerts[i-2] );
             calcTangents( apexVerts[i-0], apexVerts[i-1], apexVerts[i-2] );
         }
         apexAngle += resolution;
         baseAngle -= resolution;
     }
-    // it took a lot of trial and error to figure this out
-    apexVerts[0].tng[1] = 0.f;
-    apexVerts[0].btng[1] = 0.f;
+    
+    // Blend the first and last vertex tangents to fix a seam between them
+    calcTangents( baseVerts[ sectors+1 ], baseVerts[0], baseVerts[1] );
+    calcTangents( apexVerts[ sectors+1 ], apexVerts[0], apexVerts[1] );
+    
+    // The Tangents and Bitangents of the first, last, and apex vertices
+    // don't contain the correct y-value
+    apexVerts[ sectors+1 ].tng[1] = apexVerts[0].tng[1] = apexVerts[1].tng[1] = 0.f;
+    apexVerts[ sectors+1 ].btng[1] = apexVerts[0].btng[1] = apexVerts[1].btng[1] = 0.f;
     
 	glGenVertexArrays( 1, &vao );
 	glBindVertexArray( vao );
@@ -590,6 +603,111 @@ void cone::draw() const {
     
     glBindVertexArray( vao );
     glMultiDrawArrays( renderMode, first, count, 2 );
+    glBindVertexArray( 0 );
+}
+
+/******************************************************************************
+ *      CIRCLES
+******************************************************************************/
+circle::circle( circle&& c ) :
+    primitive( std::move( c ) ),
+    numVerts( c.numVerts )
+{
+    c.numVerts = 0;
+}
+
+circle& circle::operator = ( circle&& c ) {
+    primitive::operator=( std::move( c ) );
+    numVerts = c.numVerts;
+    c.numVerts = 0;
+    return *this;
+}
+
+bool circle::init( int sectors ) {
+    // make sure there are enough points for a minimal pyramid
+    if ( sectors < 3 ) {
+        sectors = 3;
+    }
+    
+    if ( vao && (numVerts == sectors+2 ) ) {
+        return true;
+    }
+    else {
+        terminate();
+    }
+    
+    // add an offset of + 4 for the starting & ending vertices of the circle
+    bumpVertex* verts = new( std::nothrow ) bumpVertex[ sectors + 2 ];
+    if ( !verts ) {
+        return false;
+    }
+    
+    verts[0].pos    = vec3( 0.f );
+    verts[0].uv     = vec2( 0.5f );
+    verts[0].norm   = vec3( 0.f, 1.f, 0.f );
+    
+    float baseAngle = 0.f;
+    const float resolution = HL_TWO_PI / (float)sectors;
+    
+    for ( unsigned i = 0; i <= sectors; ++i ) {
+        float bs = std::cos( baseAngle ) * 0.5f;
+        float bc = std::sin( baseAngle ) * 0.5f;
+        
+        bumpVertex& currVert = verts[i+1];
+        
+        currVert.pos    = vec3( bs, 0.f, bc );
+        currVert.uv     = vec2( bs+0.5f, bc+0.5f );
+        currVert.norm   = vec3( 0.f, 1.f, 0.f );
+        
+        if ( i >= 2 ) {
+            calcTangents( verts[i-0], verts[i-1], verts[i-2] );
+        }
+        baseAngle -= resolution;
+    }
+    // Blend the first and last vertex tangents to fix a seam between them
+    calcTangents( verts[ sectors + 1], verts[0], verts[1] );
+    
+	glGenVertexArrays( 1, &vao );
+	glBindVertexArray( vao );
+	glGenBuffers( 1, &vbo );
+    
+    if ( !vao || !vbo ) {
+        std::cerr
+            << "An error occurred while initializing the circle primitives"
+            << std::endl;
+        terminate();
+        return false;
+    }
+	
+	glBindBuffer( GL_ARRAY_BUFFER, vbo );
+    // add a +4 offset to "sectors" in order to account for the starting and
+    // ending vertices of the base & apex of the circle
+    glBufferData( GL_ARRAY_BUFFER, (sectors+2) * sizeof( bumpVertex ), verts, GL_STATIC_DRAW );
+	printGlError( "Error while sending sphere primitive data to the GPU.");
+    
+    pipeline::enableBumpVertexAttribs();
+	
+	glBindVertexArray( 0 );
+    
+    delete [] verts;
+    
+    // again, account for the start and end vertices
+    numVerts = sectors+2;
+    resetDrawMode();
+    
+    return true;
+}
+
+void circle::terminate() {
+    glDeleteVertexArrays( 1, &vao );
+    glDeleteBuffers( 1, &vbo );
+
+    vao = vbo = 0;
+    numVerts = 0;
+}
+void circle::draw() const {
+    glBindVertexArray( vao );
+    glDrawArrays( renderMode, 0, numVerts );
     glBindVertexArray( 0 );
 }
 

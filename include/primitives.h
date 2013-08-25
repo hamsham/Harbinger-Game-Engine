@@ -172,7 +172,7 @@ class HGE_API sphere final : public primitive {
         sphere&     operator =      ( sphere&& );
         
         bool        init            ( int rings, int sectors );
-        bool        init            () { return init( 10, 10 ); }
+        bool        init            () override;
         void        terminate       () override;
 
         // drawing
@@ -203,6 +203,32 @@ class HGE_API cone final : public primitive {
         
         cone&   operator =      ( const cone& ) = delete;
         cone&   operator =      ( cone&& );
+        
+        bool    init            ( int sectors );
+        bool    init            () { return init( 10 ); }
+        void    terminate       () override;
+
+        // drawing
+        void    resetDrawMode   () { renderMode = pipeline::HGE_TRIANGLE_FAN; }
+        void    draw            () const;
+};
+
+/******************************************************************************
+ * Circle Primitive
+******************************************************************************/
+class HGE_API circle final : public primitive {
+    private:
+        int numVerts = 0;
+        
+    public:
+        circle  () { resetDrawMode(); }
+        circle  ( const circle& ) = delete;
+        circle  ( circle&& );
+        
+        ~circle () { terminate(); }
+        
+        circle& operator =      ( const circle& ) = delete;
+        circle& operator =      ( circle&& );
         
         bool    init            ( int sectors );
         bool    init            () { return init( 10 ); }

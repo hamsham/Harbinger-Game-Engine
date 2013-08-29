@@ -113,7 +113,7 @@ bool triangle::init() {
     verts[1].uv = vec2( 0.f, 0.f );
     verts[2].uv = vec2( 1.f, 0.f );
     
-    verts[0].norm = verts[1].norm = verts[2].norm = vec3( 0.f, 0.f, -1.f );
+    verts[0].norm = verts[1].norm = verts[2].norm = vec3( 0.f, 0.f, 1.f );
     
     calcTangents( verts[0], verts[1], verts[2] );
 	
@@ -397,26 +397,25 @@ bool sphere::init( int rings, int sectors ) {
         return false;
     }
     
-    for( int r = 0, i = 0, j = 0; r < rings; r++ ) {
-        for( int s = 0; s < sectors; s++ ) {
-            float const y = std::sin( -HL_PI_OVER_2 + HL_PI * r * R );
-            float const x = std::cos( HL_TWO_PI * s * S ) * std::sin( HL_PI * r * R );
-            float const z = std::sin( HL_TWO_PI * s * S ) * std::sin( HL_PI * r * R );
+    for( int r = 0, i = 0, j = 0; r < rings; ++r ) {
+        for( int s = 0; s < sectors; ++s ) {
+            const float y = std::sin( -HL_PI_OVER_2 + HL_PI * r * R );
+            const float x = std::cos( HL_TWO_PI * s * S ) * std::sin( HL_PI * r * R );
+            const float z = std::sin( HL_TWO_PI * s * S ) * std::sin( HL_PI * r * R );
             
             vertices[ i ].uv[0] = s*S;
             vertices[ i ].uv[1] = r*R;
             
-            vertices[ i ].pos[0] = x;
-            vertices[ i ].pos[1] = y;
-            vertices[ i ].pos[2] = z;
+            vertices[ i ].norm =
+                vertices[ i ].pos =
+                    vec3( x, y, z );
             
-            vertices[ i ].norm[0] = x;
-            vertices[ i ].norm[1] = y;
-            vertices[ i ].norm[2] = z;
+            const vec3 zenith   = vec3( 0.f, 1.f, 0.f );
+            const vec3 temp     = vertices[ i ].pos + zenith;
+            vertices[ i ].tng   = normalize( cross( zenith, temp ) );
+            vertices[ i ].btng  = normalize( cross( vertices[ i ].tng, zenith ) );
+            
             ++i;
-            
-            if ( i >= 2 )
-                calcTangents( vertices[i-0], vertices[i-1], vertices[i-2] );
             
             indices[ j++ ] = r * sectors + s;
             indices[ j++ ] = (r+1) * sectors + s;
@@ -644,20 +643,20 @@ bool circle::init( int sectors ) {
     
     verts[0].pos    = vec3( 0.f );
     verts[0].uv     = vec2( 0.5f );
-    verts[0].norm   = vec3( 0.f, 1.f, 0.f );
+    verts[0].norm   = vec3( 0.f, 0.f, 1.f );
     
     float baseAngle = 0.f;
     const float resolution = HL_TWO_PI / (float)sectors;
     
     for ( unsigned i = 0; i <= sectors; ++i ) {
-        float bs = std::cos( baseAngle ) * 0.5f;
-        float bc = std::sin( baseAngle ) * 0.5f;
+        float bc = std::cos( baseAngle ) * 0.5f;
+        float bs = std::sin( baseAngle ) * 0.5f;
         
         bumpVertex& currVert = verts[i+1];
         
-        currVert.pos    = vec3( bs, 0.f, bc );
+        currVert.pos    = vec3( bs, bc, 0.f );
         currVert.uv     = vec2( bs+0.5f, bc+0.5f );
-        currVert.norm   = vec3( 0.f, 1.f, 0.f );
+        currVert.norm   = vec3( 0.f, 0.f, 1.f );
         
         if ( i >= 2 ) {
             calcTangents( verts[i-0], verts[i-1], verts[i-2] );

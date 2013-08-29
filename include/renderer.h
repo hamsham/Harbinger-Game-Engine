@@ -262,10 +262,10 @@ class HGE_API fwdRenderer : public pipeline {
         void doNbtPass      ();
         
     public:
-        void showEdges      ( bool b ) { pEnbtShader->showEdges(b); }
-        void showNormals    ( bool b ) { pEnbtShader->showNormals(b); }
-        void showTangents   ( bool b ) { pEnbtShader->showTangents(b); }
-        void showBitangents ( bool b ) { pEnbtShader->showBitangents(b); }
+        void showEdges      ( bool );
+        void showNormals    ( bool );
+        void showTangents   ( bool );
+        void showBitangents ( bool );
 #endif
 };
 
@@ -318,9 +318,29 @@ inline void fwdRenderer::doBillboardPass() {
 #ifdef DEBUG
 inline void fwdRenderer::doNbtPass() {
     applyStockShader( pEnbtShader->getProgramId() );
-    drawSceneUnlit();
     drawSceneLit();
+    drawSceneUnlit();
     drawFonts();
+}
+
+inline void fwdRenderer::showEdges( bool b ) {
+    applyStockShader( pEnbtShader->getProgramId() );
+    pEnbtShader->showEdges(b);
+}
+
+inline void fwdRenderer::showNormals( bool b ) {
+    applyStockShader( pEnbtShader->getProgramId() );
+    pEnbtShader->showNormals(b);
+}
+
+inline void fwdRenderer::showTangents( bool b ) {
+    applyStockShader( pEnbtShader->getProgramId() );
+    pEnbtShader->showTangents(b);
+}
+
+inline void fwdRenderer::showBitangents( bool b ) {
+    applyStockShader( pEnbtShader->getProgramId() );
+    pEnbtShader->showBitangents(b);
 }
 #endif
 

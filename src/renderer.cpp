@@ -218,37 +218,46 @@ void dsRenderer::setFontColor( const vec4& c ) {
 bool fwdRenderer::init() {
     try {
         HL_ASSERT( pipeline::init() );
+        printGlError("Pipeline setup error");
+    
         /*
          * Shaders
          */
         pPlainShader = new( std::nothrow ) plainShader();
         HL_ASSERT( pPlainShader != nullptr );
         HL_ASSERT( pPlainShader->init() );
+        printGlError("Plain Shader setup error");
 
         pPointLightShader = new( std::nothrow ) pointLightShader();
         HL_ASSERT( pPointLightShader != nullptr );
         HL_ASSERT( pPointLightShader->init() );
+        printGlError("Point Light Shader setup error");
 
         pSkyShader = new( std::nothrow ) skyShader;
         HL_ASSERT( pSkyShader != nullptr );
         HL_ASSERT( pSkyShader->init() );
+        printGlError("Skybox Shader setup error");
 
         pFontShader = new( std::nothrow ) fontShader();
         HL_ASSERT( pFontShader != nullptr );
         HL_ASSERT( pFontShader->init() );
+        printGlError("Font Shader setup error");
 
         pBillboardShader = new( std::nothrow ) billboardShader();
         HL_ASSERT( pBillboardShader != nullptr );
         HL_ASSERT( pBillboardShader->init() );
+        printGlError("Billboard Shader setup error");
 
 #ifdef DEBUG
         pEnbtShader = new( std::nothrow ) enbtShader();
         HL_ASSERT( pEnbtShader != nullptr );
         HL_ASSERT( pEnbtShader->init() );
+        pipeline::applyStockShader( pEnbtShader->getProgramId() );
         pEnbtShader->showEdges( false );
         pEnbtShader->showNormals( false );
         pEnbtShader->showTangents( false );
         pEnbtShader->showBitangents( false );
+        printGlError("ENBT Shader setup error");
 #endif
     }
     catch( const hamLibs::utils::errorType& e ) {
@@ -292,7 +301,7 @@ void fwdRenderer::tick() {
     doLightingPass();
     doBillboardPass();
 #ifdef DEBUG
-    //doNbtPass();
+    doNbtPass();
 #endif
     doSkyPass();
     doFontPass();

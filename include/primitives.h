@@ -158,31 +158,27 @@ class HGE_API cube final : public primitive {
 ******************************************************************************/
 class HGE_API sphere final : public primitive {
     private:
-        GLuint ibo = 0;
-        unsigned numIndices = 0;
+        unsigned numTris = 0;
         
     public:
         sphere      () { resetDrawMode(); }
         sphere      ( const sphere& ) = delete;
-        sphere      ( sphere&& );
+        sphere      ( sphere&& ) = default;
         
         ~sphere     () { terminate(); }
         
         sphere&     operator =      ( const sphere& ) = delete;
-        sphere&     operator =      ( sphere&& );
+        sphere&     operator =      ( sphere&& ) = default;
         
-        bool        init            ( int rings, int sectors );
+        bool        init            ( int recursionDepth );
         bool        init            () override;
         void        terminate       () override;
 
         // drawing
-        void        resetDrawMode   () { renderMode = pipeline::HGE_TRIANGLE_STRIP; }
+        void        resetDrawMode   () { renderMode = pipeline::HGE_TRIANGLES; }
         void        draw            () const {
                                         glBindVertexArray( vao );
-                                        glDrawElements(
-                                            renderMode, numIndices,
-                                            GL_UNSIGNED_INT, 0
-                                        );
+                                        glDrawArrays( renderMode, 0, numTris );
                                         glBindVertexArray( 0 );
                                     }
 };
@@ -210,7 +206,14 @@ class HGE_API cone final : public primitive {
 
         // drawing
         void    resetDrawMode   () { renderMode = pipeline::HGE_TRIANGLE_FAN; }
-        void    draw            () const;
+        void    draw            () const {
+                                    const GLint     first[] = {0,numVerts};
+                                    const GLsizei   count[] = {numVerts, numVerts};
+
+                                    glBindVertexArray( vao );
+                                    glMultiDrawArrays( renderMode, first, count, 2 );
+                                    glBindVertexArray( 0 );
+                                }
 };
 
 /******************************************************************************
@@ -236,7 +239,11 @@ class HGE_API circle final : public primitive {
 
         // drawing
         void    resetDrawMode   () { renderMode = pipeline::HGE_TRIANGLE_FAN; }
-        void    draw            () const;
+        void    draw            () const {
+                                    glBindVertexArray( vao );
+                                    glDrawArrays( renderMode, 0, numVerts );
+                                    glBindVertexArray( 0 );
+                                }
 };
 
 } // end hge namespace

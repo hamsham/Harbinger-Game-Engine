@@ -7,6 +7,7 @@
 
 #include <iostream>
 #include <utility>
+#include <vector>
 #include "primitives.h"
 #include "geometry.h"
 
@@ -236,7 +237,7 @@ bool cube::init() {
     }
     
     glBindBuffer( GL_ARRAY_BUFFER, vbo );
-    hge::bumpVertex verts[24];
+    hge::bumpVertex* verts = new bumpVertex[24];
 
     /*
      * POSITIONS
@@ -349,6 +350,8 @@ bool cube::init() {
     }
     
     glBufferData( GL_ARRAY_BUFFER, sizeof( verts ), verts, GL_STATIC_DRAW );
+    delete [] verts;
+    verts = nullptr;
     
     pipeline::enableBumpVertexAttribs();
     
@@ -363,72 +366,206 @@ bool cube::init() {
 /******************************************************************************
  *      SPHERES
 ******************************************************************************/
-sphere::sphere( sphere&& s ) :
-    primitive( std::move( s ) ),
-    ibo( s.ibo )
-{
-    s.ibo = 0;
-}
+//
+//bool sphere::init( int rings, int sectors ) {
+//    float const R = 1.f / (float)(rings-1);
+//    float const S = 1.f / (float)(sectors-1);
+//    
+//    if (vao)
+//        terminate();
+//    
+//    unsigned numVerts = rings * sectors;
+//    
+//    bumpVertex* vertices = new( std::nothrow ) bumpVertex[ numVerts ];
+//    if ( !vertices )
+//        return false;
+//        
+//    GLuint* indices = new( std::nothrow ) GLuint[ numVerts * 4 ];
+//    if ( !indices ) {
+//        delete [] vertices;
+//        vertices = nullptr;
+//        return false;
+//    }
+//    
+//    for( int r = 0, i = 0, j = 0; r < rings; ++r ) {
+//        for( int s = 0; s < sectors; ++s ) {
+//            const float y = std::sin( -HL_PI_OVER_2 + HL_PI * r * R );
+//            const float x = std::cos( HL_TWO_PI * s * S ) * std::sin( HL_PI * r * R );
+//            const float z = std::sin( HL_TWO_PI * s * S ) * std::sin( HL_PI * r * R );
+//            
+//            vertices[ i ].uv    = vec2( s*S, r*R );
+//            vertices[ i ].norm  = // the normals are equal to the vertex position
+//            vertices[ i ].pos   = vec3( x, y, z );
+//            
+//            const vec3 zenith   = vec3( 0.f, 1.f, 0.f );
+//            const vec3 temp     = vertices[ i ].pos + zenith;
+//            vertices[ i ].tng   = normalize( cross( zenith, temp ) );
+//            vertices[ i ].btng  = normalize( cross( vertices[ i ].tng, zenith ) );
+//            
+//            ++i;
+//            
+//            indices[ j++ ] = r * sectors + s;
+//            indices[ j++ ] = (r+1) * sectors + s;
+//            indices[ j++ ] = r * sectors + (s+1);
+//            indices[ j++ ] = (r+1) * sectors + (s+1);
+//        }
+//    }
+//    
+//	glGenVertexArrays( 1, &vao );
+//	glGenBuffers( 1, &vbo );
+//	glGenBuffers( 1, &ibo );
+//    
+//    if ( !vao || !vbo || !ibo ) {
+//        std::cerr
+//            << "An error occurred while initializing the sphere primitives"
+//            << std::endl;
+//        terminate();
+//        return false;
+//    }
+//    
+//    numIndices = numVerts * 4;
+//    
+//	glBindVertexArray( vao );
+//	
+//	glBindBuffer( GL_ARRAY_BUFFER, vbo );
+//    glBufferData( GL_ARRAY_BUFFER, numVerts*sizeof(bumpVertex)-rings, vertices, GL_STATIC_DRAW );
+//	printGlError( "Error while sending sphere primitive data to the GPU.");
+//    
+//    pipeline::enableBumpVertexAttribs();
+//    
+//    glBindBuffer( GL_ELEMENT_ARRAY_BUFFER, ibo );
+//    glBufferData( GL_ELEMENT_ARRAY_BUFFER, numIndices*sizeof(GLuint)-numVerts, indices, GL_STATIC_DRAW );
+//	
+//	glBindVertexArray( 0 );
+//    
+//    delete [] vertices;
+//    delete [] indices;
+//    
+//    resetDrawMode();
+//    
+//	return true;
+//}
 
-sphere& sphere::operator = ( sphere&& s ) {
-    primitive::operator=( std::move( s ) );
-    ibo = s.ibo;
-    s.ibo = 0;
-    return *this;
-}
-
-bool sphere::init( int rings, int sectors ) {
-    float const R = 1.f / (float)(rings-1);
-    float const S = 1.f / (float)(sectors-1);
+std::vector< bumpVertex > subdivide( std::vector< bumpVertex >& inVerts ) {
+    std::vector< bumpVertex > newVerts( inVerts.size() * 4 );
     
+    for (unsigned i = 0, j = 0; i < inVerts.size(); i+=3) {
+        bumpVertex a;
+        bumpVertex b;
+        bumpVertex c;
+        
+        a.pos = ( inVerts[i+0].pos + inVerts[i+1].pos ) * 0.5f;
+        b.pos = ( inVerts[i+1].pos + inVerts[i+2].pos ) * 0.5f;
+        c.pos = ( inVerts[i+2].pos + inVerts[i+0].pos ) * 0.5f;
+        /*
+        a.norm = ( inVerts[i+0].norm + inVerts[i+1].norm ) * 0.5f;
+        b.norm = ( inVerts[i+1].norm + inVerts[i+2].norm ) * 0.5f;
+        c.norm = ( inVerts[i+2].norm + inVerts[i+0].norm ) * 0.5f;
+        
+        a.uv = ( inVerts[i+0].uv + inVerts[i+1].uv ) * 0.5f;
+        b.uv = ( inVerts[i+1].uv + inVerts[i+2].uv ) * 0.5f;
+        c.uv = ( inVerts[i+2].uv + inVerts[i+0].uv ) * 0.5f;
+        
+        a.tng = ( inVerts[i+0].tng + inVerts[i+1].tng ) * 0.5f;
+        b.tng = ( inVerts[i+1].tng + inVerts[i+2].tng ) * 0.5f;
+        c.tng = ( inVerts[i+2].tng + inVerts[i+0].tng ) * 0.5f;
+        
+        a.btng = ( inVerts[i+0].btng + inVerts[i+1].btng ) * 0.5f;
+        b.btng = ( inVerts[i+1].btng + inVerts[i+2].btng ) * 0.5f;
+        c.btng = ( inVerts[i+2].btng + inVerts[i+0].btng ) * 0.5f;
+        */
+        newVerts[ j++ ] = inVerts[i+0];
+        newVerts[ j++ ] = a;
+        newVerts[ j++ ] = c;
+        
+        newVerts[ j++ ] = inVerts[i+1];
+        newVerts[ j++ ] = b;
+        newVerts[ j++ ] = a;
+        
+        newVerts[ j++ ] = inVerts[i+2];
+        newVerts[ j++ ] = c;
+        newVerts[ j++ ] = b;
+        
+        newVerts[ j++ ] = a;
+        newVerts[ j++ ] = b;
+        newVerts[ j++ ] = c;
+    }
+    return newVerts;
+}
+
+bool sphere::init( int recursionDepth ) {
     if (vao)
         terminate();
     
-    unsigned numVerts = rings * sectors;
+    std::vector< bumpVertex > vertices( 60 );
     
-    bumpVertex* vertices = new( std::nothrow ) bumpVertex[ rings * sectors ];
-    if ( !vertices )
-        return false;
+    {
+        std::vector< GLuint > indices = {
+            0,11,5,     0,5,1,      0,1,7,      0,7,10,     0,10,11,
+            1,5,9,      5,11,4,     11,10,2,    10,7,6,     7,1,8,
+            3,9,4,      3,4,2,      3,2,6,      3,6,8,      3,8,9,
+            4,9,5,      2,4,11,     6,2,10,     8,6,7,      9,8,1
+        }; // 60 elements
+        // build an icosahedron
+
+        const float t = (1.f + sqrt(5.f))/2.f;
+        //const float s = 1.f / sqrt(1.f + t*t);
+
+        // create the 12 vertices
+        std::vector< vec3 > points = {
+            vec3(-1.f, t, 0.f),     vec3(1.f, t, 0.f),
+            vec3(-1.f, -t, 0.f),    vec3(1.f, -t, 0.f),
+            vec3(0.f, -1.f, t),     vec3(0.f, 1.f, t),
+            vec3(0.f, -1.f, -t),    vec3(0.f, 1.f, -t),
+            vec3(t, 0.f, -1.f),     vec3(t, 0.f, 1.f),
+            vec3(-t, 0.f, -1.f),    vec3(-t, 0.f, 1.f)
+        };
+
+        // create 20 triangles (60 vertices)
+        for( unsigned i = 0; i < indices.size(); ++i ) {
+            vertices[i].pos = points[ indices[i] ];
+        }
         
-    GLuint* indices = new( std::nothrow ) GLuint[ rings * sectors * 4 ];
-    if ( !indices ) {
-        delete [] vertices;
-        vertices = nullptr;
-        return false;
+        // Subdivide if necessary
+        while( recursionDepth-- ) {
+            vertices = std::move( subdivide( vertices ) );
+        }
     }
     
-    for( int r = 0, i = 0, j = 0; r < rings; ++r ) {
-        for( int s = 0; s < sectors; ++s ) {
-            const float y = std::sin( -HL_PI_OVER_2 + HL_PI * r * R );
-            const float x = std::cos( HL_TWO_PI * s * S ) * std::sin( HL_PI * r * R );
-            const float z = std::sin( HL_TWO_PI * s * S ) * std::sin( HL_PI * r * R );
-            
-            vertices[ i ].uv[0] = s*S;
-            vertices[ i ].uv[1] = r*R;
-            
-            vertices[ i ].norm =
-                vertices[ i ].pos =
-                    vec3( x, y, z );
-            
+    // Populate the UV/Normal/Tangent Data
+    for ( unsigned i = 0; i < vertices.size(); ++i ) {
+        bumpVertex& vert = vertices[i];
+        
+        // Add data to the normals
+        vert.norm = vert.pos = normalize( vert.pos );
+    
+        // UV Data
+        vert.uv = vec2(
+                std::atan2(vert.norm[0], vert.norm[2])/HL_TWO_PI + 0.5f,
+                vert.norm[1] * 0.5f + 0.5f
+        );
+        
+        // finally, do the tangents and bitangents
+        if ( vert.norm[1] == 1.f ) {
+            vert.tng            = vec3( 1.f, 0.f, 0.f );
+            vert.btng           = vec3( 0.f, 0.f, 1.f );
+        }
+        else if ( vert.norm[1] == -1.f ) {
+            vert.tng            = vec3( -1.f, 0.f, 0.f );
+            vert.btng           = vec3( 0.f, 0.f, -1.f );
+        }
+        else {
             const vec3 zenith   = vec3( 0.f, 1.f, 0.f );
-            const vec3 temp     = vertices[ i ].pos + zenith;
-            vertices[ i ].tng   = normalize( cross( zenith, temp ) );
-            vertices[ i ].btng  = normalize( cross( vertices[ i ].tng, zenith ) );
-            
-            ++i;
-            
-            indices[ j++ ] = r * sectors + s;
-            indices[ j++ ] = (r+1) * sectors + s;
-            indices[ j++ ] = r * sectors + (s+1);
-            indices[ j++ ] = (r+1) * sectors + (s+1);
+            const vec3 temp     = vert.pos;
+            vert.tng            = normalize( cross( zenith, temp ) );
+            vert.btng           = normalize( cross( vert.tng, zenith ) );
         }
     }
     
 	glGenVertexArrays( 1, &vao );
 	glGenBuffers( 1, &vbo );
-	glGenBuffers( 1, &ibo );
     
-    if ( !vao || !vbo || !ibo ) {
+    if ( !vao || !vbo ) {
         std::cerr
             << "An error occurred while initializing the sphere primitives"
             << std::endl;
@@ -436,23 +573,17 @@ bool sphere::init( int rings, int sectors ) {
         return false;
     }
     
-    numIndices = numVerts * 4;
+    numTris = vertices.size();
     
 	glBindVertexArray( vao );
 	
 	glBindBuffer( GL_ARRAY_BUFFER, vbo );
-    glBufferData( GL_ARRAY_BUFFER, numVerts * sizeof( bumpVertex ), vertices, GL_STATIC_DRAW );
+    glBufferData( GL_ARRAY_BUFFER, sizeof(bumpVertex)*numTris, vertices.data(), GL_STATIC_DRAW );
 	printGlError( "Error while sending sphere primitive data to the GPU.");
     
     pipeline::enableBumpVertexAttribs();
     
-    glBindBuffer( GL_ELEMENT_ARRAY_BUFFER, ibo );
-    glBufferData( GL_ELEMENT_ARRAY_BUFFER, numIndices * sizeof( GLuint ), indices, GL_STATIC_DRAW );
-	
 	glBindVertexArray( 0 );
-    
-    delete [] vertices;
-    delete [] indices;
     
     resetDrawMode();
     
@@ -460,16 +591,15 @@ bool sphere::init( int rings, int sectors ) {
 }
 
 bool sphere::init() {
-    return this->init( 10, 10 );
+    return this->init( 0 );
 }
 
 void sphere::terminate() {
     glDeleteVertexArrays( 1, &vao );
     glDeleteBuffers( 1, &vbo );
-    glDeleteBuffers( 1, &ibo );
 
-    vao = vbo = ibo = 0;
-    numIndices = 0;
+    vao = vbo = 0;
+    numTris = 0;
     
     resetDrawMode();
 }
@@ -596,14 +726,6 @@ void cone::terminate() {
     vao = vbo = 0;
     numVerts = 0;
 }
-void cone::draw() const {
-    const GLint     first[] = {0,numVerts};
-    const GLsizei   count[] = {numVerts, numVerts};
-    
-    glBindVertexArray( vao );
-    glMultiDrawArrays( renderMode, first, count, 2 );
-    glBindVertexArray( 0 );
-}
 
 /******************************************************************************
  *      CIRCLES
@@ -703,11 +825,6 @@ void circle::terminate() {
 
     vao = vbo = 0;
     numVerts = 0;
-}
-void circle::draw() const {
-    glBindVertexArray( vao );
-    glDrawArrays( renderMode, 0, numVerts );
-    glBindVertexArray( 0 );
 }
 
 } // end hge namespace

@@ -35,6 +35,11 @@ class HGE_API billboard final : public drawable {
         unsigned    getNumImages    () const { return numBmps; }
         
         void        setImagePos     ( unsigned index, const vec3& pos );
+        void        setImageSize    ( unsigned index, float size = 1.f );
+        
+        // Set the sizes and positions. The input array sizes muse be equal to "numBmps"
+        void        setImagePositions( const vec3* positions );
+        void        setImageSizes   ( float* sizes );
         
         // Billboards only have one available draw mode and one attribute
         void        enableAttribute ( pipeline::attribute ) override {}

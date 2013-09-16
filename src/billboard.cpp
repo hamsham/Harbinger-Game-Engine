@@ -60,28 +60,35 @@ bool billboard::setNumImages( unsigned r, unsigned c ) {
         }
     }
     
-    glBindVertexArray( vao );
-    glEnableVertexAttribArray( pipeline::HGE_ATTRIB_VERTEX );
-    glBindBuffer( GL_ARRAY_BUFFER, vbo );
-    glVertexAttribPointer( 0, 3, GL_FLOAT, GL_FALSE, 0, 0 );
-    
     numBmps = r * c;
     
-    vec3* positions = new vec3[ r * c ];
+    vec3* positions = new vec3[ numBmps ];
+    float* sizes = new float[ numBmps ];
     
     for ( unsigned x = 0; x < r; ++x ) {
         for ( unsigned y = 0; y < c; ++y ) {
             positions[ x * c + y ] = vec3( (float)x, 0.f, (float)y );
+            sizes[ x * c + y ] = 1.f;
         }
     }
     
-    glBufferData(
-        GL_ARRAY_BUFFER, sizeof( vec3 ) * numBmps, positions,
-        GL_STREAM_DRAW
-    );
+    glBindVertexArray( vao );
+    glEnableVertexAttribArray( 0 );
+    glEnableVertexAttribArray( 1 );
+    
+    glBindBuffer( GL_ARRAY_BUFFER, vbo );
+    glBufferData( GL_ARRAY_BUFFER, (sizeof(vec3)+sizeof(float))*numBmps,  nullptr, GL_STREAM_DRAW );
+    
+    glVertexAttribPointer( 0, 3, GL_FLOAT, GL_FALSE, 0, 0 );
+    glBufferSubData( GL_ARRAY_BUFFER, 0, sizeof(vec3)*numBmps, positions );
+    
+    glVertexAttribPointer( 1, 1, GL_FLOAT, GL_FALSE, 0, (const GLvoid*)(sizeof(vec3)*numBmps) );
+    glBufferSubData( GL_ARRAY_BUFFER, sizeof(vec3)*numBmps, sizeof(float)*numBmps, sizes );
+    
     glBindVertexArray( 0 );
     
     delete [] positions;
+    delete [] sizes;
     
     return true;
 }
@@ -96,19 +103,64 @@ void billboard::clearImages() {
     vao = vbo = 0;
 }
 
+/******************************************************************************
+ * Billboard positioning
+******************************************************************************/
 void billboard::setImagePos( unsigned index, const vec3& pos ) {
-    if ( index > numBmps ) return;
+    if ( index >= numBmps ) return;
     
     glBindVertexArray( vao );
     glBindBuffer( GL_ARRAY_BUFFER, vbo );
+    glBufferSubData( GL_ARRAY_BUFFER, sizeof( vec3 ) * index, sizeof( vec3 ), pos.v );
     
+    glBindVertexArray( 0 );
+    printGlError("Billboard positioning error");
+}
+
+/******************************************************************************
+ * Billboard Scaling
+******************************************************************************/
+void billboard::setImageSize( unsigned index, float size ) {
+    if ( index >= numBmps ) return;
+    
+    glBindVertexArray( vao );
+    glBindBuffer( GL_ARRAY_BUFFER, vbo );
     glBufferSubData(
         GL_ARRAY_BUFFER,
-        sizeof( vec3 ) * index,
-        sizeof( vec3 ), pos.v
+        (sizeof( vec3 ) * numBmps) + (sizeof( float ) * index),
+        sizeof( float ), &size
     );
     
     glBindVertexArray( 0 );
+    printGlError("Billboard scaling error");
+}
+
+/******************************************************************************
+ * Billboard positioning
+******************************************************************************/
+void billboard::setImagePositions( const vec3* pos ) {
+    if ( !pos ) return;
+    
+    glBindVertexArray( vao );
+    glBindBuffer( GL_ARRAY_BUFFER, vbo );
+    glBufferSubData( GL_ARRAY_BUFFER, 0, sizeof(vec3)*numBmps, pos );
+    
+    glBindVertexArray( 0 );
+    printGlError("Billboard positioning error");
+}
+
+/******************************************************************************
+ * Billboard Scaling
+******************************************************************************/
+void billboard::setImageSizes( float* sizes ) {
+    if ( !sizes ) return;
+    
+    glBindVertexArray( vao );
+    glBindBuffer( GL_ARRAY_BUFFER, vbo );
+    glBufferSubData( GL_ARRAY_BUFFER, sizeof(vec3)*numBmps, sizeof(float)*numBmps, sizes );
+    
+    glBindVertexArray( 0 );
+    printGlError("Billboard scaling error");
 }
 
 } // end hge namespace

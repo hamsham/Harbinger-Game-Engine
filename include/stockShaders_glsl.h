@@ -238,9 +238,11 @@ const char billboardVS[] = R"***(
     };
 
     layout ( location = 0 ) in vec3 posVerts;
+    layout ( location = 1 ) in float inSize;
 
     void main() {
         gl_Position = vec4( posVerts, 1.0 );
+        gl_PointSize = inSize;
     }
 )***";
 
@@ -266,24 +268,25 @@ const char billboardGS[] = R"***(
         vec3 toCamera   = normalize( camPos - inPos );
         vec3 upVec      = vec3( 0.0, 1.0, 0.0 );
         vec3 rightVec   = cross( toCamera, upVec );
+        float scaling   = gl_in[0].gl_PointSize;
 
-        inPos       -= ( rightVec * 0.5 );
+        inPos       -= rightVec * scaling * 0.5;
         gl_Position = vpMatrix * vec4( inPos, 1.0 );
         texCoord    = vec2( 0.0, 0.0 );
         EmitVertex();
 
-        inPos.y     += 1.0;
+        inPos.y     += scaling;
         gl_Position = vpMatrix * vec4( inPos, 1.0 );
         texCoord    = vec2( 0.0, 1.0 );
         EmitVertex();
 
-        inPos.y     -= 1.0;
-        inPos       += rightVec;
+        inPos.y     -= scaling;
+        inPos       += rightVec * scaling;
         gl_Position = vpMatrix * vec4( inPos, 1.0 );
         texCoord    = vec2( 1.0, 0.0 );
         EmitVertex();
 
-        inPos.y     += 1.0;
+        inPos.y     += scaling;
         gl_Position = vpMatrix * vec4( inPos, 1.0 );
         texCoord    = vec2( 1.0, 1.0 );
         EmitVertex();

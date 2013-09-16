@@ -13,6 +13,7 @@
 #define	__HGE_SKYBOX_H__
 
 #include "bitmap.h"
+#include "drawable.h"
 #include "primitives.h"
 
 namespace hge {
@@ -43,26 +44,34 @@ namespace hge {
  *             |        |
  *              --------
 ******************************************************************************/
-class HGE_API skybox {
+class HGE_API skybox : public drawable {
     private:
-        hge::cubemap  skyTex;
-        hge::sphere   spherePrim;
+        hge::cubemap    skyTex;
+        GLuint          vbo = 0;
+        unsigned        numTris = 0;
         
     public:
-        skybox      () {}
-        ~skybox     () {}
+        skybox  () { resetDrawMode(); }
+        skybox  ( const skybox& ) = delete;
+        skybox  ( skybox&& );
+        ~skybox () { unload(); }
         
-        skybox      ( const skybox& ) = delete;
-        skybox      ( skybox&& ) = default;
-        skybox&     operator =  ( const skybox& ) = delete;
-        skybox&     operator =  ( skybox&& ) = default;
+        skybox& operator =  ( const skybox& ) = delete;
+        skybox& operator =  ( skybox&& );
         
-        bool load( const char* skyFiles[ 6 ] );
+        void    enableAttribute ( pipeline::attribute ) override;
+        void    disableAttribute( pipeline::attribute ) override;
         
-        void unload() {
-            skyTex.unload();
-            spherePrim.terminate();
-        }
+        bool    load            ( const char* skyFiles[ 6 ] );
+        void    unload          ();
+        void    resetDrawMode   () { renderMode = pipeline::HGE_TRIANGLES; }
+        void    draw            () const {
+                                    glBindVertexArray( vao );
+                                    skyTex.activate();
+                                    glDrawArrays( renderMode, 0, numTris );
+                                    skyTex.deActivate();
+                                    glBindVertexArray( 0 );
+                                }
         
         static void draw( const cubemap& cm, const sphere& s ) {
             cm.activate();
@@ -75,8 +84,6 @@ class HGE_API skybox {
             c.draw();
             cm.deActivate();
         }
-        
-        inline void draw() const { draw( skyTex, spherePrim ); }
 };
 
 } // End hge namespace

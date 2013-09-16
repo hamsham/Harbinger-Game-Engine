@@ -22,21 +22,26 @@ text::text( text&& s ) :
     drawable( std::move( s ) ),
     vbo( s.vbo ),
     numChars( s.numChars ),
-    indices( std::move( s.indices ) )
-{}
+    indices( s.indices )
+{
+    s.vbo = 0;
+    s.numChars = 0;
+    s.indices = nullptr;
+}
 
 text& text::operator = ( text&& s ) {
     clearString();
     
     drawable::operator = ( std::move( s ) );
     
-    vbo = s.vbo;
-    s.vbo = 0;
+    vbo         = s.vbo;
+    s.vbo       = 0;
     
-    numChars = s.numChars;
-    s.numChars = 0;
+    numChars    = s.numChars;
+    s.numChars  = 0;
     
-    indices = std::move( s.indices );
+    indices     = s.indices;
+    s.indices   = nullptr;
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -46,10 +51,12 @@ void text::clearString() {
     glDeleteVertexArrays( 1, &vao );
     glDeleteBuffers( 1, &vbo );
     
-    indices.clear();
-    
-    vao = vbo = 0;
+    vao = 0;
+    vbo = 0;
     numChars = 0;
+    
+    delete [] indices;
+    indices = nullptr;
     
     resetDrawMode();
 }
@@ -59,7 +66,8 @@ void text::clearString() {
 // This function will bind the current object's VAO and VBO
 ///////////////////////////////////////////////////////////////////////////////
 void text::createVertexBuffer( const char* str ) {
-    numChars = 0;
+    int newCharCount = 0;
+    
     //count all the whitespace
     for( int i = 0; str[ i ] != '\0'; ++i ) {
         if (    str[ i ] != '\n'
@@ -67,7 +75,7 @@ void text::createVertexBuffer( const char* str ) {
         &&      str[ i ] != '\t'
         &&      str[ i ] != ' '
         ) {
-            ++numChars;
+            ++newCharCount;
         }
     }
     
@@ -83,21 +91,23 @@ void text::createVertexBuffer( const char* str ) {
     pipeline::enablePlainVertexAttribs();
     
     // Check if the text buffer needs to be resized
-    if ( numChars == (indices.size() / 2)) {
+    if ( numChars == newCharCount ) {
         return;
     }
-
-    try {
-        indices.resize( numChars * 2 );
-        glBufferData(
-            GL_ARRAY_BUFFER, sizeof( plainVertex ) * 4 * numChars, nullptr, GL_DYNAMIC_DRAW
-        );
-    }
-    catch( const std::length_error& err ) {
+    numChars = newCharCount;
+    
+    delete [] indices;
+    indices = new(std::nothrow) GLint[ numChars * 2 ];
+    
+    if ( !indices ) {
         std::cerr << "ERROR: Unable to create the string of text: " << str << std::endl;
         clearString();
         return;
     }
+    
+    glBufferData(
+        GL_ARRAY_BUFFER, sizeof( plainVertex ) * 4 * numChars, nullptr, GL_DYNAMIC_DRAW
+    );
 	printGlError( "Error while creating a string object's vertex buffer.");
 }
 
@@ -108,7 +118,7 @@ void text::createVertexBuffer( const char* str ) {
 void text::setString( const font& f, const char* str ) {
     
     if ( !str ) {
-        createVertexBuffer( 0 );
+        clearString();
         return;
     }
     
@@ -118,8 +128,6 @@ void text::setString( const font& f, const char* str ) {
     
     createVertexBuffer( str );
     
-//    tempQuad = (plainVertex*)glMapBuffer( GL_ARRAY_BUFFER, GL_WRITE_ONLY );
-    // Harbinger is not currently multi-threaded. This operation will perform much quicker.
     tempQuad = (plainVertex*)glMapBufferRange(
         GL_ARRAY_BUFFER, 0, sizeof( plainVertex ) * 4 * numChars,
         GL_MAP_WRITE_BIT | GL_MAP_UNSYNCHRONIZED_BIT
@@ -213,31 +221,6 @@ void text::disableAttribute( pipeline::attribute a ) {
     glBindVertexArray( vao );
     glDisableVertexAttribArray( (GLint)a );
     glBindVertexArray( 0 );
-}
-
-///////////////////////////////////////////////////////////////////////////////
-// STRING - DRAWING
-///////////////////////////////////////////////////////////////////////////////
-void text::draw() const {
-    glEnable( GL_BLEND );
-    
-    // Premultiplied alpha
-//    glBlendEquationSeparate( GL_FUNC_ADD, GL_FUNC_ADD );
-//    glBlendFuncSeparate( GL_ONE, GL_ONE_MINUS_SRC_ALPHA, GL_ONE, GL_ZERO );
-    
-    // Additive Blending
-    glBlendFunc( GL_ONE, GL_ONE );
-    glBindVertexArray( vao );
-
-    glMultiDrawArrays(
-        renderMode,
-        (const GLint*)indices.data(),
-        (const GLsizei*)(indices.data() + numChars),
-        numChars
-    );
-
-    glBindVertexArray( 0 );
-    glDisable( GL_BLEND );
 }
 
 } // End Harbinger namespace

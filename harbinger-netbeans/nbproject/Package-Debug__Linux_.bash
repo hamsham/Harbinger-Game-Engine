@@ -6,7 +6,7 @@
 
 # Macros
 TOP=`pwd`
-CND_PLATFORM=MinGW-Windows
+CND_PLATFORM=MinGW_Dwarf-Windows
 CND_CONF=Debug__Linux_
 CND_DISTDIR=dist
 CND_BUILDDIR=build

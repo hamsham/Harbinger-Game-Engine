@@ -21,7 +21,7 @@ FC=gfortran
 AS=as
 
 # Macros
-CND_PLATFORM=MinGW-Windows
+CND_PLATFORM=MinGW_Dwarf-Windows
 CND_DLIB_EXT=dll
 CND_CONF=Release_DLL
 CND_DISTDIR=dist
@@ -74,7 +74,7 @@ FFLAGS=
 ASFLAGS=
 
 # Link Libraries and Options
-LDLIBSOPTIONS=-lglew32 -lglfw3dll -lopengl32 -lFreeImage -lassimp.dll -lfreetype.dll ../../hamlibs/HamLibs_NetBeans/../bin/WIN32/libhamlibs.a
+LDLIBSOPTIONS=-lglew32 -lglfw3dll -lopengl32 -lFreeImage -lassimp.dll -lfreetype ../../hamlibs/HamLibs_NetBeans/../bin/WIN32/libhamlibs.a
 
 # Build Targets
 .build-conf: ${BUILD_SUBPROJECTS}

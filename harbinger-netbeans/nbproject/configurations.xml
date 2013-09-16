@@ -101,7 +101,7 @@
             <pElem>../../hamlibs/include</pElem>
             <pElem>../../../../../../mingw4.8.1/mingw32/i686-w64-mingw32/include/freetype2</pElem>
           </incDir>
-          <commandLine>-g -Wall -Werror -Wextra -pedantic -mmmx -msse -msse2 -msse3 -mfpmath=sse -O2 -s -shared -fPIC</commandLine>
+          <commandLine>-ggdb -Wall -Werror -Wextra -pedantic -mmmx -msse -msse2 -msse3 -mfpmath=sse -O2 -s -shared -fPIC</commandLine>
           <preprocessorList>
             <Elem>DEBUG</Elem>
             <Elem>HGE_BUILD_DYNAMIC</Elem>
@@ -116,7 +116,7 @@
             <linkerLibLibItem>opengl32</linkerLibLibItem>
             <linkerLibLibItem>FreeImage</linkerLibLibItem>
             <linkerLibLibItem>assimp.dll</linkerLibLibItem>
-            <linkerLibLibItem>freetype.dll</linkerLibLibItem>
+            <linkerLibLibItem>freetype</linkerLibLibItem>
             <linkerLibProjectItem>
               <makeArtifact PL="../../hamlibs/HamLibs_NetBeans"
                             CT="3"
@@ -303,7 +303,7 @@
             <linkerLibLibItem>opengl32</linkerLibLibItem>
             <linkerLibLibItem>FreeImage</linkerLibLibItem>
             <linkerLibLibItem>assimp.dll</linkerLibLibItem>
-            <linkerLibLibItem>freetype.dll</linkerLibLibItem>
+            <linkerLibLibItem>freetype</linkerLibLibItem>
             <linkerLibProjectItem>
               <makeArtifact PL="../../hamlibs/HamLibs_NetBeans"
                             CT="3"

@@ -21,7 +21,7 @@ FC=gfortran
 AS=as
 
 # Macros
-CND_PLATFORM=MinGW-Windows
+CND_PLATFORM=MinGW_Dwarf-Windows
 CND_DLIB_EXT=dll
 CND_CONF=Release__Linux_
 CND_DISTDIR=dist

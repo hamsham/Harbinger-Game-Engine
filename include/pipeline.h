@@ -155,6 +155,7 @@ class HGE_API pipeline : public application {
         virtual void    drawSky             () = 0;
         virtual void    drawFonts           () = 0;
         virtual void    drawBillboards      () = 0;
+        virtual void    drawDebug           () = 0;
         
         /******************************************************************************
          * OpenGL Display Pipeline Functions

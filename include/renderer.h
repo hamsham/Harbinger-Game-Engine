@@ -81,6 +81,7 @@ class HGE_API dsRenderer : public pipeline {
         virtual void        drawSky             () = 0;
         virtual void        drawFonts           () = 0;
         virtual void        drawBillboards      () = 0;
+        virtual void        drawDebug           () = 0;
         
     private:
         void doGeometryPass () final; // calls "drawSceneLit()"
@@ -91,7 +92,7 @@ class HGE_API dsRenderer : public pipeline {
         void doBillboardPass() final;
         
 #ifdef DEBUG
-        enbtShader*    pEnbtShader = nullptr;
+        enbtShader*         pEnbtShader = nullptr;
         void doNbtPass      ();
         
     public:
@@ -99,6 +100,12 @@ class HGE_API dsRenderer : public pipeline {
         void showNormals    ( bool );
         void showTangents   ( bool );
         void showBitangents ( bool );
+#else
+    public:
+        void showEdges      ( bool ) {}
+        void showNormals    ( bool ) {}
+        void showTangents   ( bool ) {}
+        void showBitangents ( bool ) {}
 #endif
 };
 
@@ -141,9 +148,7 @@ inline void dsRenderer::setPointLight( unsigned i, const dsPointLight& l ) {
 #ifdef DEBUG
 inline void dsRenderer::doNbtPass() {
     applyStockShader( pEnbtShader->getProgramId() );
-    drawSceneLit();
-    drawSceneUnlit();
-    drawFonts();
+    drawDebug();
 }
 
 inline void dsRenderer::showEdges( bool b ) {
@@ -179,8 +184,10 @@ inline void dsRenderer::doSkyPass() {
  * DRAW FONTS
  */
 inline void dsRenderer::doFontPass() {
+    glEnable( GL_BLEND );
     applyStockShader( pFontShader->getProgramId() );
     drawFonts();
+    glDisable( GL_BLEND );
 }
 
 /*
@@ -249,6 +256,7 @@ class HGE_API fwdRenderer : public pipeline {
         virtual void        drawSky             () = 0;
         virtual void        drawFonts           () = 0;
         virtual void        drawBillboards      () = 0;
+        virtual void        drawDebug           () = 0;
         
     private:
         void doGeometryPass () final; // calls "drawSceneUnlit()"
@@ -266,6 +274,12 @@ class HGE_API fwdRenderer : public pipeline {
         void showNormals    ( bool );
         void showTangents   ( bool );
         void showBitangents ( bool );
+#else
+    public:
+        void showEdges      ( bool ) {}
+        void showNormals    ( bool ) {}
+        void showTangents   ( bool ) {}
+        void showBitangents ( bool ) {}
 #endif
 };
 
@@ -318,9 +332,7 @@ inline void fwdRenderer::doBillboardPass() {
 #ifdef DEBUG
 inline void fwdRenderer::doNbtPass() {
     applyStockShader( pEnbtShader->getProgramId() );
-    drawSceneLit();
-    drawSceneUnlit();
-    drawFonts();
+    drawDebug();
 }
 
 inline void fwdRenderer::showEdges( bool b ) {

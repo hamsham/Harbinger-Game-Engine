@@ -203,6 +203,7 @@ bool mesh::prepMeshes( const aiScene* pScene, unsigned& numVerts, unsigned& numI
 	std::cout
 		<< "\t\t" << numVerts << " vertices\n"
 		<< "\t\t" << numIndices << " indices\n"
+		<< "\t\t" << pScene->mNumMaterials << " textures\n"
 		<< "\t\t" << numMeshes << " meshes\n";
 	return true;
 }

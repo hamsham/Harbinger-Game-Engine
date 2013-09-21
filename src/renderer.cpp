@@ -109,9 +109,13 @@ void dsRenderer::tick() {
     doGeometryPass();
     
     glEnable( GL_STENCIL_TEST );
+    glClearStencil(0);
+    pGBuffer->bindForLightPass();
+    applyStockShader( pDsLightShader->getProgramId() );
     doStencilPass();
     doLightingPass();
     glDisable( GL_STENCIL_TEST );
+    
     applyStockShader( pPlainShader->getProgramId() );
     drawSceneUnlit();
 #ifdef DEBUG
@@ -145,48 +149,38 @@ void dsRenderer::doGeometryPass() {
  */
 void dsRenderer::doStencilPass() {
     // Disable color and depth writes to the stencil buffer
-    applyStockShader( pNullShader->getProgramId() );
-    pGBuffer->bindForStencilPass();
-    
+    glColorMask( GL_FALSE, GL_FALSE, GL_FALSE, GL_FALSE );
     glDepthMask( GL_FALSE ); // don't allow the stencil pass to update the depth buffer
-    glDisable( GL_CULL_FACE );
     
     // always pass the stencil test
     glStencilFunc( GL_ALWAYS, 0, 0 );
-    
-    glStencilOpSeparate( GL_BACK, GL_KEEP, GL_INCR_WRAP, GL_KEEP );
-    glStencilOpSeparate( GL_FRONT, GL_KEEP, GL_DECR_WRAP, GL_KEEP );
+    glStencilOp( GL_REPLACE, GL_INCR, GL_KEEP );
     
     lightSphere.draw();
     
-    glEnable( GL_CULL_FACE );
-    glDepthMask( GL_TRUE );
+    glColorMask( GL_TRUE, GL_TRUE, GL_TRUE, GL_TRUE );
 }
 
 /*
  * LIGHTING PASS
  */
 void dsRenderer::doLightingPass() {
-    applyStockShader( pDsLightShader->getProgramId() );
-    pGBuffer->bindForLightPass();
+    glDepthFunc( GL_GEQUAL );
+    glCullFace( GL_FRONT );
     
-    glStencilFunc( GL_NOTEQUAL, 0, 0xFF );
-    
-    glDisable( GL_DEPTH_TEST );
+    glStencilFunc( GL_EQUAL, 0XFF, 0 );
+    glStencilOp( GL_KEEP, GL_REPLACE, GL_KEEP );
     
     glEnable( GL_BLEND );
     glBlendEquation( GL_FUNC_ADD );
     glBlendFunc( GL_ONE, GL_ONE );
     
-    glCullFace( GL_FRONT );
-    
     lightSphere.draw();
     
-    glCullFace( GL_BACK );
-    
     glDisable( GL_BLEND );
-    
-    glEnable( GL_DEPTH_TEST );
+    glDepthFunc( GL_LEQUAL );
+    glDepthMask( GL_TRUE );
+    glCullFace( GL_BACK );
 }
 
 /*

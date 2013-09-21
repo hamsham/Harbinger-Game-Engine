@@ -95,11 +95,6 @@ struct HGE_API dsPointLight {
 //      To be used with a GBuffer and Deferred Shader
 ///////////////////////////////////////////////////////////////////////////////
 class HGE_API dsLightSphere {
-    enum : int {
-        DEFAULT_NUM_RINGS   = 10,
-        DEFAULT_NUM_SECTORS = 10
-    };
-    
     enum lightAttributes : int {
         SCALE_ATTRIB    = 1,
         POS_ATTRIB      = 2,
@@ -108,10 +103,9 @@ class HGE_API dsLightSphere {
     };
     
     private:
-        GLuint vao = 0;
-        GLuint vbo[3] = {0,0,0}; // vertex buffer, index buffers, instanced light buffer
-        unsigned numIndices = 0;
-        unsigned numInstances = 0;
+        GLuint      vao = 0;
+        GLuint      vbo[2] = {0,0}; // vertex buffer, instanced light buffer
+        unsigned    numInstances = 0;
         
     public:
         dsLightSphere   () {}
@@ -130,12 +124,15 @@ class HGE_API dsLightSphere {
         void            setLight        ( unsigned index, const dsPointLight& );
         unsigned        getNumLights    () const { return numInstances; }
         
-        void draw() const {
-            glBindVertexArray( vao );
-            glDrawElementsInstanced( GL_TRIANGLE_STRIP, numIndices, GL_UNSIGNED_INT, 0, numInstances );
-            glBindVertexArray( 0 );
-        }
+        inline void     draw            () const;
 };
+
+inline void dsLightSphere::draw() const {
+    // The subdivided icosahedron has been measured to use 240 triangles
+    glBindVertexArray( vao );
+    glDrawArraysInstanced( pipeline::HGE_TRIANGLES, 0, 240, numInstances );
+    glBindVertexArray( 0 );
+}
 
 } // end hge namespace
 

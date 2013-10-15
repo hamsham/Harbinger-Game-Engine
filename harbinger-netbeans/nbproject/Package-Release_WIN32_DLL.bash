@@ -7,14 +7,14 @@
 # Macros
 TOP=`pwd`
 CND_PLATFORM=MinGW_Dwarf-Windows
-CND_CONF=Debug_DLL
+CND_CONF=Release_WIN32_DLL
 CND_DISTDIR=dist
 CND_BUILDDIR=build
 CND_DLIB_EXT=dll
 NBTMPDIR=${CND_BUILDDIR}/${CND_CONF}/${CND_PLATFORM}/tmp-packaging
 TMPDIRNAME=tmp-packaging
-OUTPUT_PATH=../bin/WIN32/harbinger-debug.dll
-OUTPUT_BASENAME=harbinger-debug.dll
+OUTPUT_PATH=../bin/WIN32/harbinger.dll
+OUTPUT_BASENAME=harbinger.dll
 PACKAGE_TOP_DIR=libharbinger-netbeans.dll/
 
 # Functions

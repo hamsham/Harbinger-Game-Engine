@@ -7,15 +7,15 @@
 # Macros
 TOP=`pwd`
 CND_PLATFORM=MinGW_Dwarf-Windows
-CND_CONF=Release_DLL
+CND_CONF=Release_WIN32_Static
 CND_DISTDIR=dist
 CND_BUILDDIR=build
 CND_DLIB_EXT=dll
 NBTMPDIR=${CND_BUILDDIR}/${CND_CONF}/${CND_PLATFORM}/tmp-packaging
 TMPDIRNAME=tmp-packaging
-OUTPUT_PATH=../bin/WIN32/harbinger.dll
-OUTPUT_BASENAME=harbinger.dll
-PACKAGE_TOP_DIR=libharbinger-netbeans.dll/
+OUTPUT_PATH=../bin/WIN32/libharbinger-static-debug.a
+OUTPUT_BASENAME=libharbinger-static-debug.a
+PACKAGE_TOP_DIR=harbinger-netbeans/
 
 # Functions
 function checkReturnCode
@@ -60,15 +60,15 @@ mkdir -p ${NBTMPDIR}
 
 # Copy files and create directories and links
 cd "${TOP}"
-makeDirectory "${NBTMPDIR}/libharbinger-netbeans.dll/lib"
+makeDirectory "${NBTMPDIR}/harbinger-netbeans/lib"
 copyFileToTmpDir "${OUTPUT_PATH}" "${NBTMPDIR}/${PACKAGE_TOP_DIR}lib/${OUTPUT_BASENAME}" 0644
 
 
 # Generate tar file
 cd "${TOP}"
-rm -f ${CND_DISTDIR}/${CND_CONF}/${CND_PLATFORM}/package/libharbinger-netbeans.dll.tar
+rm -f ${CND_DISTDIR}/${CND_CONF}/${CND_PLATFORM}/package/harbinger-netbeans.tar
 cd ${NBTMPDIR}
-tar -vcf ../../../../${CND_DISTDIR}/${CND_CONF}/${CND_PLATFORM}/package/libharbinger-netbeans.dll.tar *
+tar -vcf ../../../../${CND_DISTDIR}/${CND_CONF}/${CND_PLATFORM}/package/harbinger-netbeans.tar *
 checkReturnCode
 
 # Cleanup

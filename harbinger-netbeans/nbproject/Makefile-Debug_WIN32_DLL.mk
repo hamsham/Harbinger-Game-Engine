@@ -23,7 +23,7 @@ AS=as
 # Macros
 CND_PLATFORM=MinGW_Dwarf-Windows
 CND_DLIB_EXT=dll
-CND_CONF=Debug_DLL
+CND_CONF=Debug_WIN32_DLL
 CND_DISTDIR=dist
 CND_BUILDDIR=build
 

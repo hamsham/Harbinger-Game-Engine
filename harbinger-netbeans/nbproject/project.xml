@@ -16,12 +16,20 @@
             </sourceRootList>
             <confList>
                 <confElem>
-                    <name>Debug_DLL</name>
+                    <name>Debug_WIN32_DLL</name>
                     <type>2</type>
                 </confElem>
                 <confElem>
-                    <name>Release_DLL</name>
+                    <name>Release_WIN32_DLL</name>
                     <type>2</type>
+                </confElem>
+                <confElem>
+                    <name>Debug_WIN32_Static</name>
+                    <type>3</type>
+                </confElem>
+                <confElem>
+                    <name>Release_WIN32_Static</name>
+                    <type>3</type>
                 </confElem>
                 <confElem>
                     <name>Debug__Linux_</name>

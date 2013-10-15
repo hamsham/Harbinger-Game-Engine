@@ -84,7 +84,7 @@
   </sourceRootList>
   <projectmakefile>Makefile</projectmakefile>
   <confs>
-    <conf name="Debug_DLL" type="2">
+    <conf name="Debug_WIN32_DLL" type="2">
       <toolsSet>
         <remote-sources-mode>LOCAL_SOURCES</remote-sources-mode>
         <compilerSet>default</compilerSet>
@@ -259,7 +259,7 @@
       <item path="../src/transformations.cpp" ex="false" tool="1" flavor2="0">
       </item>
     </conf>
-    <conf name="Release_DLL" type="2">
+    <conf name="Release_WIN32_DLL" type="2">
       <toolsSet>
         <remote-sources-mode>LOCAL_SOURCES</remote-sources-mode>
         <compilerSet>default</compilerSet>
@@ -319,6 +319,325 @@
           </linkerLibItems>
           <commandLine>-Wl,--out-implib,../bin/WIN32/libharbinger.dll.a</commandLine>
         </linkerTool>
+        <requiredProjects>
+          <makeArtifact PL="../../hamlibs/HamLibs_NetBeans"
+                        CT="3"
+                        CN="Release"
+                        AC="false"
+                        BL="false"
+                        WD="../../hamlibs/HamLibs_NetBeans"
+                        BC="${MAKE}  -f Makefile CONF=Release"
+                        CC="${MAKE}  -f Makefile CONF=Release clean"
+                        OP="../bin/WIN32/libhamlibs.a">
+          </makeArtifact>
+        </requiredProjects>
+      </compileType>
+      <item path="../bin/LINUX/libharbinger-debug.so" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="../bin/LINUX/libharbinger.so" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="../bin/WIN32/harbinger-debug.dll" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="../bin/WIN32/harbinger.dll" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="../bin/WIN32/libharbinger-debug.dll.a"
+            ex="false"
+            tool="3"
+            flavor2="0">
+      </item>
+      <item path="../bin/WIN32/libharbinger.dll.a" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="../include/application.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="../include/billboard.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="../include/bitmap.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="../include/camera.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="../include/display.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="../include/drawable.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="../include/font.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="../include/gBuffer.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="../include/geometry.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="../include/harbinger.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="../include/input.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="../include/light.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="../include/mesh.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="../include/pipeline.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="../include/primitives.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="../include/renderer.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="../include/resource.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="../include/setup.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="../include/shader.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="../include/shadowMap.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="../include/skybox.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="../include/stockShaders.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="../include/stockShaders_glsl.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="../include/text.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="../include/transformations.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="../include/types.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="../src/application.cpp" ex="false" tool="1" flavor2="0">
+      </item>
+      <item path="../src/billboard.cpp" ex="false" tool="1" flavor2="0">
+      </item>
+      <item path="../src/bitmap.cpp" ex="false" tool="1" flavor2="0">
+      </item>
+      <item path="../src/camera.cpp" ex="false" tool="1" flavor2="0">
+      </item>
+      <item path="../src/display.cpp" ex="false" tool="1" flavor2="0">
+      </item>
+      <item path="../src/drawable.cpp" ex="false" tool="1" flavor2="0">
+      </item>
+      <item path="../src/font.cpp" ex="false" tool="1" flavor2="0">
+      </item>
+      <item path="../src/gBuffer.cpp" ex="false" tool="1" flavor2="0">
+      </item>
+      <item path="../src/geometry.cpp" ex="false" tool="1" flavor2="0">
+      </item>
+      <item path="../src/harbinger.cpp" ex="false" tool="1" flavor2="0">
+      </item>
+      <item path="../src/input.cpp" ex="false" tool="1" flavor2="0">
+      </item>
+      <item path="../src/light.cpp" ex="false" tool="1" flavor2="0">
+      </item>
+      <item path="../src/mesh.cpp" ex="false" tool="1" flavor2="0">
+      </item>
+      <item path="../src/pipeline.cpp" ex="false" tool="1" flavor2="0">
+      </item>
+      <item path="../src/primitives.cpp" ex="false" tool="1" flavor2="0">
+      </item>
+      <item path="../src/renderer.cpp" ex="false" tool="1" flavor2="0">
+      </item>
+      <item path="../src/resource.cpp" ex="false" tool="1" flavor2="0">
+      </item>
+      <item path="../src/shader.cpp" ex="false" tool="1" flavor2="0">
+      </item>
+      <item path="../src/shadowMap.cpp" ex="false" tool="1" flavor2="0">
+      </item>
+      <item path="../src/skybox.cpp" ex="false" tool="1" flavor2="0">
+      </item>
+      <item path="../src/stockShaders.cpp" ex="false" tool="1" flavor2="0">
+      </item>
+      <item path="../src/text.cpp" ex="false" tool="1" flavor2="0">
+      </item>
+      <item path="../src/transformations.cpp" ex="false" tool="1" flavor2="0">
+      </item>
+    </conf>
+    <conf name="Debug_WIN32_Static" type="3">
+      <toolsSet>
+        <remote-sources-mode>LOCAL_SOURCES</remote-sources-mode>
+        <compilerSet>default</compilerSet>
+        <dependencyChecking>true</dependencyChecking>
+        <rebuildPropChanged>true</rebuildPropChanged>
+      </toolsSet>
+      <compileType>
+        <ccTool>
+          <developmentMode>0</developmentMode>
+          <architecture>1</architecture>
+          <standard>8</standard>
+          <incDir>
+            <pElem>../include</pElem>
+            <pElem>../../hamlibs/include</pElem>
+            <pElem>../../../../../../mingw4.8.1/mingw32/i686-w64-mingw32/include/freetype2</pElem>
+          </incDir>
+          <commandLine>-ggdb -Wall -Werror -Wextra -pedantic -mmmx -msse -msse2 -msse3 -mfpmath=sse -O2 -ffast-math</commandLine>
+          <preprocessorList>
+            <Elem>DEBUG</Elem>
+            <Elem>HGE_BUILD_STATIC</Elem>
+          </preprocessorList>
+          <warningLevel>0</warningLevel>
+        </ccTool>
+        <archiverTool>
+          <output>../bin/WIN32/libharbinger-static-debug.a</output>
+        </archiverTool>
+        <requiredProjects>
+          <makeArtifact PL="../../hamlibs/HamLibs_NetBeans"
+                        CT="3"
+                        CN="Debug"
+                        AC="false"
+                        BL="false"
+                        WD="../../hamlibs/HamLibs_NetBeans"
+                        BC="${MAKE}  -f Makefile CONF=Debug"
+                        CC="${MAKE}  -f Makefile CONF=Debug clean"
+                        OP="../bin/WIN32/libhamlibs-debug.a">
+          </makeArtifact>
+        </requiredProjects>
+      </compileType>
+      <item path="../bin/LINUX/libharbinger-debug.so" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="../bin/LINUX/libharbinger.so" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="../bin/WIN32/harbinger-debug.dll" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="../bin/WIN32/harbinger.dll" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="../bin/WIN32/libharbinger-debug.dll.a"
+            ex="false"
+            tool="3"
+            flavor2="0">
+      </item>
+      <item path="../bin/WIN32/libharbinger.dll.a" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="../include/application.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="../include/billboard.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="../include/bitmap.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="../include/camera.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="../include/display.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="../include/drawable.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="../include/font.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="../include/gBuffer.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="../include/geometry.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="../include/harbinger.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="../include/input.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="../include/light.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="../include/mesh.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="../include/pipeline.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="../include/primitives.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="../include/renderer.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="../include/resource.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="../include/setup.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="../include/shader.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="../include/shadowMap.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="../include/skybox.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="../include/stockShaders.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="../include/stockShaders_glsl.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="../include/text.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="../include/transformations.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="../include/types.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="../src/application.cpp" ex="false" tool="1" flavor2="0">
+      </item>
+      <item path="../src/billboard.cpp" ex="false" tool="1" flavor2="0">
+      </item>
+      <item path="../src/bitmap.cpp" ex="false" tool="1" flavor2="0">
+      </item>
+      <item path="../src/camera.cpp" ex="false" tool="1" flavor2="0">
+      </item>
+      <item path="../src/display.cpp" ex="false" tool="1" flavor2="0">
+      </item>
+      <item path="../src/drawable.cpp" ex="false" tool="1" flavor2="0">
+      </item>
+      <item path="../src/font.cpp" ex="false" tool="1" flavor2="0">
+      </item>
+      <item path="../src/gBuffer.cpp" ex="false" tool="1" flavor2="0">
+      </item>
+      <item path="../src/geometry.cpp" ex="false" tool="1" flavor2="0">
+      </item>
+      <item path="../src/harbinger.cpp" ex="false" tool="1" flavor2="0">
+      </item>
+      <item path="../src/input.cpp" ex="false" tool="1" flavor2="0">
+      </item>
+      <item path="../src/light.cpp" ex="false" tool="1" flavor2="0">
+      </item>
+      <item path="../src/mesh.cpp" ex="false" tool="1" flavor2="0">
+      </item>
+      <item path="../src/pipeline.cpp" ex="false" tool="1" flavor2="0">
+      </item>
+      <item path="../src/primitives.cpp" ex="false" tool="1" flavor2="0">
+      </item>
+      <item path="../src/renderer.cpp" ex="false" tool="1" flavor2="0">
+      </item>
+      <item path="../src/resource.cpp" ex="false" tool="1" flavor2="0">
+      </item>
+      <item path="../src/shader.cpp" ex="false" tool="1" flavor2="0">
+      </item>
+      <item path="../src/shadowMap.cpp" ex="false" tool="1" flavor2="0">
+      </item>
+      <item path="../src/skybox.cpp" ex="false" tool="1" flavor2="0">
+      </item>
+      <item path="../src/stockShaders.cpp" ex="false" tool="1" flavor2="0">
+      </item>
+      <item path="../src/text.cpp" ex="false" tool="1" flavor2="0">
+      </item>
+      <item path="../src/transformations.cpp" ex="false" tool="1" flavor2="0">
+      </item>
+    </conf>
+    <conf name="Release_WIN32_Static" type="3">
+      <toolsSet>
+        <remote-sources-mode>LOCAL_SOURCES</remote-sources-mode>
+        <compilerSet>default</compilerSet>
+        <dependencyChecking>true</dependencyChecking>
+        <rebuildPropChanged>true</rebuildPropChanged>
+      </toolsSet>
+      <compileType>
+        <cTool>
+          <developmentMode>6</developmentMode>
+          <stripSymbols>true</stripSymbols>
+          <warningLevel>3</warningLevel>
+        </cTool>
+        <ccTool>
+          <developmentMode>0</developmentMode>
+          <stripSymbols>true</stripSymbols>
+          <architecture>1</architecture>
+          <standard>8</standard>
+          <incDir>
+            <pElem>../include</pElem>
+            <pElem>../../hamlibs/include</pElem>
+            <pElem>../../../../../../mingw4.8.1/mingw32/i686-w64-mingw32/include/freetype2</pElem>
+          </incDir>
+          <commandLine>-Wall -Werror -Wextra -pedantic -mmmx -msse -msse2 -msse3 -mfpmath=sse -O3 -ffast-math</commandLine>
+          <preprocessorList>
+            <Elem>HGE_BUILD_STATIC</Elem>
+          </preprocessorList>
+          <warningLevel>0</warningLevel>
+        </ccTool>
+        <fortranCompilerTool>
+          <developmentMode>5</developmentMode>
+        </fortranCompilerTool>
+        <asmTool>
+          <developmentMode>5</developmentMode>
+        </asmTool>
+        <archiverTool>
+          <output>../bin/WIN32/libharbinger-static-debug.a</output>
+        </archiverTool>
         <requiredProjects>
           <makeArtifact PL="../../hamlibs/HamLibs_NetBeans"
                         CT="3"

@@ -27,11 +27,11 @@ CLEAN_SUBPROJECTS=${CLEAN_SUBPROJECTS_${SUBPROJECTS}}
 PROJECTNAME=harbinger-netbeans
 
 # Active Configuration
-DEFAULTCONF=Debug_DLL
+DEFAULTCONF=Debug_WIN32_DLL
 CONF=${DEFAULTCONF}
 
 # All Configurations
-ALLCONFS=Debug_DLL Release_DLL Debug__Linux_ Release__Linux_ 
+ALLCONFS=Debug_WIN32_DLL Release_WIN32_DLL Debug_WIN32_Static Release_WIN32_Static Debug__Linux_ Release__Linux_ 
 
 
 # build

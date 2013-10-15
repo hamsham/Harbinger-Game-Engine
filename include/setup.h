@@ -34,6 +34,8 @@
 #ifdef HL_OS_WINDOWS
     #if defined(HGE_BUILD_DYNAMIC)
         #define HGE_API __declspec( dllexport )
+    #elif defined(HGE_BUILD_STATIC)
+        #define HGE_API
     #else
         #define HGE_API __declspec( dllimport )
     #endif

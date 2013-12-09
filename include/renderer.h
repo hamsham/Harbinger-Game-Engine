@@ -26,7 +26,7 @@ namespace hge {
 /******************************************************************************
  * Deferred Rendering Class
 ******************************************************************************/
-class HGE_API dsRenderer : public pipeline {
+class HGE_API dsRenderer : virtual public pipeline {
     
     private:
         gBuffer*            pGBuffer        = nullptr;
@@ -53,7 +53,7 @@ class HGE_API dsRenderer : public pipeline {
         dsRenderer&         operator =          ( dsRenderer&& )         = delete;
         
         virtual bool        init                ( const vec2i& resolution );
-        virtual bool        init                () override { return init( vec2i(0,0) ); }
+        virtual bool        init                () override { return init( vec2i(HGE_DEFAULT_WINDOW_WIDTH, HGE_DEFAULT_WINDOW_HEIGHT) ); }
         virtual void        terminate           () override;
         void                tick                () final;
         
@@ -205,7 +205,7 @@ inline void dsRenderer::doBillboardPass() {
 /******************************************************************************
  * Forward Rendering Class
 ******************************************************************************/
-class HGE_API fwdRenderer : public pipeline {
+class HGE_API fwdRenderer : virtual public pipeline {
     
     private:
         plainShader*        pPlainShader        = nullptr;

@@ -50,5 +50,16 @@
 	#define HGE_INLINE HL_INLINE
 #endif
 
+/*
+ * Engine Default Values
+ */
+#ifndef HGE_DEFAULT_WINDOW_WIDTH
+    #define HGE_DEFAULT_WINDOW_WIDTH 640
+#endif
+
+#ifndef HGE_DEFAULT_WINDOW_HEIGHT
+    #define HGE_DEFAULT_WINDOW_HEIGHT 480
+#endif
+
 #endif	/* __HGE_SETUP_H__ */
 

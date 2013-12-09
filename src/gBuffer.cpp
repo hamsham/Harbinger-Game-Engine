@@ -176,10 +176,6 @@ void gBuffer::bindForGeometryPass() const {
     };
     
     glDrawBuffers( 3, drawBuffers );
-    
-#ifdef DEBUG
-    //glClear( GL_COLOR_BUFFER_BIT );
-#endif
 }
 
 /******************************************************************************

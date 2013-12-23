@@ -151,7 +151,8 @@ window::window(
     glfwMakeContextCurrent  ( pContext );
     glfwGetWindowSize       ( pContext, &resolution[0], &resolution[1] );
     glfwSetInputMode        ( pContext, GLFW_STICKY_KEYS, GL_TRUE );
-    glfwSwapInterval        ( (int)useVsync );
+    //glfwSwapInterval        ( (int)useVsync );
+    glfwSwapInterval        (1);
     
     displayFullscreen = fullscreen != nullptr;
     
@@ -202,7 +203,8 @@ bool window::isOpen() {
 //-----------------------------------------------------------------------------
 void window::flip() {
     glfwSwapBuffers         ( pContext );
-    glfwPollEvents          ();
+    //glfwPollEvents          ();
+    glfwWaitEvents          ();
 }
 
 //-----------------------------------------------------------------------------

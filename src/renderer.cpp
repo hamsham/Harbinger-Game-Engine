@@ -115,6 +115,7 @@ void dsRenderer::tick() {
     doStencilPass();
     doLightingPass();
     glDisable( GL_STENCIL_TEST );
+    pGBuffer->unbind();
     
     applyStockShader( pPlainShader->getProgramId() );
     drawSceneUnlit();
@@ -124,9 +125,6 @@ void dsRenderer::tick() {
     doBillboardPass();
     doSkyPass();
     doFontPass();
-    
-    pGBuffer->bindForReading();
-    pGBuffer->drawBuffer();
 }
 
 /*
@@ -135,12 +133,8 @@ void dsRenderer::tick() {
 void dsRenderer::doGeometryPass() {
     // Tell the GBuffer to prepare the next frame
     applyStockShader( pGeomShader->getProgramId() );
-    pGBuffer->bindForWriting();
-    
-    glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT );
-    
     pGBuffer->bindForGeometryPass();
-    
+    glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT );
     drawSceneLit();
 }
 
@@ -199,8 +193,8 @@ void dsRenderer::setResolution( const vec2i& res ) {
  * FONT HANDLING
  */
 void dsRenderer::setFontColor( const vec4& c ) {
-    applyStockShader ( pFontShader->getProgramId() );
-    pFontShader->setFontColor   ( c );
+    applyStockShader( pFontShader->getProgramId() );
+    pFontShader->setFontColor( c );
 }
 
 /******************************************************************************

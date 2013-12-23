@@ -481,23 +481,23 @@ const char dsGeometryFs[] = R"***(
     in vec3 tngCoords;
     in vec3 btngCoords;
     
-    layout ( location = 0 ) out vec3 gBufPosition;
-    layout ( location = 1 ) out vec3 gBufDiffuse;
-    layout ( location = 2 ) out vec3 gBufNormal;
+    layout ( location = 0 ) out vec4 gBufPosition;
+    layout ( location = 1 ) out vec4 gBufDiffuse;
+    layout ( location = 2 ) out vec4 gBufNormal;
     
     uniform sampler2D diffuseMap;
     uniform sampler2D normalMap;
 
-    vec3 calcBumpedNormal() {
+    vec4 calcBumpedNormal() {
         vec3 bumpNormal = 2.0 * texture( normalMap, texCoords ).rgb - 1.0;
         mat3 tbn        = mat3( tngCoords, btngCoords, nrmCoords );
 
-        return normalize( tbn * bumpNormal ).xyz;
+        return normalize( tbn * bumpNormal );
     }
     
     void main() {
-        gBufPosition = posCoords;
-        gBufDiffuse = texture( diffuseMap, texCoords ).xyz;
+        gBufPosition = vec4( posCoords, 1.0 );
+        gBufDiffuse = texture2D( diffuseMap, texCoords );
         gBufNormal = calcBumpedNormal();
     }
     
@@ -545,9 +545,9 @@ const char dsLightVs[] = R"***(
 const char dsLightFs[] = R"***(
     #version 330
     
-    uniform sampler2D       gBufPosition;
-    uniform sampler2D       gBufDiffuse;
-    uniform sampler2D       gBufNormal;
+    uniform sampler2DRect   gBufPosition;
+    uniform sampler2DRect   gBufDiffuse;
+    uniform sampler2DRect   gBufNormal;
     uniform vec2            gBufResolution;
     
     in vec3 lightPos;
@@ -576,13 +576,12 @@ const char dsLightFs[] = R"***(
 
     void main() {
         vec2 textureCoords  = calcTextureCoord();
-        vec3 worldPosition  = texture( gBufPosition, textureCoords ).xyz;
-        vec3 screenColor    = texture( gBufDiffuse, textureCoords ).xyz;
-        vec3 normalCoords   = normalize( texture( gBufNormal, textureCoords ).xyz );
+        vec4 worldPosition  = texture( gBufPosition, textureCoords ).xyz;
+        vec4 screenColor    = texture( gBufDiffuse, textureCoords );
+        vec3 normalCoords   = normalize( texture( gBufNormal, textureCoords ) ).xyz;
         
-        fragCol
-            = vec4( screenColor, 1.0 )
-            * calcPointLight( worldPosition, normalCoords );
+        fragCol             = screenColor
+                            * calcPointLight( worldPosition, normalCoords );
     }
 )***";
 

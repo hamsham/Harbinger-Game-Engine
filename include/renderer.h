@@ -76,12 +76,12 @@ class HGE_API dsRenderer : virtual public pipeline {
     protected:
         virtual void        updateScene         ( float ) = 0;
         virtual void        changeResolution    ( const vec2i& res ) = 0;
-        virtual void        drawSceneLit        () = 0;
-        virtual void        drawSceneUnlit      () = 0;
-        virtual void        drawSky             () = 0;
-        virtual void        drawFonts           () = 0;
-        virtual void        drawBillboards      () = 0;
-        virtual void        drawDebug           () = 0;
+        virtual void        drawSceneLit        () {}
+        virtual void        drawSceneUnlit      () {}
+        virtual void        drawSky             () {}
+        virtual void        drawFonts           () {}
+        virtual void        drawBillboards      () {}
+        virtual void        drawDebug           () {}
         
     private:
         void doGeometryPass () final; // calls "drawSceneLit()"
@@ -251,12 +251,12 @@ class HGE_API fwdRenderer : virtual public pipeline {
     protected:
         virtual void        updateScene         ( float ) = 0;
         virtual void        changeResolution    ( const vec2i& ) = 0;
-        virtual void        drawSceneLit        () = 0;
-        virtual void        drawSceneUnlit      () = 0;
-        virtual void        drawSky             () = 0;
-        virtual void        drawFonts           () = 0;
-        virtual void        drawBillboards      () = 0;
-        virtual void        drawDebug           () = 0;
+        virtual void        drawSceneLit        () {}
+        virtual void        drawSceneUnlit      () {}
+        virtual void        drawSky             () {}
+        virtual void        drawFonts           () {}
+        virtual void        drawBillboards      () {}
+        virtual void        drawDebug           () {}
         
     private:
         void doGeometryPass () final; // calls "drawSceneUnlit()"

@@ -525,21 +525,7 @@ bool dsGeometryShader::init() {
 /******************************************************************************
  * Deferred Renderer Light Pass for instanced lights
 ******************************************************************************/
-dsLightShader::dsLightShader( dsLightShader&& ds ) :
-    stockShader::stockShader( std::move( ds ) ),
-    resolutionId    ( ds.resolutionId )
-{
-    ds.resolutionId = 0;
-}
-
-dsLightShader& dsLightShader::operator =( dsLightShader&& ds ) {
-    stockShader::operator =( std::move( ds ) );
-    resolutionId    = ds.resolutionId;
-    
-    ds.resolutionId = 0;
-}
-
-bool dsLightShader::init( const vec2i& gBufResolution ) {
+bool dsLightShader::init() {
     if (    !program.loadBuffer( dsLightVs, sizeof( dsLightVs ), GL_VERTEX_SHADER )
     ||      !program.loadBuffer( dsLightFs, sizeof( dsLightFs ), GL_FRAGMENT_SHADER )
     ) {
@@ -569,12 +555,9 @@ bool dsLightShader::init( const vec2i& gBufResolution ) {
     GLint colSampler = glGetUniformLocation( program.getProgramId(), "gBufDiffuse" );
     GLint nrmSampler = glGetUniformLocation( program.getProgramId(), "gBufNormal" );
     
-    resolutionId    = glGetUniformLocation( program.getProgramId(), "gBufResolution" );
-    
     if (    posSampler      == hge::pipeline::HGE_ATTRIB_INVALID
     ||      colSampler      == hge::pipeline::HGE_ATTRIB_INVALID
     ||      nrmSampler      == hge::pipeline::HGE_ATTRIB_INVALID
-    ||      resolutionId    == hge::pipeline::HGE_ATTRIB_INVALID
     ) {
         std::cerr << "ERROR: Unable to access point light uniforms." << std::endl;
         program.unload();
@@ -584,28 +567,9 @@ bool dsLightShader::init( const vec2i& gBufResolution ) {
     glUniform1i( colSampler, 1 ); // GL_COLOR_ATTACHMENT1
     glUniform1i( nrmSampler, 2 ); // GL_COLOR_ATTACHMENT2
     
-    setInputResolution( gBufResolution );
-    
     glUseProgram( 0 );
     
     return true;
-}
-
-/*
- * Resolution modification
- */
-void dsLightShader::setInputResolution( const vec2i& gBufResolution ) {
-    const vec2 res = vec2( (float)gBufResolution[0], (float)gBufResolution[1] );
-    glUniform2fv( resolutionId, 1, res.v );
-}
-
-/*
- * Binding
- */
-void dsLightShader::terminate() {
-    program.unload();
-    
-    resolutionId    = 0;
 }
 
 /******************************************************************************

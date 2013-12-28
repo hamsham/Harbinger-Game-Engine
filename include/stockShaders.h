@@ -228,24 +228,17 @@ class HGE_API dsGeometryShader final : public stockShader {
  * Deferred Renderer Light Pass for instanced lights
 ******************************************************************************/
 class HGE_API dsLightShader final : public stockShader {
-    private:
-        GLint resolutionId  = 0;
-        
     public:
-        dsLightShader() {}
+        dsLightShader() = default;
         dsLightShader   ( const dsLightShader& ) = delete;
-        dsLightShader   ( dsLightShader&& );
+        dsLightShader   ( dsLightShader&& ) = default;
         
         dsLightShader&  operator =  ( const dsLightShader& ) = delete;
-        dsLightShader&  operator =  ( dsLightShader&& );
+        dsLightShader&  operator =  ( dsLightShader&& ) = default;
         
         ~dsLightShader  () { terminate(); }
         
-        bool init       ( const vec2i& gBufferResolution );
-        bool init       () { return init( vec2i( 0,0 ) ); }
-        void terminate  ();
-        
-        void setInputResolution( const vec2i& );
+        bool init       ();
 };
 
 /******************************************************************************

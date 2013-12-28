@@ -15,15 +15,15 @@ namespace hge {
 ******************************************************************************/
 gBuffer::gBuffer( gBuffer&& gb ) :
     readBuffer( gb.readBuffer ),
-    fbo{ gb.fbo },
+    fbo( gb.fbo ),
     renderBuffer{ gb.renderBuffer },
-    textures{ gb.textures[0], gb.textures[1], gb.textures[2] },
+    textures{ gb.textures[0], gb.textures[1], gb.textures[2], gb.textures[3] },
     bufferRes( gb.bufferRes )
 {
     gb.readBuffer = GB_RENDER_BUFFER;
     gb.fbo = 0;
     gb.renderBuffer = 0;
-    gb.textures[0] = gb.textures[1] = gb.textures[2] = 0;
+    gb.textures[0] = gb.textures[1] = gb.textures[2] = gb.textures[3] = 0;
     gb.bufferRes = vec2i( 0,0 );
 }
 
@@ -36,12 +36,12 @@ gBuffer& gBuffer::operator =( gBuffer&& gb ) {
     gb.fbo = 0;
     
     renderBuffer = gb.renderBuffer;
-    gb.renderBuffer = 0;
     
     textures[0] = gb.textures[0];
     textures[1] = gb.textures[1];
     textures[2] = gb.textures[2];
-    gb.textures[0] = gb.textures[1] = gb.textures[2] = 0;
+    textures[3] = gb.textures[3];
+    gb.textures[0] = gb.textures[1] = gb.textures[2] = gb.textures[3] = 0;
     
     bufferRes = gb.bufferRes;
     gb.bufferRes = vec2i( 0,0 );
@@ -56,7 +56,7 @@ bool gBuffer::init( const vec2i& windowRes ) {
         // Create the FBO
         glGenFramebuffers( 1, &fbo );
         glGenRenderbuffers( 1, &renderBuffer );
-        glGenTextures( 3, textures );
+        glGenTextures( 4, textures );
 
         glBindFramebuffer( GL_DRAW_FRAMEBUFFER, fbo );
 
@@ -67,46 +67,57 @@ bool gBuffer::init( const vec2i& windowRes ) {
         }
     }
     
-    // initialize the depth buffer
-    glBindRenderbuffer( GL_RENDERBUFFER, renderBuffer );
-    glRenderbufferStorage( GL_RENDERBUFFER, GL_DEPTH_COMPONENT32, windowRes[0], windowRes[1] );
-    glFramebufferRenderbuffer(
-        GL_DRAW_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_RENDERBUFFER, renderBuffer
-    );
-    
     /*
-     * Positions buffer
+     * Positions
      */
     glBindTexture( GL_TEXTURE_RECTANGLE, textures[ 0 ] );
-    glTexImage2D( GL_TEXTURE_RECTANGLE, 0, GL_RGBA32F, windowRes[0], windowRes[1], 0, GL_BGRA, GL_FLOAT, nullptr );
+    glTexImage2D(GL_TEXTURE_RECTANGLE, 0, GL_RGBA16F, windowRes[0], windowRes[1], 0, GL_BGRA, GL_FLOAT, nullptr);
     glTexParameterf( GL_TEXTURE_RECTANGLE, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE );
     glTexParameterf( GL_TEXTURE_RECTANGLE, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE );
-    glTexParameterf( GL_TEXTURE_RECTANGLE, GL_TEXTURE_MIN_FILTER, GL_LINEAR );
-    glTexParameterf( GL_TEXTURE_RECTANGLE, GL_TEXTURE_MAG_FILTER, GL_LINEAR );
+    glTexParameterf( GL_TEXTURE_RECTANGLE, GL_TEXTURE_MIN_FILTER, GL_NEAREST );
+    glTexParameterf( GL_TEXTURE_RECTANGLE, GL_TEXTURE_MAG_FILTER, GL_NEAREST );
     
     /*
-     * Color buffer (uses RGB8 unsigned bytes)
+     * Albedo
      */
     glBindTexture( GL_TEXTURE_RECTANGLE, textures[ 1 ] );
-    glTexImage2D( GL_TEXTURE_RECTANGLE, 0, GL_RGBA, windowRes[0], windowRes[1], 0, GL_BGRA, GL_UNSIGNED_BYTE, nullptr );
+    glTexImage2D(GL_TEXTURE_RECTANGLE, 0, GL_RGBA8, windowRes[0], windowRes[1], 0, GL_BGRA, GL_UNSIGNED_BYTE, nullptr);
     glTexParameterf( GL_TEXTURE_RECTANGLE, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE );
     glTexParameterf( GL_TEXTURE_RECTANGLE, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE );
-    glTexParameterf( GL_TEXTURE_RECTANGLE, GL_TEXTURE_MIN_FILTER, GL_LINEAR );
-    glTexParameterf( GL_TEXTURE_RECTANGLE, GL_TEXTURE_MAG_FILTER, GL_LINEAR );
+    glTexParameterf( GL_TEXTURE_RECTANGLE, GL_TEXTURE_MIN_FILTER, GL_NEAREST );
+    glTexParameterf( GL_TEXTURE_RECTANGLE, GL_TEXTURE_MAG_FILTER, GL_NEAREST );
     
     /*
-     * Normals buffer
+     * Normals
      */
     glBindTexture( GL_TEXTURE_RECTANGLE, textures[ 2 ] );
-    glTexImage2D( GL_TEXTURE_RECTANGLE, 0, GL_RGBA16F, windowRes[0], windowRes[1], 0, GL_BGRA, GL_FLOAT, nullptr );
+    glTexImage2D(GL_TEXTURE_RECTANGLE, 0, GL_RGBA16F, windowRes[0], windowRes[1], 0, GL_BGRA, GL_FLOAT, nullptr);
     glTexParameterf( GL_TEXTURE_RECTANGLE, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE );
     glTexParameterf( GL_TEXTURE_RECTANGLE, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE );
-    glTexParameterf( GL_TEXTURE_RECTANGLE, GL_TEXTURE_MIN_FILTER, GL_LINEAR );
-    glTexParameterf( GL_TEXTURE_RECTANGLE, GL_TEXTURE_MAG_FILTER, GL_LINEAR );
+    glTexParameterf( GL_TEXTURE_RECTANGLE, GL_TEXTURE_MIN_FILTER, GL_NEAREST );
+    glTexParameterf( GL_TEXTURE_RECTANGLE, GL_TEXTURE_MAG_FILTER, GL_NEAREST );
     
-    glFramebufferTexture2D( GL_DRAW_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_RECTANGLE, textures[ 0 ], 0 );
-    glFramebufferTexture2D( GL_DRAW_FRAMEBUFFER, GL_COLOR_ATTACHMENT1, GL_TEXTURE_RECTANGLE, textures[ 1 ], 0 );
-    glFramebufferTexture2D( GL_DRAW_FRAMEBUFFER, GL_COLOR_ATTACHMENT2, GL_TEXTURE_RECTANGLE, textures[ 2 ], 0 );
+    /*
+     * Final composite
+     */
+    glBindTexture( GL_TEXTURE_RECTANGLE, textures[ 3 ] );
+    glTexImage2D(GL_TEXTURE_RECTANGLE, 0, GL_RGBA8, windowRes[0], windowRes[1], 0, GL_BGRA, GL_UNSIGNED_BYTE, nullptr);
+    glTexParameterf( GL_TEXTURE_RECTANGLE, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE );
+    glTexParameterf( GL_TEXTURE_RECTANGLE, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE );
+    glTexParameterf( GL_TEXTURE_RECTANGLE, GL_TEXTURE_MIN_FILTER, GL_NEAREST );
+    glTexParameterf( GL_TEXTURE_RECTANGLE, GL_TEXTURE_MAG_FILTER, GL_NEAREST );
+    
+    /*
+     * Depth
+     */
+    glBindRenderbuffer( GL_RENDERBUFFER, renderBuffer );
+    glRenderbufferStorage( GL_RENDERBUFFER, GL_DEPTH_COMPONENT32F, windowRes[0], windowRes[1] );
+    
+    glFramebufferTexture2D(GL_DRAW_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_RECTANGLE, textures[0], 0);
+    glFramebufferTexture2D(GL_DRAW_FRAMEBUFFER, GL_COLOR_ATTACHMENT1, GL_TEXTURE_RECTANGLE, textures[1], 0);
+    glFramebufferTexture2D(GL_DRAW_FRAMEBUFFER, GL_COLOR_ATTACHMENT2, GL_TEXTURE_RECTANGLE, textures[2], 0);
+    glFramebufferTexture2D(GL_DRAW_FRAMEBUFFER, GL_COLOR_ATTACHMENT3, GL_TEXTURE_RECTANGLE, textures[3], 0);
+    glFramebufferRenderbuffer(GL_DRAW_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_RENDERBUFFER, renderBuffer);
     
     // ensure the buffers were setup correctly
     GLenum fbStatus = glCheckFramebufferStatus( GL_FRAMEBUFFER );
@@ -145,20 +156,19 @@ void gBuffer::terminate() {
     fbo = 0;
     
     glDeleteRenderbuffers( 1, &renderBuffer );
-    renderBuffer = 0;
+    renderBuffer  = 0;
     
-    glDeleteTextures( 3, textures );
+    glDeleteTextures( 4, textures );
     textures[0] = 0;
     textures[1] = 0;
     textures[2] = 0;
+    textures[3] = 0;
 }
 
 /******************************************************************************
  * G-BUFFER GEOMETRY PASS
 ******************************************************************************/
 void gBuffer::bindForGeometryPass() const {
-    glBindFramebuffer( GL_FRAMEBUFFER, fbo );
-    
     const GLenum drawBuffers[] = {
         GL_COLOR_ATTACHMENT0,
         GL_COLOR_ATTACHMENT1,
@@ -169,10 +179,18 @@ void gBuffer::bindForGeometryPass() const {
 }
 
 /******************************************************************************
+ * G-BUFFER STENCIL PASS
+******************************************************************************/
+void gBuffer::bindForStencilPass() const {
+    // disable the draw buffers
+    glDrawBuffer( GL_NONE );
+}
+
+/******************************************************************************
  * G-BUFFER LIGHTING PASS
 ******************************************************************************/
 void gBuffer::bindForLightPass() const {
-    glDrawBuffer( 0 );
+    glDrawBuffer( GL_COLOR_ATTACHMENT3 );
     
     glActiveTexture( GL_TEXTURE0 );
     glBindTexture( GL_TEXTURE_RECTANGLE, textures[0] );
@@ -185,10 +203,20 @@ void gBuffer::bindForLightPass() const {
 }
 
 /******************************************************************************
+ * G-BUFFER FRAME INITIALIZATION
+******************************************************************************/
+void gBuffer::bindForWriting() const {
+    glBindFramebuffer( GL_DRAW_FRAMEBUFFER, fbo );
+    glDrawBuffer( GL_COLOR_ATTACHMENT3 );
+}
+
+/******************************************************************************
  * G-BUFFER FRAME ENDING
 ******************************************************************************/
-void gBuffer::unbind() const {
-    glBindFramebuffer( GL_FRAMEBUFFER, 0 );
+void gBuffer::bindForReading() const {
+    glBindFramebuffer( GL_DRAW_FRAMEBUFFER, 0 );
+    glBindFramebuffer( GL_READ_FRAMEBUFFER, fbo );
+    glReadBuffer( readBuffer );
 }
 
 /******************************************************************************

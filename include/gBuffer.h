@@ -18,14 +18,14 @@ class HGE_API gBuffer {
             GB_POSITION_BUFFER  = GL_COLOR_ATTACHMENT0,
             GB_DIFFUSE_BUFFER   = GL_COLOR_ATTACHMENT1,
             GB_NORMAL_BUFFER    = GL_COLOR_ATTACHMENT2,
-            GB_RENDER_BUFFER    = 0
+            GB_RENDER_BUFFER    = GL_COLOR_ATTACHMENT3
         };
         
     private:
         buffer_target   readBuffer          = GB_RENDER_BUFFER;
         GLuint          fbo                 = 0;
         GLuint          renderBuffer        = 0; // depth/stencil buffer
-        GLuint          textures[ 3 ]       = { 0,0,0 }; // positions, colors, normals, composite
+        GLuint          textures[ 4 ]       = { 0,0,0,0 }; // positions, colors, normals, composite
         vec2i           bufferRes;
         
     public:
@@ -52,20 +52,33 @@ class HGE_API gBuffer {
          * be rendered normally, as if the default framebuffer was already active
          */
         
-        // Draw all geometry here, call GlClear()
+        void bindForWriting() const; // use at the start of deferred rendering
+        // call GlClear() here
         void bindForGeometryPass() const;
-        
-        // Light pass, draw fonts and skybox afterwards
+        // Draw all geometry here
+        void bindForStencilPass() const;
+        // initial light pass
         void bindForLightPass() const;
-        
-        void unbind() const;
+        // second light pass
+        // draw fonts and skybox here
+        void bindForReading() const;
+        // use to back to the default framebuffer
         
         void setReadBuffer( buffer_target b ) { readBuffer = b; }
+        
+        void drawBuffer() const;
         
 #ifdef DEBUG
         void drawBufferDebug() const;
 #endif
 };
+
+inline void gBuffer::drawBuffer() const {
+    glBlitFramebuffer(
+        0, 0, bufferRes[0], bufferRes[1], 0, 0, bufferRes[0], bufferRes[1],
+        GL_COLOR_BUFFER_BIT, GL_NEAREST
+    );
+}
 
 } // end hge namespace
 

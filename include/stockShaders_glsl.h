@@ -452,7 +452,7 @@ const char dsGeometryVs[] = R"***(
     layout ( location = 3 ) in vec3 tngVerts;
     layout ( location = 4 ) in vec3 btngVerts;
     
-    out vec3 posCoords;
+    out vec4 posCoords;
     out vec2 texCoords;
     out vec3 nrmCoords;
     out vec3 tngCoords;
@@ -460,9 +460,9 @@ const char dsGeometryVs[] = R"***(
     
     void main() {
         gl_Position = mvpMatrix * vec4( posVerts, 1.0 );
-        posCoords   = (modelMatrix * vec4( posVerts, 1.0 )).xyz;
+        posCoords   = modelMatrix * vec4(posVerts, 1.0);
         texCoords   = texVerts;
-        nrmCoords   = (modelMatrix * vec4( nrmVerts, 0.0 )).xyz;
+        nrmCoords   = (modelMatrix * vec4(nrmVerts, 0.0)).xyz;
         tngCoords   = (modelMatrix * vec4(tngVerts, 0.0)).xyz;
         btngCoords  = (modelMatrix * vec4(btngVerts, 0.0)).xyz;
     }
@@ -475,7 +475,7 @@ const char dsGeometryVs[] = R"***(
 const char dsGeometryFs[] = R"***(
     #version 330
     
-    in vec3 posCoords;
+    in vec4 posCoords;
     in vec2 texCoords;
     in vec3 nrmCoords;
     in vec3 tngCoords;
@@ -488,17 +488,17 @@ const char dsGeometryFs[] = R"***(
     uniform sampler2D diffuseMap;
     uniform sampler2D normalMap;
 
-    vec4 calcBumpedNormal() {
+    vec3 calcBumpedNormal() {
         vec3 bumpNormal = 2.0 * texture( normalMap, texCoords ).rgb - 1.0;
-        mat3 tbn        = mat3( tngCoords, btngCoords, nrmCoords );
+        mat3 tbn = mat3( tngCoords, btngCoords, nrmCoords );
 
         return normalize( tbn * bumpNormal );
     }
     
     void main() {
-        gBufPosition = vec4( posCoords, 1.0 );
+        gBufPosition = posCoords;
         gBufDiffuse = texture2D( diffuseMap, texCoords );
-        gBufNormal = calcBumpedNormal();
+        gBufNormal = vec4(calcBumpedNormal(), 0.0);
     }
     
 )***";
@@ -548,7 +548,6 @@ const char dsLightFs[] = R"***(
     uniform sampler2DRect   gBufPosition;
     uniform sampler2DRect   gBufDiffuse;
     uniform sampler2DRect   gBufNormal;
-    uniform vec2            gBufResolution;
     
     in vec3 lightPos;
     in vec4 lightCol;
@@ -556,14 +555,10 @@ const char dsLightFs[] = R"***(
 
     out vec4 fragCol;
 
-    vec2 calcTextureCoord() {
-        return gl_FragCoord.xy / gBufResolution;
-    }
-
     vec4 calcPointLight( in vec3 worldPos, in vec3 normals ) {
         vec3 lightDir   = worldPos - lightPos;
         float distance  = length( lightDir );
-        lightDir        = -normalize( lightDir );
+        lightDir        = normalize( -lightDir );
 
         float diffuse = max( 0.0, dot( normals, lightDir ) );
         float attenuation
@@ -575,11 +570,10 @@ const char dsLightFs[] = R"***(
     }
 
     void main() {
-        vec2 textureCoords  = calcTextureCoord();
-        vec4 worldPosition  = texture( gBufPosition, textureCoords ).xyz;
-        vec4 screenColor    = texture( gBufDiffuse, textureCoords );
-        vec3 normalCoords   = normalize( texture( gBufNormal, textureCoords ) ).xyz;
-        
+        vec3 worldPosition  = texture( gBufPosition, gl_FragCoord.xy ).xyz;
+        vec4 screenColor    = texture( gBufDiffuse, gl_FragCoord.xy );
+        vec3 normalCoords   = texture( gBufNormal, gl_FragCoord.xy ).xyz;
+       
         fragCol             = screenColor
                             * calcPointLight( worldPosition, normalCoords );
     }

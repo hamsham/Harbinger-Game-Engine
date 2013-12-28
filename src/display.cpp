@@ -143,6 +143,8 @@ window::window(
     glfwWindowHint( GLFW_STENCIL_BITS, 8 );
 #ifdef DEBUG
     glfwWindowHint( GLFW_OPENGL_DEBUG_CONTEXT, GL_TRUE );
+#else
+    glfwWindowHint( GLFW_OPENGL_DEBUG_CONTEXT, GL_FALSE );
 #endif
     
     pContext = glfwCreateWindow( w, h, "Harbinger Game Engine", fullscreen, nullptr );
@@ -152,7 +154,7 @@ window::window(
     glfwGetWindowSize       ( pContext, &resolution[0], &resolution[1] );
     glfwSetInputMode        ( pContext, GLFW_STICKY_KEYS, GL_TRUE );
     //glfwSwapInterval        ( (int)useVsync );
-    glfwSwapInterval        (1);
+    glfwSwapInterval        (0);
     
     displayFullscreen = fullscreen != nullptr;
     
@@ -203,8 +205,8 @@ bool window::isOpen() {
 //-----------------------------------------------------------------------------
 void window::flip() {
     glfwSwapBuffers         ( pContext );
-    //glfwPollEvents          ();
-    glfwWaitEvents          ();
+    glfwPollEvents          ();
+    //glfwWaitEvents          ();
 }
 
 //-----------------------------------------------------------------------------

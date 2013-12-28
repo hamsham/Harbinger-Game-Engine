@@ -37,7 +37,7 @@ bool dsRenderer::init( const vec2i& resolution ) {
 
         pDsLightShader = new( std::nothrow ) dsLightShader();
         HL_ASSERT( pDsLightShader != nullptr );
-        HL_ASSERT( pDsLightShader->init( resolution ) );
+        HL_ASSERT( pDsLightShader->init() );
 
         pNullShader = new( std::nothrow ) dsNullShader();
         HL_ASSERT( pNullShader != nullptr );
@@ -110,12 +110,9 @@ void dsRenderer::tick() {
     
     glEnable( GL_STENCIL_TEST );
     glClearStencil(0);
-    pGBuffer->bindForLightPass();
-    applyStockShader( pDsLightShader->getProgramId() );
     doStencilPass();
     doLightingPass();
     glDisable( GL_STENCIL_TEST );
-    pGBuffer->unbind();
     
     applyStockShader( pPlainShader->getProgramId() );
     drawSceneUnlit();
@@ -125,6 +122,9 @@ void dsRenderer::tick() {
     doBillboardPass();
     doSkyPass();
     doFontPass();
+    
+    pGBuffer->bindForReading();
+    pGBuffer->drawBuffer();
 }
 
 /*
@@ -133,8 +133,9 @@ void dsRenderer::tick() {
 void dsRenderer::doGeometryPass() {
     // Tell the GBuffer to prepare the next frame
     applyStockShader( pGeomShader->getProgramId() );
-    pGBuffer->bindForGeometryPass();
+    pGBuffer->bindForWriting();
     glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT );
+    pGBuffer->bindForGeometryPass();
     drawSceneLit();
 }
 
@@ -142,6 +143,9 @@ void dsRenderer::doGeometryPass() {
  * STENCIL BUFFER PASS
  */
 void dsRenderer::doStencilPass() {
+    // make sure that there is no on/offscreen rendering being performed
+    glDrawBuffer( GL_NONE );
+    
     // Disable color and depth writes to the stencil buffer
     glColorMask( GL_FALSE, GL_FALSE, GL_FALSE, GL_FALSE );
     glDepthMask( GL_FALSE ); // don't allow the stencil pass to update the depth buffer
@@ -159,6 +163,9 @@ void dsRenderer::doStencilPass() {
  * LIGHTING PASS
  */
 void dsRenderer::doLightingPass() {
+    applyStockShader( pDsLightShader->getProgramId() );
+    pGBuffer->bindForLightPass();
+    
     glDepthFunc( GL_GEQUAL );
     glCullFace( GL_FRONT );
     
@@ -182,9 +189,6 @@ void dsRenderer::doLightingPass() {
  */
 void dsRenderer::setResolution( const vec2i& res ) {
     pGBuffer->setBufferResolution( res );
-    
-    applyStockShader( pDsLightShader->getProgramId() );
-    pDsLightShader->setInputResolution( res );
     
     changeResolution( res );
 }

@@ -541,7 +541,7 @@ bool sphere::init( int recursionDepth ) {
         
         vert.uv = vec2(
             0.5f + (std::atan2(vert.norm[0], vert.norm[2])/HL_TWO_PI),
-            0.5 - (std::asin(vert.norm[1])/HL_PI)
+            0.5 - (std::asin(vert.norm[1])/-HL_PI)
         );
         
         // finally, do the tangents and bitangents

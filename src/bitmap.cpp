@@ -93,7 +93,7 @@ GLint loadImageFile( const char* filename, FIBITMAP** img, int* w, int* h ) {
         << " uses an unsupported file format " << (int)colorType
         << std::endl;
     
-    return false;;
+    return false;
 }
 
 //-----------------------------------------------------------------------------

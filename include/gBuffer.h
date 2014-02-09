@@ -73,13 +73,6 @@ class HGE_API gBuffer {
 #endif
 };
 
-inline void gBuffer::drawBuffer() const {
-    glBlitFramebuffer(
-        0, 0, bufferRes[0], bufferRes[1], 0, 0, bufferRes[0], bufferRes[1],
-        GL_COLOR_BUFFER_BIT, GL_NEAREST
-    );
-}
-
 } // end hge namespace
 
 #endif	/* __HGE_GBUFFER_H__ */

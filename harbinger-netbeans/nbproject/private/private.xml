@@ -16,8 +16,8 @@
     </editor-bookmarks>
     <open-files xmlns="http://www.netbeans.org/ns/projectui-open-files/2">
         <group>
-            <file>file:/C:/Users/hammy/C++/projects/harbinger/include/stockShaders_glsl.h</file>
-            <file>file:/C:/Users/hammy/C++/projects/harbinger/src/gBuffer.cpp</file>
+            <file>file:/C:/Users/hammy/C++/projects/harbinger/src/primitives.cpp</file>
+            <file>file:/C:/Users/hammy/C++/projects/harbinger/include/primitives.h</file>
         </group>
     </open-files>
 </project-private>

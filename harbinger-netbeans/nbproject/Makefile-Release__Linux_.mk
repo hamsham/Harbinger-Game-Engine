@@ -21,7 +21,7 @@ FC=gfortran
 AS=as
 
 # Macros
-CND_PLATFORM=MinGW_tdm-Windows
+CND_PLATFORM=MinGW-Windows
 CND_DLIB_EXT=dll
 CND_CONF=Release__Linux_
 CND_DISTDIR=dist
@@ -64,8 +64,8 @@ OBJECTFILES= \
 CFLAGS=
 
 # CC Compiler Flags
-CCFLAGS=-m64 -Wall -Werror -Wextra -pedantic -mmmx -msse -msse2 -msse3 -mfpmath=sse -O3 -fPIC
-CXXFLAGS=-m64 -Wall -Werror -Wextra -pedantic -mmmx -msse -msse2 -msse3 -mfpmath=sse -O3 -fPIC
+CCFLAGS=-m64 -Wall -Werror -Wextra -pedantic -mmmx -msse -msse2 -msse3 -mfpmath=sse -O3 -fPIC -flto
+CXXFLAGS=-m64 -Wall -Werror -Wextra -pedantic -mmmx -msse -msse2 -msse3 -mfpmath=sse -O3 -fPIC -flto
 
 # Fortran Compiler Flags
 FFLAGS=

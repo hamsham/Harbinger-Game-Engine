@@ -6,7 +6,7 @@
 
 # Macros
 TOP=`pwd`
-CND_PLATFORM=MinGW_tdm-Windows
+CND_PLATFORM=MinGW-Windows
 CND_CONF=Release__Linux_
 CND_DISTDIR=dist
 CND_BUILDDIR=build

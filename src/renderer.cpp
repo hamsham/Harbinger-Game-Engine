@@ -62,7 +62,7 @@ bool dsRenderer::init( const vec2i& resolution ) {
 #endif
         HL_ASSERT( lightSphere.init() );
     }
-    catch( const hamLibs::utils::errorType e ) {
+    catch( const hamLibs::utils::error_t e ) {
         terminate();
         return false;
     }
@@ -252,7 +252,7 @@ bool fwdRenderer::init() {
         printGlError("ENBT Shader setup error");
 #endif
     }
-    catch( const hamLibs::utils::errorType& e ) {
+    catch( const hamLibs::utils::error_t& e ) {
         terminate();
         return false;
     }

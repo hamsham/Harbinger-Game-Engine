@@ -105,7 +105,7 @@ class HGE_API camera {
         void        setUp           ( const vec3& up )      { yAxis = up; }
         const mat4& getViewMatrix   () const                { return viewMatrix; }
         const mat4& getProjMatrix   () const                { return projMatrix; }
-        mat4        getVPMatrix     () const                { return viewMatrix * projMatrix; }
+        mat4        getVPMatrix     () const                { return projMatrix*viewMatrix; }
         
         const quat& getOrientation  () const                { return orientation; }
         void        setOrientation  ( const quat& o )       { orientation = o; }

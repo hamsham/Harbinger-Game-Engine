@@ -80,12 +80,12 @@ input::action_t input::getMouseButtonState( input::mouse_t m ) {
 //      MOUSE POSITIONING
 ///////////////////////////////////////////////////////////////////////////////
 void input::setMousePos( const vec2d& pos ) {
-    glfwSetCursorPos( pContext, pos.index.x, pos.index.y );
+    glfwSetCursorPos( pContext, pos[0], pos[1] );
 }
 
 vec2d input::getMousePos() {
     vec2d pos;
-    glfwGetCursorPos( pContext, &pos.index.x, &pos.index.y );
+    glfwGetCursorPos( pContext, &pos[0], &pos[1] );
     return pos;
 }
 

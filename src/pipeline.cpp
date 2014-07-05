@@ -73,7 +73,7 @@ void pipeline::updateMatricesImpl() {
 void pipeline::applyMatrix( matrixType s, const mat4& m ) {
     // Update the current MVP matrix
     transforms[ s ] = m;
-    transforms[ 2 ] = transforms[ HGE_MODEL_MAT ] * transforms[ HGE_VP_MAT ];
+    transforms[ 2 ] = transforms[ HGE_VP_MAT ] * transforms[ HGE_MODEL_MAT ];
     
     updateMatricesImpl();
 }
@@ -82,7 +82,7 @@ void pipeline::applyMatrix( const drawTransform& obj, const camera& cam ) {
     // Update the current MVP matrix
     transforms[ HGE_MODEL_MAT ] = obj.getModelMatrix();
     transforms[ HGE_VP_MAT ] = cam.getVPMatrix();
-    transforms[ 2 ] = transforms[ HGE_MODEL_MAT ] * transforms[ HGE_VP_MAT ];
+    transforms[ 2 ] = transforms[ HGE_VP_MAT ] * transforms[ HGE_MODEL_MAT ];
     
     updateMatricesImpl();
 }

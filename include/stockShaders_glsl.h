@@ -439,6 +439,8 @@ const char enbtFS[] = R"***(
  */
 const char dsGeometryVs[] = R"***(
     #version 330
+
+    precision lowp float;
     
     layout ( std140 ) uniform matrixBlock {
         mat4 modelMatrix;
@@ -474,6 +476,8 @@ const char dsGeometryVs[] = R"***(
  */
 const char dsGeometryFs[] = R"***(
     #version 330
+
+    precision lowp float;
     
     in vec4 posCoords;
     in vec2 texCoords;
@@ -511,6 +515,8 @@ const char dsGeometryFs[] = R"***(
  */
 const char dsLightVs[] = R"***(
     #version 330
+
+    precision lowp float;
     
     layout ( std140 ) uniform matrixBlock {
         mat4 modelMatrix;
@@ -544,6 +550,8 @@ const char dsLightVs[] = R"***(
  */
 const char dsLightFs[] = R"***(
     #version 330
+
+    precision lowp float;
     
     uniform sampler2DRect   gBufPosition;
     uniform sampler2DRect   gBufDiffuse;
@@ -587,6 +595,8 @@ const char dsLightFs[] = R"***(
  */
 const char nullVs[] = R"***(
     #version 330
+
+    precision lowp float;
     
     layout ( std140 ) uniform matrixBlock {
         mat4 modelMatrix;

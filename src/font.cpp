@@ -8,7 +8,7 @@
 #include <iostream>
 #include <utility>
 
-#include <ft2build.h>
+#include <freetype2/ft2build.h>
 #include FT_FREETYPE_H
 
 #include "font.h"

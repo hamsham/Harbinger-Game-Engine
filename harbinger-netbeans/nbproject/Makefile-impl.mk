@@ -31,7 +31,7 @@ DEFAULTCONF=Debug_WIN32_DLL
 CONF=${DEFAULTCONF}
 
 # All Configurations
-ALLCONFS=Debug_WIN32_DLL Release_WIN32_DLL Debug__Linux_ Release__Linux_ 
+ALLCONFS=Debug_WIN32_DLL Release_WIN32_DLL 
 
 
 # build

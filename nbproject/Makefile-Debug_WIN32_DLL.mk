@@ -95,117 +95,117 @@ LDLIBSOPTIONS=-lglew32 -lglfw3dll -lopengl32 -lFreeImage -lassimp.dll -lfreetype
 ${OBJECTDIR}/src/application.o: nbproject/Makefile-${CND_CONF}.mk src/application.cpp 
 	${MKDIR} -p ${OBJECTDIR}/src
 	${RM} "$@.d"
-	$(COMPILE.cc) -w -DDEBUG -DHGE_BUILD_DYNAMIC -I../../../../../../MinGW32/include/freetype2 -I../HamLibs/include -Iinclude -std=c++11  -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/src/application.o src/application.cpp
+	$(COMPILE.cc) -w -DDEBUG -DHGE_BUILD_DYNAMIC -I../../../../../../MinGW32/include/freetype2 -I../HamLibs/include -Iinclude -I. -std=c++11  -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/src/application.o src/application.cpp
 
 ${OBJECTDIR}/src/billboard.o: nbproject/Makefile-${CND_CONF}.mk src/billboard.cpp 
 	${MKDIR} -p ${OBJECTDIR}/src
 	${RM} "$@.d"
-	$(COMPILE.cc) -w -DDEBUG -DHGE_BUILD_DYNAMIC -I../../../../../../MinGW32/include/freetype2 -I../HamLibs/include -Iinclude -std=c++11  -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/src/billboard.o src/billboard.cpp
+	$(COMPILE.cc) -w -DDEBUG -DHGE_BUILD_DYNAMIC -I../../../../../../MinGW32/include/freetype2 -I../HamLibs/include -Iinclude -I. -std=c++11  -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/src/billboard.o src/billboard.cpp
 
 ${OBJECTDIR}/src/bitmap.o: nbproject/Makefile-${CND_CONF}.mk src/bitmap.cpp 
 	${MKDIR} -p ${OBJECTDIR}/src
 	${RM} "$@.d"
-	$(COMPILE.cc) -w -DDEBUG -DHGE_BUILD_DYNAMIC -I../../../../../../MinGW32/include/freetype2 -I../HamLibs/include -Iinclude -std=c++11  -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/src/bitmap.o src/bitmap.cpp
+	$(COMPILE.cc) -w -DDEBUG -DHGE_BUILD_DYNAMIC -I../../../../../../MinGW32/include/freetype2 -I../HamLibs/include -Iinclude -I. -std=c++11  -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/src/bitmap.o src/bitmap.cpp
 
 ${OBJECTDIR}/src/camera.o: nbproject/Makefile-${CND_CONF}.mk src/camera.cpp 
 	${MKDIR} -p ${OBJECTDIR}/src
 	${RM} "$@.d"
-	$(COMPILE.cc) -w -DDEBUG -DHGE_BUILD_DYNAMIC -I../../../../../../MinGW32/include/freetype2 -I../HamLibs/include -Iinclude -std=c++11  -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/src/camera.o src/camera.cpp
+	$(COMPILE.cc) -w -DDEBUG -DHGE_BUILD_DYNAMIC -I../../../../../../MinGW32/include/freetype2 -I../HamLibs/include -Iinclude -I. -std=c++11  -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/src/camera.o src/camera.cpp
 
 ${OBJECTDIR}/src/display.o: nbproject/Makefile-${CND_CONF}.mk src/display.cpp 
 	${MKDIR} -p ${OBJECTDIR}/src
 	${RM} "$@.d"
-	$(COMPILE.cc) -w -DDEBUG -DHGE_BUILD_DYNAMIC -I../../../../../../MinGW32/include/freetype2 -I../HamLibs/include -Iinclude -std=c++11  -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/src/display.o src/display.cpp
+	$(COMPILE.cc) -w -DDEBUG -DHGE_BUILD_DYNAMIC -I../../../../../../MinGW32/include/freetype2 -I../HamLibs/include -Iinclude -I. -std=c++11  -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/src/display.o src/display.cpp
 
 ${OBJECTDIR}/src/drawable.o: nbproject/Makefile-${CND_CONF}.mk src/drawable.cpp 
 	${MKDIR} -p ${OBJECTDIR}/src
 	${RM} "$@.d"
-	$(COMPILE.cc) -w -DDEBUG -DHGE_BUILD_DYNAMIC -I../../../../../../MinGW32/include/freetype2 -I../HamLibs/include -Iinclude -std=c++11  -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/src/drawable.o src/drawable.cpp
+	$(COMPILE.cc) -w -DDEBUG -DHGE_BUILD_DYNAMIC -I../../../../../../MinGW32/include/freetype2 -I../HamLibs/include -Iinclude -I. -std=c++11  -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/src/drawable.o src/drawable.cpp
 
 ${OBJECTDIR}/src/font.o: nbproject/Makefile-${CND_CONF}.mk src/font.cpp 
 	${MKDIR} -p ${OBJECTDIR}/src
 	${RM} "$@.d"
-	$(COMPILE.cc) -w -DDEBUG -DHGE_BUILD_DYNAMIC -I../../../../../../MinGW32/include/freetype2 -I../HamLibs/include -Iinclude -std=c++11  -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/src/font.o src/font.cpp
+	$(COMPILE.cc) -w -DDEBUG -DHGE_BUILD_DYNAMIC -I../../../../../../MinGW32/include/freetype2 -I../HamLibs/include -Iinclude -I. -std=c++11  -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/src/font.o src/font.cpp
 
 ${OBJECTDIR}/src/gBuffer.o: nbproject/Makefile-${CND_CONF}.mk src/gBuffer.cpp 
 	${MKDIR} -p ${OBJECTDIR}/src
 	${RM} "$@.d"
-	$(COMPILE.cc) -w -DDEBUG -DHGE_BUILD_DYNAMIC -I../../../../../../MinGW32/include/freetype2 -I../HamLibs/include -Iinclude -std=c++11  -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/src/gBuffer.o src/gBuffer.cpp
+	$(COMPILE.cc) -w -DDEBUG -DHGE_BUILD_DYNAMIC -I../../../../../../MinGW32/include/freetype2 -I../HamLibs/include -Iinclude -I. -std=c++11  -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/src/gBuffer.o src/gBuffer.cpp
 
 ${OBJECTDIR}/src/geometry.o: nbproject/Makefile-${CND_CONF}.mk src/geometry.cpp 
 	${MKDIR} -p ${OBJECTDIR}/src
 	${RM} "$@.d"
-	$(COMPILE.cc) -w -DDEBUG -DHGE_BUILD_DYNAMIC -I../../../../../../MinGW32/include/freetype2 -I../HamLibs/include -Iinclude -std=c++11  -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/src/geometry.o src/geometry.cpp
+	$(COMPILE.cc) -w -DDEBUG -DHGE_BUILD_DYNAMIC -I../../../../../../MinGW32/include/freetype2 -I../HamLibs/include -Iinclude -I. -std=c++11  -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/src/geometry.o src/geometry.cpp
 
 ${OBJECTDIR}/src/harbinger.o: nbproject/Makefile-${CND_CONF}.mk src/harbinger.cpp 
 	${MKDIR} -p ${OBJECTDIR}/src
 	${RM} "$@.d"
-	$(COMPILE.cc) -w -DDEBUG -DHGE_BUILD_DYNAMIC -I../../../../../../MinGW32/include/freetype2 -I../HamLibs/include -Iinclude -std=c++11  -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/src/harbinger.o src/harbinger.cpp
+	$(COMPILE.cc) -w -DDEBUG -DHGE_BUILD_DYNAMIC -I../../../../../../MinGW32/include/freetype2 -I../HamLibs/include -Iinclude -I. -std=c++11  -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/src/harbinger.o src/harbinger.cpp
 
 ${OBJECTDIR}/src/input.o: nbproject/Makefile-${CND_CONF}.mk src/input.cpp 
 	${MKDIR} -p ${OBJECTDIR}/src
 	${RM} "$@.d"
-	$(COMPILE.cc) -w -DDEBUG -DHGE_BUILD_DYNAMIC -I../../../../../../MinGW32/include/freetype2 -I../HamLibs/include -Iinclude -std=c++11  -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/src/input.o src/input.cpp
+	$(COMPILE.cc) -w -DDEBUG -DHGE_BUILD_DYNAMIC -I../../../../../../MinGW32/include/freetype2 -I../HamLibs/include -Iinclude -I. -std=c++11  -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/src/input.o src/input.cpp
 
 ${OBJECTDIR}/src/light.o: nbproject/Makefile-${CND_CONF}.mk src/light.cpp 
 	${MKDIR} -p ${OBJECTDIR}/src
 	${RM} "$@.d"
-	$(COMPILE.cc) -w -DDEBUG -DHGE_BUILD_DYNAMIC -I../../../../../../MinGW32/include/freetype2 -I../HamLibs/include -Iinclude -std=c++11  -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/src/light.o src/light.cpp
+	$(COMPILE.cc) -w -DDEBUG -DHGE_BUILD_DYNAMIC -I../../../../../../MinGW32/include/freetype2 -I../HamLibs/include -Iinclude -I. -std=c++11  -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/src/light.o src/light.cpp
 
 ${OBJECTDIR}/src/mesh.o: nbproject/Makefile-${CND_CONF}.mk src/mesh.cpp 
 	${MKDIR} -p ${OBJECTDIR}/src
 	${RM} "$@.d"
-	$(COMPILE.cc) -w -DDEBUG -DHGE_BUILD_DYNAMIC -I../../../../../../MinGW32/include/freetype2 -I../HamLibs/include -Iinclude -std=c++11  -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/src/mesh.o src/mesh.cpp
+	$(COMPILE.cc) -w -DDEBUG -DHGE_BUILD_DYNAMIC -I../../../../../../MinGW32/include/freetype2 -I../HamLibs/include -Iinclude -I. -std=c++11  -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/src/mesh.o src/mesh.cpp
 
 ${OBJECTDIR}/src/pipeline.o: nbproject/Makefile-${CND_CONF}.mk src/pipeline.cpp 
 	${MKDIR} -p ${OBJECTDIR}/src
 	${RM} "$@.d"
-	$(COMPILE.cc) -w -DDEBUG -DHGE_BUILD_DYNAMIC -I../../../../../../MinGW32/include/freetype2 -I../HamLibs/include -Iinclude -std=c++11  -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/src/pipeline.o src/pipeline.cpp
+	$(COMPILE.cc) -w -DDEBUG -DHGE_BUILD_DYNAMIC -I../../../../../../MinGW32/include/freetype2 -I../HamLibs/include -Iinclude -I. -std=c++11  -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/src/pipeline.o src/pipeline.cpp
 
 ${OBJECTDIR}/src/primitives.o: nbproject/Makefile-${CND_CONF}.mk src/primitives.cpp 
 	${MKDIR} -p ${OBJECTDIR}/src
 	${RM} "$@.d"
-	$(COMPILE.cc) -w -DDEBUG -DHGE_BUILD_DYNAMIC -I../../../../../../MinGW32/include/freetype2 -I../HamLibs/include -Iinclude -std=c++11  -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/src/primitives.o src/primitives.cpp
+	$(COMPILE.cc) -w -DDEBUG -DHGE_BUILD_DYNAMIC -I../../../../../../MinGW32/include/freetype2 -I../HamLibs/include -Iinclude -I. -std=c++11  -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/src/primitives.o src/primitives.cpp
 
 ${OBJECTDIR}/src/renderer.o: nbproject/Makefile-${CND_CONF}.mk src/renderer.cpp 
 	${MKDIR} -p ${OBJECTDIR}/src
 	${RM} "$@.d"
-	$(COMPILE.cc) -w -DDEBUG -DHGE_BUILD_DYNAMIC -I../../../../../../MinGW32/include/freetype2 -I../HamLibs/include -Iinclude -std=c++11  -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/src/renderer.o src/renderer.cpp
+	$(COMPILE.cc) -w -DDEBUG -DHGE_BUILD_DYNAMIC -I../../../../../../MinGW32/include/freetype2 -I../HamLibs/include -Iinclude -I. -std=c++11  -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/src/renderer.o src/renderer.cpp
 
 ${OBJECTDIR}/src/resource.o: nbproject/Makefile-${CND_CONF}.mk src/resource.cpp 
 	${MKDIR} -p ${OBJECTDIR}/src
 	${RM} "$@.d"
-	$(COMPILE.cc) -w -DDEBUG -DHGE_BUILD_DYNAMIC -I../../../../../../MinGW32/include/freetype2 -I../HamLibs/include -Iinclude -std=c++11  -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/src/resource.o src/resource.cpp
+	$(COMPILE.cc) -w -DDEBUG -DHGE_BUILD_DYNAMIC -I../../../../../../MinGW32/include/freetype2 -I../HamLibs/include -Iinclude -I. -std=c++11  -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/src/resource.o src/resource.cpp
 
 ${OBJECTDIR}/src/shader.o: nbproject/Makefile-${CND_CONF}.mk src/shader.cpp 
 	${MKDIR} -p ${OBJECTDIR}/src
 	${RM} "$@.d"
-	$(COMPILE.cc) -w -DDEBUG -DHGE_BUILD_DYNAMIC -I../../../../../../MinGW32/include/freetype2 -I../HamLibs/include -Iinclude -std=c++11  -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/src/shader.o src/shader.cpp
+	$(COMPILE.cc) -w -DDEBUG -DHGE_BUILD_DYNAMIC -I../../../../../../MinGW32/include/freetype2 -I../HamLibs/include -Iinclude -I. -std=c++11  -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/src/shader.o src/shader.cpp
 
 ${OBJECTDIR}/src/shadowMap.o: nbproject/Makefile-${CND_CONF}.mk src/shadowMap.cpp 
 	${MKDIR} -p ${OBJECTDIR}/src
 	${RM} "$@.d"
-	$(COMPILE.cc) -w -DDEBUG -DHGE_BUILD_DYNAMIC -I../../../../../../MinGW32/include/freetype2 -I../HamLibs/include -Iinclude -std=c++11  -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/src/shadowMap.o src/shadowMap.cpp
+	$(COMPILE.cc) -w -DDEBUG -DHGE_BUILD_DYNAMIC -I../../../../../../MinGW32/include/freetype2 -I../HamLibs/include -Iinclude -I. -std=c++11  -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/src/shadowMap.o src/shadowMap.cpp
 
 ${OBJECTDIR}/src/skybox.o: nbproject/Makefile-${CND_CONF}.mk src/skybox.cpp 
 	${MKDIR} -p ${OBJECTDIR}/src
 	${RM} "$@.d"
-	$(COMPILE.cc) -w -DDEBUG -DHGE_BUILD_DYNAMIC -I../../../../../../MinGW32/include/freetype2 -I../HamLibs/include -Iinclude -std=c++11  -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/src/skybox.o src/skybox.cpp
+	$(COMPILE.cc) -w -DDEBUG -DHGE_BUILD_DYNAMIC -I../../../../../../MinGW32/include/freetype2 -I../HamLibs/include -Iinclude -I. -std=c++11  -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/src/skybox.o src/skybox.cpp
 
 ${OBJECTDIR}/src/stockShaders.o: nbproject/Makefile-${CND_CONF}.mk src/stockShaders.cpp 
 	${MKDIR} -p ${OBJECTDIR}/src
 	${RM} "$@.d"
-	$(COMPILE.cc) -w -DDEBUG -DHGE_BUILD_DYNAMIC -I../../../../../../MinGW32/include/freetype2 -I../HamLibs/include -Iinclude -std=c++11  -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/src/stockShaders.o src/stockShaders.cpp
+	$(COMPILE.cc) -w -DDEBUG -DHGE_BUILD_DYNAMIC -I../../../../../../MinGW32/include/freetype2 -I../HamLibs/include -Iinclude -I. -std=c++11  -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/src/stockShaders.o src/stockShaders.cpp
 
 ${OBJECTDIR}/src/text.o: nbproject/Makefile-${CND_CONF}.mk src/text.cpp 
 	${MKDIR} -p ${OBJECTDIR}/src
 	${RM} "$@.d"
-	$(COMPILE.cc) -w -DDEBUG -DHGE_BUILD_DYNAMIC -I../../../../../../MinGW32/include/freetype2 -I../HamLibs/include -Iinclude -std=c++11  -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/src/text.o src/text.cpp
+	$(COMPILE.cc) -w -DDEBUG -DHGE_BUILD_DYNAMIC -I../../../../../../MinGW32/include/freetype2 -I../HamLibs/include -Iinclude -I. -std=c++11  -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/src/text.o src/text.cpp
 
 ${OBJECTDIR}/src/transformations.o: nbproject/Makefile-${CND_CONF}.mk src/transformations.cpp 
 	${MKDIR} -p ${OBJECTDIR}/src
 	${RM} "$@.d"
-	$(COMPILE.cc) -w -DDEBUG -DHGE_BUILD_DYNAMIC -I../../../../../../MinGW32/include/freetype2 -I../HamLibs/include -Iinclude -std=c++11  -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/src/transformations.o src/transformations.cpp
+	$(COMPILE.cc) -w -DDEBUG -DHGE_BUILD_DYNAMIC -I../../../../../../MinGW32/include/freetype2 -I../HamLibs/include -Iinclude -I. -std=c++11  -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/src/transformations.o src/transformations.cpp
 
 # Subprojects
 .build-subprojects:
@@ -221,25 +221,25 @@ ${OBJECTDIR}/src/transformations.o: nbproject/Makefile-${CND_CONF}.mk src/transf
 ${TESTDIR}/tests/Deferred_Test/blankNormalMap.o: tests/Deferred_Test/blankNormalMap.cpp 
 	${MKDIR} -p ${TESTDIR}/tests/Deferred_Test
 	${RM} "$@.d"
-	$(COMPILE.cc) -w -DDEBUG -DHGE_BUILD_DYNAMIC -I../../../../../../MinGW32/include/freetype2 -I../HamLibs/include -Iinclude -I. -std=c++11 -MMD -MP -MF "$@.d" -o ${TESTDIR}/tests/Deferred_Test/blankNormalMap.o tests/Deferred_Test/blankNormalMap.cpp
+	$(COMPILE.cc) -w -DDEBUG -DHGE_BUILD_DYNAMIC -I../../../../../../MinGW32/include/freetype2 -I../HamLibs/include -Iinclude -I. -I. -std=c++11 -MMD -MP -MF "$@.d" -o ${TESTDIR}/tests/Deferred_Test/blankNormalMap.o tests/Deferred_Test/blankNormalMap.cpp
 
 
 ${TESTDIR}/tests/Deferred_Test/logicApp.o: tests/Deferred_Test/logicApp.cpp 
 	${MKDIR} -p ${TESTDIR}/tests/Deferred_Test
 	${RM} "$@.d"
-	$(COMPILE.cc) -w -DDEBUG -DHGE_BUILD_DYNAMIC -I../../../../../../MinGW32/include/freetype2 -I../HamLibs/include -Iinclude -I. -std=c++11 -MMD -MP -MF "$@.d" -o ${TESTDIR}/tests/Deferred_Test/logicApp.o tests/Deferred_Test/logicApp.cpp
+	$(COMPILE.cc) -w -DDEBUG -DHGE_BUILD_DYNAMIC -I../../../../../../MinGW32/include/freetype2 -I../HamLibs/include -Iinclude -I. -I. -std=c++11 -MMD -MP -MF "$@.d" -o ${TESTDIR}/tests/Deferred_Test/logicApp.o tests/Deferred_Test/logicApp.cpp
 
 
 ${TESTDIR}/tests/Deferred_Test/main.o: tests/Deferred_Test/main.cpp 
 	${MKDIR} -p ${TESTDIR}/tests/Deferred_Test
 	${RM} "$@.d"
-	$(COMPILE.cc) -w -DDEBUG -DHGE_BUILD_DYNAMIC -I../../../../../../MinGW32/include/freetype2 -I../HamLibs/include -Iinclude -I. -std=c++11 -MMD -MP -MF "$@.d" -o ${TESTDIR}/tests/Deferred_Test/main.o tests/Deferred_Test/main.cpp
+	$(COMPILE.cc) -w -DDEBUG -DHGE_BUILD_DYNAMIC -I../../../../../../MinGW32/include/freetype2 -I../HamLibs/include -Iinclude -I. -I. -std=c++11 -MMD -MP -MF "$@.d" -o ${TESTDIR}/tests/Deferred_Test/main.o tests/Deferred_Test/main.cpp
 
 
 ${TESTDIR}/tests/Deferred_Test/renderApp.o: tests/Deferred_Test/renderApp.cpp 
 	${MKDIR} -p ${TESTDIR}/tests/Deferred_Test
 	${RM} "$@.d"
-	$(COMPILE.cc) -w -DDEBUG -DHGE_BUILD_DYNAMIC -I../../../../../../MinGW32/include/freetype2 -I../HamLibs/include -Iinclude -I. -std=c++11 -MMD -MP -MF "$@.d" -o ${TESTDIR}/tests/Deferred_Test/renderApp.o tests/Deferred_Test/renderApp.cpp
+	$(COMPILE.cc) -w -DDEBUG -DHGE_BUILD_DYNAMIC -I../../../../../../MinGW32/include/freetype2 -I../HamLibs/include -Iinclude -I. -I. -std=c++11 -MMD -MP -MF "$@.d" -o ${TESTDIR}/tests/Deferred_Test/renderApp.o tests/Deferred_Test/renderApp.cpp
 
 
 ${OBJECTDIR}/src/application_nomain.o: ${OBJECTDIR}/src/application.o src/application.cpp 
@@ -250,7 +250,7 @@ ${OBJECTDIR}/src/application_nomain.o: ${OBJECTDIR}/src/application.o src/applic
 	   (echo "$$NMOUTPUT" | ${GREP} 'T _main$$'); \
 	then  \
 	    ${RM} "$@.d";\
-	    $(COMPILE.cc) -w -DDEBUG -DHGE_BUILD_DYNAMIC -I../../../../../../MinGW32/include/freetype2 -I../HamLibs/include -Iinclude -std=c++11  -Dmain=__nomain -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/src/application_nomain.o src/application.cpp;\
+	    $(COMPILE.cc) -w -DDEBUG -DHGE_BUILD_DYNAMIC -I../../../../../../MinGW32/include/freetype2 -I../HamLibs/include -Iinclude -I. -std=c++11  -Dmain=__nomain -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/src/application_nomain.o src/application.cpp;\
 	else  \
 	    ${CP} ${OBJECTDIR}/src/application.o ${OBJECTDIR}/src/application_nomain.o;\
 	fi
@@ -263,7 +263,7 @@ ${OBJECTDIR}/src/billboard_nomain.o: ${OBJECTDIR}/src/billboard.o src/billboard.
 	   (echo "$$NMOUTPUT" | ${GREP} 'T _main$$'); \
 	then  \
 	    ${RM} "$@.d";\
-	    $(COMPILE.cc) -w -DDEBUG -DHGE_BUILD_DYNAMIC -I../../../../../../MinGW32/include/freetype2 -I../HamLibs/include -Iinclude -std=c++11  -Dmain=__nomain -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/src/billboard_nomain.o src/billboard.cpp;\
+	    $(COMPILE.cc) -w -DDEBUG -DHGE_BUILD_DYNAMIC -I../../../../../../MinGW32/include/freetype2 -I../HamLibs/include -Iinclude -I. -std=c++11  -Dmain=__nomain -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/src/billboard_nomain.o src/billboard.cpp;\
 	else  \
 	    ${CP} ${OBJECTDIR}/src/billboard.o ${OBJECTDIR}/src/billboard_nomain.o;\
 	fi
@@ -276,7 +276,7 @@ ${OBJECTDIR}/src/bitmap_nomain.o: ${OBJECTDIR}/src/bitmap.o src/bitmap.cpp
 	   (echo "$$NMOUTPUT" | ${GREP} 'T _main$$'); \
 	then  \
 	    ${RM} "$@.d";\
-	    $(COMPILE.cc) -w -DDEBUG -DHGE_BUILD_DYNAMIC -I../../../../../../MinGW32/include/freetype2 -I../HamLibs/include -Iinclude -std=c++11  -Dmain=__nomain -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/src/bitmap_nomain.o src/bitmap.cpp;\
+	    $(COMPILE.cc) -w -DDEBUG -DHGE_BUILD_DYNAMIC -I../../../../../../MinGW32/include/freetype2 -I../HamLibs/include -Iinclude -I. -std=c++11  -Dmain=__nomain -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/src/bitmap_nomain.o src/bitmap.cpp;\
 	else  \
 	    ${CP} ${OBJECTDIR}/src/bitmap.o ${OBJECTDIR}/src/bitmap_nomain.o;\
 	fi
@@ -289,7 +289,7 @@ ${OBJECTDIR}/src/camera_nomain.o: ${OBJECTDIR}/src/camera.o src/camera.cpp
 	   (echo "$$NMOUTPUT" | ${GREP} 'T _main$$'); \
 	then  \
 	    ${RM} "$@.d";\
-	    $(COMPILE.cc) -w -DDEBUG -DHGE_BUILD_DYNAMIC -I../../../../../../MinGW32/include/freetype2 -I../HamLibs/include -Iinclude -std=c++11  -Dmain=__nomain -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/src/camera_nomain.o src/camera.cpp;\
+	    $(COMPILE.cc) -w -DDEBUG -DHGE_BUILD_DYNAMIC -I../../../../../../MinGW32/include/freetype2 -I../HamLibs/include -Iinclude -I. -std=c++11  -Dmain=__nomain -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/src/camera_nomain.o src/camera.cpp;\
 	else  \
 	    ${CP} ${OBJECTDIR}/src/camera.o ${OBJECTDIR}/src/camera_nomain.o;\
 	fi
@@ -302,7 +302,7 @@ ${OBJECTDIR}/src/display_nomain.o: ${OBJECTDIR}/src/display.o src/display.cpp
 	   (echo "$$NMOUTPUT" | ${GREP} 'T _main$$'); \
 	then  \
 	    ${RM} "$@.d";\
-	    $(COMPILE.cc) -w -DDEBUG -DHGE_BUILD_DYNAMIC -I../../../../../../MinGW32/include/freetype2 -I../HamLibs/include -Iinclude -std=c++11  -Dmain=__nomain -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/src/display_nomain.o src/display.cpp;\
+	    $(COMPILE.cc) -w -DDEBUG -DHGE_BUILD_DYNAMIC -I../../../../../../MinGW32/include/freetype2 -I../HamLibs/include -Iinclude -I. -std=c++11  -Dmain=__nomain -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/src/display_nomain.o src/display.cpp;\
 	else  \
 	    ${CP} ${OBJECTDIR}/src/display.o ${OBJECTDIR}/src/display_nomain.o;\
 	fi
@@ -315,7 +315,7 @@ ${OBJECTDIR}/src/drawable_nomain.o: ${OBJECTDIR}/src/drawable.o src/drawable.cpp
 	   (echo "$$NMOUTPUT" | ${GREP} 'T _main$$'); \
 	then  \
 	    ${RM} "$@.d";\
-	    $(COMPILE.cc) -w -DDEBUG -DHGE_BUILD_DYNAMIC -I../../../../../../MinGW32/include/freetype2 -I../HamLibs/include -Iinclude -std=c++11  -Dmain=__nomain -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/src/drawable_nomain.o src/drawable.cpp;\
+	    $(COMPILE.cc) -w -DDEBUG -DHGE_BUILD_DYNAMIC -I../../../../../../MinGW32/include/freetype2 -I../HamLibs/include -Iinclude -I. -std=c++11  -Dmain=__nomain -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/src/drawable_nomain.o src/drawable.cpp;\
 	else  \
 	    ${CP} ${OBJECTDIR}/src/drawable.o ${OBJECTDIR}/src/drawable_nomain.o;\
 	fi
@@ -328,7 +328,7 @@ ${OBJECTDIR}/src/font_nomain.o: ${OBJECTDIR}/src/font.o src/font.cpp
 	   (echo "$$NMOUTPUT" | ${GREP} 'T _main$$'); \
 	then  \
 	    ${RM} "$@.d";\
-	    $(COMPILE.cc) -w -DDEBUG -DHGE_BUILD_DYNAMIC -I../../../../../../MinGW32/include/freetype2 -I../HamLibs/include -Iinclude -std=c++11  -Dmain=__nomain -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/src/font_nomain.o src/font.cpp;\
+	    $(COMPILE.cc) -w -DDEBUG -DHGE_BUILD_DYNAMIC -I../../../../../../MinGW32/include/freetype2 -I../HamLibs/include -Iinclude -I. -std=c++11  -Dmain=__nomain -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/src/font_nomain.o src/font.cpp;\
 	else  \
 	    ${CP} ${OBJECTDIR}/src/font.o ${OBJECTDIR}/src/font_nomain.o;\
 	fi
@@ -341,7 +341,7 @@ ${OBJECTDIR}/src/gBuffer_nomain.o: ${OBJECTDIR}/src/gBuffer.o src/gBuffer.cpp
 	   (echo "$$NMOUTPUT" | ${GREP} 'T _main$$'); \
 	then  \
 	    ${RM} "$@.d";\
-	    $(COMPILE.cc) -w -DDEBUG -DHGE_BUILD_DYNAMIC -I../../../../../../MinGW32/include/freetype2 -I../HamLibs/include -Iinclude -std=c++11  -Dmain=__nomain -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/src/gBuffer_nomain.o src/gBuffer.cpp;\
+	    $(COMPILE.cc) -w -DDEBUG -DHGE_BUILD_DYNAMIC -I../../../../../../MinGW32/include/freetype2 -I../HamLibs/include -Iinclude -I. -std=c++11  -Dmain=__nomain -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/src/gBuffer_nomain.o src/gBuffer.cpp;\
 	else  \
 	    ${CP} ${OBJECTDIR}/src/gBuffer.o ${OBJECTDIR}/src/gBuffer_nomain.o;\
 	fi
@@ -354,7 +354,7 @@ ${OBJECTDIR}/src/geometry_nomain.o: ${OBJECTDIR}/src/geometry.o src/geometry.cpp
 	   (echo "$$NMOUTPUT" | ${GREP} 'T _main$$'); \
 	then  \
 	    ${RM} "$@.d";\
-	    $(COMPILE.cc) -w -DDEBUG -DHGE_BUILD_DYNAMIC -I../../../../../../MinGW32/include/freetype2 -I../HamLibs/include -Iinclude -std=c++11  -Dmain=__nomain -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/src/geometry_nomain.o src/geometry.cpp;\
+	    $(COMPILE.cc) -w -DDEBUG -DHGE_BUILD_DYNAMIC -I../../../../../../MinGW32/include/freetype2 -I../HamLibs/include -Iinclude -I. -std=c++11  -Dmain=__nomain -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/src/geometry_nomain.o src/geometry.cpp;\
 	else  \
 	    ${CP} ${OBJECTDIR}/src/geometry.o ${OBJECTDIR}/src/geometry_nomain.o;\
 	fi
@@ -367,7 +367,7 @@ ${OBJECTDIR}/src/harbinger_nomain.o: ${OBJECTDIR}/src/harbinger.o src/harbinger.
 	   (echo "$$NMOUTPUT" | ${GREP} 'T _main$$'); \
 	then  \
 	    ${RM} "$@.d";\
-	    $(COMPILE.cc) -w -DDEBUG -DHGE_BUILD_DYNAMIC -I../../../../../../MinGW32/include/freetype2 -I../HamLibs/include -Iinclude -std=c++11  -Dmain=__nomain -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/src/harbinger_nomain.o src/harbinger.cpp;\
+	    $(COMPILE.cc) -w -DDEBUG -DHGE_BUILD_DYNAMIC -I../../../../../../MinGW32/include/freetype2 -I../HamLibs/include -Iinclude -I. -std=c++11  -Dmain=__nomain -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/src/harbinger_nomain.o src/harbinger.cpp;\
 	else  \
 	    ${CP} ${OBJECTDIR}/src/harbinger.o ${OBJECTDIR}/src/harbinger_nomain.o;\
 	fi
@@ -380,7 +380,7 @@ ${OBJECTDIR}/src/input_nomain.o: ${OBJECTDIR}/src/input.o src/input.cpp
 	   (echo "$$NMOUTPUT" | ${GREP} 'T _main$$'); \
 	then  \
 	    ${RM} "$@.d";\
-	    $(COMPILE.cc) -w -DDEBUG -DHGE_BUILD_DYNAMIC -I../../../../../../MinGW32/include/freetype2 -I../HamLibs/include -Iinclude -std=c++11  -Dmain=__nomain -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/src/input_nomain.o src/input.cpp;\
+	    $(COMPILE.cc) -w -DDEBUG -DHGE_BUILD_DYNAMIC -I../../../../../../MinGW32/include/freetype2 -I../HamLibs/include -Iinclude -I. -std=c++11  -Dmain=__nomain -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/src/input_nomain.o src/input.cpp;\
 	else  \
 	    ${CP} ${OBJECTDIR}/src/input.o ${OBJECTDIR}/src/input_nomain.o;\
 	fi
@@ -393,7 +393,7 @@ ${OBJECTDIR}/src/light_nomain.o: ${OBJECTDIR}/src/light.o src/light.cpp
 	   (echo "$$NMOUTPUT" | ${GREP} 'T _main$$'); \
 	then  \
 	    ${RM} "$@.d";\
-	    $(COMPILE.cc) -w -DDEBUG -DHGE_BUILD_DYNAMIC -I../../../../../../MinGW32/include/freetype2 -I../HamLibs/include -Iinclude -std=c++11  -Dmain=__nomain -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/src/light_nomain.o src/light.cpp;\
+	    $(COMPILE.cc) -w -DDEBUG -DHGE_BUILD_DYNAMIC -I../../../../../../MinGW32/include/freetype2 -I../HamLibs/include -Iinclude -I. -std=c++11  -Dmain=__nomain -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/src/light_nomain.o src/light.cpp;\
 	else  \
 	    ${CP} ${OBJECTDIR}/src/light.o ${OBJECTDIR}/src/light_nomain.o;\
 	fi
@@ -406,7 +406,7 @@ ${OBJECTDIR}/src/mesh_nomain.o: ${OBJECTDIR}/src/mesh.o src/mesh.cpp
 	   (echo "$$NMOUTPUT" | ${GREP} 'T _main$$'); \
 	then  \
 	    ${RM} "$@.d";\
-	    $(COMPILE.cc) -w -DDEBUG -DHGE_BUILD_DYNAMIC -I../../../../../../MinGW32/include/freetype2 -I../HamLibs/include -Iinclude -std=c++11  -Dmain=__nomain -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/src/mesh_nomain.o src/mesh.cpp;\
+	    $(COMPILE.cc) -w -DDEBUG -DHGE_BUILD_DYNAMIC -I../../../../../../MinGW32/include/freetype2 -I../HamLibs/include -Iinclude -I. -std=c++11  -Dmain=__nomain -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/src/mesh_nomain.o src/mesh.cpp;\
 	else  \
 	    ${CP} ${OBJECTDIR}/src/mesh.o ${OBJECTDIR}/src/mesh_nomain.o;\
 	fi
@@ -419,7 +419,7 @@ ${OBJECTDIR}/src/pipeline_nomain.o: ${OBJECTDIR}/src/pipeline.o src/pipeline.cpp
 	   (echo "$$NMOUTPUT" | ${GREP} 'T _main$$'); \
 	then  \
 	    ${RM} "$@.d";\
-	    $(COMPILE.cc) -w -DDEBUG -DHGE_BUILD_DYNAMIC -I../../../../../../MinGW32/include/freetype2 -I../HamLibs/include -Iinclude -std=c++11  -Dmain=__nomain -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/src/pipeline_nomain.o src/pipeline.cpp;\
+	    $(COMPILE.cc) -w -DDEBUG -DHGE_BUILD_DYNAMIC -I../../../../../../MinGW32/include/freetype2 -I../HamLibs/include -Iinclude -I. -std=c++11  -Dmain=__nomain -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/src/pipeline_nomain.o src/pipeline.cpp;\
 	else  \
 	    ${CP} ${OBJECTDIR}/src/pipeline.o ${OBJECTDIR}/src/pipeline_nomain.o;\
 	fi
@@ -432,7 +432,7 @@ ${OBJECTDIR}/src/primitives_nomain.o: ${OBJECTDIR}/src/primitives.o src/primitiv
 	   (echo "$$NMOUTPUT" | ${GREP} 'T _main$$'); \
 	then  \
 	    ${RM} "$@.d";\
-	    $(COMPILE.cc) -w -DDEBUG -DHGE_BUILD_DYNAMIC -I../../../../../../MinGW32/include/freetype2 -I../HamLibs/include -Iinclude -std=c++11  -Dmain=__nomain -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/src/primitives_nomain.o src/primitives.cpp;\
+	    $(COMPILE.cc) -w -DDEBUG -DHGE_BUILD_DYNAMIC -I../../../../../../MinGW32/include/freetype2 -I../HamLibs/include -Iinclude -I. -std=c++11  -Dmain=__nomain -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/src/primitives_nomain.o src/primitives.cpp;\
 	else  \
 	    ${CP} ${OBJECTDIR}/src/primitives.o ${OBJECTDIR}/src/primitives_nomain.o;\
 	fi
@@ -445,7 +445,7 @@ ${OBJECTDIR}/src/renderer_nomain.o: ${OBJECTDIR}/src/renderer.o src/renderer.cpp
 	   (echo "$$NMOUTPUT" | ${GREP} 'T _main$$'); \
 	then  \
 	    ${RM} "$@.d";\
-	    $(COMPILE.cc) -w -DDEBUG -DHGE_BUILD_DYNAMIC -I../../../../../../MinGW32/include/freetype2 -I../HamLibs/include -Iinclude -std=c++11  -Dmain=__nomain -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/src/renderer_nomain.o src/renderer.cpp;\
+	    $(COMPILE.cc) -w -DDEBUG -DHGE_BUILD_DYNAMIC -I../../../../../../MinGW32/include/freetype2 -I../HamLibs/include -Iinclude -I. -std=c++11  -Dmain=__nomain -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/src/renderer_nomain.o src/renderer.cpp;\
 	else  \
 	    ${CP} ${OBJECTDIR}/src/renderer.o ${OBJECTDIR}/src/renderer_nomain.o;\
 	fi
@@ -458,7 +458,7 @@ ${OBJECTDIR}/src/resource_nomain.o: ${OBJECTDIR}/src/resource.o src/resource.cpp
 	   (echo "$$NMOUTPUT" | ${GREP} 'T _main$$'); \
 	then  \
 	    ${RM} "$@.d";\
-	    $(COMPILE.cc) -w -DDEBUG -DHGE_BUILD_DYNAMIC -I../../../../../../MinGW32/include/freetype2 -I../HamLibs/include -Iinclude -std=c++11  -Dmain=__nomain -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/src/resource_nomain.o src/resource.cpp;\
+	    $(COMPILE.cc) -w -DDEBUG -DHGE_BUILD_DYNAMIC -I../../../../../../MinGW32/include/freetype2 -I../HamLibs/include -Iinclude -I. -std=c++11  -Dmain=__nomain -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/src/resource_nomain.o src/resource.cpp;\
 	else  \
 	    ${CP} ${OBJECTDIR}/src/resource.o ${OBJECTDIR}/src/resource_nomain.o;\
 	fi
@@ -471,7 +471,7 @@ ${OBJECTDIR}/src/shader_nomain.o: ${OBJECTDIR}/src/shader.o src/shader.cpp
 	   (echo "$$NMOUTPUT" | ${GREP} 'T _main$$'); \
 	then  \
 	    ${RM} "$@.d";\
-	    $(COMPILE.cc) -w -DDEBUG -DHGE_BUILD_DYNAMIC -I../../../../../../MinGW32/include/freetype2 -I../HamLibs/include -Iinclude -std=c++11  -Dmain=__nomain -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/src/shader_nomain.o src/shader.cpp;\
+	    $(COMPILE.cc) -w -DDEBUG -DHGE_BUILD_DYNAMIC -I../../../../../../MinGW32/include/freetype2 -I../HamLibs/include -Iinclude -I. -std=c++11  -Dmain=__nomain -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/src/shader_nomain.o src/shader.cpp;\
 	else  \
 	    ${CP} ${OBJECTDIR}/src/shader.o ${OBJECTDIR}/src/shader_nomain.o;\
 	fi
@@ -484,7 +484,7 @@ ${OBJECTDIR}/src/shadowMap_nomain.o: ${OBJECTDIR}/src/shadowMap.o src/shadowMap.
 	   (echo "$$NMOUTPUT" | ${GREP} 'T _main$$'); \
 	then  \
 	    ${RM} "$@.d";\
-	    $(COMPILE.cc) -w -DDEBUG -DHGE_BUILD_DYNAMIC -I../../../../../../MinGW32/include/freetype2 -I../HamLibs/include -Iinclude -std=c++11  -Dmain=__nomain -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/src/shadowMap_nomain.o src/shadowMap.cpp;\
+	    $(COMPILE.cc) -w -DDEBUG -DHGE_BUILD_DYNAMIC -I../../../../../../MinGW32/include/freetype2 -I../HamLibs/include -Iinclude -I. -std=c++11  -Dmain=__nomain -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/src/shadowMap_nomain.o src/shadowMap.cpp;\
 	else  \
 	    ${CP} ${OBJECTDIR}/src/shadowMap.o ${OBJECTDIR}/src/shadowMap_nomain.o;\
 	fi
@@ -497,7 +497,7 @@ ${OBJECTDIR}/src/skybox_nomain.o: ${OBJECTDIR}/src/skybox.o src/skybox.cpp
 	   (echo "$$NMOUTPUT" | ${GREP} 'T _main$$'); \
 	then  \
 	    ${RM} "$@.d";\
-	    $(COMPILE.cc) -w -DDEBUG -DHGE_BUILD_DYNAMIC -I../../../../../../MinGW32/include/freetype2 -I../HamLibs/include -Iinclude -std=c++11  -Dmain=__nomain -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/src/skybox_nomain.o src/skybox.cpp;\
+	    $(COMPILE.cc) -w -DDEBUG -DHGE_BUILD_DYNAMIC -I../../../../../../MinGW32/include/freetype2 -I../HamLibs/include -Iinclude -I. -std=c++11  -Dmain=__nomain -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/src/skybox_nomain.o src/skybox.cpp;\
 	else  \
 	    ${CP} ${OBJECTDIR}/src/skybox.o ${OBJECTDIR}/src/skybox_nomain.o;\
 	fi
@@ -510,7 +510,7 @@ ${OBJECTDIR}/src/stockShaders_nomain.o: ${OBJECTDIR}/src/stockShaders.o src/stoc
 	   (echo "$$NMOUTPUT" | ${GREP} 'T _main$$'); \
 	then  \
 	    ${RM} "$@.d";\
-	    $(COMPILE.cc) -w -DDEBUG -DHGE_BUILD_DYNAMIC -I../../../../../../MinGW32/include/freetype2 -I../HamLibs/include -Iinclude -std=c++11  -Dmain=__nomain -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/src/stockShaders_nomain.o src/stockShaders.cpp;\
+	    $(COMPILE.cc) -w -DDEBUG -DHGE_BUILD_DYNAMIC -I../../../../../../MinGW32/include/freetype2 -I../HamLibs/include -Iinclude -I. -std=c++11  -Dmain=__nomain -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/src/stockShaders_nomain.o src/stockShaders.cpp;\
 	else  \
 	    ${CP} ${OBJECTDIR}/src/stockShaders.o ${OBJECTDIR}/src/stockShaders_nomain.o;\
 	fi
@@ -523,7 +523,7 @@ ${OBJECTDIR}/src/text_nomain.o: ${OBJECTDIR}/src/text.o src/text.cpp
 	   (echo "$$NMOUTPUT" | ${GREP} 'T _main$$'); \
 	then  \
 	    ${RM} "$@.d";\
-	    $(COMPILE.cc) -w -DDEBUG -DHGE_BUILD_DYNAMIC -I../../../../../../MinGW32/include/freetype2 -I../HamLibs/include -Iinclude -std=c++11  -Dmain=__nomain -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/src/text_nomain.o src/text.cpp;\
+	    $(COMPILE.cc) -w -DDEBUG -DHGE_BUILD_DYNAMIC -I../../../../../../MinGW32/include/freetype2 -I../HamLibs/include -Iinclude -I. -std=c++11  -Dmain=__nomain -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/src/text_nomain.o src/text.cpp;\
 	else  \
 	    ${CP} ${OBJECTDIR}/src/text.o ${OBJECTDIR}/src/text_nomain.o;\
 	fi
@@ -536,7 +536,7 @@ ${OBJECTDIR}/src/transformations_nomain.o: ${OBJECTDIR}/src/transformations.o sr
 	   (echo "$$NMOUTPUT" | ${GREP} 'T _main$$'); \
 	then  \
 	    ${RM} "$@.d";\
-	    $(COMPILE.cc) -w -DDEBUG -DHGE_BUILD_DYNAMIC -I../../../../../../MinGW32/include/freetype2 -I../HamLibs/include -Iinclude -std=c++11  -Dmain=__nomain -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/src/transformations_nomain.o src/transformations.cpp;\
+	    $(COMPILE.cc) -w -DDEBUG -DHGE_BUILD_DYNAMIC -I../../../../../../MinGW32/include/freetype2 -I../HamLibs/include -Iinclude -I. -std=c++11  -Dmain=__nomain -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/src/transformations_nomain.o src/transformations.cpp;\
 	else  \
 	    ${CP} ${OBJECTDIR}/src/transformations.o ${OBJECTDIR}/src/transformations_nomain.o;\
 	fi

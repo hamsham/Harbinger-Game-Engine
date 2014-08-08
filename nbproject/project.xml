@@ -13,7 +13,9 @@
                 <make-dep-project>C:/Users/miles/C++/projects/HamLibs</make-dep-project>
             </make-dep-projects>
             <sourceRootList>
-                <sourceRootElem>..</sourceRootElem>
+                <sourceRootElem>include</sourceRootElem>
+                <sourceRootElem>src</sourceRootElem>
+                <sourceRootElem>bin</sourceRootElem>
             </sourceRootList>
             <confList>
                 <confElem>

@@ -81,7 +81,9 @@
     </logicalFolder>
   </logicalFolder>
   <sourceRootList>
-    <Elem>..</Elem>
+    <Elem>include</Elem>
+    <Elem>src</Elem>
+    <Elem>bin</Elem>
   </sourceRootList>
   <projectmakefile>Makefile</projectmakefile>
   <confs>
@@ -100,6 +102,7 @@
             <pElem>../../../../../../MinGW32/include/freetype2</pElem>
             <pElem>../HamLibs/include</pElem>
             <pElem>include</pElem>
+            <pElem>.</pElem>
           </incDir>
           <commandLine>-ggdb -Wall -Werror -Wextra -pedantic -mmmx -msse -msse2 -msse3 -mfpmath=sse -O2 -ffast-math -s -shared -fPIC</commandLine>
           <preprocessorList>

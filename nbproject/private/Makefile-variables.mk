@@ -3,5 +3,5 @@
 #
 # NOCDDL
 #
-# Debug_WIN32_DLL configuration
-# Release_WIN32_DLL configuration
+# Debug_WIN32 configuration
+# Release_WIN32 configuration

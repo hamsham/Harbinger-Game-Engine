@@ -10,7 +10,6 @@
             <sourceEncoding>UTF-8</sourceEncoding>
             <make-dep-projects>
                 <make-dep-project>../HamLibs</make-dep-project>
-                <make-dep-project>C:/Users/miles/C++/projects/HamLibs</make-dep-project>
             </make-dep-projects>
             <sourceRootList>
                 <sourceRootElem>include</sourceRootElem>
@@ -19,11 +18,11 @@
             </sourceRootList>
             <confList>
                 <confElem>
-                    <name>Debug_WIN32_DLL</name>
+                    <name>Debug_WIN32</name>
                     <type>2</type>
                 </confElem>
                 <confElem>
-                    <name>Release_WIN32_DLL</name>
+                    <name>Release_WIN32</name>
                     <type>2</type>
                 </confElem>
             </confList>

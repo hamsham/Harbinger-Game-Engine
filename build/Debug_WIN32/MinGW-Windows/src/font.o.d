@@ -1,4 +1,4 @@
-build/Debug_WIN32_DLL/MinGW-Windows/src/font.o: src/font.cpp \
+build/Debug_WIN32/MinGW-Windows/src/font.o: src/font.cpp \
  ../../../../../MinGW32/include/freetype2/freetype.h \
  ../../../../../MinGW32/include/freetype2/ft2build.h \
  ../../../../../MinGW32/include/freetype2/config/ftconfig.h \

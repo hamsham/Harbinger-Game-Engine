@@ -80,13 +80,13 @@ FFLAGS=
 ASFLAGS=
 
 # Link Libraries and Options
-LDLIBSOPTIONS=-lglew32 -lglfw3dll -lopengl32 -lFreeImage -lassimp.dll -lfreetype ../HamLibs/bin/WIN32/libhamlibs.a
+LDLIBSOPTIONS=-lglew32 -lglfw3dll -lopengl32 -lFreeImage -lassimp.dll -lfreetype ../HamLibs/./bin/WIN32/libhamlibs.a
 
 # Build Targets
 .build-conf: ${BUILD_SUBPROJECTS}
 	"${MAKE}"  -f nbproject/Makefile-${CND_CONF}.mk ./bin/WIN32/harbinger.dll
 
-./bin/WIN32/harbinger.dll: ../HamLibs/bin/WIN32/libhamlibs.a
+./bin/WIN32/harbinger.dll: ../HamLibs/./bin/WIN32/libhamlibs.a
 
 ./bin/WIN32/harbinger.dll: ${OBJECTFILES}
 	${MKDIR} -p ./bin/WIN32
@@ -209,12 +209,13 @@ ${OBJECTDIR}/src/transformations.o: nbproject/Makefile-${CND_CONF}.mk src/transf
 
 # Subprojects
 .build-subprojects:
+	cd ../HamLibs && ${MAKE}  -f Makefile CONF=Release
 
 # Build Test Targets
 .build-tests-conf: .build-conf ${TESTFILES}
 ../../bin/hge_deferred_test: ${TESTDIR}/tests/Deferred_Test/blankNormalMap.o ${TESTDIR}/tests/Deferred_Test/logicApp.o ${TESTDIR}/tests/Deferred_Test/main.o ${TESTDIR}/tests/Deferred_Test/renderApp.o ${OBJECTFILES:%.o=%_nomain.o}
 	${MKDIR} -p ../../bin
-	${LINK.cc}   -o ../../bin/hge_deferred_test -s $^ ${LDLIBSOPTIONS} ../HamLibs/bin/WIN32/libhamlibs.a 
+	${LINK.cc}   -o ../../bin/hge_deferred_test -s $^ ${LDLIBSOPTIONS} ../HamLibs/./bin/WIN32/libhamlibs.a 
 
 
 ${TESTDIR}/tests/Deferred_Test/blankNormalMap.o: tests/Deferred_Test/blankNormalMap.cpp 
@@ -556,6 +557,7 @@ ${OBJECTDIR}/src/transformations_nomain.o: ${OBJECTDIR}/src/transformations.o sr
 
 # Subprojects
 .clean-subprojects:
+	cd ../HamLibs && ${MAKE}  -f Makefile CONF=Release clean
 
 # Enable dependency checking
 .dep.inc: .depcheck-impl

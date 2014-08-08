@@ -122,11 +122,11 @@
                             CT="3"
                             CN="Release"
                             AC="true"
-                            BL="false"
+                            BL="true"
                             WD="../HamLibs"
                             BC="${MAKE}  -f Makefile CONF=Release"
                             CC="${MAKE}  -f Makefile CONF=Release clean"
-                            OP="bin/WIN32/libhamlibs.a">
+                            OP="./bin/WIN32/libhamlibs.a">
               </makeArtifact>
             </linkerLibProjectItem>
           </linkerLibItems>
@@ -153,11 +153,11 @@
                             CT="3"
                             CN="Release"
                             AC="true"
-                            BL="false"
+                            BL="true"
                             WD="../HamLibs"
                             BC="${MAKE}  -f Makefile CONF=Release"
                             CC="${MAKE}  -f Makefile CONF=Release clean"
-                            OP="bin/WIN32/libhamlibs.a">
+                            OP="./bin/WIN32/libhamlibs.a">
               </makeArtifact>
             </linkerLibProjectItem>
           </linkerLibItems>
@@ -348,11 +348,11 @@
                             CT="3"
                             CN="Release"
                             AC="true"
-                            BL="false"
+                            BL="true"
                             WD="../HamLibs"
                             BC="${MAKE}  -f Makefile CONF=Release"
                             CC="${MAKE}  -f Makefile CONF=Release clean"
-                            OP="bin/WIN32/libhamlibs.a">
+                            OP="./bin/WIN32/libhamlibs.a">
               </makeArtifact>
             </linkerLibProjectItem>
           </linkerLibItems>
@@ -379,11 +379,11 @@
                             CT="3"
                             CN="Release"
                             AC="true"
-                            BL="false"
+                            BL="true"
                             WD="../HamLibs"
                             BC="${MAKE}  -f Makefile CONF=Release"
                             CC="${MAKE}  -f Makefile CONF=Release clean"
-                            OP="bin/WIN32/libhamlibs.a">
+                            OP="./bin/WIN32/libhamlibs.a">
               </makeArtifact>
             </linkerLibProjectItem>
           </linkerLibItems>
